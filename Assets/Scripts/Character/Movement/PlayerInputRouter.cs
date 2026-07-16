@@ -19,6 +19,13 @@ namespace Project.Character.Movement
         [SerializeField] private LayerMask groundLayer;
         [SerializeField] private LayerMask enemyLayer;
 
+        private bool isPointerOverUI;
+
+        private void Update()
+        {
+            isPointerOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+        }
+
         /// <summary>
         /// Called by the Input System when the Move action changes value,
         /// carrying the WASD or gamepad stick axis.
@@ -38,7 +45,7 @@ namespace Project.Character.Movement
         /// <param name="context">Callback context for the move click action.</param>
         public void OnMoveClick(InputAction.CallbackContext context)
         {
-            if (!context.performed || IsPointerOverUI())
+            if (!context.performed || isPointerOverUI)
             {
                 return;
             }
@@ -61,7 +68,7 @@ namespace Project.Character.Movement
         /// <param name="context">Callback context for the attack click action.</param>
         public void OnAttackClick(InputAction.CallbackContext context)
         {
-            if (!context.performed || IsPointerOverUI())
+            if (!context.performed || isPointerOverUI)
             {
                 return;
             }
@@ -73,11 +80,6 @@ namespace Project.Character.Movement
             {
                 targetSelector.SelectTarget(hit.collider);
             }
-        }
-
-        private bool IsPointerOverUI()
-        {
-            return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
         }
     }
 }

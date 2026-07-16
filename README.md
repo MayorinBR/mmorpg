@@ -48,6 +48,8 @@
 
 # \- Item drop system (loot tables rolled on enemy death) and inventory data structure (stacking, capacity)
 
+# \- Inventory UI (slot grid with icon and quantity)
+
 # 
 
 # \---
@@ -92,6 +94,8 @@
 
 # \- Sistema de drop de item (tabelas de loot roladas na morte do inimigo) e estrutura de dados de inventário (empilhamento, capacidade)
 
+# \- UI de inventário (grade de slots com ícone e quantidade)
+
 # 
 
 # \---
@@ -135,4 +139,6 @@
 # \- 経験値バーUI
 
 # \- アイテムドロップシステム(敵の死亡時に抽選されるルートテーブル)とインベントリのデータ構造(スタック、容量制限)
+
+# \- インベントリUI(アイコンと数量を表示するスロットグリッド)
 
