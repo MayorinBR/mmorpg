@@ -46,6 +46,8 @@
 
 # \- Experience bar UI
 
+# \- Item drop system (loot tables rolled on enemy death) and inventory data structure (stacking, capacity)
+
 # 
 
 # \---
@@ -88,6 +90,8 @@
 
 # \- UI de barra de experiência
 
+# \- Sistema de drop de item (tabelas de loot roladas na morte do inimigo) e estrutura de dados de inventário (empilhamento, capacidade)
+
 # 
 
 # \---
@@ -129,4 +133,6 @@
 # \- 経験値(XP)とレベルアップシステム、レベルごとにステータスポイントを付与
 
 # \- 経験値バーUI
+
+# \- アイテムドロップシステム(敵の死亡時に抽選されるルートテーブル)とインベントリのデータ構造(スタック、容量制限)
 

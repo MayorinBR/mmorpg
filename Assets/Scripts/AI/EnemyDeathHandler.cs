@@ -3,15 +3,14 @@ using UnityEngine;
 using UnityEngine.AI;
 using Project.Character.Combat;
 using Project.Combat;
+using Project.Items;
 
 namespace Project.AI
 {
     /// <summary>
-    /// Reacts to the enemy's death by granting experience to the player,
+    /// Reacts to the enemy's death by granting experience, spawning loot,
     /// hiding the enemy, waiting a fixed delay, then reviving it at its
-    /// spawn point. Kept as a separate listener so this respawn behavior
-    /// can be extended later (loot drops, death animation) without changing
-    /// <see cref="HealthComponent"/> or <see cref="EnemyController"/>.
+    /// spawn point.
     /// </summary>
     [RequireComponent(typeof(HealthComponent))]
     public class EnemyDeathHandler : MonoBehaviour
@@ -23,6 +22,8 @@ namespace Project.AI
         [SerializeField] private Renderer visualRenderer;
         [SerializeField] private GameObject healthBarRoot;
         [SerializeField] private PlayerExperience playerExperience;
+        [SerializeField] private LootTableDefinition lootTable;
+        [SerializeField] private ItemPickup itemPickupPrefab;
         [SerializeField] private float respawnDelaySeconds = 5f;
 
         private void OnEnable()
@@ -42,7 +43,22 @@ namespace Project.AI
                 playerExperience.AddExperience(controller.Stats.ExperienceReward);
             }
 
+            SpawnLoot();
             StartCoroutine(RespawnRoutine());
+        }
+
+        private void SpawnLoot()
+        {
+            if (lootTable == null || itemPickupPrefab == null)
+            {
+                return;
+            }
+
+            foreach (var (item, quantity) in lootTable.RollDrops())
+            {
+                var pickup = Instantiate(itemPickupPrefab, transform.position, Quaternion.identity);
+                pickup.Initialize(item, quantity);
+            }
         }
 
         private IEnumerator RespawnRoutine()

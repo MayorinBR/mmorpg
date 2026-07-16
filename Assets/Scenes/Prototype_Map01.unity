@@ -1773,6 +1773,7 @@ GameObject:
   - component: {fileID: 401280846}
   - component: {fileID: 401280847}
   - component: {fileID: 401280848}
+  - component: {fileID: 401280849}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -2092,6 +2093,19 @@ MonoBehaviour:
   statsController: {fileID: 401280845}
   health: {fileID: 401280843}
   statPointsPerLevel: 5
+--- !u!114 &401280849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 401280833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a32361e65ab5f94d8d2e4ac9193539c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Project.Items.PlayerInventory
+  capacity: 20
 --- !u!1 &406763598
 GameObject:
   m_ObjectHideFlags: 0
@@ -3687,6 +3701,8 @@ MonoBehaviour:
   visualRenderer: {fileID: 880199557}
   healthBarRoot: {fileID: 1479974159}
   playerExperience: {fileID: 401280848}
+  lootTable: {fileID: 11400000, guid: 957a1806e79264448a2c24e60531c9a4, type: 2}
+  itemPickupPrefab: {fileID: 5243884865457942396, guid: 4bd359e73ab1ce44894ebcea38886042, type: 3}
   respawnDelaySeconds: 5
 --- !u!114 &880199563
 MonoBehaviour:
