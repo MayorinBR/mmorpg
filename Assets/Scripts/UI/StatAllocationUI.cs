@@ -14,6 +14,7 @@ namespace Project.UI
     {
         [SerializeField] private PlayerStatsController statsController;
         [SerializeField] private PlayerExperience experience;
+        [SerializeField] private Items.EquipmentManager equipment;
         [SerializeField] private TMP_Text availablePointsText;
         [SerializeField] private StatRowUI[] statRows;
 
@@ -28,6 +29,11 @@ namespace Project.UI
             {
                 experience.LeveledUp += HandleLeveledUp;
             }
+
+            if (equipment != null)
+            {
+                equipment.EquipmentChanged += RefreshAll;
+            }
         }
 
         private void OnDisable()
@@ -40,6 +46,11 @@ namespace Project.UI
             if (experience != null)
             {
                 experience.LeveledUp -= HandleLeveledUp;
+            }
+
+            if (equipment != null)
+            {
+                equipment.EquipmentChanged -= RefreshAll;
             }
         }
 
@@ -66,7 +77,9 @@ namespace Project.UI
 
             foreach (var row in statRows)
             {
-                row.SetValue(statsController.BaseStats.GetValue(row.StatType));
+                var baseValue = statsController.BaseStats.GetValue(row.StatType);
+                var equipmentBonus = equipment != null ? equipment.GetBonus(row.StatType) : 0;
+                row.SetValue(baseValue, equipmentBonus);
                 row.SetInteractable(availablePoints > 0);
             }
         }

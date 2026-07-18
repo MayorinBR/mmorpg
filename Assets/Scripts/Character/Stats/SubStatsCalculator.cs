@@ -8,14 +8,14 @@ namespace Project.Character.Stats
     public class SubStatsCalculator : ISubStatsCalculator
     {
         /// <inheritdoc />
-        public SubStats Calculate(CharacterBaseStats baseStats, int baseLevel)
+        public SubStats Calculate(IStatProvider stats, int baseLevel)
         {
-            var str = baseStats.GetValue(StatType.Strength);
-            var agi = baseStats.GetValue(StatType.Agility);
-            var vit = baseStats.GetValue(StatType.Vitality);
-            var intel = baseStats.GetValue(StatType.Intelligence);
-            var dex = baseStats.GetValue(StatType.Dexterity);
-            var luk = baseStats.GetValue(StatType.Luck);
+            var str = stats.GetValue(StatType.Strength);
+            var agi = stats.GetValue(StatType.Agility);
+            var vit = stats.GetValue(StatType.Vitality);
+            var intel = stats.GetValue(StatType.Intelligence);
+            var dex = stats.GetValue(StatType.Dexterity);
+            var luk = stats.GetValue(StatType.Luck);
 
             var statusAtk = str;
             var statusMatk = (int)(intel * 1.5f);

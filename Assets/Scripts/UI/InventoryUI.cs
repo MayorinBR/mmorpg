@@ -16,6 +16,7 @@ namespace Project.UI
         [SerializeField] private PlayerInventory playerInventory;
         [SerializeField] private InventorySlotUI slotPrefab;
         [SerializeField] private Transform slotsParent;
+        [SerializeField] private EquipmentManager equipment;
 
         private InventorySlotUI[] slotViews;
 
@@ -60,7 +61,18 @@ namespace Project.UI
 
             for (var i = 0; i < capacity; i++)
             {
-                slotViews[i] = Instantiate(slotPrefab, slotsParent);
+                var slotView = Instantiate(slotPrefab, slotsParent);
+                slotView.SetIndex(i);
+                slotView.Clicked += HandleSlotClicked;
+                slotViews[i] = slotView;
+            }
+        }
+
+        private void HandleSlotClicked(int index)
+        {
+            if (equipment != null)
+            {
+                equipment.TryEquipFromInventory(index);
             }
         }
 

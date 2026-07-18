@@ -1,6 +1,7 @@
 using UnityEngine;
+using Project.Combat;
 
-namespace Project.Combat
+namespace Project.DebugTools
 {
     /// <summary>
     /// Temporary debug helper that logs health changes and death to the
