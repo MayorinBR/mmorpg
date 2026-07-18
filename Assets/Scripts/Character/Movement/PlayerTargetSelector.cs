@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Project.Combat;
 
-namespace Project.Character.Combat
+namespace Project.Character.Movement
 {
     /// <summary>
     /// Holds the player's currently selected combat target. Selection input
