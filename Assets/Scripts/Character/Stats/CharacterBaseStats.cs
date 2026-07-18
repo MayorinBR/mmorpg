@@ -9,7 +9,7 @@ namespace Project.Character.Stats
     /// (base plus equipment/buff bonuses) are intentionally out of scope here
     /// and belong to a separate aggregation step closer to combat.
     /// </summary>
-    public class CharacterBaseStats
+    public class CharacterBaseStats : IStatProvider
     {
         private const int MinStatValue = 1;
         private const int MaxStatValue = 99;

@@ -50,6 +50,8 @@
 
 # \- Inventory UI (slot grid with icon and quantity)
 
+# \- Equipment system (9 slots including dual accessories, multi-slot items like two-handed weapons, stat bonuses reflected live in the stat panel)
+
 # 
 
 # \---
@@ -96,6 +98,8 @@
 
 # \- UI de inventário (grade de slots com ícone e quantidade)
 
+# \- Sistema de equipamento (9 slots incluindo dois acessórios simultâneos, itens que ocupam múltiplos slots como armas de duas mãos, bônus de status refletidos em tempo real no painel de status)
+
 # 
 
 # \---
@@ -141,4 +145,6 @@
 # \- アイテムドロップシステム(敵の死亡時に抽選されるルートテーブル)とインベントリのデータ構造(スタック、容量制限)
 
 # \- インベントリUI(アイコンと数量を表示するスロットグリッド)
+
+# \- 装備システム(アクセサリー2枠を含む9つの装備スロット、両手武器のような複数スロットを占有するアイテム、ステータスパネルにリアルタイムで反映される装備ボーナス)
 

@@ -10,9 +10,9 @@ namespace Project.Character.Stats
         /// <summary>
         /// Calculates the sub-stats for a character.
         /// </summary>
-        /// <param name="baseStats">The character's current base stat values.</param>
+        /// <param name="stats">A provider of the character's current effective stat values.</param>
         /// <param name="baseLevel">The character's current base level.</param>
         /// <returns>The calculated status-derived sub-stats.</returns>
-        SubStats Calculate(CharacterBaseStats baseStats, int baseLevel);
+        SubStats Calculate(IStatProvider stats, int baseLevel);
     }
 }

@@ -30,12 +30,13 @@ namespace Project.UI
         }
 
         /// <summary>
-        /// Updates the displayed value.
+        /// Updates the displayed value, always showing the equipment bonus
+        /// in parentheses, even when it's zero (e.g. "5 (+3)" or "1 (+0)").
         /// </summary>
-        /// <param name="value">The stat's current value.</param>
-        public void SetValue(int value)
+        public void SetValue(int baseValue, int equipmentBonus)
         {
-            valueText.text = value.ToString();
+            var sign = equipmentBonus >= 0 ? "+" : string.Empty;
+            valueText.text = $"{baseValue} ({sign}{equipmentBonus})";
         }
 
         /// <summary>
