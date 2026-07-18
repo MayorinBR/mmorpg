@@ -1,8 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
-using Project.Character.Combat;
-
 namespace Project.Character.Movement
 {
     /// <summary>

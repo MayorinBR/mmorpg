@@ -73,7 +73,7 @@ namespace Project.UI
         private void RefreshAll()
         {
             var availablePoints = statsController.BaseStats.AvailablePoints;
-            availablePointsText.text = $"Points: {availablePoints}";
+            availablePointsText.text = $"Available Points: {availablePoints}";
 
             foreach (var row in statRows)
             {
