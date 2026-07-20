@@ -1,24 +1,27 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 using Project.Items;
 
 namespace Project.UI
 {
     /// <summary>
-    /// Displays a single inventory slot's icon and quantity, and raises
-    /// <see cref="Clicked"/> with its own index when clicked. Purely
-    /// presentational otherwise — it doesn't decide what clicking should do.
+    /// Displays a single inventory slot's icon and quantity, raises
+    /// <see cref="Clicked"/> with its own index when clicked, and shows the
+    /// shared item tooltip on hover. Purely presentational otherwise — it
+    /// doesn't decide what clicking should do.
     /// </summary>
     [RequireComponent(typeof(Button))]
-    public class InventorySlotUI : MonoBehaviour
+    public class InventorySlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField] private Image iconImage;
         [SerializeField] private TMP_Text quantityText;
         [SerializeField] private Button button;
 
         private int slotIndex;
+        private ItemDefinition currentItem;
 
         /// <summary>Raised when this slot is clicked, carrying its inventory index.</summary>
         public event Action<int> Clicked;
@@ -44,6 +47,8 @@ namespace Project.UI
         /// <param name="slot">The slot data to display.</param>
         public void SetSlot(InventorySlot slot)
         {
+            currentItem = slot.IsEmpty ? null : slot.Item;
+
             if (slot.IsEmpty)
             {
                 iconImage.enabled = false;
@@ -56,6 +61,22 @@ namespace Project.UI
             quantityText.text = slot.Item.IsStackable && slot.Quantity > 1
                 ? slot.Quantity.ToString()
                 : string.Empty;
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (currentItem != null && ItemTooltipUI.Instance != null)
+            {
+                ItemTooltipUI.Instance.Show(currentItem, eventData.position);
+            }
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (ItemTooltipUI.Instance != null)
+            {
+                ItemTooltipUI.Instance.Hide();
+            }
         }
     }
 }
