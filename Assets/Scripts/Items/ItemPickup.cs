@@ -3,15 +3,34 @@ using UnityEngine;
 namespace Project.Items
 {
     /// <summary>
-    /// A dropped item sitting in the world. Adds itself to the first
-    /// <see cref="PlayerInventory"/> that touches its trigger collider, then
-    /// destroys itself once fully picked up.
+    /// A dropped item sitting in the world. Collected explicitly via
+    /// <see cref="TryCollect"/> (click-based, with range checked by the
+    /// caller), not automatically on contact.
     /// </summary>
-    [RequireComponent(typeof(Rigidbody))]
     public class ItemPickup : MonoBehaviour
     {
         [SerializeField] private ItemDefinition item;
         [SerializeField] private int quantity = 1;
+        [SerializeField] private SpriteRenderer iconRenderer;
+
+        /// <summary>Gets the item this pickup represents, read-only for external observers like tooltip triggers.</summary>
+        public ItemDefinition Item => item;
+
+        private Camera mainCamera;
+
+        private void Awake()
+        {
+            mainCamera = Camera.main;
+            UpdateIconSprite();
+        }
+
+        private void LateUpdate()
+        {
+            if (mainCamera != null)
+            {
+                transform.forward = mainCamera.transform.forward;
+            }
+        }
 
         /// <summary>
         /// Configures which item and quantity this pickup represents,
@@ -23,21 +42,33 @@ namespace Project.Items
         {
             item = droppedItem;
             quantity = droppedQuantity;
+            UpdateIconSprite();
         }
 
-        private void OnTriggerEnter(Collider other)
+        private void UpdateIconSprite()
         {
-            var inventory = other.GetComponentInParent<PlayerInventory>();
-
-            if (inventory == null)
+            if (iconRenderer != null && item != null)
             {
-                return;
+                iconRenderer.sprite = item.Icon;
+            }
+        }
+
+        /// <summary>
+        /// Attempts to add this pickup's item to the given inventory,
+        /// destroying this pickup on success. The caller is responsible for
+        /// range checking before calling this.
+        /// </summary>
+        /// <param name="inventory">The inventory to add the item to.</param>
+        /// <returns>True if the item was fully added and the pickup was collected.</returns>
+        public bool TryCollect(PlayerInventory inventory)
+        {
+            if (!inventory.Items.TryAddItem(item, quantity))
+            {
+                return false;
             }
 
-            if (inventory.Items.TryAddItem(item, quantity))
-            {
-                Destroy(gameObject);
-            }
+            Destroy(gameObject);
+            return true;
         }
     }
 }

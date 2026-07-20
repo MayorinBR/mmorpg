@@ -24,6 +24,7 @@ namespace Project.AI
         [SerializeField] private PlayerExperience playerExperience;
         [SerializeField] private LootTableDefinition lootTable;
         [SerializeField] private ItemPickup itemPickupPrefab;
+        [SerializeField] private float dropSpreadRadius = 1.5f;
         [SerializeField] private float respawnDelaySeconds = 5f;
 
         private void OnEnable()
@@ -56,9 +57,16 @@ namespace Project.AI
 
             foreach (var (item, quantity) in lootTable.RollDrops())
             {
-                var pickup = Instantiate(itemPickupPrefab, transform.position, Quaternion.identity);
+                var dropPosition = transform.position + GetRandomSpreadOffset();
+                var pickup = Instantiate(itemPickupPrefab, dropPosition, Quaternion.identity);
                 pickup.Initialize(item, quantity);
             }
+        }
+
+        private Vector3 GetRandomSpreadOffset()
+        {
+            var randomCircle = Random.insideUnitCircle * dropSpreadRadius;
+            return new Vector3(randomCircle.x, 0f, randomCircle.y);
         }
 
         private IEnumerator RespawnRoutine()

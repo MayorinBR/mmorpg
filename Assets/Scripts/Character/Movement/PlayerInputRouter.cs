@@ -1,21 +1,25 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
+using Project.Items;
+
 namespace Project.Character.Movement
 {
     /// <summary>
     /// Reads Input System callbacks (move axis and click/tap point) and
-    /// forwards them to a <see cref="CharacterMovementController"/> or
-    /// <see cref="PlayerTargetSelector"/> depending on what was clicked.
-    /// Clicks that land on UI elements are ignored.
+    /// forwards them to a <see cref="CharacterMovementController"/>,
+    /// <see cref="PlayerTargetSelector"/>, or <see cref="PlayerLootController"/>
+    /// depending on what was clicked. Clicks that land on UI elements are ignored.
     /// </summary>
     public class PlayerInputRouter : MonoBehaviour
     {
         [SerializeField] private CharacterMovementController movementController;
         [SerializeField] private PlayerTargetSelector targetSelector;
+        [SerializeField] private PlayerLootController lootController;
         [SerializeField] private Camera worldCamera;
         [SerializeField] private LayerMask groundLayer;
         [SerializeField] private LayerMask enemyLayer;
+        [SerializeField] private LayerMask itemLayer;
 
         private bool isPointerOverUI;
 
@@ -37,8 +41,9 @@ namespace Project.Character.Movement
 
         /// <summary>
         /// Called by the Input System when the Move Click action (left mouse
-        /// button) is performed, casting a ray against the ground layer to
-        /// find a destination point.
+        /// button) is performed. Clicking an item pickup sets it as the
+        /// pending loot target; clicking anywhere else on the ground moves
+        /// the character there.
         /// </summary>
         /// <param name="context">Callback context for the move click action.</param>
         public void OnMoveClick(InputAction.CallbackContext context)
@@ -50,12 +55,23 @@ namespace Project.Character.Movement
 
             var pointerPosition = Pointer.current.position.ReadValue();
             var ray = worldCamera.ScreenPointToRay(pointerPosition);
+            var combinedMask = groundLayer | itemLayer;
 
-            if (Physics.Raycast(ray, out var hit, float.MaxValue, groundLayer))
+            if (!Physics.Raycast(ray, out var hit, float.MaxValue, combinedMask))
             {
-                targetSelector.ClearTarget();
-                movementController.SetClickDestination(hit.point);
+                return;
             }
+
+            targetSelector.ClearTarget();
+
+            if (hit.collider.TryGetComponent(out ItemPickup pickup))
+            {
+                lootController.SetTarget(pickup);
+                return;
+            }
+
+            lootController.SetTarget(null);
+            movementController.SetClickDestination(hit.point);
         }
 
         /// <summary>
@@ -76,6 +92,7 @@ namespace Project.Character.Movement
 
             if (Physics.Raycast(ray, out var hit, float.MaxValue, enemyLayer))
             {
+                lootController.SetTarget(null);
                 targetSelector.SelectTarget(hit.collider);
             }
         }
