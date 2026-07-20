@@ -22,6 +22,7 @@ namespace Project.Items
         [SerializeField] private StatModifiers statBonuses;
         [SerializeField] private int requiredLevel = 1;
         [SerializeField] private CharacterClass[] allowedClasses;
+        [SerializeField] private float weight = 1f;
 
         /// <summary>Gets the display name of the item.</summary>
         public string ItemName => itemName;
@@ -52,5 +53,8 @@ namespace Project.Items
 
         /// <summary>Gets the classes allowed to equip this item. An empty array means any class can use it. Only meaningful when <see cref="ItemType"/> is Equipment.</summary>
         public IReadOnlyList<CharacterClass> AllowedClasses => allowedClasses;
+
+        /// <summary>Gets the weight of a single unit of this item, used by the carry-weight inventory system.</summary>
+        public float Weight => weight;
     }
 }

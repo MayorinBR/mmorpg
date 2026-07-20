@@ -1,24 +1,33 @@
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 using Project.Items;
 
 namespace Project.UI
 {
     /// <summary>
-    /// Builds a grid of <see cref="InventorySlotUI"/> matching the player's
-    /// inventory capacity, and keeps it in sync with
-    /// <see cref="Inventory.InventoryChanged"/>. Slot views are built and
-    /// the initial sync happens in <see cref="Start"/> to guarantee
-    /// <see cref="PlayerInventory.Items"/> has already been created by
-    /// <see cref="PlayerInventory.Awake"/>.
+    /// Shows the player's inventory one fixed-size page at a time (matching
+    /// <see cref="PageSize"/>), with Next/Back navigation between pages.
+    /// New pages become reachable automatically as <see cref="Inventory"/>
+    /// grows internally; this component never changes how many slot views
+    /// exist, only which underlying inventory indices they display.
     /// </summary>
     public class InventoryUI : MonoBehaviour
     {
+        private const int PageSize = 20;
+
         [SerializeField] private PlayerInventory playerInventory;
         [SerializeField] private InventorySlotUI slotPrefab;
         [SerializeField] private Transform slotsParent;
         [SerializeField] private EquipmentManager equipment;
+        [SerializeField] private Button nextPageButton;
+        [SerializeField] private Button previousPageButton;
+        [SerializeField] private TMP_Text weightText;
+        [SerializeField] private TMP_Text pageIndicatorText;
 
-        private InventorySlotUI[] slotViews;
+        private readonly InventorySlotUI[] slotViews = new InventorySlotUI[PageSize];
+        private int currentPage;
+        private bool isBuilt;
 
         private void OnEnable()
         {
@@ -27,23 +36,11 @@ namespace Project.UI
                 playerInventory.Items.InventoryChanged -= RefreshAll;
                 playerInventory.Items.InventoryChanged += RefreshAll;
 
-                if (slotViews != null)
+                if (isBuilt)
                 {
                     RefreshAll();
                 }
             }
-        }
-
-        private void Start()
-        {
-            BuildSlotViews();
-
-            // Defensive: avoids a duplicate subscription in case OnEnable
-            // already subscribed successfully before this ran.
-            playerInventory.Items.InventoryChanged -= RefreshAll;
-            playerInventory.Items.InventoryChanged += RefreshAll;
-
-            RefreshAll();
         }
 
         private void OnDisable()
@@ -54,33 +51,95 @@ namespace Project.UI
             }
         }
 
+        private void Start()
+        {
+            BuildSlotViews();
+            WireNavigationButtons();
+
+            playerInventory.Items.InventoryChanged -= RefreshAll;
+            playerInventory.Items.InventoryChanged += RefreshAll;
+
+            isBuilt = true;
+            RefreshAll();
+        }
+
         private void BuildSlotViews()
         {
-            var capacity = playerInventory.Items.Capacity;
-            slotViews = new InventorySlotUI[capacity];
-
-            for (var i = 0; i < capacity; i++)
+            for (var i = 0; i < PageSize; i++)
             {
                 var slotView = Instantiate(slotPrefab, slotsParent);
-                slotView.SetIndex(i);
                 slotView.Clicked += HandleSlotClicked;
                 slotViews[i] = slotView;
             }
         }
 
-        private void HandleSlotClicked(int index)
+        private void WireNavigationButtons()
+        {
+            if (nextPageButton != null)
+            {
+                nextPageButton.onClick.AddListener(GoToNextPage);
+            }
+
+            if (previousPageButton != null)
+            {
+                previousPageButton.onClick.AddListener(GoToPreviousPage);
+            }
+        }
+
+        private void GoToNextPage()
+        {
+            currentPage++;
+            RefreshAll();
+        }
+
+        private void GoToPreviousPage()
+        {
+            currentPage--;
+            RefreshAll();
+        }
+
+        private void HandleSlotClicked(int inventoryIndex)
         {
             if (equipment != null)
             {
-                equipment.TryEquipFromInventory(index);
+                equipment.TryEquipFromInventory(inventoryIndex);
             }
         }
 
         private void RefreshAll()
         {
-            for (var i = 0; i < slotViews.Length; i++)
+            var totalPages = Mathf.Max(1, Mathf.CeilToInt((float)playerInventory.Items.SlotCount / PageSize));
+            currentPage = Mathf.Clamp(currentPage, 0, totalPages - 1);
+
+            for (var i = 0; i < PageSize; i++)
             {
-                slotViews[i].SetSlot(playerInventory.Items.GetSlot(i));
+                var inventoryIndex = (currentPage * PageSize) + i;
+                var slotData = inventoryIndex < playerInventory.Items.SlotCount
+                    ? playerInventory.Items.GetSlot(inventoryIndex)
+                    : InventorySlot.Empty;
+
+                slotViews[i].SetIndex(inventoryIndex);
+                slotViews[i].SetSlot(slotData);
+            }
+
+            if (previousPageButton != null)
+            {
+                previousPageButton.interactable = currentPage > 0;
+            }
+
+            if (nextPageButton != null)
+            {
+                nextPageButton.interactable = currentPage < totalPages - 1;
+            }
+
+            if (pageIndicatorText != null)
+            {
+                pageIndicatorText.text = $"{currentPage + 1}/{totalPages}";
+            }
+
+            if (weightText != null)
+            {
+                weightText.text = $"{playerInventory.Items.CurrentWeight:F1} / {playerInventory.Items.MaxCarryWeight:F1}";
             }
         }
     }
