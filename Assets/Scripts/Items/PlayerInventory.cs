@@ -10,14 +10,14 @@ namespace Project.Items
     /// </summary>
     public class PlayerInventory : MonoBehaviour
     {
-        [SerializeField] private int capacity = 20;
+        [SerializeField] private float maxCarryWeight = 50f;
 
         /// <summary>Gets the player's inventory.</summary>
         public Inventory Items { get; private set; }
 
         private void Awake()
         {
-            Items = new Inventory(capacity);
+            Items = new Inventory(maxCarryWeight);
         }
     }
 }

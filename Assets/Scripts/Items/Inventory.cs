@@ -1,35 +1,42 @@
 using System;
+using System.Collections.Generic;
 
 namespace Project.Items
 {
     /// <summary>
-    /// Manages a fixed-capacity collection of <see cref="InventorySlot"/>s,
-    /// handling stacking automatically when adding stackable items. Kept as
-    /// a plain C# class (not a MonoBehaviour) so it can be unit tested and
-    /// reused independently of the Unity component that owns it.
+    /// Manages a weight-bounded, dynamically growing collection of
+    /// <see cref="InventorySlot"/>s. Slots are added in pages as needed,
+    /// limited only by <see cref="MaxCarryWeight"/> — there is no fixed
+    /// slot count. Kept as a plain C# class (not a MonoBehaviour) so it can
+    /// be unit tested and reused independently of the Unity component that
+    /// owns it.
     /// </summary>
     public class Inventory
     {
-        private readonly InventorySlot[] slots;
+        private const int SlotsPerPage = 20;
+
+        private readonly List<InventorySlot> slots = new List<InventorySlot>();
 
         /// <summary>Raised whenever any slot's contents change.</summary>
         public event Action InventoryChanged;
 
-        /// <summary>Gets the total number of slots.</summary>
-        public int Capacity => slots.Length;
+        /// <summary>Gets the maximum total weight this inventory can carry.</summary>
+        public float MaxCarryWeight { get; }
+
+        /// <summary>Gets the combined weight of everything currently carried.</summary>
+        public float CurrentWeight { get; private set; }
+
+        /// <summary>Gets the number of slots currently allocated (grows in pages as needed).</summary>
+        public int SlotCount => slots.Count;
 
         /// <summary>
-        /// Initializes an empty inventory with the given number of slots.
+        /// Initializes an inventory with one starting page of empty slots.
         /// </summary>
-        /// <param name="capacity">The total number of slots available.</param>
-        public Inventory(int capacity)
+        /// <param name="maxCarryWeight">The maximum total weight this inventory can carry.</param>
+        public Inventory(float maxCarryWeight)
         {
-            slots = new InventorySlot[capacity];
-
-            for (var i = 0; i < capacity; i++)
-            {
-                slots[i] = InventorySlot.Empty;
-            }
+            MaxCarryWeight = maxCarryWeight;
+            AddPage();
         }
 
         /// <summary>
@@ -44,11 +51,12 @@ namespace Project.Items
 
         /// <summary>
         /// Attempts to add a quantity of an item, filling existing stacks
-        /// before using empty slots.
+        /// before using or creating empty slots. New slot pages are added
+        /// automatically if needed and weight capacity allows.
         /// </summary>
         /// <param name="item">The item to add.</param>
         /// <param name="quantity">The number of units to add.</param>
-        /// <returns>True if the full quantity was added; false if there wasn't enough space for all of it.</returns>
+        /// <returns>True only if the full requested quantity was added.</returns>
         public bool TryAddItem(ItemDefinition item, int quantity)
         {
             if (item == null || quantity <= 0)
@@ -56,16 +64,26 @@ namespace Project.Items
                 return false;
             }
 
-            var remaining = quantity;
-            remaining = FillExistingStacks(item, remaining);
-            remaining = FillEmptySlots(item, remaining);
+            var addable = ClampToWeightCapacity(item, quantity);
 
-            if (remaining < quantity)
+            if (addable <= 0)
             {
+                return false;
+            }
+
+            var remaining = addable;
+            remaining = FillExistingStacks(item, remaining);
+            remaining = FillIntoSlots(item, remaining);
+
+            var actuallyAdded = addable - remaining;
+
+            if (actuallyAdded > 0)
+            {
+                CurrentWeight += actuallyAdded * item.Weight;
                 InventoryChanged?.Invoke();
             }
 
-            return remaining == 0;
+            return actuallyAdded == quantity;
         }
 
         /// <summary>
@@ -74,8 +92,35 @@ namespace Project.Items
         /// <param name="index">The slot index to clear.</param>
         public void RemoveAt(int index)
         {
+            var removedSlot = slots[index];
+
+            if (!removedSlot.IsEmpty)
+            {
+                CurrentWeight -= removedSlot.Item.Weight * removedSlot.Quantity;
+            }
+
             slots[index] = InventorySlot.Empty;
             InventoryChanged?.Invoke();
+        }
+
+        private int ClampToWeightCapacity(ItemDefinition item, int quantity)
+        {
+            if (item.Weight <= 0f)
+            {
+                return quantity;
+            }
+
+            var remainingWeightCapacity = MaxCarryWeight - CurrentWeight;
+            var weightCapacityUnits = (int)(remainingWeightCapacity / item.Weight);
+            return Math.Min(quantity, Math.Max(weightCapacityUnits, 0));
+        }
+
+        private void AddPage()
+        {
+            for (var i = 0; i < SlotsPerPage; i++)
+            {
+                slots.Add(InventorySlot.Empty);
+            }
         }
 
         private int FillExistingStacks(ItemDefinition item, int remaining)
@@ -85,7 +130,7 @@ namespace Project.Items
                 return remaining;
             }
 
-            for (var i = 0; i < slots.Length && remaining > 0; i++)
+            for (var i = 0; i < slots.Count && remaining > 0; i++)
             {
                 var slot = slots[i];
 
@@ -103,19 +148,28 @@ namespace Project.Items
             return remaining;
         }
 
-        private int FillEmptySlots(ItemDefinition item, int remaining)
+        private int FillIntoSlots(ItemDefinition item, int remaining)
         {
-            for (var i = 0; i < slots.Length && remaining > 0; i++)
+            var index = 0;
+
+            while (remaining > 0)
             {
-                if (!slots[i].IsEmpty)
+                if (index >= slots.Count)
                 {
-                    continue;
+                    AddPage();
                 }
 
-                var stackLimit = item.IsStackable ? item.MaxStackSize : 1;
-                var amountToAdd = Math.Min(stackLimit, remaining);
-                slots[i] = new InventorySlot(item, amountToAdd);
-                remaining -= amountToAdd;
+                var slot = slots[index];
+
+                if (slot.IsEmpty)
+                {
+                    var stackLimit = item.IsStackable ? item.MaxStackSize : 1;
+                    var amountToAdd = Math.Min(stackLimit, remaining);
+                    slots[index] = new InventorySlot(item, amountToAdd);
+                    remaining -= amountToAdd;
+                }
+
+                index++;
             }
 
             return remaining;

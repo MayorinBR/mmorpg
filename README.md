@@ -52,6 +52,8 @@
 
 # \- Equipment system (9 slots including dual accessories, multi-slot items like two-handed weapons, stat bonuses reflected live in the stat panel)
 
+# \- Weight-based inventory capacity (instead of slot count), with fixed-size paginated pages, Next/Back navigation, and a carried weight readout
+
 # 
 
 # \---
@@ -100,6 +102,8 @@
 
 # \- Sistema de equipamento (9 slots incluindo dois acessórios simultâneos, itens que ocupam múltiplos slots como armas de duas mãos, bônus de status refletidos em tempo real no painel de status)
 
+# \- Inventário por capacidade de peso (em vez de contagem de slots), com páginas de tamanho fixo, navegação Next/Back e indicador de peso carregado
+
 # 
 
 # \---
@@ -147,4 +151,6 @@
 # \- インベントリUI(アイコンと数量を表示するスロットグリッド)
 
 # \- 装備システム(アクセサリー2枠を含む9つの装備スロット、両手武器のような複数スロットを占有するアイテム、ステータスパネルにリアルタイムで反映される装備ボーナス)
+
+# \- 重量ベースのインベントリ容量(スロット数ではなく重量で管理)、固定サイズのページ制、Next/Back操作によるページ移動、所持重量の表示
 
