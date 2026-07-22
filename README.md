@@ -54,9 +54,11 @@
 
 # \- Weight-based inventory capacity (instead of slot count), with fixed-size paginated pages, Next/Back navigation, and a carried weight readout
 
-# \- Item tooltips on hover (inventory, equipment, and world-dropped items) showing icon, name, description, stat bonuses, and requirements
+# \- Item tooltips on hover (inventory, equipment, and world-dropped items) showing icon, name, description, stat bonuses, requirements, and weight
 
 # \- Click-to-collect item pickups (walks into range automatically if needed) with drops spread out around the enemy's death position
+
+# \- Ragnarok-style window UI system: toggle panels via HUD buttons or keyboard shortcuts, draggable and remembered per session, auto-cascading layout that reclaims freed slots, minimize/close controls, and bring-to-front on click
 
 # 
 
@@ -108,9 +110,11 @@
 
 # \- Inventário por capacidade de peso (em vez de contagem de slots), com páginas de tamanho fixo, navegação Next/Back e indicador de peso carregado
 
-# \- Tooltips de item ao passar o mouse (inventário, equipamento e itens dropados no chão) mostrando ícone, nome, descrição, bônus de status e requisitos
+# \- Tooltips de item ao passar o mouse (inventário, equipamento e itens dropados no chão) mostrando ícone, nome, descrição, bônus de status, requisitos e peso
 
 # \- Coleta de item por clique (o player anda até o alcance automaticamente se necessário), com drops espalhados ao redor da posição de morte do inimigo
+
+# \- Sistema de janelas de UI estilo Ragnarok: abrir/fechar painéis por botão na HUD ou atalho de teclado, arrastáveis e lembradas durante a sessão, layout em cascata que reaproveita espaço liberado, controles de minimizar/fechar, e traz pra frente ao clicar
 
 # 
 
@@ -162,7 +166,9 @@
 
 # \- 重量ベースのインベントリ容量(スロット数ではなく重量で管理)、固定サイズのページ制、Next/Back操作によるページ移動、所持重量の表示
 
-# \- マウスホバーで表示されるアイテムツールチップ(インベントリ、装備、地面のドロップアイテム)、アイコン・名前・説明・ステータスボーナス・条件を表示
+# \- マウスホバーで表示されるアイテムツールチップ(インベントリ、装備、地面のドロップアイテム)、アイコン・名前・説明・ステータスボーナス・条件・重量を表示
 
 # \- クリックでアイテムを収集(必要に応じて自動で範囲内まで移動)、敵の死亡位置周辺にドロップが分散して出現
+
+# \- Ragnarok風のウィンドウUIシステム: HUDボタンまたはキーボードショートカットでパネルの開閉、ドラッグ移動とセッション中の位置記憶、空いたスペースを再利用する自動カスケード配置、最小化・閉じるボタン、クリックで最前面に表示
 

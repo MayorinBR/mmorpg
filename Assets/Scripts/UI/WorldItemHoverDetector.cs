@@ -19,6 +19,7 @@ namespace Project.UI
         [SerializeField] private LayerMask itemLayer;
 
         private ItemPickup currentHoveredItem;
+        private bool isHovering;
 
         private void Update()
         {
@@ -40,6 +41,7 @@ namespace Project.UI
                 hit.collider.TryGetComponent(out ItemPickup pickup))
             {
                 currentHoveredItem = pickup;
+                isHovering = true;
                 ItemTooltipUI.Instance?.Show(pickup.Item, pointerPosition);
                 return;
             }
@@ -49,11 +51,12 @@ namespace Project.UI
 
         private void ClearHover()
         {
-            if (currentHoveredItem == null)
+            if (!isHovering)
             {
                 return;
             }
 
+            isHovering = false;
             currentHoveredItem = null;
             ItemTooltipUI.Instance?.Hide();
         }

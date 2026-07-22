@@ -25,6 +25,7 @@ namespace Project.UI
         [SerializeField] private TMP_Text descriptionText;
         [SerializeField] private TMP_Text statsText;
         [SerializeField] private TMP_Text requirementsText;
+        [SerializeField] private TMP_Text weightText;
         [SerializeField] private Vector2 offsetFromPointer = new Vector2(16f, -16f);
 
         private Canvas parentCanvas;
@@ -55,6 +56,7 @@ namespace Project.UI
             descriptionText.text = item.Description;
             statsText.text = BuildStatsText(item);
             requirementsText.text = BuildRequirementsText(item);
+            weightText.text = $"{item.Weight:F1}";
 
             rectTransform.position = ClampToScreen(screenPosition + offsetFromPointer);
             root.SetActive(true);
