@@ -12,6 +12,7 @@ This document tracks considerations raised during development that were delibera
 
 ## Architecture / Organization
 
+- **`HealthBarUI` and `ManaBarUI` are near-identical duplicates** (same Slider-driving logic, different source component). A unification via a shared `IResourceProvider` interface was implemented and then deliberately reverted back to two separate scripts, by team preference (simplicity/independence over DRY in this case). Worth remembering before re-proposing the same unification later.
 - **`Project.DebugTools` is not restricted to the Editor platform** (unlike `Project.EditorTools`). Debug loggers (`HealthDebugLogger`, `EquipmentDebugLogger`) could end up in the final build if the components are forgotten on scene objects before publishing.
 - **No automated tests** cover the pure logic classes (`Inventory.TryAddItem`, `EquipmentManager` multi-slot/eviction) — good candidates for the Unity Test Framework, since they've caused subtle bugs more than once during manual development.
 

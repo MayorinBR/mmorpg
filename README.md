@@ -60,6 +60,10 @@
 
 # \- Ragnarok-style window UI system: toggle panels via HUD buttons or keyboard shortcuts, draggable and remembered per session, auto-cascading layout that reclaims freed slots, minimize/close controls, and bring-to-front on click
 
+# \- Character class system: 6 base classes (Swordman, Archer, Merchant, Acolyte, Thief, Mage), dual Base/Job leveling (base grants stat points, job grants skill points for the future skill system), and mana (SP)
+
+# \- Main player HUD: name, HP/SP bars, Base/Job level with experience bars, carried weight, Zeny (currency system with no in-game source yet), and class icon/name
+
 # 
 
 # \---
@@ -116,6 +120,10 @@
 
 # \- Sistema de janelas de UI estilo Ragnarok: abrir/fechar painéis por botão na HUD ou atalho de teclado, arrastáveis e lembradas durante a sessão, layout em cascata que reaproveita espaço liberado, controles de minimizar/fechar, e traz pra frente ao clicar
 
+# \- Sistema de classe do personagem: 6 classes base (Swordman, Archer, Merchant, Acolyte, Thief, Mage), progressão dupla Base/Job (base concede pontos de status, job concede pontos de skill para o futuro sistema de skills), e mana (SP)
+
+# \- HUD principal do player: nome, barras de HP/SP, nível Base/Job com barras de experiência, peso carregado, Zeny (sistema de moeda ainda sem fonte no jogo) e ícone/nome da classe
+
 # 
 
 # \---
@@ -171,4 +179,8 @@
 # \- クリックでアイテムを収集(必要に応じて自動で範囲内まで移動)、敵の死亡位置周辺にドロップが分散して出現
 
 # \- Ragnarok風のウィンドウUIシステム: HUDボタンまたはキーボードショートカットでパネルの開閉、ドラッグ移動とセッション中の位置記憶、空いたスペースを再利用する自動カスケード配置、最小化・閉じるボタン、クリックで最前面に表示
+
+# \- キャラクタークラスシステム: 6つの基本職(Swordman、Archer、Merchant、Acolyte、Thief、Mage)、ベース/ジョブの二重レベル制(ベースはステータスポイント、ジョブは将来のスキルシステム用のスキルポイントを付与)、マナ(SP)
+
+# \- プレイヤーメインHUD: 名前、HP/SPバー、経験値バー付きのベース/ジョブレベル、所持重量、ゼニー(まだゲーム内に入手手段のない通貨システム)、職業アイコン・名前
 
