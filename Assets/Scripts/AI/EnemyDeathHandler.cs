@@ -22,6 +22,7 @@ namespace Project.AI
         [SerializeField] private Renderer visualRenderer;
         [SerializeField] private GameObject healthBarRoot;
         [SerializeField] private PlayerExperience playerExperience;
+        [SerializeField] private PlayerJobProgress playerJobProgress;
         [SerializeField] private LootTableDefinition lootTable;
         [SerializeField] private ItemPickup itemPickupPrefab;
         [SerializeField] private float dropSpreadRadius = 1.5f;
@@ -42,6 +43,11 @@ namespace Project.AI
             if (playerExperience != null)
             {
                 playerExperience.AddExperience(controller.Stats.ExperienceReward);
+            }
+
+            if (playerJobProgress != null)
+            {
+                playerJobProgress.AddExperience(controller.Stats.JobExperienceReward);
             }
 
             SpawnLoot();
