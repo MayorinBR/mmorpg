@@ -18,6 +18,17 @@ namespace Project.Items
         private const int AccessoryCapacity = 2;
 
         [SerializeField] private PlayerInventory inventory;
+        [SerializeField] private MonoBehaviour playerStatsSource;
+        [SerializeField] private MonoBehaviour playerClassSource;
+
+        private IPlayerLevelProvider levelProvider;
+        private IPlayerClassProvider classProvider;
+
+        private void Awake()
+        {
+            levelProvider = playerStatsSource as IPlayerLevelProvider;
+            classProvider = playerClassSource as IPlayerClassProvider;
+        }
 
         private readonly List<EquippedRecord> equippedRecords = new List<EquippedRecord>();
 
@@ -72,6 +83,12 @@ namespace Project.Items
             }
 
             var itemToEquip = slotContents.Item;
+
+            if (!MeetsRequirements(itemToEquip))
+            {
+                return false;
+            }
+
             var requiredSlots = itemToEquip.RequiredSlots;
 
             inventory.Items.RemoveAt(inventorySlotIndex);
@@ -79,6 +96,23 @@ namespace Project.Items
 
             equippedRecords.Add(new EquippedRecord(itemToEquip, requiredSlots));
             EquipmentChanged?.Invoke();
+            return true;
+        }
+
+        private bool MeetsRequirements(ItemDefinition item)
+        {
+            if (levelProvider != null && levelProvider.BaseLevel < item.RequiredLevel)
+            {
+                //Debug.Log($"Cannot equip {item.ItemName}: requires level {item.RequiredLevel}, current is {levelProvider.BaseLevel}");
+                return false;
+            }
+
+            if (classProvider != null && item.AllowedClasses.Count > 0 && !item.AllowedClasses.Contains(classProvider.CurrentClass))
+            {
+                //Debug.Log($"Cannot equip {item.ItemName}: class {classProvider.CurrentClass} not allowed");
+                return false;
+            }
+
             return true;
         }
 

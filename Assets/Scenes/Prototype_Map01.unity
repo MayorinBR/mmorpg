@@ -3462,6 +3462,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Project.Items.EquipmentManager
   inventory: {fileID: 401280849}
+  playerStatsSource: {fileID: 401280845}
+  playerClassSource: {fileID: 401280857}
 --- !u!114 &401280853
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3532,7 +3534,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e50158b06126a8428023af9dab9da15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Project.Character.Combat::Project.Character.Combat.PlayerClassController
-  startingClass: 1
+  startingClass: 5
 --- !u!114 &401280858
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6851,7 +6853,6 @@ GameObject:
   - component: {fileID: 880199561}
   - component: {fileID: 880199560}
   - component: {fileID: 880199564}
-  - component: {fileID: 880199563}
   - component: {fileID: 880199562}
   m_Layer: 8
   m_Name: Enemy
@@ -7022,19 +7023,6 @@ MonoBehaviour:
   itemPickupPrefab: {fileID: 5243884865457942396, guid: 4bd359e73ab1ce44894ebcea38886042, type: 3}
   dropSpreadRadius: 1.5
   respawnDelaySeconds: 5
---- !u!114 &880199563
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 880199555}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ee39e88bb9e7d94bafc014c6d980ada, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Project.Combat.HealthDebugLogger
-  health: {fileID: 880199564}
 --- !u!114 &880199564
 MonoBehaviour:
   m_ObjectHideFlags: 0

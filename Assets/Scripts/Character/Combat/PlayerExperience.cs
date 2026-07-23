@@ -71,10 +71,10 @@ namespace Project.Character.Combat
 
             if (didLevelUp)
             {
-                Debug.Log(health != null
+                /*Debug.Log(health != null
                     ? "Leveled up, healing to full."
                     : "Leveled up, but Health reference is NULL on PlayerExperience.");
-
+                */
                 if (health != null)
                 {
                     health.ResetHealth();

@@ -64,6 +64,8 @@
 
 # \- Main player HUD: name, HP/SP bars, Base/Job level with experience bars, carried weight, Zeny (currency system with no in-game source yet), and class icon/name
 
+# \- Equipment level/class requirement validation (blocks equipping items the player's level or class doesn't meet)
+
 # 
 
 # \---
@@ -124,6 +126,8 @@
 
 # \- HUD principal do player: nome, barras de HP/SP, nível Base/Job com barras de experiência, peso carregado, Zeny (sistema de moeda ainda sem fonte no jogo) e ícone/nome da classe
 
+# \- Validação de requisito de nível/classe pra equipar itens (bloqueia equipar algo que o nível ou a classe do player não atende)
+
 # 
 
 # \---
@@ -183,4 +187,6 @@
 # \- キャラクタークラスシステム: 6つの基本職(Swordman、Archer、Merchant、Acolyte、Thief、Mage)、ベース/ジョブの二重レベル制(ベースはステータスポイント、ジョブは将来のスキルシステム用のスキルポイントを付与)、マナ(SP)
 
 # \- プレイヤーメインHUD: 名前、HP/SPバー、経験値バー付きのベース/ジョブレベル、所持重量、ゼニー(まだゲーム内に入手手段のない通貨システム)、職業アイコン・名前
+
+# \- 装備のレベル・職業条件バリデーション(プレイヤーのレベルや職業が条件を満たさないアイテムは装備できない)
 

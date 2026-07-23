@@ -11,7 +11,7 @@ namespace Project.Character.Combat
     /// <see cref="EquipmentManager"/> is assigned, equipped item bonuses are
     /// included in the sub-stats calculation.
     /// </summary>
-    public class PlayerStatsController : MonoBehaviour
+    public class PlayerStatsController : MonoBehaviour, IPlayerLevelProvider
     {
         [SerializeField] private int startingLevel = 1;
         [SerializeField] private int startingStatPoints = 10;

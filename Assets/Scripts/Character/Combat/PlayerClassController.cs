@@ -13,7 +13,7 @@ namespace Project.Character.Combat
     /// already react to <see cref="ClassChanged"/> rather than reading the
     /// class once and caching it.
     /// </summary>
-    public class PlayerClassController : MonoBehaviour
+    public class PlayerClassController : MonoBehaviour, IPlayerClassProvider
     {
         [SerializeField] private CharacterClass startingClass = CharacterClass.Swordman;
 

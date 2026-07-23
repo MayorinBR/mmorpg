@@ -23,13 +23,18 @@ This document tracks considerations raised during development that were delibera
 
 ## Incomplete systems / hooks for future features
 
-- **`ItemDefinition.RequiredLevel` and `AllowedClasses`** exist as data, but **nothing validates them yet** — needs a character class system (`PlayerClass` or equivalent) before validation makes sense.
+- **Grid-based (SQM) movement, considered and deferred.** Explored making click-to-move snap to a Ragnarok-style square grid (`GridSystem`/`GridVisualizer`, later reverted). Worth revisiting once the project needs it more concretely — likely alongside the authoritative-server migration, since grid coordinates are cheap to sync/validate compared to free-form `Vector3` positions. Key open decisions for whenever this comes back:
+  - Whether WASD movement should also be grid-locked, or stay free while only click-to-move/pathing snaps to cells (asymmetry vs. consistency trade-off).
+  - Cell size, chosen carefully since it will affect every range/distance value in the game (attack range, aggro radius, skill AoE) once adopted — expensive to change later.
+  - Character footprint in cells (1x1 vs. larger, e.g. 3x3) — not yet decided.
+  - Whether the visual grid indicator needs to be visible in-game (shader/mesh) or Scene-view-only (Gizmos) is enough.
 - **"Ammo" item type** (arrows, bullets) not implemented yet — needs special handling because it's stack-consumable while equipped, unlike the rest of the equipment system (which assumes "one item, worn once").
 - **`ItemDefinition` has no `OnValidate()`** guarding against inconsistent Inspector configuration (e.g. an `Equipment` item marked `Is Stackable`, or with no `Required Slots` set).
 
 ## Player feedback (UX)
 
 - **`PlayerLootController.TryCollect` can fail silently** if the inventory is at max weight — the player walks up to the item, nothing happens, with no message explaining why.
+- **Equip requirement checks (`EquipmentManager.MeetsRequirements`) also fail silently** — clicking an item that doesn't meet level/class requirements just does nothing, with no message explaining why. Same category as the weight-capacity silent failure above; worth solving both together when a general "action feedback" UI element is built.
 - **A pursued item can be destroyed mid-chase** (another player grabs it first, future time-based despawn) — today the player just stops walking with no explanation.
 
 ## UI Window System
