@@ -45,7 +45,7 @@
                 {
                     "name": "ZoomCamera",
                     "type": "Value",
-                    "id": "64ccff3e-bdaa-4bec-b29d-3724ccbf800e",
+                    "id": "d4c0acd5-22d7-46b1-9152-6e77c7ce691d",
                     "expectedControlType": "Axis",
                     "processors": "",
                     "interactions": "",
@@ -73,6 +73,42 @@
                     "name": "ToggleEquipment",
                     "type": "Button",
                     "id": "f8757140-6589-4d50-8c28-19c4803d3962",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CastSkill1",
+                    "type": "Button",
+                    "id": "877d6b9c-8037-4d04-8161-a696078eabe3",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CastSkill2",
+                    "type": "Button",
+                    "id": "91eb0cca-271d-4ebf-9165-1d5f27d97d3c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CastSkill3",
+                    "type": "Button",
+                    "id": "ab0373ae-39c0-4947-8895-74dd251abd2c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CastSkill4",
+                    "type": "Button",
+                    "id": "0ebc1291-8d18-4788-8731-c2c9cfc28361",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -272,15 +308,48 @@
                     "id": "35ff89ec-2e14-425a-99b7-2813da7d52a7",
                     "path": "<Mouse>/scroll/x",
                     "interactions": "",
-                    "processors": "",
+                    "processors": "Scale(factor=5)",
                     "groups": "",
                     "action": "RotateCamera",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
+                    "name": "One Modifier",
+                    "id": "bd6cf7ba-8018-4e6f-9369-e7b4cbe11a84",
+                    "path": "OneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RotateCamera",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "038daee3-de3c-4a91-9d4c-383e792fc245",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RotateCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "binding",
+                    "id": "f73184cd-35d2-4cac-82b7-9e47f571bc2b",
+                    "path": "<Mouse>/delta/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RotateCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
                     "name": "",
-                    "id": "1d58de7a-e03f-4972-a840-aad6bf6a6bd4",
+                    "id": "38cd8a9f-5449-4880-9366-eca8deada0d3",
                     "path": "<Gamepad>/rightStick/y",
                     "interactions": "",
                     "processors": "",
@@ -291,7 +360,7 @@
                 },
                 {
                     "name": "",
-                    "id": "464df286-93fa-40ed-ac0b-167c0912d492",
+                    "id": "569d1532-4840-4a51-be1d-dacbe8c018cb",
                     "path": "<Gamepad>/dpad/y",
                     "interactions": "",
                     "processors": "",
@@ -302,7 +371,7 @@
                 },
                 {
                     "name": "",
-                    "id": "92011665-bf7b-4379-8eb6-887b2f04ccb6",
+                    "id": "02e9e4b1-ae9f-4797-b7fc-deb8602a512c",
                     "path": "<Mouse>/scroll/y",
                     "interactions": "",
                     "processors": "Scale(factor=20)",
@@ -341,6 +410,50 @@
                     "processors": "",
                     "groups": "",
                     "action": "ToggleEquipment",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4442d304-6793-41a1-8aa0-49228613cd46",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CastSkill1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "350d0c3f-345d-405c-bb1b-707453dc9654",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CastSkill2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4b54ef6a-c483-414e-af1c-2c882c573da8",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CastSkill3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9d334b54-0e2a-4065-ae95-8fe8736802e2",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CastSkill4",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

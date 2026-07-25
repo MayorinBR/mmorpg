@@ -50,6 +50,8 @@ GameObject:
   - component: {fileID: 8729646936949443446}
   - component: {fileID: 1779097833141928456}
   - component: {fileID: 1342852652475366660}
+  - component: {fileID: 5852807939054385983}
+  - component: {fileID: 5559137722806121120}
   m_Layer: 8
   m_Name: Poporing
   m_TagString: Untagged
@@ -113,7 +115,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   aggroRange: 5
-  leashRange: 10
+  leashRange: 30
   attackRange: 1.5
   behaviorMode: 0
   health: {fileID: 8729646936949443446}
@@ -144,7 +146,7 @@ MonoBehaviour:
   health: {fileID: 8729646936949443446}
   controller: {fileID: 7424619469386716032}
   agent: {fileID: 7664099574988607175}
-  hitCollider: {fileID: 8691757022557870916}
+  hitCollider: {fileID: 0}
   visualRenderer: {fileID: 7147891482049453421}
   healthBarRoot: {fileID: 5411425689760265616}
   playerExperience: {fileID: 0}
@@ -166,6 +168,44 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Project.Character.Stats::Project.Character.Stats.CharacterStatsHolder
   stats: {fileID: 11400000, guid: f0d204ff42e17114690c3874bcf6a2ca, type: 2}
+--- !u!95 &5852807939054385983
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2301299987623212396}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: e0624c84651754542bc74f542fc03357, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!111 &5559137722806121120
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2301299987623212396}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Animation: {fileID: 7400000, guid: c3acb441a7cd7564da785ede402a8b39, type: 2}
+  m_Animations: []
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_UpdateMode: 0
+  m_CullingType: 0
 --- !u!1 &2809848501221703555
 GameObject:
   m_ObjectHideFlags: 0
@@ -341,9 +381,9 @@ GameObject:
   - component: {fileID: 496431037501591645}
   - component: {fileID: 7580447269617499018}
   - component: {fileID: 7147891482049453421}
-  - component: {fileID: 8691757022557870916}
+  - component: {fileID: 3619171597107855839}
   m_Layer: 8
-  m_Name: Geometry
+  m_Name: EnemyGeometry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -358,7 +398,7 @@ Transform:
   m_GameObject: {fileID: 3258136933572363585}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -422,8 +462,8 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &8691757022557870916
-CapsuleCollider:
+--- !u!65 &3619171597107855839
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -440,10 +480,8 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.52
-  m_Height: 0
-  m_Direction: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4711562983093350417
 GameObject:
@@ -794,6 +832,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 528def6e22ccf6343ad1da3acef6dc79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Project.UI.WorldSpaceHealthBarFollower
-  target: {fileID: 3326884195266179666}
+  target: {fileID: 496431037501591645}
   offset: {x: 0, y: 0.85, z: 0}
   viewCamera: {fileID: 0}

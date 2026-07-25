@@ -5,9 +5,9 @@ namespace Project.Character.Combat
 {
     /// <summary>
     /// Tracks the player's job level and experience, separate from base
-    /// level. Job level ups grant skill points instead of stat points —
-    /// there's no skill system to spend them on yet, so
-    /// <see cref="AvailableSkillPoints"/> simply accumulates until one exists.
+    /// level. Job level ups grant skill points, spent via
+    /// <see cref="TrySpendSkillPoint"/> by <see cref="PlayerSkillBook"/> to
+    /// learn or upgrade skills.
     /// </summary>
     public class PlayerJobProgress : MonoBehaviour
     {
@@ -32,8 +32,27 @@ namespace Project.Character.Combat
         /// <summary>Gets the job experience required to advance from the current job level.</summary>
         public int RequiredExperienceForNextLevel => experienceCurve.GetRequiredExperience(JobLevel);
 
-        /// <summary>Gets the number of unspent skill points, ready for a future skill system to consume.</summary>
+        /// <summary>Gets the number of unspent skill points.</summary>
         public int AvailableSkillPoints { get; private set; }
+
+        /// <summary>Raised whenever a skill point is spent.</summary>
+        public event Action SkillPointSpent;
+
+        /// <summary>
+        /// Attempts to spend one skill point, typically to learn or upgrade a skill.
+        /// </summary>
+        /// <returns>True if a point was available and spent; false otherwise.</returns>
+        public bool TrySpendSkillPoint()
+        {
+            if (AvailableSkillPoints <= 0)
+            {
+                return false;
+            }
+
+            AvailableSkillPoints--;
+            SkillPointSpent?.Invoke();
+            return true;
+        }
 
         private void Awake()
         {
