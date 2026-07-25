@@ -18,6 +18,11 @@ namespace Project.AI
         /// <inheritdoc />
         public void Tick(EnemyController enemy)
         {
+            if (enemy.BehaviorMode != EnemyBehaviorMode.Aggressive)
+            {
+                return;
+            }
+
             var detectedPlayer = enemy.DetectPlayer();
 
             if (detectedPlayer != null)

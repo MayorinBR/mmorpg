@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using Project.Character.Stats;
+using Project.Combat;
 
 namespace Project.AI
 {
@@ -11,16 +12,33 @@ namespace Project.AI
     /// manages state transitions.
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
+    [RequireComponent(typeof(CharacterStatsHolder))]
     public class EnemyController : MonoBehaviour
     {
         [SerializeField] private NavMeshAgent agent;
-        [SerializeField] private CharacterStatsDefinition stats;
         [SerializeField] private LayerMask playerLayer;
         [SerializeField] private float aggroRange = 5f;
         [SerializeField] private float leashRange = 10f;
         [SerializeField] private float attackRange = 1.5f;
+        [SerializeField] private EnemyBehaviorMode behaviorMode = EnemyBehaviorMode.Aggressive;
+        [SerializeField] private HealthComponent health;
 
+        private CharacterStatsHolder statsHolder;
         private IEnemyState currentState;
+        private int? lastKnownHealth;
+
+        private CharacterStatsHolder StatsHolder
+        {
+            get
+            {
+                if (statsHolder == null)
+                {
+                    statsHolder = GetComponent<CharacterStatsHolder>();
+                }
+
+                return statsHolder;
+            }
+        }
 
         /// <summary>Gets the NavMeshAgent used for chasing the target.</summary>
         public NavMeshAgent Agent => agent;
@@ -35,7 +53,10 @@ namespace Project.AI
         public float AttackRange => attackRange;
 
         /// <summary>Gets the enemy's base combat stats.</summary>
-        public CharacterStatsDefinition Stats => stats;
+        public CharacterStatsDefinition Stats => StatsHolder.Stats;
+
+        /// <summary>Gets whether this mob auto-aggros (Aggressive) or only retaliates when attacked (Passive).</summary>
+        public EnemyBehaviorMode BehaviorMode => behaviorMode;
 
         /// <summary>Gets the world position where the enemy started, used to evaluate the leash range.</summary>
         public Vector3 SpawnPosition { get; private set; }
@@ -46,7 +67,23 @@ namespace Project.AI
         private void Awake()
         {
             SpawnPosition = transform.position;
-            agent.speed = stats.MoveSpeed;
+            agent.speed = Stats.MoveSpeed;
+        }
+
+        private void OnEnable()
+        {
+            if (health != null)
+            {
+                health.HealthChanged += HandleHealthChanged;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (health != null)
+            {
+                health.HealthChanged -= HandleHealthChanged;
+            }
         }
 
         private void Start()
@@ -79,7 +116,36 @@ namespace Project.AI
         {
             var hits = Physics.OverlapSphere(transform.position, aggroRange, playerLayer);
 
+            // if (Time.frameCount % 60 == 0)
+            // {
+            //     Debug.Log($"{name} overlap check: {hits.Length} hit(s), layer mask value = {playerLayer.value}");
+            // }
+
             return hits.Length > 0 ? hits[0].transform : null;
+        }
+
+        private void HandleHealthChanged(int current, int max)
+        {
+            var previous = lastKnownHealth ?? max;
+            lastKnownHealth = current;
+
+            if (current >= previous)
+            {
+                return;
+            }
+
+            if (behaviorMode != EnemyBehaviorMode.Passive || PlayerTarget != null)
+            {
+                return;
+            }
+
+            var attacker = DetectPlayer();
+
+            if (attacker != null)
+            {
+                PlayerTarget = attacker;
+                ChangeState(new EnemyChaseState());
+            }
         }
 
         private void OnDrawGizmosSelected()

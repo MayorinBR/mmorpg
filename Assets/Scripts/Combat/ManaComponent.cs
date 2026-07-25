@@ -10,24 +10,37 @@ namespace Project.Combat
     /// <see cref="HealthComponent"/>. Exists ahead of the skill system so
     /// skills can consume mana as soon as they're implemented.
     /// </summary>
+    [RequireComponent(typeof(CharacterStatsHolder))]
     public class ManaComponent : MonoBehaviour
     {
-        [SerializeField] private CharacterStatsDefinition stats;
-
+        private CharacterStatsHolder statsHolder;
         private int currentMana;
+
+        private CharacterStatsHolder StatsHolder
+        {
+            get
+            {
+                if (statsHolder == null)
+                {
+                    statsHolder = GetComponent<CharacterStatsHolder>();
+                }
+
+                return statsHolder;
+            }
+        }
 
         /// <summary>Raised whenever mana changes, with (currentMana, maxMana).</summary>
         public event Action<int, int> ManaChanged;
 
         /// <summary>Gets the maximum mana defined by the character's stats.</summary>
-        public int MaxMana => stats.MaxMana;
+        public int MaxMana => StatsHolder.Stats.MaxMana;
 
         /// <summary>Gets the current mana value.</summary>
         public int CurrentMana => currentMana;
 
         private void Awake()
         {
-            currentMana = stats.MaxMana;
+            currentMana = MaxMana;
         }
 
         /// <summary>

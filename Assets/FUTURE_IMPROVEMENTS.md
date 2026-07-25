@@ -12,17 +12,23 @@ This document tracks considerations raised during development that were delibera
 
 ## Architecture / Organization
 
+- **`Prefabs/Characters` is still empty** — the Player still exists only as a scene object, never turned into a real prefab, unlike `Prefabs/Enemies` (Poring/Poporing are now proper Prefab Variants). Worth doing before the Player gets iterated on further, since scene-only changes are harder to review in Git diffs than prefab changes.
 - **`HealthBarUI` and `ManaBarUI` are near-identical duplicates** (same Slider-driving logic, different source component). A unification via a shared `IResourceProvider` interface was implemented and then deliberately reverted back to two separate scripts, by team preference (simplicity/independence over DRY in this case). Worth remembering before re-proposing the same unification later.
 - **`Project.DebugTools` is not restricted to the Editor platform** (unlike `Project.EditorTools`). Debug loggers (`HealthDebugLogger`, `EquipmentDebugLogger`) could end up in the final build if the components are forgotten on scene objects before publishing.
 - **No automated tests** cover the pure logic classes (`Inventory.TryAddItem`, `EquipmentManager` multi-slot/eviction) — good candidates for the Unity Test Framework, since they've caused subtle bugs more than once during manual development.
 
 ## Balancing (placeholders assumed deliberately)
 
-- **`FlatStatPointCostStrategy`**: always costs 1 point per stat increase, regardless of current value. Needs to become the real RO curve before launch.
-- **`LinearExperienceCurve`**: required XP = 100 × current level. Test formula, not balanced.
+- **`FlatStatPointCostStrategy`**: costs a flat 1 point per stat increase, regardless of current value. **Real target formula now documented** (source: iRO Wiki — Stats, consulted July 2026): `floor((X-1)/10) + 2` for stat value X = 1–99 (steeper tier for 100–129, third-class only). Full table in the companion Design Data Tracker's "Leveling & Stat Costs" sheet. Not yet implemented.
+- **Stat points granted per Base Level-up**: currently a flat 5 points (`PlayerExperience.statPointsPerLevel`). **Real target formula now documented**: tiered by level range — roughly `floor(level/5) + 3` under level 100, coarser bands from 100–200. Same tracker sheet. Not yet implemented.
+- **`LinearExperienceCurve`** (XP required per level): still a fully open placeholder (100 × current level). The iRO Wiki Stats reference documents stat-point *rewards* per level, not XP *thresholds* — that curve needs a different source (e.g. the wiki's Experience/Levels pages) when it's tackled.
 
 ## Incomplete systems / hooks for future features
 
+- **Quasi-stats not yet modeled**: Attack Range (partially covered by existing attack/aggro ranges), Cast Time/Cast Delay/Cooldown (blocked on the skill system), Critical Hit Shield, Perfect Dodge, Perfect Hit, and Status Effect Resistance (no status effect system exists). See the Design Data Tracker's "Quasi-Stats" sheet for the full reference.
+- **Movement Speed is correctly NOT tied to AGI** — this matches Ragnarok Online's actual behavior (a common misconception is that it should be). Worth remembering before ever "fixing" this as if it were a bug.
+- **Stat Points Reset** — no mechanism exists to respec invested stat points. Ragnarok Online offers this via NPCs/consumables/one-time resets; a simplified version (without the advanced-class trappings) is a plausible near-future QoL addition.
+- **Talent Stats (POW/STA/WIS/SPL/CON/CRT) and Level 200+ substats (P.ATK/S.MATK/RES/MRES)** — explicitly out of scope for now. These assume fourth-job classes and very high character levels, far beyond the current roadmap; documented in the GDD (Section 3.7) purely for future reference, not as near-term work.
 - **Grid-based (SQM) movement, considered and deferred.** Explored making click-to-move snap to a Ragnarok-style square grid (`GridSystem`/`GridVisualizer`, later reverted). Worth revisiting once the project needs it more concretely — likely alongside the authoritative-server migration, since grid coordinates are cheap to sync/validate compared to free-form `Vector3` positions. Key open decisions for whenever this comes back:
   - Whether WASD movement should also be grid-locked, or stay free while only click-to-move/pathing snaps to cells (asymmetry vs. consistency trade-off).
   - Cell size, chosen carefully since it will affect every range/distance value in the game (attack range, aggro radius, skill AoE) once adopted — expensive to change later.

@@ -27,7 +27,7 @@ namespace Project.Character.Movement
         public void SelectTarget(Collider hitCollider)
         {
             CurrentTarget = hitCollider.transform;
-            CurrentDamageable = hitCollider.GetComponent<IDamageable>();
+            CurrentDamageable = hitCollider.GetComponentInParent<IDamageable>();
             TargetChanged?.Invoke(CurrentTarget);
         }
 

@@ -10,11 +10,24 @@ namespace Project.Combat
     /// use the same data-driven stat asset. Raises events on change and
     /// death so other systems (UI, AI, loot) can react without polling.
     /// </summary>
+    [RequireComponent(typeof(CharacterStatsHolder))]
     public class HealthComponent : MonoBehaviour, IDamageable
     {
-        [SerializeField] private CharacterStatsDefinition stats;
-
+        private CharacterStatsHolder statsHolder;
         private int currentHealth;
+
+        private CharacterStatsHolder StatsHolder
+        {
+            get
+            {
+                if (statsHolder == null)
+                {
+                    statsHolder = GetComponent<CharacterStatsHolder>();
+                }
+
+                return statsHolder;
+            }
+        }
 
         /// <summary>Raised whenever health changes, with (currentHealth, maxHealth).</summary>
         public event Action<int, int> HealthChanged;
@@ -23,7 +36,7 @@ namespace Project.Combat
         public event Action Died;
 
         /// <summary>Gets the maximum health defined by the character's stats.</summary>
-        public int MaxHealth => stats.MaxHealth;
+        public int MaxHealth => StatsHolder.Stats.MaxHealth;
 
         /// <summary>Gets the current health value.</summary>
         public int CurrentHealth => currentHealth;
@@ -33,7 +46,7 @@ namespace Project.Combat
 
         private void Awake()
         {
-            currentHealth = stats.MaxHealth;
+            currentHealth = MaxHealth;
         }
 
         /// <inheritdoc />

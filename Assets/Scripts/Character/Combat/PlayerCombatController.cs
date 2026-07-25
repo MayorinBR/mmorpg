@@ -44,7 +44,14 @@ namespace Project.Character.Combat
             }
 
             movementController.StopMovement();
-            transform.forward = (targetSelector.CurrentTarget.position - transform.position).normalized;
+
+            var directionToTarget = targetSelector.CurrentTarget.position - transform.position;
+            directionToTarget.y = 0f;
+
+            if (directionToTarget.sqrMagnitude > 0.0001f)
+            {
+                transform.forward = directionToTarget.normalized;
+            }
 
             cooldownRemaining -= Time.deltaTime;
 

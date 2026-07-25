@@ -66,6 +66,10 @@
 
 # \- Equipment level/class requirement validation (blocks equipping items the player's level or class doesn't meet)
 
+# \- Mob variety: Aggressive/Passive behavior modes (Passive mobs only retaliate when attacked first), first content pair (Poring/Poporing) as Prefab Variants sharing a shared-color shader
+
+# \- `CharacterStatsHolder`: single shared stats reference per character, read by health, mana, and enemy AI instead of each needing its own duplicate reference
+
 # 
 
 # \---
@@ -128,6 +132,10 @@
 
 # \- Validação de requisito de nível/classe pra equipar itens (bloqueia equipar algo que o nível ou a classe do player não atende)
 
+# \- Variedade de mob: modos de comportamento Aggressive/Passive (mobs Passive só revidam se atacados primeiro), primeiro par de conteúdo (Poring/Poporing) como Prefab Variants compartilhando um shader de cor
+
+# \- `CharacterStatsHolder`: referência única de status por personagem, lida por vida, mana e IA de inimigo em vez de cada um precisar da própria referência duplicada
+
 # 
 
 # \---
@@ -189,4 +197,8 @@
 # \- プレイヤーメインHUD: 名前、HP/SPバー、経験値バー付きのベース/ジョブレベル、所持重量、ゼニー(まだゲーム内に入手手段のない通貨システム)、職業アイコン・名前
 
 # \- 装備のレベル・職業条件バリデーション(プレイヤーのレベルや職業が条件を満たさないアイテムは装備できない)
+
+# \- モブのバリエーション: Aggressive/Passive行動モード(Passiveモブは攻撃されるまで反撃しない)、最初のコンテンツペア(PoringとPoporing)をカラー共有シェーダーを使ったPrefab Variantとして実装
+
+# \- `CharacterStatsHolder`: キャラクターごとに単一のステータス参照を持ち、体力・マナ・敵AIがそれぞれ重複した参照を持つ代わりにこれを参照
 
