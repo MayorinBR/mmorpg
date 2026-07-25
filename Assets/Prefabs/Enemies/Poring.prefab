@@ -250,7 +250,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 528def6e22ccf6343ad1da3acef6dc79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Project.UI.WorldSpaceHealthBarFollower
-  target: {fileID: 6191344707893608728}
+  target: {fileID: 3670278400042409424}
   offset: {x: 0, y: 0.85, z: 0}
   viewCamera: {fileID: 0}
 --- !u!1 &5713257000297569445
@@ -380,6 +380,8 @@ GameObject:
   - component: {fileID: 4831875017803827334}
   - component: {fileID: 8075923787613613762}
   - component: {fileID: 6929252069651699362}
+  - component: {fileID: 230196999900072228}
+  - component: {fileID: 5985593107685568941}
   m_Layer: 8
   m_Name: Poring
   m_TagString: Untagged
@@ -474,7 +476,7 @@ MonoBehaviour:
   health: {fileID: 4831875017803827334}
   controller: {fileID: 3451313833103779264}
   agent: {fileID: 4613584862562306671}
-  hitCollider: {fileID: 450745478181649857}
+  hitCollider: {fileID: 0}
   visualRenderer: {fileID: 5461021245195377367}
   healthBarRoot: {fileID: 2363408862091125617}
   playerExperience: {fileID: 0}
@@ -496,6 +498,44 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Project.Character.Stats::Project.Character.Stats.CharacterStatsHolder
   stats: {fileID: 11400000, guid: e8f71853d9debfb4fa972b19458caee9, type: 2}
+--- !u!95 &230196999900072228
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6638017485894401303}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: e0624c84651754542bc74f542fc03357, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!111 &5985593107685568941
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6638017485894401303}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Animation: {fileID: 7400000, guid: c3acb441a7cd7564da785ede402a8b39, type: 2}
+  m_Animations: []
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_UpdateMode: 0
+  m_CullingType: 0
 --- !u!1 &6808703629625854916
 GameObject:
   m_ObjectHideFlags: 0
@@ -618,9 +658,9 @@ GameObject:
   - component: {fileID: 3670278400042409424}
   - component: {fileID: 8020320434228128284}
   - component: {fileID: 5461021245195377367}
-  - component: {fileID: 450745478181649857}
+  - component: {fileID: 7256425071382727484}
   m_Layer: 8
-  m_Name: Geometry
+  m_Name: EnemyGeometry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -676,7 +716,6 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 826a4f93a8d51304d9dba7e39b070b57, type: 2}
-  - {fileID: 2100000, guid: 826a4f93a8d51304d9dba7e39b070b57, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -700,8 +739,8 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &450745478181649857
-CapsuleCollider:
+--- !u!65 &7256425071382727484
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -718,10 +757,8 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.52
-  m_Height: 0
-  m_Direction: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8186204556109448567
 GameObject:

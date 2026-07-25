@@ -45,7 +45,7 @@
                 {
                     "name": "ZoomCamera",
                     "type": "Value",
-                    "id": "64ccff3e-bdaa-4bec-b29d-3724ccbf800e",
+                    "id": "d4c0acd5-22d7-46b1-9152-6e77c7ce691d",
                     "expectedControlType": "Axis",
                     "processors": "",
                     "interactions": "",
@@ -308,15 +308,48 @@
                     "id": "35ff89ec-2e14-425a-99b7-2813da7d52a7",
                     "path": "<Mouse>/scroll/x",
                     "interactions": "",
-                    "processors": "",
+                    "processors": "Scale(factor=5)",
                     "groups": "",
                     "action": "RotateCamera",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
+                    "name": "One Modifier",
+                    "id": "bd6cf7ba-8018-4e6f-9369-e7b4cbe11a84",
+                    "path": "OneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RotateCamera",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "038daee3-de3c-4a91-9d4c-383e792fc245",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RotateCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "binding",
+                    "id": "f73184cd-35d2-4cac-82b7-9e47f571bc2b",
+                    "path": "<Mouse>/delta/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RotateCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
                     "name": "",
-                    "id": "1d58de7a-e03f-4972-a840-aad6bf6a6bd4",
+                    "id": "38cd8a9f-5449-4880-9366-eca8deada0d3",
                     "path": "<Gamepad>/rightStick/y",
                     "interactions": "",
                     "processors": "",
@@ -327,7 +360,7 @@
                 },
                 {
                     "name": "",
-                    "id": "464df286-93fa-40ed-ac0b-167c0912d492",
+                    "id": "569d1532-4840-4a51-be1d-dacbe8c018cb",
                     "path": "<Gamepad>/dpad/y",
                     "interactions": "",
                     "processors": "",
@@ -338,7 +371,7 @@
                 },
                 {
                     "name": "",
-                    "id": "92011665-bf7b-4379-8eb6-887b2f04ccb6",
+                    "id": "02e9e4b1-ae9f-4797-b7fc-deb8602a512c",
                     "path": "<Mouse>/scroll/y",
                     "interactions": "",
                     "processors": "Scale(factor=20)",

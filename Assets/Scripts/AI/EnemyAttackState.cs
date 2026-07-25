@@ -54,7 +54,7 @@ namespace Project.AI
 
         private void PerformAttack(EnemyController enemy)
         {
-            var damageable = enemy.PlayerTarget.GetComponent<IDamageable>();
+            var damageable = enemy.PlayerTarget.GetComponentInParent<IDamageable>();
 
             damageable?.TakeDamage(enemy.Stats.AttackPower);
         }
