@@ -75,5 +75,21 @@ namespace Project.Combat
             currentHealth = MaxHealth;
             HealthChanged?.Invoke(currentHealth, MaxHealth);
         }
+
+        /// <summary>
+        /// Restores a partial amount of health, clamped to the maximum.
+        /// Does nothing if already dead.
+        /// </summary>
+        /// <param name="amount">The amount of health to restore. Non-positive values are ignored.</param>
+        public void Heal(int amount)
+        {
+            if (IsDead || amount <= 0)
+            {
+                return;
+            }
+
+            currentHealth = Mathf.Min(currentHealth + amount, MaxHealth);
+            HealthChanged?.Invoke(currentHealth, MaxHealth);
+        }
     }
 }

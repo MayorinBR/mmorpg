@@ -25,7 +25,7 @@ This document tracks considerations raised during development that were delibera
 
 ## Incomplete systems / hooks for future features
 
-- **Quasi-stats not yet modeled**: Attack Range (partially covered by existing attack/aggro ranges), Cast Time/Cast Delay/Cooldown (blocked on the skill system), Critical Hit Shield, Perfect Dodge, Perfect Hit, and Status Effect Resistance (no status effect system exists). See the Design Data Tracker's "Quasi-Stats" sheet for the full reference.
+- **Quasi-stats not yet modeled**: Attack Range (partially covered by existing attack/aggro ranges), Cast Time and Cast Delay (skills cast instantly today, no channeling — `Cooldown` itself is now implemented per-skill in `PlayerSkillCaster`), Critical Hit Shield, Perfect Dodge, Perfect Hit, and Status Effect Resistance (no status effect system exists). See the Design Data Tracker's "Quasi-Stats" sheet for the full reference.
 - **Movement Speed is correctly NOT tied to AGI** — this matches Ragnarok Online's actual behavior (a common misconception is that it should be). Worth remembering before ever "fixing" this as if it were a bug.
 - **Stat Points Reset** — no mechanism exists to respec invested stat points. Ragnarok Online offers this via NPCs/consumables/one-time resets; a simplified version (without the advanced-class trappings) is a plausible near-future QoL addition.
 - **Talent Stats (POW/STA/WIS/SPL/CON/CRT) and Level 200+ substats (P.ATK/S.MATK/RES/MRES)** — explicitly out of scope for now. These assume fourth-job classes and very high character levels, far beyond the current roadmap; documented in the GDD (Section 3.7) purely for future reference, not as near-term work.
@@ -36,6 +36,18 @@ This document tracks considerations raised during development that were delibera
   - Whether the visual grid indicator needs to be visible in-game (shader/mesh) or Scene-view-only (Gizmos) is enough.
 - **"Ammo" item type** (arrows, bullets) not implemented yet — needs special handling because it's stack-consumable while equipped, unlike the rest of the equipment system (which assumes "one item, worn once").
 - **`ItemDefinition` has no `OnValidate()`** guarding against inconsistent Inspector configuration (e.g. an `Equipment` item marked `Is Stackable`, or with no `Required Slots` set).
+
+## Planned skill system expansion (documented, not implemented)
+
+The current skill system (`SkillDefinition`, `PlayerSkillCaster`) only supports instant single-target Damage or Heal effects. Three kinds of skills are planned but deliberately not built yet — noted here with enough shape to avoid re-deriving the architecture later:
+
+- **Temporary buffs and debuffs** (e.g. +20% ATK for 30s, -10% DEF for 15s). Needs a new `StatusEffectDefinition` (which stat, magnitude, duration) and a per-character `StatusEffectController` tracking active effects and their remaining time, applying/removing modifiers. This becomes a third layer in the stat pipeline, alongside the existing Base Stats + Equipment layers (`IStatProvider`/`EquippedStatsView`) — likely another `IStatProvider` implementation that sums active effect modifiers.
+- **Ground-targeted area skills with no fixed target** (e.g. a Fire Wall that damages whoever walks into it, an AoE heal zone). Needs a different cast flow from today's (which always resolves to a specific `IDamageable`): the player would click a world position instead of selecting a target, spawning a persistent "zone" object (trigger collider + duration timer) that applies its effect to anything that enters/stays inside it, checking layers to determine who it affects (enemies only, allies only, or both, depending on the skill).
+- **Elemental damage and resistances** (Fire, Ice, Holy, Dark, Wind, Electric, Neutral, etc.). Needs an `Element` enum, an optional `Element` field on `SkillDefinition` (and eventually weapons), and a per-element resistance/weakness table added to `CharacterStatsDefinition` (or a new asset type for enemies specifically) — damage would multiply by the target's resistance value for the attack's element. Connects to the already-noted Status Effect Resistance quasi-stat gap.
+
+- **Ally-target skills (`SkillTargetType.Ally`) currently behave identically to Self-target** — `StrongHeal` can only heal the caster today, since no "select another player as a target" mechanic exists yet (there's no multiplayer to test it against). The data field is in place; only the targeting input is missing.
+
+None of this is scheduled — it's here so a future skill-system pass starts from an already-thought-through shape instead of a blank page.
 
 ## Player feedback (UX)
 
@@ -53,6 +65,11 @@ This document tracks considerations raised during development that were delibera
 ## Lesson learned: destroyed Unity object references
 
 - Comparing a cached `MonoBehaviour`/`GameObject` reference directly against `null` doesn't reliably detect "was destroyed while referenced" in the same way as a plain `bool` flag — Unity's overloaded `==` operator treats destroyed objects as equal to `null`, which caused a real bug in `WorldItemHoverDetector` (tooltip staying on screen after the hovered item was collected). Worth keeping in mind for any future system that caches a reference to something that can be destroyed at runtime (mobs, pickups, projectiles): prefer a separate `bool` flag alongside the reference rather than relying solely on the `== null` check.
+
+## Lesson learned: Awake-ordering and GetComponent lookups
+
+- **Caching a `GetComponent<T>()` result only in `Awake()` is fragile** if any *other* component might read that cached value before this component's own `Awake()` has run (Unity doesn't guarantee `Awake` order across different GameObjects). This caused a real `NullReferenceException` in `HealthBarUI` reading `HealthComponent.MaxHealth` before `HealthComponent`'s own `Awake()` had resolved its `CharacterStatsHolder`. Fixed by resolving lazily (on first access, cached from then on) instead of only in `Awake()` — safe regardless of who asks first. Worth using this pattern by default for any "look up a sibling component once" case, not just when a bug surfaces.
+- **`GetComponent<T>()` only checks the exact GameObject hit, not its parents.** When a collider lives on a child object (e.g. an imported model's mesh, like Poring's `Geometry` child) but the component you actually need (`HealthComponent`, etc.) lives on the prefab root, `GetComponent` silently returns null instead of finding it. `PlayerTargetSelector` had this exact bug. `GetComponentInParent<T>()` is the safer default whenever a hit collider might not live on the same object as the data you need from it.
 
 ## Multiplayer / Persistence (out of scope for this phase, but relevant to the roadmap)
 
