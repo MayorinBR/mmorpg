@@ -16,6 +16,7 @@ namespace Project.Character
     public class PlayerDeathHandler : MonoBehaviour
     {
         [SerializeField] private HealthComponent health;
+        [SerializeField] private ManaComponent mana;
         [SerializeField] private CharacterMovementController movementController;
         [SerializeField] private PlayerCombatController combatController;
         [SerializeField] private PlayerInputRouter inputRouter;
@@ -55,6 +56,7 @@ namespace Project.Character
 
             movementController.WarpTo(respawnPoint.position);
             health.ResetHealth();
+            mana.ResetMana();
             deathScreenRoot.SetActive(false);
             SetControlsEnabled(true);
         }

@@ -37,6 +37,17 @@ This document tracks considerations raised during development that were delibera
 - **"Ammo" item type** (arrows, bullets) not implemented yet — needs special handling because it's stack-consumable while equipped, unlike the rest of the equipment system (which assumes "one item, worn once").
 - **`ItemDefinition` has no `OnValidate()`** guarding against inconsistent Inspector configuration (e.g. an `Equipment` item marked `Is Stackable`, or with no `Required Slots` set).
 
+## Skill system UI (implemented)
+
+The Skill Book and Skill Hotbar windows are implemented: drag-and-drop from a learned skill's icon in the Skill Book onto any of the 10 hotbar slots (`PlayerSkillHotbar`, keys 1-9 and 0) binds it to that slot, and each hotbar slot (`SkillHotbarSlotUI`) reflects real-time availability via `PlayerSkillCaster.GetAvailability` — normal icon when ready, grayscale with a countdown timer (`GetCooldownRemaining`, shown to 1 decimal place) while on cooldown, red tint when blocked for any other reason (not learned, insufficient mana, no valid target). The Skill Book (`SkillBookWindowUI`/`SkillBookEntryUI`) lists every skill available to the current class with icon, name, current/max level, mana cost, and cooldown, plus a Learn button spending a `PlayerJobProgress` skill point.
+
+Known gaps left from this pass:
+
+- **No tooltip on hotbar hover.** The Skill Book shows mana cost/cooldown/description, but hovering a hotbar slot shows nothing — has to reopen the Skill Book to check what a bound skill does. A natural next step, reusing the `ItemTooltipUI`-style hover pattern already used elsewhere.
+- **No minimum-level requirement to learn a skill**, only class restriction. `SkillDefinition` doesn't have a `requiredLevel` field yet; the quasi-stat gap for this was already noted below.
+- **Hotbar slot assignments aren't persisted** — like everything else, they reset when Play Mode stops. Rolls into the general persistence gap noted further down.
+- **`PlayerSkillHotbar.SlotCount`** was bumped from 4 to 10 (keys 1-9 and 0) after the initial 4-slot version shipped. Because `slots` is a `[SerializeField]` array sized from that constant only at authoring time, existing scene/prefab instances kept their old serialized array length (4) even after the constant changed — `GetSkill`/`SetSkill` then threw `IndexOutOfRangeException` for the new slot indices until the array was manually resized to 10 in the Inspector. Worth remembering for any future constant-driven array resize: bumping the constant in code does not resize already-serialized data: check the Inspector every time.
+
 ## Planned skill system expansion (documented, not implemented)
 
 The current skill system (`SkillDefinition`, `PlayerSkillCaster`) only supports instant single-target Damage or Heal effects. Three kinds of skills are planned but deliberately not built yet — noted here with enough shape to avoid re-deriving the architecture later:
@@ -70,6 +81,10 @@ None of this is scheduled — it's here so a future skill-system pass starts fro
 
 - **Caching a `GetComponent<T>()` result only in `Awake()` is fragile** if any *other* component might read that cached value before this component's own `Awake()` has run (Unity doesn't guarantee `Awake` order across different GameObjects). This caused a real `NullReferenceException` in `HealthBarUI` reading `HealthComponent.MaxHealth` before `HealthComponent`'s own `Awake()` had resolved its `CharacterStatsHolder`. Fixed by resolving lazily (on first access, cached from then on) instead of only in `Awake()` — safe regardless of who asks first. Worth using this pattern by default for any "look up a sibling component once" case, not just when a bug surfaces.
 - **`GetComponent<T>()` only checks the exact GameObject hit, not its parents.** When a collider lives on a child object (e.g. an imported model's mesh, like Poring's `Geometry` child) but the component you actually need (`HealthComponent`, etc.) lives on the prefab root, `GetComponent` silently returns null instead of finding it. `PlayerTargetSelector` had this exact bug. `GetComponentInParent<T>()` is the safer default whenever a hit collider might not live on the same object as the data you need from it.
+
+## Lesson learned: serialized scene references on dynamically-instantiated prefabs
+
+- **A `[SerializeField]` reference to a scene object (e.g. the parent `Canvas`) cannot be pre-wired on a prefab asset that gets `Instantiate`d at runtime** — there's no scene instance to drag into the field at author time, so it silently stays `null` on every clone. This caused a `NullReferenceException` in `SkillBookEntryUI`'s drag-and-drop (needed its `Canvas` to parent a floating drag icon). Fixed by resolving it lazily via `GetComponentInParent<Canvas>()` in `Awake()` instead of a serialized field — the same pattern `ItemTooltipUI` already used for its own parent canvas. Worth defaulting to this pattern for any component that will be cloned from a prefab asset and needs a reference to whatever scene hierarchy it ends up parented under.
 
 ## Multiplayer / Persistence (out of scope for this phase, but relevant to the roadmap)
 
