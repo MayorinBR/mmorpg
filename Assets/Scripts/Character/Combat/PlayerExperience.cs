@@ -14,6 +14,7 @@ namespace Project.Character.Combat
     {
         [SerializeField] private PlayerStatsController statsController;
         [SerializeField] private HealthComponent health;
+        [SerializeField] private ManaComponent mana;
         [SerializeField] private int statPointsPerLevel = 5;
 
         private IExperienceCurve experienceCurve;
@@ -78,6 +79,11 @@ namespace Project.Character.Combat
                 if (health != null)
                 {
                     health.ResetHealth();
+                }
+
+                if (mana != null)
+                {
+                    mana.ResetMana();
                 }
             }
 

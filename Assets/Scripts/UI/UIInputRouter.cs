@@ -40,5 +40,25 @@ namespace Project.UI
                 uiController.ToggleWindow("Equipment");
             }
         }
+
+        /// <summary>Called by the Input System when the Toggle Skill Hotbar shortcut is pressed.</summary>
+        /// <param name="context">Callback context for the action.</param>
+        public void OnToggleSkillHotbar(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+            {
+                uiController.ToggleWindow("SkillHotbar");
+            }
+        }
+
+        /// <summary>Called by the Input System when the Toggle Skill Book shortcut is pressed.</summary>
+        /// <param name="context">Callback context for the action.</param>
+        public void OnToggleSkillBook(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+            {
+                uiController.ToggleWindow("SkillBook");
+            }
+        }
     }
 }

@@ -34,7 +34,8 @@ Prototype of a 2.5D/3D MMORPG built in Unity, inspired by Ragnarok Online's clas
 - Equipment level/class requirement validation (blocks equipping items the player's level or class doesn't meet)
 - Mob variety: Aggressive/Passive behavior modes (Passive mobs only retaliate when attacked first), first content pair (Poring/Poporing) as Prefab Variants sharing a shared-color shader
 - `CharacterStatsHolder`: single shared stats reference per character, read by health, mana, and enemy AI instead of each needing its own duplicate reference
-- Basic skill system: class-restricted skills learned/leveled up by spending Job Level skill points, with mana cost, cooldown, and range; supports Damage (Physical/Magical, scaling from Status ATK/MATK) and Heal effects, cast from a 4-slot keyboard hotbar; four test skills covering both effect types and both target scopes (self-only and enemy-targeted)
+- Basic skill system: class-restricted skills learned/leveled up by spending Job Level skill points, with mana cost, cooldown, and range; supports Damage (Physical/Magical, scaling from Status ATK/MATK) and Heal effects, cast from a 10-slot keyboard hotbar (keys 1-9 and 0); four test skills covering both effect types and both target scopes (self-only and enemy-targeted)
+- Skill Book and Skill Hotbar windows (draggable/closable like the rest of the UI): drag a learned skill's icon from the Skill Book straight onto a hotbar slot to bind it to that slot's key; each hotbar slot shows the skill's icon in one of three states — normal when ready, grayscale with a countdown timer while on cooldown, and a red tint when unusable for any other reason (not learned, insufficient mana, no valid target); the Skill Book itself lists every skill available to the player's current class with icon, name, current/max level, mana cost, and cooldown, plus a button to learn or upgrade it
 
 ---
 
@@ -68,7 +69,8 @@ Protótipo de um MMORPG 2.5D/3D feito em Unity, inspirado no gameplay clássico 
 - Validação de requisito de nível/classe pra equipar itens (bloqueia equipar algo que o nível ou a classe do player não atende)
 - Variedade de mob: modos de comportamento Aggressive/Passive (mobs Passive só revidam se atacados primeiro), primeiro par de conteúdo (Poring/Poporing) como Prefab Variants compartilhando um shader de cor
 - `CharacterStatsHolder`: referência única de status por personagem, lida por vida, mana e IA de inimigo em vez de cada um precisar da própria referência duplicada
-- Sistema básico de skills: skills restritas por classe, aprendidas/upadas gastando pontos de skill do Job Level, com custo de mana, cooldown e alcance; suporta efeitos de Dano (Físico/Mágico, escalando de Status ATK/MATK) e Cura, conjuradas por uma hotbar de teclado com 4 slots; quatro skills de teste cobrindo os dois tipos de efeito e os dois tipos de alvo (só o próprio jogador, e alvo inimigo)
+- Sistema básico de skills: skills restritas por classe, aprendidas/upadas gastando pontos de skill do Job Level, com custo de mana, cooldown e alcance; suporta efeitos de Dano (Físico/Mágico, escalando de Status ATK/MATK) e Cura, conjuradas por uma hotbar de teclado com 10 slots (teclas 1-9 e 0); quatro skills de teste cobrindo os dois tipos de efeito e os dois tipos de alvo (só o próprio jogador, e alvo inimigo)
+- Janelas de Skill Book e Skill Hotbar (arrastáveis/fecháveis como o resto da UI): arraste o ícone de uma skill aprendida do Skill Book direto pra um slot da hotbar pra vincular ela à tecla daquele slot; cada slot da hotbar mostra o ícone em um de três estados — normal quando disponível, em escala de cinza com um timer regressivo durante o cooldown, e com tom avermelhado quando indisponível por qualquer outro motivo (não aprendida, mana insuficiente, sem alvo válido); o Skill Book lista todas as skills disponíveis pra classe atual do jogador com ícone, nome, nível atual/máximo, custo de mana e cooldown, além de um botão pra aprender ou upar
 
 ---
 
@@ -102,4 +104,5 @@ Ragnarok Onlineのクラシックな戦闘(PvE)と探索のゲームプレイに
 - 装備のレベル・職業条件バリデーション(プレイヤーのレベルや職業が条件を満たさないアイテムは装備できない)
 - モブのバリエーション: Aggressive/Passive行動モード(Passiveモブは攻撃されるまで反撃しない)、最初のコンテンツペア(PoringとPoporing)をカラー共有シェーダーを使ったPrefab Variantとして実装
 - `CharacterStatsHolder`: キャラクターごとに単一のステータス参照を持ち、体力・マナ・敵AIがそれぞれ重複した参照を持つ代わりにこれを参照
-- 基本スキルシステム: ジョブレベルのスキルポイントを消費して習得・レベルアップする職業限定スキル、マナコスト・クールダウン・射程付き。ダメージ(物理/魔法、Status ATK/MATKに基づく)と回復効果に対応し、4スロットのキーボードホットバーから使用。両方の効果タイプと対象範囲(自己のみ・敵対象)をカバーする4つのテストスキルを実装
+- 基本スキルシステム: ジョブレベルのスキルポイントを消費して習得・レベルアップする職業限定スキル、マナコスト・クールダウン・射程付き。ダメージ(物理/魔法、Status ATK/MATKに基づく)と回復効果に対応し、10スロット(キー1〜9と0)のキーボードホットバーから使用。両方の効果タイプと対象範囲(自己のみ・敵対象)をカバーする4つのテストスキルを実装
+- スキルブックとスキルホットバーのウィンドウ(他のUIと同様にドラッグ移動・閉じる操作が可能): スキルブックで習得済みのスキルのアイコンをホットバーのスロットへドラッグするとそのスロットのキーに割り当てられる。各ホットバースロットは3つの状態でアイコンを表示 — 使用可能なら通常表示、クールダウン中はグレースケール表示とカウントダウンタイマー、それ以外の理由(未習得・マナ不足・有効な対象なし)で使用不可の場合は赤みがかった表示。スキルブックにはプレイヤーの現在の職業で習得可能な全スキルがアイコン・名前・現在/最大レベル・マナコスト・クールダウンと共に一覧表示され、習得・レベルアップ用のボタンも備える
