@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ac8772ba691df44989e71fd8e110b57, type: 3}
-  m_Name: TestWeapon
+  m_Name: TestWeaponOff
   m_EditorClassIdentifier: Assembly-CSharp::Project.Items.ItemDefinition
-  itemName: Test Weapon
-  description: Test Weapon Description
-  icon: {fileID: 228823985, guid: 287e2daed8778f44d940a3c78a40551c, type: 3}
+  itemName: Test Weapon Off
+  description: Test Weapon Off Description
+  icon: {fileID: 253523554, guid: 287e2daed8778f44d940a3c78a40551c, type: 3}
   isStackable: 0
   maxStackSize: 99
   itemType: 2
   requiredSlots: 03000000
   statBonuses:
-    strength: 2
+    strength: 1
     agility: 0
     vitality: 0
     intelligence: 0
@@ -28,5 +28,5 @@ MonoBehaviour:
     luck: 0
   requiredLevel: 1
   allowedClasses: 
-  weight: 4
-  canBeOffHand: 0
+  weight: 2
+  canBeOffHand: 1

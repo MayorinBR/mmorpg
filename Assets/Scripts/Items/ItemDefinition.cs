@@ -23,6 +23,9 @@ namespace Project.Items
         [SerializeField] private int requiredLevel = 1;
         [SerializeField] private CharacterClass[] allowedClasses;
         [SerializeField] private float weight = 1f;
+        [SerializeField] private bool canBeOffHand;
+        [SerializeField] private WeaponType weaponType = WeaponType.Melee;
+        [SerializeField] private float attackRange = 1.5f;
 
         /// <summary>Gets the display name of the item.</summary>
         public string ItemName => itemName;
@@ -56,5 +59,14 @@ namespace Project.Items
 
         /// <summary>Gets the weight of a single unit of this item, used by the carry-weight inventory system.</summary>
         public float Weight => weight;
+
+        /// <summary>Gets whether this one-handed weapon can be equipped in the off hand (Right Hand) alongside a main-hand weapon.</summary>
+        public bool CanBeOffHand => canBeOffHand;
+
+        /// <summary>Gets whether this weapon is melee or ranged. Only meaningful for hand-slot equipment.</summary>
+        public WeaponType WeaponType => weaponType;
+
+        /// <summary>Gets the basic-attack range this weapon grants while equipped. Only meaningful for hand-slot weapons.</summary>
+        public float AttackRange => attackRange;
     }
 }

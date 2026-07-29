@@ -9,14 +9,12 @@ namespace Project.UI
 {
     /// <summary>
     /// Displays one row in the Skill Book window: a skill's icon, name,
-    /// current/max level, mana cost, and cooldown, with a button to learn
-    /// or upgrade it. Acts as a drag source for assigning the skill to a
-    /// hotbar slot once it's been learned (dragging an unlearned skill is
-    /// a no-op). Resolves its parent Canvas automatically at runtime,
-    /// since instances are cloned from a prefab asset and can't have a
-    /// scene reference dragged into them ahead of time.
+    /// and current/max level, with a button to learn or upgrade it. Acts
+    /// as a drag source for assigning the skill to a hotbar slot once
+    /// it's been learned (dragging an unlearned skill is a no-op), and
+    /// shows the shared <see cref="SkillTooltipUI"/> on hover.
     /// </summary>
-    public class SkillBookEntryUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+    public class SkillBookEntryUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField] private Image iconImage;
         [SerializeField] private TMP_Text nameText;
@@ -36,6 +34,14 @@ namespace Project.UI
         {
             rootCanvas = GetComponentInParent<Canvas>();
             learnButton.onClick.AddListener(OnLearnClicked);
+        }
+
+        private void OnDisable()
+        {
+            if (SkillTooltipUI.Instance != null)
+            {
+                SkillTooltipUI.Instance.Hide();
+            }
         }
 
         /// <summary>
@@ -62,8 +68,29 @@ namespace Project.UI
             learnButton.interactable = level < Skill.MaxLevel;
         }
 
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (Skill != null && SkillTooltipUI.Instance != null)
+            {
+                SkillTooltipUI.Instance.Show(Skill, eventData.position);
+            }
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (SkillTooltipUI.Instance != null)
+            {
+                SkillTooltipUI.Instance.Hide();
+            }
+        }
+
         public void OnBeginDrag(PointerEventData eventData)
         {
+            if (SkillTooltipUI.Instance != null)
+            {
+                SkillTooltipUI.Instance.Hide();
+            }
+
             if (skillBook.GetLevel(Skill) <= 0 || rootCanvas == null)
             {
                 return;

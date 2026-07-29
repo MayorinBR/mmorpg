@@ -8,13 +8,15 @@ namespace Project.UI
     /// <summary>
     /// Populates the Skill Book window with one <see cref="SkillBookEntryUI"/>
     /// row per skill available to the player's current class, refreshing
-    /// whenever a skill is learned or upgraded elsewhere.
+    /// whenever a skill is learned/upgraded or the player's Base Level
+    /// changes (since some skills require a minimum level to learn).
     /// </summary>
     public class SkillBookWindowUI : MonoBehaviour
     {
         [SerializeField] private SkillDefinition[] allSkills;
         [SerializeField] private PlayerSkillBook skillBook;
         [SerializeField] private PlayerClassController classController;
+        [SerializeField] private PlayerExperience experience;
         [SerializeField] private SkillBookEntryUI entryPrefab;
         [SerializeField] private Transform contentRoot;
 
@@ -48,11 +50,16 @@ namespace Project.UI
 
         private void OnSkillLeveledUp(SkillDefinition skill, int newLevel)
         {
+            RefreshAllEntries();
+        }
+
+        private void RefreshAllEntries()
+        {
             foreach (Transform child in contentRoot)
             {
                 var entry = child.GetComponent<SkillBookEntryUI>();
 
-                if (entry != null && entry.Skill == skill)
+                if (entry != null)
                 {
                     entry.Refresh();
                 }

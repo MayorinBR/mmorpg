@@ -13,8 +13,11 @@ namespace Project.Combat
     [RequireComponent(typeof(CharacterStatsHolder))]
     public class HealthComponent : MonoBehaviour, IDamageable
     {
+        [SerializeField] private MonoBehaviour damageModifierSource;
+
         private CharacterStatsHolder statsHolder;
         private int currentHealth;
+        private IDamageModifier damageModifier;
 
         private CharacterStatsHolder StatsHolder
         {
@@ -47,12 +50,23 @@ namespace Project.Combat
         private void Awake()
         {
             currentHealth = MaxHealth;
+            damageModifier = damageModifierSource as IDamageModifier;
         }
 
         /// <inheritdoc />
         public void TakeDamage(int amount)
         {
             if (IsDead || amount <= 0)
+            {
+                return;
+            }
+
+            if (damageModifier != null)
+            {
+                amount = damageModifier.ModifyIncomingDamage(amount);
+            }
+
+            if (amount <= 0)
             {
                 return;
             }

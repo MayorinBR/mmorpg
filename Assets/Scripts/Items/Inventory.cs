@@ -174,5 +174,28 @@ namespace Project.Items
 
             return remaining;
         }
+
+        /// <summary>
+        /// Directly replaces the contents of a slot, bypassing stacking and
+        /// weight-capacity logic. Intended for swaps where the caller already
+        /// knows exactly which slot should hold the item (e.g. exchanging
+        /// equipped ammo with the stack that's replacing it).
+        /// </summary>
+        /// <param name="index">The slot index to overwrite.</param>
+        /// <param name="item">The item to place in the slot.</param>
+        /// <param name="quantity">The quantity to place in the slot.</param>
+        public void SetSlot(int index, ItemDefinition item, int quantity)
+        {
+            var previousSlot = slots[index];
+
+            if (!previousSlot.IsEmpty)
+            {
+                CurrentWeight -= previousSlot.Item.Weight * previousSlot.Quantity;
+            }
+
+            slots[index] = new InventorySlot(item, quantity);
+            CurrentWeight += item.Weight * quantity;
+            InventoryChanged?.Invoke();
+        }
     }
 }

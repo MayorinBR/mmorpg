@@ -13,6 +13,7 @@ namespace Project.Items
         RightHand,
         Pants,
         Boots,
-        Accessory
+        Accessory,
+        Ammo
     }
 }

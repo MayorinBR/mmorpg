@@ -13,9 +13,10 @@ namespace Project.UI
     /// when the skill can't currently be cast for any other reason
     /// (not learned, insufficient mana, no valid target). Accepts
     /// drag-and-drop from <see cref="SkillBookEntryUI"/> to assign a
-    /// skill to this slot, and casts on click when ready.
+    /// skill to this slot, casts on click when ready, and shows the
+    /// shared <see cref="SkillTooltipUI"/> on hover.
     /// </summary>
-    public class SkillHotbarSlotUI : MonoBehaviour, IDropHandler, IPointerClickHandler
+    public class SkillHotbarSlotUI : MonoBehaviour, IDropHandler, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
         private static readonly Color ReadyColor = Color.white;
         private static readonly Color CooldownColor = new Color(0.5f, 0.5f, 0.5f, 1f);
@@ -39,6 +40,11 @@ namespace Project.UI
         private void OnDisable()
         {
             hotbar.SlotChanged -= OnSlotChanged;
+
+            if (SkillTooltipUI.Instance != null)
+            {
+                SkillTooltipUI.Instance.Hide();
+            }
         }
 
         private void Update()
@@ -63,6 +69,22 @@ namespace Project.UI
             if (assignedSkill != null && caster.GetAvailability(assignedSkill) == SkillAvailability.Ready)
             {
                 caster.TryCastSkill(assignedSkill);
+            }
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (assignedSkill != null && SkillTooltipUI.Instance != null)
+            {
+                SkillTooltipUI.Instance.Show(assignedSkill, eventData.position);
+            }
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (SkillTooltipUI.Instance != null)
+            {
+                SkillTooltipUI.Instance.Hide();
             }
         }
 
