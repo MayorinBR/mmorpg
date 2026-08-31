@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Project.Persistence;
 
 namespace Project.UI
 {
@@ -14,7 +15,7 @@ namespace Project.UI
     /// for the rest of the session and used on every subsequent open.
     /// Clicking the window (or starting to drag it) brings it to front.
     /// </summary>
-    public class WindowPanel : MonoBehaviour, IPointerDownHandler
+    public class WindowPanel : MonoBehaviour, IPointerDownHandler, ISaveParticipant
     {
         [SerializeField] private RectTransform contentRoot;
         [SerializeField] private Button closeButton;
@@ -150,6 +151,47 @@ namespace Project.UI
         public void OnPointerDown(PointerEventData eventData)
         {
             BringToFront();
+        }
+
+        /// <inheritdoc />
+        public void CaptureState(PlayerSaveData data)
+        {
+            data.windowIds.Add(id);
+            data.windowIsOpen.Add(IsOpen ? 1 : 0);
+            data.windowIsMinimized.Add(isMinimized ? 1 : 0);
+            data.windowHasCustomPosition.Add(hasCustomPosition ? 1 : 0);
+
+            var positionToSave = hasCustomPosition ? customPosition : rectTransform.anchoredPosition;
+            data.windowPositionX.Add(positionToSave.x);
+            data.windowPositionY.Add(positionToSave.y);
+        }
+
+        /// <inheritdoc />
+        public void RestoreState(PlayerSaveData data)
+        {
+            var index = data.windowIds.IndexOf(id);
+
+            if (index < 0)
+            {
+                return;
+            }
+
+            hasCustomPosition = data.windowHasCustomPosition[index] != 0;
+            customPosition = new Vector2(data.windowPositionX[index], data.windowPositionY[index]);
+
+            if (data.windowIsOpen[index] != 0)
+            {
+                Open();
+
+                if (data.windowIsMinimized[index] != 0)
+                {
+                    ToggleMinimize();
+                }
+            }
+            else
+            {
+                Close();
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Project.Character.Stats;
+using Project.Persistence;
 
 namespace Project.Items
 {
@@ -21,13 +22,15 @@ namespace Project.Items
     /// contributing while a Ranged weapon is equipped. Equipping and
     /// unequipping move items to and from the player's inventory.
     /// </summary>
-    public class EquipmentManager : MonoBehaviour
+    public class EquipmentManager : MonoBehaviour, ISaveParticipant
     {
         private const int AccessoryCapacity = 2;
+        private const int SlotCount = 9;
 
         [SerializeField] private PlayerInventory inventory;
         [SerializeField] private MonoBehaviour playerStatsSource;
         [SerializeField] private MonoBehaviour playerClassSource;
+        [SerializeField] private ItemDatabase itemDatabase;
 
         private IPlayerLevelProvider levelProvider;
         private IPlayerClassProvider classProvider;
@@ -371,6 +374,77 @@ namespace Project.Items
                 case StatType.Luck: return modifiers.Luck;
                 default: return 0;
             }
+        }
+
+        /// <inheritdoc />
+        public void CaptureState(PlayerSaveData data)
+        {
+            data.equippedItemIds.Clear();
+            data.equippedSlotMasks.Clear();
+            data.equippedAmmoCount = equippedAmmoCount;
+
+            if (itemDatabase == null)
+            {
+                return;
+            }
+
+            foreach (var record in equippedRecords)
+            {
+                data.equippedItemIds.Add(itemDatabase.GetId(record.Item));
+                data.equippedSlotMasks.Add(ToSlotMask(record.OccupiedSlots));
+            }
+        }
+
+        /// <inheritdoc />
+        public void RestoreState(PlayerSaveData data)
+        {
+            equippedRecords.Clear();
+            equippedAmmoCount = 0;
+
+            if (itemDatabase != null)
+            {
+                for (var i = 0; i < data.equippedItemIds.Count; i++)
+                {
+                    var item = itemDatabase.FindById(data.equippedItemIds[i]);
+
+                    if (item != null)
+                    {
+                        equippedRecords.Add(new EquippedRecord(item, FromSlotMask(data.equippedSlotMasks[i])));
+                    }
+                }
+
+                equippedAmmoCount = data.equippedAmmoCount;
+            }
+
+            EquipmentChanged?.Invoke();
+            AmmoCountChanged?.Invoke();
+        }
+
+        private static int ToSlotMask(IReadOnlyList<EquipmentSlot> slots)
+        {
+            var mask = 0;
+
+            foreach (var slot in slots)
+            {
+                mask |= 1 << (int)slot;
+            }
+
+            return mask;
+        }
+
+        private static IReadOnlyList<EquipmentSlot> FromSlotMask(int mask)
+        {
+            var slots = new List<EquipmentSlot>();
+
+            for (var bit = 0; bit < SlotCount; bit++)
+            {
+                if ((mask & (1 << bit)) != 0)
+                {
+                    slots.Add((EquipmentSlot)bit);
+                }
+            }
+
+            return slots;
         }
 
         private class EquippedRecord

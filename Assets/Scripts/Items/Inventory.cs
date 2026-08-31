@@ -123,6 +123,21 @@ namespace Project.Items
             }
         }
 
+        /// <summary>
+        /// Adds pages until at least the given number of slots are
+        /// allocated. Intended for restoring previously-saved state, where
+        /// the saved slot count may exceed what a fresh inventory starts
+        /// with. Does nothing if enough slots already exist.
+        /// </summary>
+        /// <param name="requiredSlotCount">The minimum number of slots that must exist afterward.</param>
+        public void EnsureSlotCount(int requiredSlotCount)
+        {
+            while (slots.Count < requiredSlotCount)
+            {
+                AddPage();
+            }
+        }
+
         private int FillExistingStacks(ItemDefinition item, int remaining)
         {
             if (!item.IsStackable)
@@ -179,7 +194,8 @@ namespace Project.Items
         /// Directly replaces the contents of a slot, bypassing stacking and
         /// weight-capacity logic. Intended for swaps where the caller already
         /// knows exactly which slot should hold the item (e.g. exchanging
-        /// equipped ammo with the stack that's replacing it).
+        /// equipped ammo with the stack that's replacing it, or restoring a
+        /// previously-saved slot).
         /// </summary>
         /// <param name="index">The slot index to overwrite.</param>
         /// <param name="item">The item to place in the slot.</param>

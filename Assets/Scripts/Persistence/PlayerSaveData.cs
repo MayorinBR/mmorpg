@@ -9,10 +9,10 @@ namespace Project.Persistence
     /// (no ScriptableObject or enum references) so it serializes cleanly
     /// with <see cref="UnityEngine.JsonUtility"/> and so this whole
     /// assembly stays free of dependencies on any gameplay assembly.
-    /// Cross-assembly references (a learned skill, an equipped element)
-    /// are stored as an id string or an enum's underlying int, resolved
-    /// back to the real type by whichever <see cref="ISaveParticipant"/>
-    /// owns that data.
+    /// Cross-assembly references (a learned skill, an inventory item, an
+    /// equipped element) are stored as an id string or an enum's underlying
+    /// int, resolved back to the real type by whichever
+    /// <see cref="ISaveParticipant"/> owns that data.
     /// </summary>
     [Serializable]
     public class PlayerSaveData
@@ -70,5 +70,48 @@ namespace Project.Persistence
 
         /// <summary>Id (asset name) assigned to each hotbar slot, in slot order. An empty string means the slot is unassigned.</summary>
         public List<string> hotbarSkillIds = new List<string>();
+
+        /// <summary>
+        /// Id (asset name) held in each inventory slot, in slot order,
+        /// parallel to <see cref="inventoryQuantities"/>. An empty string
+        /// means that slot is empty. Length matches the inventory's slot
+        /// count at the time of saving.
+        /// </summary>
+        public List<string> inventoryItemIds = new List<string>();
+
+        /// <summary>Quantity held in each inventory slot, parallel to <see cref="inventoryItemIds"/>.</summary>
+        public List<int> inventoryQuantities = new List<int>();
+
+        /// <summary>Id (asset name) of each currently equipped item, parallel to <see cref="equippedSlotMasks"/>.</summary>
+        public List<string> equippedItemIds = new List<string>();
+
+        /// <summary>
+        /// Bitmask of the <c>EquipmentSlot</c> value(s) each equipped item
+        /// occupies (bit N set means slot N, by the enum's underlying int),
+        /// parallel to <see cref="equippedItemIds"/>. A multi-slot item
+        /// (e.g. a two-handed weapon) has more than one bit set.
+        /// </summary>
+        public List<int> equippedSlotMasks = new List<int>();
+
+        /// <summary>Number of ammo units currently equipped.</summary>
+        public int equippedAmmoCount;
+
+        /// <summary>Stable id of each saved UI window, parallel to the other <c>window*</c> lists.</summary>
+        public List<string> windowIds = new List<string>();
+
+        /// <summary>Whether each saved window was open (1) or closed (0), parallel to <see cref="windowIds"/>.</summary>
+        public List<int> windowIsOpen = new List<int>();
+
+        /// <summary>Whether each saved window was minimized (1) or not (0), parallel to <see cref="windowIds"/>.</summary>
+        public List<int> windowIsMinimized = new List<int>();
+
+        /// <summary>Whether each saved window had a custom (dragged) position (1) or was still cascade-positioned (0), parallel to <see cref="windowIds"/>.</summary>
+        public List<int> windowHasCustomPosition = new List<int>();
+
+        /// <summary>X component of each saved window's anchored position, parallel to <see cref="windowIds"/>.</summary>
+        public List<float> windowPositionX = new List<float>();
+
+        /// <summary>Y component of each saved window's anchored position, parallel to <see cref="windowIds"/>.</summary>
+        public List<float> windowPositionY = new List<float>();
     }
 }
