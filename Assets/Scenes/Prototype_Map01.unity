@@ -3145,6 +3145,7 @@ GameObject:
   - component: {fileID: 401280865}
   - component: {fileID: 401280866}
   - component: {fileID: 401280867}
+  - component: {fileID: 401280868}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -3779,6 +3780,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Character.Combat::Project.Character.Combat.PlayerSkillBook
   jobProgress: {fileID: 401280856}
   classController: {fileID: 401280857}
+  skillDatabase: {fileID: 11400000, guid: 6745807489204ff89ffd51b5945effd4, type: 2}
 --- !u!114 &401280865
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3802,6 +3804,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  skillDatabase: {fileID: 11400000, guid: 6745807489204ff89ffd51b5945effd4, type: 2}
 --- !u!114 &401280866
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3830,6 +3833,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Project.Character.Combat::Project.Character.Combat.PlayerElementController
   startingElement: 1
+--- !u!114 &401280868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 401280833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 956a039c40a04e0a88994f659fcf1fed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Persistence::Project.Persistence.PlayerSaveController
+  loadOnStart: 1
+  saveFileName: playersave.json
 --- !u!1 &406763598
 GameObject:
   m_ObjectHideFlags: 0
@@ -13115,6 +13132,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 023c463efa310c44397ea4dd4bb226d6, type: 2}
   - {fileID: 11400000, guid: 99418ce20ee103b4ebe06402a3aada3c, type: 2}
   - {fileID: 11400000, guid: cd59af5583263c8449504b7da93d8586, type: 2}
+  - {fileID: 11400000, guid: dcb25a02c824e7a4c85b505122a017d4, type: 2}
+  - {fileID: 11400000, guid: e4c0afd41744fd240a2fe0f240b424fb, type: 2}
+  - {fileID: 11400000, guid: 37f1fdc8083463d4a95e0e3a639db6b9, type: 2}
   skillBook: {fileID: 401280864}
   classController: {fileID: 401280857}
   experience: {fileID: 0}

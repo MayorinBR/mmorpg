@@ -34,7 +34,7 @@ Prototype of a 2.5D/3D MMORPG built in Unity, inspired by Ragnarok Online's clas
 - Equipment level/class requirement validation
 - Mob variety: Aggressive/Passive behavior, Poring/Poporing as Prefab Variants
 - `CharacterStatsHolder`: single shared stats reference per character
-- Basic skill system: class-restricted, mana cost/cooldown/range, Damage or Heal effects, 10-slot hotbar, 4 test skills
+- Basic skill system: class-restricted, mana cost/cooldown/range, Damage or Heal effects, 10-slot hotbar, 7 skills covering all 6 classes (3 still missing an icon)
 - Skill Book and Skill Hotbar windows: drag skills onto hotbar slots; icons show ready/cooldown/unusable state; learn/upgrade by spending Job Level points
 - Class differentiation in basic attacks: range comes from the equipped weapon; Archer uses ammo (weak infinite fallback when out); Thief dual-wields for a second hit; Swordman can block; Mage attacks cost mana and have a selectable element (not yet affecting damage)
 
@@ -70,7 +70,7 @@ Protótipo de um MMORPG 2.5D/3D feito em Unity, inspirado no gameplay clássico 
 - Validação de requisito de nível/classe pra equipar itens
 - Variedade de mob: comportamento Aggressive/Passive, Poring/Poporing como Prefab Variants
 - `CharacterStatsHolder`: referência única de status por personagem
-- Sistema básico de skills: restritas por classe, custo de mana/cooldown/alcance, efeitos de Dano ou Cura, hotbar de 10 slots, 4 skills de teste
+- Sistema básico de skills: restritas por classe, custo de mana/cooldown/alcance, efeitos de Dano ou Cura, hotbar de 10 slots, 7 skills cobrindo as 6 classes (3 ainda sem ícone)
 - Janelas de Skill Book e Skill Hotbar: arraste skills pra hotbar; ícones mostram estado pronto/cooldown/indisponível; aprenda/upe gastando pontos de Job Level
 - Diferenciação de classes no ataque básico: alcance vem da arma equipada; Archer usa munição (fallback fraco e infinito quando acaba); Thief dá um segundo golpe ao dual-wield; Swordman pode bloquear; ataque do Mage custa mana e tem elemento selecionável (ainda sem efeito no dano)
 
@@ -106,6 +106,6 @@ Ragnarok Onlineのクラシックな戦闘(PvE)と探索のゲームプレイに
 - 装備のレベル・職業条件バリデーション
 - モブのバリエーション: Aggressive/Passive行動、PoringとPoporingのPrefab Variant
 - `CharacterStatsHolder`: キャラクターごとに単一のステータス参照
-- 基本スキルシステム: 職業限定、マナコスト/クールダウン/射程、ダメージまたは回復効果、10スロットホットバー、テストスキル4種
+- 基本スキルシステム: 職業限定、マナコスト/クールダウン/射程、ダメージまたは回復効果、10スロットホットバー、6職業をカバーする7つのスキル(3つはアイコン未設定)
 - スキルブックとスキルホットバーのウィンドウ: スキルをホットバーへドラッグ、アイコンで使用可能/クールダウン/使用不可を表示、ジョブレベルのポイントを消費して習得・レベルアップ
 - 基本攻撃における職業ごとの差別化: 攻撃レンジは装備武器から決定、Archerは矢を消費(尽きると弱い無限射撃にフォールバック)、Thiefは二刀流で2撃目、Swordmanはブロック可能、Mageの攻撃はマナ消費と属性選択(ダメージにはまだ影響なし)

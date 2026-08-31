@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Project.Persistence;
 
 namespace Project.Character.Combat
 {
@@ -9,7 +10,7 @@ namespace Project.Character.Combat
     /// <see cref="TrySpendSkillPoint"/> by <see cref="PlayerSkillBook"/> to
     /// learn or upgrade skills.
     /// </summary>
-    public class PlayerJobProgress : MonoBehaviour
+    public class PlayerJobProgress : MonoBehaviour, ISaveParticipant
     {
         [SerializeField] private int startingJobLevel = 1;
         [SerializeField] private int skillPointsPerJobLevel = 1;
@@ -89,6 +90,23 @@ namespace Project.Character.Combat
             }
 
             JobExperienceChanged?.Invoke(currentExperience, requiredForNextLevel);
+        }
+
+        /// <inheritdoc />
+        public void CaptureState(PlayerSaveData data)
+        {
+            data.jobLevel = JobLevel;
+            data.jobExperience = currentExperience;
+            data.availableSkillPoints = AvailableSkillPoints;
+        }
+
+        /// <inheritdoc />
+        public void RestoreState(PlayerSaveData data)
+        {
+            JobLevel = data.jobLevel;
+            currentExperience = data.jobExperience;
+            AvailableSkillPoints = data.availableSkillPoints;
+            JobExperienceChanged?.Invoke(currentExperience, experienceCurve.GetRequiredExperience(JobLevel));
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Project.Persistence;
 
 namespace Project.Character.Combat
 {
@@ -8,7 +9,7 @@ namespace Project.Character.Combat
     /// exists in the project — future systems (shops, loot, quest rewards)
     /// should add/spend through this rather than tracking their own copy.
     /// </summary>
-    public class PlayerCurrency : MonoBehaviour
+    public class PlayerCurrency : MonoBehaviour, ISaveParticipant
     {
         [SerializeField] private int startingZeny;
 
@@ -53,6 +54,19 @@ namespace Project.Character.Combat
             CurrentZeny -= amount;
             ZenyChanged?.Invoke(CurrentZeny);
             return true;
+        }
+
+        /// <inheritdoc />
+        public void CaptureState(PlayerSaveData data)
+        {
+            data.zeny = CurrentZeny;
+        }
+
+        /// <inheritdoc />
+        public void RestoreState(PlayerSaveData data)
+        {
+            CurrentZeny = data.zeny;
+            ZenyChanged?.Invoke(CurrentZeny);
         }
     }
 }

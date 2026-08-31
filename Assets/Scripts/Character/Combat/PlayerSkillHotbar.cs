@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Project.Persistence;
 using Project.Skills;
 
 namespace Project.Character.Combat
@@ -12,12 +13,13 @@ namespace Project.Character.Combat
     /// reassign slots at runtime (drag-and-drop) without either of those
     /// needing to know about it.
     /// </summary>
-    public class PlayerSkillHotbar : MonoBehaviour
+    public class PlayerSkillHotbar : MonoBehaviour, ISaveParticipant
     {
         /// <summary>The fixed number of hotbar slots.</summary>
         public const int SlotCount = 10;
 
         [SerializeField] private SkillDefinition[] slots = new SkillDefinition[SlotCount];
+        [SerializeField] private SkillDatabase skillDatabase;
 
         /// <summary>Raised when a slot's assigned skill changes, with (slotIndex, newSkill).</summary>
         public event Action<int, SkillDefinition> SlotChanged;
@@ -51,6 +53,36 @@ namespace Project.Character.Combat
         private bool IsValidIndex(int slotIndex)
         {
             return slotIndex >= 0 && slotIndex < SlotCount;
+        }
+
+        /// <inheritdoc />
+        public void CaptureState(PlayerSaveData data)
+        {
+            data.hotbarSkillIds.Clear();
+
+            if (skillDatabase == null)
+            {
+                return;
+            }
+
+            for (var i = 0; i < SlotCount; i++)
+            {
+                data.hotbarSkillIds.Add(skillDatabase.GetId(slots[i]));
+            }
+        }
+
+        /// <inheritdoc />
+        public void RestoreState(PlayerSaveData data)
+        {
+            if (skillDatabase == null)
+            {
+                return;
+            }
+
+            for (var i = 0; i < SlotCount && i < data.hotbarSkillIds.Count; i++)
+            {
+                SetSkill(i, skillDatabase.FindById(data.hotbarSkillIds[i]));
+            }
         }
     }
 }

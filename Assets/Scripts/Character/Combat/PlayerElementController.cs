@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Project.Combat;
+using Project.Persistence;
 
 namespace Project.Character.Combat
 {
@@ -11,7 +12,7 @@ namespace Project.Character.Combat
     /// but the selection is tracked and exposed now so combat code and UI
     /// can start reading it.
     /// </summary>
-    public class PlayerElementController : MonoBehaviour
+    public class PlayerElementController : MonoBehaviour, ISaveParticipant
     {
         private static readonly Element[] AllElements = (Element[])Enum.GetValues(typeof(Element));
 
@@ -48,6 +49,18 @@ namespace Project.Character.Combat
         {
             var nextIndex = (Array.IndexOf(AllElements, CurrentElement) + 1) % AllElements.Length;
             SetElement(AllElements[nextIndex]);
+        }
+
+        /// <inheritdoc />
+        public void CaptureState(PlayerSaveData data)
+        {
+            data.mageElementIndex = (int)CurrentElement;
+        }
+
+        /// <inheritdoc />
+        public void RestoreState(PlayerSaveData data)
+        {
+            SetElement((Element)data.mageElementIndex);
         }
     }
 }

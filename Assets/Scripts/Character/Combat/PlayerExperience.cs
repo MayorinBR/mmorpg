@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Project.Combat;
+using Project.Persistence;
 
 namespace Project.Character.Combat
 {
@@ -10,7 +11,7 @@ namespace Project.Character.Combat
     /// grants stat points via <see cref="PlayerStatsController.BaseStats"/>,
     /// and fully heals the player.
     /// </summary>
-    public class PlayerExperience : MonoBehaviour
+    public class PlayerExperience : MonoBehaviour, ISaveParticipant
     {
         [SerializeField] private PlayerStatsController statsController;
         [SerializeField] private HealthComponent health;
@@ -72,10 +73,6 @@ namespace Project.Character.Combat
 
             if (didLevelUp)
             {
-                /*Debug.Log(health != null
-                    ? "Leveled up, healing to full."
-                    : "Leveled up, but Health reference is NULL on PlayerExperience.");
-                */
                 if (health != null)
                 {
                     health.ResetHealth();
@@ -88,6 +85,21 @@ namespace Project.Character.Combat
             }
 
             ExperienceChanged?.Invoke(currentExperience, requiredForNextLevel);
+        }
+
+        /// <inheritdoc />
+        public void CaptureState(PlayerSaveData data)
+        {
+            data.baseLevel = statsController.BaseLevel;
+            data.baseExperience = currentExperience;
+        }
+
+        /// <inheritdoc />
+        public void RestoreState(PlayerSaveData data)
+        {
+            statsController.BaseLevel = data.baseLevel;
+            currentExperience = data.baseExperience;
+            ExperienceChanged?.Invoke(currentExperience, experienceCurve.GetRequiredExperience(CurrentLevel));
         }
     }
 }

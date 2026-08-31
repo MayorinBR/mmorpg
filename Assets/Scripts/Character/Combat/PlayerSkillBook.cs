@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Project.Persistence;
 using Project.Skills;
 
 namespace Project.Character.Combat
@@ -11,10 +12,11 @@ namespace Project.Character.Combat
     /// Learning or upgrading a skill spends one point from
     /// <see cref="PlayerJobProgress"/> and respects the skill's class restriction.
     /// </summary>
-    public class PlayerSkillBook : MonoBehaviour
+    public class PlayerSkillBook : MonoBehaviour, ISaveParticipant
     {
         [SerializeField] private PlayerJobProgress jobProgress;
         [SerializeField] private PlayerClassController classController;
+        [SerializeField] private SkillDatabase skillDatabase;
 
         private readonly Dictionary<SkillDefinition, int> skillLevels = new Dictionary<SkillDefinition, int>();
 
@@ -59,6 +61,48 @@ namespace Project.Character.Combat
             skillLevels[skill] = newLevel;
             SkillLeveledUp?.Invoke(skill, newLevel);
             return true;
+        }
+
+        /// <inheritdoc />
+        public void CaptureState(PlayerSaveData data)
+        {
+            data.learnedSkillIds.Clear();
+            data.learnedSkillLevels.Clear();
+
+            if (skillDatabase == null)
+            {
+                return;
+            }
+
+            foreach (var entry in skillLevels)
+            {
+                data.learnedSkillIds.Add(skillDatabase.GetId(entry.Key));
+                data.learnedSkillLevels.Add(entry.Value);
+            }
+        }
+
+        /// <inheritdoc />
+        public void RestoreState(PlayerSaveData data)
+        {
+            skillLevels.Clear();
+
+            if (skillDatabase == null)
+            {
+                return;
+            }
+
+            for (var i = 0; i < data.learnedSkillIds.Count; i++)
+            {
+                var skill = skillDatabase.FindById(data.learnedSkillIds[i]);
+
+                if (skill == null)
+                {
+                    continue;
+                }
+
+                skillLevels[skill] = data.learnedSkillLevels[i];
+                SkillLeveledUp?.Invoke(skill, data.learnedSkillLevels[i]);
+            }
         }
     }
 }

@@ -92,5 +92,29 @@ namespace Project.Character.Stats
             baseValues[stat] = currentValue + 1;
             return true;
         }
+
+        /// <summary>
+        /// Directly sets a stat's base value, clamped to the valid range,
+        /// bypassing the point-cost strategy entirely. Intended for
+        /// restoring previously-saved state — use <see cref="TryIncreaseStat"/>
+        /// for the normal spend-a-point flow.
+        /// </summary>
+        /// <param name="stat">The stat to set.</param>
+        /// <param name="value">The raw value to assign, clamped to [1, 99].</param>
+        public void SetValue(StatType stat, int value)
+        {
+            baseValues[stat] = Math.Clamp(value, MinStatValue, MaxStatValue);
+        }
+
+        /// <summary>
+        /// Directly sets the number of unspent stat points, bypassing
+        /// <see cref="GrantPoints"/>'s positive-amount validation. Intended
+        /// for restoring previously-saved state.
+        /// </summary>
+        /// <param name="amount">The number of unspent points to assign. Negative values are clamped to 0.</param>
+        public void SetAvailablePoints(int amount)
+        {
+            AvailablePoints = Math.Max(amount, 0);
+        }
     }
 }

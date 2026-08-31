@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Project.Character.Stats;
+using Project.Persistence;
 
 namespace Project.Character.Combat
 {
@@ -13,7 +14,7 @@ namespace Project.Character.Combat
     /// already react to <see cref="ClassChanged"/> rather than reading the
     /// class once and caching it.
     /// </summary>
-    public class PlayerClassController : MonoBehaviour, IPlayerClassProvider
+    public class PlayerClassController : MonoBehaviour, IPlayerClassProvider, ISaveParticipant
     {
         [SerializeField] private CharacterClass startingClass = CharacterClass.Swordman;
 
@@ -37,6 +38,18 @@ namespace Project.Character.Combat
         {
             CurrentClass = newClass;
             ClassChanged?.Invoke(newClass);
+        }
+
+        /// <inheritdoc />
+        public void CaptureState(PlayerSaveData data)
+        {
+            data.characterClassIndex = (int)CurrentClass;
+        }
+
+        /// <inheritdoc />
+        public void RestoreState(PlayerSaveData data)
+        {
+            ChangeClass((CharacterClass)data.characterClassIndex);
         }
     }
 }
