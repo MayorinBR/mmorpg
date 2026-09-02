@@ -28,5 +28,20 @@ namespace Project.UI
                 transform.forward = viewCamera.transform.forward;
             }
         }
+
+        /// <summary>
+        /// Assigns the camera to billboard toward. Needed on any instance
+        /// that survives a scene load (e.g. parented under a persisted
+        /// player) while its target camera does not — the previous map's
+        /// camera is destroyed on <c>SceneManager.LoadScene</c>, and without
+        /// a fresh reference billboarding silently stops, leaving this
+        /// object to inherit its parent's rotation instead of facing the
+        /// camera.
+        /// </summary>
+        /// <param name="newViewCamera">The active map's camera.</param>
+        public void SetViewCamera(Camera newViewCamera)
+        {
+            viewCamera = newViewCamera;
+        }
     }
 }

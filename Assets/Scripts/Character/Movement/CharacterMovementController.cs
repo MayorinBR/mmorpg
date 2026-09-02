@@ -80,7 +80,24 @@ namespace Project.Character.Movement
         /// <param name="position">The world-space position to warp to.</param>
         public void WarpTo(Vector3 position)
         {
-            agent.Warp(position);
+            if (!agent.Warp(position))
+            {
+                Debug.LogWarning($"CharacterMovementController.WarpTo: {position} is not close enough to a baked NavMesh, character was not moved.", this);
+            }
+        }
+
+        /// <summary>
+        /// Assigns the camera used to read yaw for camera-relative WASD
+        /// movement. Called by <see cref="Project.World.MapBootstrap"/>
+        /// after a map loads, since this component is persisted across
+        /// scene loads while <paramref name="newSource"/> is not
+        /// (<see cref="cameraYawSource"/> is only ever wired for the
+        /// scene this component originally loaded in).
+        /// </summary>
+        /// <param name="newSource">The active map's camera yaw provider.</param>
+        public void SetCameraYawSource(ICameraYawProvider newSource)
+        {
+            cameraYawProvider = newSource;
         }
 
         private void Apply(IMovementIntent intent, bool isDirectMovement)

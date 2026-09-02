@@ -41,12 +41,21 @@ namespace Project.UI
         public bool IsOpen => gameObject.activeSelf;
 
         /// <summary>Gets this window's own RectTransform, used by <see cref="WindowDragHandler"/> to move it.</summary>
-        public RectTransform RectTransform => rectTransform;
+        public RectTransform RectTransform => CachedRectTransform;
+
+        /// <summary>
+        /// Gets the RectTransform, resolving it on first access rather than
+        /// only in <see cref="Awake"/>. A window that stays closed for an
+        /// entire session never has its GameObject activated, so its own
+        /// Awake never runs — but <see cref="PlayerSaveController"/> still
+        /// calls <see cref="CaptureState"/> on it (inactive objects are
+        /// included so closed windows are still saved), which would
+        /// otherwise hit a null reference here.
+        /// </summary>
+        private RectTransform CachedRectTransform => rectTransform != null ? rectTransform : (rectTransform = (RectTransform)transform);
 
         private void Awake()
         {
-            rectTransform = (RectTransform)transform;
-
             if (titleText != null)
             {
                 titleText.text = WindowTitleLookup.GetDisplayName(id);
@@ -80,7 +89,7 @@ namespace Project.UI
 
             if (hasCustomPosition)
             {
-                rectTransform.anchoredPosition = customPosition;
+                CachedRectTransform.anchoredPosition = customPosition;
             }
             else if (layoutManager != null)
             {
@@ -161,7 +170,7 @@ namespace Project.UI
             data.windowIsMinimized.Add(isMinimized ? 1 : 0);
             data.windowHasCustomPosition.Add(hasCustomPosition ? 1 : 0);
 
-            var positionToSave = hasCustomPosition ? customPosition : rectTransform.anchoredPosition;
+            var positionToSave = hasCustomPosition ? customPosition : CachedRectTransform.anchoredPosition;
             data.windowPositionX.Add(positionToSave.x);
             data.windowPositionY.Add(positionToSave.y);
         }

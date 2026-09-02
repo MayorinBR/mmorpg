@@ -35,6 +35,17 @@ namespace Project.Character
             health.Died -= HandleDeath;
         }
 
+        /// <summary>
+        /// Changes where the player revives after death. Used when moving
+        /// between maps, so each map can register its own default respawn
+        /// point instead of the one baked into the scene at edit time.
+        /// </summary>
+        /// <param name="newRespawnPoint">Transform to warp the player to on respawn.</param>
+        public void SetRespawnPoint(Transform newRespawnPoint)
+        {
+            respawnPoint = newRespawnPoint;
+        }
+
         private void HandleDeath()
         {
             StartCoroutine(RespawnRoutine());

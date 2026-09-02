@@ -75,6 +75,20 @@ namespace Project.Character.Movement
         }
 
         /// <summary>
+        /// Assigns the camera used to convert screen clicks into world-space
+        /// rays. Called by <see cref="Project.World.MapBootstrap"/> after a
+        /// map loads, since this component is persisted across scene loads
+        /// (<see cref="Project.World.PersistentPlayerAnchor"/>) while each
+        /// map's camera is not, so a plain Inspector reference would go
+        /// stale the moment the previous map's camera is destroyed.
+        /// </summary>
+        /// <param name="newWorldCamera">The active map's camera.</param>
+        public void SetWorldCamera(Camera newWorldCamera)
+        {
+            worldCamera = newWorldCamera;
+        }
+
+        /// <summary>
         /// Called by the Input System when the Attack Click action (right
         /// mouse button) is performed, casting a ray against the enemy
         /// layer to select a combat target.
