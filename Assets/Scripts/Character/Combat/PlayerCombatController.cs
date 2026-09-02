@@ -1,3 +1,4 @@
+using Project.Character.Animation;
 using Project.Character.Movement;
 using Project.Character.Stats;
 using Project.Combat;
@@ -26,6 +27,16 @@ namespace Project.Character.Combat
     /// applied through <see cref="Project.Combat.IDamageable"/>, the same
     /// contract enemies use.
     /// </summary>
+    /// <remarks>
+    /// Whether a swing plays the melee or the ranged (bow) attack
+    /// animation is decided by the equipped weapon's
+    /// <see cref="WeaponType"/>, the same check already used for the
+    /// Archer's ammo consumption, so it isn't limited to a specific
+    /// class. Damage is applied the instant the attack fires, in step
+    /// with the animation trigger rather than waiting for the clip to
+    /// play out — the same immediate-hit approach skill casts already
+    /// use in <see cref="PlayerSkillCaster"/>.
+    /// </remarks>
     public class PlayerCombatController : MonoBehaviour
     {
         private const float CriticalDamageMultiplier = 1.4f;
@@ -37,6 +48,7 @@ namespace Project.Character.Combat
         [SerializeField] private PlayerClassController classController;
         [SerializeField] private EquipmentManager equipment;
         [SerializeField] private ManaComponent mana;
+        [SerializeField] private PlayerAnimatorController animatorController;
 
         [SerializeField] private float unarmedRange = 1.5f;
 
@@ -64,7 +76,7 @@ namespace Project.Character.Combat
             }
 
             var attackRange = GetAttackRange();
-            var distanceToTarget = Vector3.Distance(transform.position, targetSelector.CurrentTarget.position);
+            var distanceToTarget = CombatRangeMath.HorizontalDistance(transform.position, targetSelector.CurrentTarget.position);
 
             if (distanceToTarget > attackRange)
             {
@@ -112,6 +124,17 @@ namespace Project.Character.Combat
 
         private void PerformAttack()
         {
+            var isRanged = equipment.IsMainHandWeaponRanged();
+
+            if (isRanged)
+            {
+                animatorController?.TriggerRangedAttack();
+            }
+            else
+            {
+                animatorController?.TriggerAttack();
+            }
+
             if (classController.CurrentClass == CharacterClass.Mage)
             {
                 mana.TryConsumeMana(mageManaCostPerAttack);
@@ -119,7 +142,7 @@ namespace Project.Character.Combat
 
             var baseDamage = playerStats.CurrentSubStats.StatusAtk;
 
-            if (classController.CurrentClass == CharacterClass.Archer && equipment.IsMainHandWeaponRanged())
+            if (classController.CurrentClass == CharacterClass.Archer && isRanged)
             {
                 if (!equipment.TryConsumeAmmo())
                 {
@@ -127,11 +150,11 @@ namespace Project.Character.Combat
                 }
             }
 
-            DealHit(baseDamage);
+            DealHit(targetSelector.CurrentDamageable, baseDamage);
 
             if (classController.CurrentClass == CharacterClass.Thief && IsDualWielding())
             {
-                DealHit(Mathf.RoundToInt(playerStats.CurrentSubStats.StatusAtk * OffHandDamageMultiplier));
+                DealHit(targetSelector.CurrentDamageable, Mathf.RoundToInt(playerStats.CurrentSubStats.StatusAtk * OffHandDamageMultiplier));
             }
         }
 
@@ -153,14 +176,14 @@ namespace Project.Character.Combat
             return mainHandItems[0] != offHandItems[0];
         }
 
-        private void DealHit(int baseDamage)
+        private void DealHit(IDamageable target, int baseDamage)
         {
             var isCriticalHit = Random.value * 100f < playerStats.CurrentSubStats.CriticalRate;
             var damage = isCriticalHit
                 ? Mathf.RoundToInt(baseDamage * CriticalDamageMultiplier)
                 : baseDamage;
 
-            targetSelector.CurrentDamageable.TakeDamage(damage);
+            target.TakeDamage(damage);
         }
     }
 }

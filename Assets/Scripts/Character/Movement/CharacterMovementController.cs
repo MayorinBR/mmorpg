@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using Project.CameraSystem;
+using Project.Character.Animation;
 
 namespace Project.Character.Movement
 {
@@ -16,6 +17,7 @@ namespace Project.Character.Movement
         [SerializeField] private NavMeshAgent agent;
         [SerializeField] private float moveSpeed = 4f;
         [SerializeField] private MonoBehaviour cameraYawSource;
+        [SerializeField] private PlayerAnimatorController animatorController;
 
         private DirectionalMovementProvider directionalProvider;
         private ClickToMoveProvider clickToMoveProvider;
@@ -50,6 +52,11 @@ namespace Project.Character.Movement
         /// <param name="axis">Normalized input axis, x = horizontal, y = forward/back.</param>
         public void SetDirectionalAxis(Vector2 axis)
         {
+            if (!enabled)
+            {
+                return;
+            }
+
             directionalAxis = axis;
         }
 
@@ -60,6 +67,11 @@ namespace Project.Character.Movement
         /// <param name="destination">World-space point to move toward.</param>
         public void SetClickDestination(Vector3 destination)
         {
+            if (!enabled)
+            {
+                return;
+            }
+
             clickToMoveProvider.SetDestination(destination);
         }
 
@@ -108,10 +120,14 @@ namespace Project.Character.Movement
                 agent.Move(intent.Direction * moveSpeed * Time.deltaTime);
             }
 
-            if (intent.Direction.sqrMagnitude > 0.0001f)
+            var isMoving = intent.Direction.sqrMagnitude > 0.0001f;
+
+            if (isMoving)
             {
                 transform.forward = intent.Direction;
             }
+
+            animatorController?.SetMovementSpeed(isMoving ? 1f : 0f);
         }
     }
 }

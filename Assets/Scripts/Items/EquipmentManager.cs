@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Project.Character.Stats;
+using Project.Combat;
 using Project.Persistence;
 
 namespace Project.Items
@@ -31,6 +32,7 @@ namespace Project.Items
         [SerializeField] private MonoBehaviour playerStatsSource;
         [SerializeField] private MonoBehaviour playerClassSource;
         [SerializeField] private ItemDatabase itemDatabase;
+        [SerializeField] private HealthComponent playerHealth;
 
         private IPlayerLevelProvider levelProvider;
         private IPlayerClassProvider classProvider;
@@ -103,6 +105,11 @@ namespace Project.Items
         /// <returns>True if the item was equipped.</returns>
         public bool TryEquipFromInventory(int inventorySlotIndex)
         {
+            if (playerHealth != null && playerHealth.IsDead)
+            {
+                return false;
+            }
+
             var slotContents = inventory.Items.GetSlot(inventorySlotIndex);
 
             if (slotContents.IsEmpty || slotContents.Item.ItemType != ItemType.Equipment)
@@ -199,6 +206,11 @@ namespace Project.Items
         /// <param name="indexWithinSlot">Which of the (possibly multiple) items in that slot to remove.</param>
         public void Unequip(EquipmentSlot slot, int indexWithinSlot)
         {
+            if (playerHealth != null && playerHealth.IsDead)
+            {
+                return;
+            }
+
             var recordsInSlot = equippedRecords.Where(record => record.OccupiedSlots.Contains(slot)).ToList();
 
             if (indexWithinSlot < 0 || indexWithinSlot >= recordsInSlot.Count)

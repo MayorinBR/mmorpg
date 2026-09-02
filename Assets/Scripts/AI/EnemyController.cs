@@ -88,7 +88,17 @@ namespace Project.AI
 
         private void Start()
         {
-            ChangeState(new EnemyIdleState());
+            // Left as null (rather than always defaulting to Idle here) when
+            // something else has already set an initial state before this
+            // ran — e.g. EnemyDeathHandler restoring a chase/attack state
+            // saved from before the last map switch. Start() order between
+            // sibling components isn't guaranteed, so this check is what
+            // makes that restoration safe regardless of which Start() runs
+            // first.
+            if (currentState == null)
+            {
+                ChangeState(new EnemyIdleState());
+            }
         }
 
         private void Update()

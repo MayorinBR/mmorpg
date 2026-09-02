@@ -264,7 +264,6 @@ GameObject:
   - component: {fileID: 5552413499945374164}
   - component: {fileID: 404848662708412052}
   - component: {fileID: 297721668089156710}
-  - component: {fileID: 7741718150194666023}
   m_Layer: 8
   m_Name: FaceDisplay
   m_TagString: Untagged
@@ -344,28 +343,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &7741718150194666023
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5713257000297569445}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &6638017485894401303
 GameObject:
   m_ObjectHideFlags: 0
@@ -381,6 +358,7 @@ GameObject:
   - component: {fileID: 8075923787613613762}
   - component: {fileID: 6929252069651699362}
   - component: {fileID: 230196999900072228}
+  - component: {fileID: 4663976036402656503}
   m_Layer: 8
   m_Name: Poring
   m_TagString: Untagged
@@ -460,6 +438,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49a0f3c945689704089bc9603eccd804, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Project.Combat.HealthComponent
+  damageModifierSource: {fileID: 0}
 --- !u!114 &8075923787613613762
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -475,8 +454,10 @@ MonoBehaviour:
   health: {fileID: 4831875017803827334}
   controller: {fileID: 3451313833103779264}
   agent: {fileID: 4613584862562306671}
-  hitCollider: {fileID: 7256425071382727484}
+  hitCollider: {fileID: 4663976036402656503}
   visualRenderer: {fileID: 5461021245195377367}
+  additionalRenderers:
+  - {fileID: 297721668089156710}
   healthBarRoot: {fileID: 2363408862091125617}
   playerExperience: {fileID: 0}
   playerJobProgress: {fileID: 0}
@@ -484,6 +465,7 @@ MonoBehaviour:
   itemPickupPrefab: {fileID: 5243884865457942396, guid: 4bd359e73ab1ce44894ebcea38886042, type: 3}
   dropSpreadRadius: 1.5
   respawnDelaySeconds: 5
+  enemyId: 
 --- !u!114 &6929252069651699362
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -519,6 +501,27 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!65 &4663976036402656503
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6638017485894401303}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &6808703629625854916
 GameObject:
   m_ObjectHideFlags: 0
@@ -641,7 +644,6 @@ GameObject:
   - component: {fileID: 3670278400042409424}
   - component: {fileID: 8020320434228128284}
   - component: {fileID: 5461021245195377367}
-  - component: {fileID: 7256425071382727484}
   m_Layer: 8
   m_Name: EnemyGeometry
   m_TagString: Untagged
@@ -722,27 +724,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &7256425071382727484
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7716977120649390284}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8186204556109448567
 GameObject:
   m_ObjectHideFlags: 0

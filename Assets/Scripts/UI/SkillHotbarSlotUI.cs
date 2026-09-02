@@ -66,7 +66,17 @@ namespace Project.UI
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (assignedSkill != null && caster.GetAvailability(assignedSkill) == SkillAvailability.Ready)
+            if (assignedSkill == null)
+            {
+                return;
+            }
+
+            // NoValidTarget is let through too (not just Ready): TryCastSkill
+            // itself now starts the skill's target-picking ring instead of
+            // failing when a Damage skill has no valid target yet.
+            var availability = caster.GetAvailability(assignedSkill);
+
+            if (availability == SkillAvailability.Ready || availability == SkillAvailability.NoValidTarget)
             {
                 caster.TryCastSkill(assignedSkill);
             }
