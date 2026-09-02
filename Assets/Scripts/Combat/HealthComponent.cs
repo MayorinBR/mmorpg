@@ -105,5 +105,20 @@ namespace Project.Combat
             currentHealth = Mathf.Min(currentHealth + amount, MaxHealth);
             HealthChanged?.Invoke(currentHealth, MaxHealth);
         }
+
+        /// <summary>
+        /// Directly sets the current health to a previously-known value,
+        /// clamped to [0, MaxHealth], without raising <see cref="Died"/>.
+        /// Intended for restoring captured state (e.g. enemy world-state
+        /// restore across map switches) rather than as a combat action —
+        /// normal gameplay should keep using <see cref="TakeDamage"/> and
+        /// <see cref="Heal"/>.
+        /// </summary>
+        /// <param name="value">The health value to restore.</param>
+        public void SetCurrentHealth(int value)
+        {
+            currentHealth = Mathf.Clamp(value, 0, MaxHealth);
+            HealthChanged?.Invoke(currentHealth, MaxHealth);
+        }
     }
 }

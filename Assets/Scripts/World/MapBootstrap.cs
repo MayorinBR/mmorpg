@@ -1,5 +1,6 @@
 using UnityEngine;
 using Project.CameraSystem;
+using Project.Character.Combat;
 
 namespace Project.World
 {
@@ -44,6 +45,7 @@ namespace Project.World
                 player.InputRouter.SetWorldCamera(localViewCamera);
                 player.HoverDetector.SetWorldCamera(localViewCamera);
                 player.StatsCanvasFollower.SetViewCamera(localViewCamera);
+                SkillTargetingController.Instance?.SetWorldCamera(localViewCamera);
             }
 
             if (defaultRespawnPoint != null)

@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using Project.Character.Animation;
 using Project.Character.Combat;
 using Project.Character.Movement;
 using Project.Combat;
@@ -20,6 +21,7 @@ namespace Project.Character
         [SerializeField] private CharacterMovementController movementController;
         [SerializeField] private PlayerCombatController combatController;
         [SerializeField] private PlayerInputRouter inputRouter;
+        [SerializeField] private PlayerAnimatorController animatorController;
         [SerializeField] private Transform respawnPoint;
         [SerializeField] private float respawnDelaySeconds = 5f;
         [SerializeField] private GameObject deathScreenRoot;
@@ -48,6 +50,7 @@ namespace Project.Character
 
         private void HandleDeath()
         {
+            animatorController?.SetIsDead(true);
             StartCoroutine(RespawnRoutine());
         }
 
@@ -68,6 +71,7 @@ namespace Project.Character
             movementController.WarpTo(respawnPoint.position);
             health.ResetHealth();
             mana.ResetMana();
+            animatorController?.SetIsDead(false);
             deathScreenRoot.SetActive(false);
             SetControlsEnabled(true);
         }
@@ -77,6 +81,11 @@ namespace Project.Character
             movementController.enabled = isEnabled;
             combatController.enabled = isEnabled;
             inputRouter.enabled = isEnabled;
+
+            if (!isEnabled)
+            {
+                movementController.StopMovement();
+            }
         }
 
         private void UpdateCountdownText(float remainingSeconds)

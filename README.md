@@ -37,6 +37,7 @@ Prototype of a 2.5D/3D MMORPG built in Unity, inspired by Ragnarok Online's clas
 - Basic skill system: class-restricted, mana cost/cooldown/range, Damage or Heal effects, 10-slot hotbar, 7 skills covering all 6 classes (3 still missing an icon)
 - Skill Book and Skill Hotbar windows: drag skills onto hotbar slots; icons show ready/cooldown/unusable state; learn/upgrade by spending Job Level points
 - Class differentiation in basic attacks: range comes from the equipped weapon; Archer uses ammo (weak infinite fallback when out); Thief dual-wields for a second hit; Swordman can block; Mage attacks cost mana and have a selectable element (not yet affecting damage)
+- Skill targeting: casting a Damage skill with no valid current target shows a ground-ring picker to choose one; a separate ring always marks the current auto-attack target
 
 ---
 
@@ -73,6 +74,7 @@ Protótipo de um MMORPG 2.5D/3D feito em Unity, inspirado no gameplay clássico 
 - Sistema básico de skills: restritas por classe, custo de mana/cooldown/alcance, efeitos de Dano ou Cura, hotbar de 10 slots, 7 skills cobrindo as 6 classes (3 ainda sem ícone)
 - Janelas de Skill Book e Skill Hotbar: arraste skills pra hotbar; ícones mostram estado pronto/cooldown/indisponível; aprenda/upe gastando pontos de Job Level
 - Diferenciação de classes no ataque básico: alcance vem da arma equipada; Archer usa munição (fallback fraco e infinito quando acaba); Thief dá um segundo golpe ao dual-wield; Swordman pode bloquear; ataque do Mage custa mana e tem elemento selecionável (ainda sem efeito no dano)
+- Seleção de alvo para skills: ao usar uma skill de Dano sem alvo válido, um anel no chão aparece para escolher um; um segundo anel marca sempre o alvo atual do auto-attack
 
 ---
 
@@ -109,3 +111,4 @@ Ragnarok Onlineのクラシックな戦闘(PvE)と探索のゲームプレイに
 - 基本スキルシステム: 職業限定、マナコスト/クールダウン/射程、ダメージまたは回復効果、10スロットホットバー、6職業をカバーする7つのスキル(3つはアイコン未設定)
 - スキルブックとスキルホットバーのウィンドウ: スキルをホットバーへドラッグ、アイコンで使用可能/クールダウン/使用不可を表示、ジョブレベルのポイントを消費して習得・レベルアップ
 - 基本攻撃における職業ごとの差別化: 攻撃レンジは装備武器から決定、Archerは矢を消費(尽きると弱い無限射撃にフォールバック)、Thiefは二刀流で2撃目、Swordmanはブロック可能、Mageの攻撃はマナ消費と属性選択(ダメージにはまだ影響なし)
+- スキルのターゲット選択: 有効な対象がない状態でダメージスキルを使うと、地面のリング表示で対象を選択できる。別のリングは現在の自動攻撃対象を常に示す

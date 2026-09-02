@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Project.Skills;
+using Project.Character.Animation;
 using Project.Character.Movement;
 using Project.Combat;
 
@@ -18,20 +19,38 @@ namespace Project.Character.Combat
         [SerializeField] private ManaComponent mana;
         [SerializeField] private HealthComponent ownHealth;
         [SerializeField] private PlayerTargetSelector targetSelector;
+        [SerializeField] private PlayerAnimatorController animatorController;
 
         private readonly Dictionary<SkillDefinition, float> cooldownEndTimes = new Dictionary<SkillDefinition, float>();
 
         /// <summary>
-        /// Attempts to cast the given skill.
+        /// Attempts to cast the given skill. For a Damage skill with no
+        /// valid current target, this hands off to
+        /// <see cref="SkillTargetingController"/> to let the player pick
+        /// one (showing a targeting ring, per its own docs) instead of
+        /// just failing — so this can return false either because the
+        /// skill genuinely can't be cast (not learned, on cooldown) or
+        /// because it just started waiting for a target pick.
         /// </summary>
         /// <param name="skill">The skill to cast.</param>
-        /// <returns>True if the skill was successfully cast; false if any requirement wasn't met.</returns>
+        /// <returns>True if the skill was successfully cast; false if any requirement wasn't met, or a target pick was started instead.</returns>
         public bool TryCastSkill(SkillDefinition skill)
         {
+            if (ownHealth.IsDead)
+            {
+                return false;
+            }
+
             var level = skillBook.GetLevel(skill);
 
             if (level <= 0 || Time.time < GetCooldownEndTime(skill))
             {
+                return false;
+            }
+
+            if (skill.EffectType == SkillEffectType.Damage && !HasValidDamageTarget(skill))
+            {
+                SkillTargetingController.Instance?.BeginPicking(skill);
                 return false;
             }
 
@@ -41,6 +60,7 @@ namespace Project.Character.Combat
 
             if (cast)
             {
+                animatorController?.TriggerCast();
                 cooldownEndTimes[skill] = Time.time + skill.CooldownSeconds;
             }
 
@@ -89,14 +109,22 @@ namespace Project.Character.Combat
             return Mathf.Max(0f, GetCooldownEndTime(skill) - Time.time);
         }
 
-        private bool HasValidDamageTarget(SkillDefinition skill)
+        /// <summary>
+        /// Checks whether the current combat target is a usable target
+        /// for this skill (selected, alive, and within range). Public so
+        /// <see cref="SkillTargetingController"/> can re-check it right
+        /// after the player confirms a picked target.
+        /// </summary>
+        /// <param name="skill">The damage skill to check range against.</param>
+        /// <returns>True if the current target can be hit by this skill right now.</returns>
+        public bool HasValidDamageTarget(SkillDefinition skill)
         {
             if (targetSelector.CurrentTarget == null || targetSelector.CurrentDamageable == null)
             {
                 return false;
             }
 
-            return Vector3.Distance(transform.position, targetSelector.CurrentTarget.position) <= skill.Range;
+            return CombatRangeMath.HorizontalDistance(transform.position, targetSelector.CurrentTarget.position) <= skill.Range;
         }
 
         private bool TryCastHeal(SkillDefinition skill)
@@ -119,7 +147,7 @@ namespace Project.Character.Combat
                 return false;
             }
 
-            var distance = Vector3.Distance(transform.position, targetSelector.CurrentTarget.position);
+            var distance = CombatRangeMath.HorizontalDistance(transform.position, targetSelector.CurrentTarget.position);
 
             if (distance > skill.Range || !mana.TryConsumeMana(skill.ManaCost))
             {

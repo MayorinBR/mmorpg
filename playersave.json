@@ -1,24 +1,30 @@
 {
-    "baseLevel": 1,
-    "baseExperience": 50,
-    "strength": 1,
+    "baseLevel": 10,
+    "baseExperience": 500,
+    "strength": 37,
     "agility": 1,
     "vitality": 1,
     "intelligence": 1,
-    "dexterity": 1,
+    "dexterity": 20,
     "luck": 1,
-    "availableStatPoints": 10,
-    "jobLevel": 2,
-    "jobExperience": 0,
-    "availableSkillPoints": 1,
+    "availableStatPoints": 0,
+    "jobLevel": 13,
+    "jobExperience": 200,
+    "availableSkillPoints": 10,
     "characterClassIndex": 1,
     "zeny": 0,
     "mageElementIndex": 1,
-    "learnedSkillIds": [],
-    "learnedSkillLevels": [],
+    "learnedSkillIds": [
+        "BasicHeal",
+        "Snipe"
+    ],
+    "learnedSkillLevels": [
+        1,
+        1
+    ],
     "hotbarSkillIds": [
-        "",
-        "",
+        "BasicHeal",
+        "Snipe",
         "",
         "",
         "",
@@ -29,14 +35,14 @@
         ""
     ],
     "inventoryItemIds": [
-        "TestDualHand",
-        "AmmoTest",
-        "TestItem",
-        "TestWeapon",
+        "",
         "AmmoTest 1",
-        "",
-        "",
-        "",
+        "TestItem",
+        "AmmoTest",
+        "TestDualHand",
+        "TestDualHand",
+        "TestWeapon",
+        "TestDualHand",
         "",
         "",
         "",
@@ -51,14 +57,14 @@
         ""
     ],
     "inventoryQuantities": [
+        0,
+        11,
+        14,
+        12,
         1,
-        3,
-        4,
         1,
-        4,
-        0,
-        0,
-        0,
+        1,
+        1,
         0,
         0,
         0,
@@ -72,18 +78,22 @@
         0,
         0
     ],
-    "equippedItemIds": [],
-    "equippedSlotMasks": [],
+    "equippedItemIds": [
+        "TestWeapon"
+    ],
+    "equippedSlotMasks": [
+        8
+    ],
     "equippedAmmoCount": 0,
     "windowIds": [
+        "Stats",
         "Equipment",
-        "Inventory",
         "SkillBook",
         "SkillHotbar",
-        "Stats"
+        "Inventory"
     ],
     "windowIsOpen": [
-        0,
+        1,
         0,
         0,
         0,
@@ -100,21 +110,21 @@
         0,
         0,
         0,
-        0,
+        1,
         0
     ],
     "windowPositionX": [
+        16.0,
+        426.0,
         0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        1001.3831787109375,
+        426.0
     ],
     "windowPositionY": [
+        -386.0,
+        -16.0,
         0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        -17.9044189453125,
+        -16.0
     ]
 }
