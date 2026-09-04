@@ -1,10 +1,12 @@
 namespace Project.Character.Stats
 {
     /// <summary>
-    /// Temporary placeholder strategy that costs a flat 1 point per stat
-    /// increase, regardless of current value. Exists so
-    /// <see cref="CharacterBaseStats"/> can be used for testing before the
-    /// real Ragnarok cost curve (which scales past 100) is implemented.
+    /// Flat 1-point-per-increase cost strategy, regardless of current
+    /// value. No longer used by <c>PlayerStatsController</c>, which now
+    /// uses the real cost curve in <see cref="RagnarokStatPointCostStrategy"/>;
+    /// kept as a simple reference implementation of
+    /// <see cref="IStatPointCostStrategy"/> (e.g. for unit tests that want
+    /// a predictable, non-scaling cost).
     /// </summary>
     public class FlatStatPointCostStrategy : IStatPointCostStrategy
     {

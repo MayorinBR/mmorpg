@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Project.Character.Stats;
@@ -68,5 +69,25 @@ namespace Project.Items
 
         /// <summary>Gets the basic-attack range this weapon grants while equipped. Only meaningful for hand-slot weapons.</summary>
         public float AttackRange => attackRange;
+
+        private void OnValidate()
+        {
+            if (itemType != ItemType.Equipment)
+            {
+                return;
+            }
+
+            var isAmmo = requiredSlots != null && Array.Exists(requiredSlots, slot => slot == EquipmentSlot.Ammo);
+
+            if (isStackable && !isAmmo)
+            {
+                Debug.LogWarning($"{name}: Equipment item is marked Is Stackable, which equipment should never be.", this);
+            }
+
+            if (requiredSlots == null || requiredSlots.Length == 0)
+            {
+                Debug.LogWarning($"{name}: Equipment item has no Required Slots assigned, so it can never actually be equipped.", this);
+            }
+        }
     }
 }

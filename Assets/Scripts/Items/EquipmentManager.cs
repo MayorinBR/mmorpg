@@ -185,11 +185,13 @@ namespace Project.Items
         {
             if (levelProvider != null && levelProvider.BaseLevel < item.RequiredLevel)
             {
+                PlayerFeedbackChannel.Publish($"Level {item.RequiredLevel} required to equip {item.ItemName}.");
                 return false;
             }
 
             if (classProvider != null && item.AllowedClasses.Count > 0 && !item.AllowedClasses.Contains(classProvider.CurrentClass))
             {
+                PlayerFeedbackChannel.Publish($"Your class cannot equip {item.ItemName}.");
                 return false;
             }
 

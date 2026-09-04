@@ -54,7 +54,14 @@ namespace Project.AI
 
         private void PerformAttack(EnemyController enemy)
         {
-            var damageable = enemy.PlayerTarget.GetComponentInParent<IDamageable>();
+            // Searched from the hierarchy root rather than directly on
+            // enemy.PlayerTarget: the collider Physics.OverlapSphere finds
+            // in EnemyController.DetectPlayer can be on any child of the
+            // Player GameObject (e.g. its visual/hitbox geometry), while
+            // IDamageable (HealthComponent) lives under the separate
+            // "Vitals" child. Searching from the root covers both without
+            // assuming which sibling holds which.
+            var damageable = enemy.PlayerTarget.root.GetComponentInChildren<IDamageable>();
 
             damageable?.TakeDamage(enemy.Stats.AttackPower);
         }

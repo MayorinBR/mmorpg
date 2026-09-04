@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Project.Character.Stats;
 using Project.Combat;
 using Project.Persistence;
 
@@ -16,9 +17,9 @@ namespace Project.Character.Combat
         [SerializeField] private PlayerStatsController statsController;
         [SerializeField] private HealthComponent health;
         [SerializeField] private ManaComponent mana;
-        [SerializeField] private int statPointsPerLevel = 5;
 
         private IExperienceCurve experienceCurve;
+        private IStatPointsPerLevelStrategy pointsPerLevelStrategy;
         private int currentExperience;
 
         /// <summary>Raised whenever experience changes, with (currentExperience, requiredForNextLevel).</summary>
@@ -39,6 +40,7 @@ namespace Project.Character.Combat
         private void Awake()
         {
             experienceCurve = new LinearExperienceCurve();
+            pointsPerLevelStrategy = new RagnarokStatPointsPerLevelStrategy();
         }
 
         private void Start()
@@ -64,8 +66,9 @@ namespace Project.Character.Combat
             while (currentExperience >= requiredForNextLevel)
             {
                 currentExperience -= requiredForNextLevel;
+                var levelBeforeThisLevelUp = statsController.BaseLevel;
                 statsController.BaseLevel++;
-                statsController.BaseStats.GrantPoints(statPointsPerLevel);
+                statsController.BaseStats.GrantPoints(pointsPerLevelStrategy.GetPointsForLevelUp(levelBeforeThisLevelUp));
                 didLevelUp = true;
                 LeveledUp?.Invoke(statsController.BaseLevel);
                 requiredForNextLevel = experienceCurve.GetRequiredExperience(CurrentLevel);

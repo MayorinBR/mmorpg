@@ -1,4 +1,5 @@
 using UnityEngine;
+using Project.Combat;
 using Project.Items;
 
 namespace Project.Character.Movement
@@ -7,11 +8,13 @@ namespace Project.Character.Movement
     /// Holds the item pickup the player has clicked on and walks toward it
     /// if out of range, collecting it automatically once close enough.
     /// Mirrors the chase-then-act pattern used by combat auto-attack.
+    /// Abandons the pursuit if the player dies before reaching it.
     /// </summary>
     public class PlayerLootController : MonoBehaviour
     {
         [SerializeField] private PlayerInventory inventory;
         [SerializeField] private CharacterMovementController movementController;
+        [SerializeField] private HealthComponent playerHealth;
         [SerializeField] private float collectRange = 1.5f;
 
         private ItemPickup pendingPickup;
@@ -20,6 +23,12 @@ namespace Project.Character.Movement
         {
             if (pendingPickup == null)
             {
+                return;
+            }
+
+            if (playerHealth != null && playerHealth.IsDead)
+            {
+                pendingPickup = null;
                 return;
             }
 
