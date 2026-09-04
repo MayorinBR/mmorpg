@@ -1,4 +1,5 @@
 using UnityEngine;
+using Project.Combat;
 
 namespace Project.Items
 {
@@ -56,7 +57,10 @@ namespace Project.Items
         /// <summary>
         /// Attempts to add this pickup's item to the given inventory,
         /// destroying this pickup on success. The caller is responsible for
-        /// range checking before calling this.
+        /// range checking before calling this. Publishes a
+        /// <see cref="PlayerFeedbackChannel"/> message on failure (in
+        /// practice, always the carried-weight cap) so the attempt doesn't
+        /// fail with no explanation.
         /// </summary>
         /// <param name="inventory">The inventory to add the item to.</param>
         /// <returns>True if the item was fully added and the pickup was collected.</returns>
@@ -64,6 +68,7 @@ namespace Project.Items
         {
             if (!inventory.Items.TryAddItem(item, quantity))
             {
+                PlayerFeedbackChannel.Publish($"Maximum weight reached: couldn't pick up {item.ItemName}.");
                 return false;
             }
 

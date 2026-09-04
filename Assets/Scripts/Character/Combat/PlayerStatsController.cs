@@ -34,7 +34,7 @@ namespace Project.Character.Combat
         private void Awake()
         {
             BaseLevel = startingLevel;
-            baseStats = new CharacterBaseStats(new FlatStatPointCostStrategy());
+            baseStats = new CharacterBaseStats(new RagnarokStatPointCostStrategy());
             baseStats.GrantPoints(startingStatPoints);
             subStatsCalculator = new SubStatsCalculator();
             effectiveStats = equipment != null ? new EquippedStatsView(baseStats, equipment) : baseStats;
