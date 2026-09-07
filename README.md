@@ -36,8 +36,11 @@ Prototype of a 2.5D/3D MMORPG built in Unity, inspired by Ragnarok Online's clas
 - `CharacterStatsHolder`: single shared stats reference per character
 - Basic skill system: class-restricted, mana cost/cooldown/range, Damage or Heal effects, 10-slot hotbar, 7 skills covering all 6 classes (3 still missing an icon)
 - Skill Book and Skill Hotbar windows: drag skills onto hotbar slots; icons show ready/cooldown/unusable state; learn/upgrade by spending Job Level points
-- Class differentiation in basic attacks: range comes from the equipped weapon; Archer uses ammo (weak infinite fallback when out); Thief dual-wields for a second hit; Swordman can block; Mage attacks cost mana and have a selectable element (not yet affecting damage)
+- Class differentiation in basic attacks: range comes from the equipped weapon, except Mage, which always attacks at a fixed ranged distance with the cast animation regardless of what's equipped; Archer uses ammo (weak infinite fallback when out); Thief dual-wields for a second hit; Swordman can block; Mage attacks cost mana and carry a selectable element
+- Elemental damage and resistance: any attack carries an element, including plain physical damage (modeled as Neutral, a real resistable element, not "no element"); an optional per-character resistance/weakness table scales incoming damage of any element (not yet attached to any enemy, so it has no effect in practice today)
 - Skill targeting: casting a Damage skill with no valid current target shows a ground-ring picker to choose one; a separate ring always marks the current auto-attack target
+- Aggro indicator: a brief overhead "!" flashes above an enemy on fresh detection, retaliation, or re-aggro
+- Floating damage numbers rise above the player and enemies on every hit
 
 ---
 
@@ -73,8 +76,11 @@ Protótipo de um MMORPG 2.5D/3D feito em Unity, inspirado no gameplay clássico 
 - `CharacterStatsHolder`: referência única de status por personagem
 - Sistema básico de skills: restritas por classe, custo de mana/cooldown/alcance, efeitos de Dano ou Cura, hotbar de 10 slots, 7 skills cobrindo as 6 classes (3 ainda sem ícone)
 - Janelas de Skill Book e Skill Hotbar: arraste skills pra hotbar; ícones mostram estado pronto/cooldown/indisponível; aprenda/upe gastando pontos de Job Level
-- Diferenciação de classes no ataque básico: alcance vem da arma equipada; Archer usa munição (fallback fraco e infinito quando acaba); Thief dá um segundo golpe ao dual-wield; Swordman pode bloquear; ataque do Mage custa mana e tem elemento selecionável (ainda sem efeito no dano)
+- Diferenciação de classes no ataque básico: alcance vem da arma equipada, exceto o Mage, que sempre ataca a uma distância fixa com a animação de conjuração, não importa o que estiver equipado; Archer usa munição (fallback fraco e infinito quando acaba); Thief dá um segundo golpe ao dual-wield; Swordman pode bloquear; ataque do Mage custa mana e tem elemento selecionável
+- Dano e resistência elemental: todo ataque carrega um elemento, incluindo o dano físico comum (modelado como Neutral, um elemento resistível de verdade, não "sem elemento"); uma tabela opcional de resistência/fraqueza por personagem escala o dano recebido de qualquer elemento (ainda não anexada a nenhum inimigo, então hoje não tem efeito na prática)
 - Seleção de alvo para skills: ao usar uma skill de Dano sem alvo válido, um anel no chão aparece para escolher um; um segundo anel marca sempre o alvo atual do auto-attack
+- Indicador de aggro: um "!" flutuante pisca sobre o inimigo ao detectar, revidar ou reengajar o player
+- Números de dano flutuantes sobem sobre o player e os inimigos a cada acerto
 
 ---
 
@@ -110,5 +116,8 @@ Ragnarok Onlineのクラシックな戦闘(PvE)と探索のゲームプレイに
 - `CharacterStatsHolder`: キャラクターごとに単一のステータス参照
 - 基本スキルシステム: 職業限定、マナコスト/クールダウン/射程、ダメージまたは回復効果、10スロットホットバー、6職業をカバーする7つのスキル(3つはアイコン未設定)
 - スキルブックとスキルホットバーのウィンドウ: スキルをホットバーへドラッグ、アイコンで使用可能/クールダウン/使用不可を表示、ジョブレベルのポイントを消費して習得・レベルアップ
-- 基本攻撃における職業ごとの差別化: 攻撃レンジは装備武器から決定、Archerは矢を消費(尽きると弱い無限射撃にフォールバック)、Thiefは二刀流で2撃目、Swordmanはブロック可能、Mageの攻撃はマナ消費と属性選択(ダメージにはまだ影響なし)
+- 基本攻撃における職業ごとの差別化: 攻撃レンジは装備武器から決定(Mageのみ例外で、装備に関係なく常に固定の遠距離レンジと詠唱アニメーションで攻撃)、Archerは矢を消費(尽きると弱い無限射撃にフォールバック)、Thiefは二刀流で2撃目、Swordmanはブロック可能、Mageの攻撃はマナ消費と属性選択付き
+- 属性ダメージと耐性: あらゆる攻撃が属性を持つ(通常の物理ダメージもNeutralという実在する耐性可能な属性として扱われ、「属性なし」ではない)。キャラクターごとの耐性/弱点テーブル(任意設定)がどの属性のダメージも増減させるが、現状どの敵にも未設定のため実際の効果はまだ無い
 - スキルのターゲット選択: 有効な対象がない状態でダメージスキルを使うと、地面のリング表示で対象を選択できる。別のリングは現在の自動攻撃対象を常に示す
+- 索敵アイコン: 敵が索敵・反撃・再索敵した際に頭上に「!」が一瞬表示される
+- ダメージ数値: プレイヤーと敵が被弾するたびに数値が上昇しながら表示される

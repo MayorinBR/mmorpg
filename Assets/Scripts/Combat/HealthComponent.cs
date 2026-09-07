@@ -62,7 +62,7 @@ namespace Project.Combat
         }
 
         /// <inheritdoc />
-        public void TakeDamage(int amount)
+        public void TakeDamage(int amount, Element element = Element.Neutral)
         {
             if (IsDead || amount <= 0)
             {
@@ -71,7 +71,7 @@ namespace Project.Combat
 
             if (damageModifier != null)
             {
-                amount = damageModifier.ModifyIncomingDamage(amount);
+                amount = damageModifier.ModifyIncomingDamage(amount, element);
             }
 
             if (amount <= 0)

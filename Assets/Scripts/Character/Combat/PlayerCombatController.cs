@@ -38,7 +38,13 @@ namespace Project.Character.Combat
     /// its hand. Damage is applied the instant the attack fires, in step
     /// with the animation trigger rather than waiting for the clip to
     /// play out — the same immediate-hit approach skill casts already
-    /// use in <see cref="PlayerSkillCaster"/>.
+    /// use in <see cref="PlayerSkillCaster"/>. The Mage's basic attack also
+    /// carries its <see cref="PlayerElementController.CurrentElement"/>
+    /// into the hit; every other class's basic attack deals
+    /// <see cref="Project.Combat.Element.Neutral"/> damage — modeled as a
+    /// real, resistable element rather than "no element", so a target's
+    /// <see cref="Project.Combat.ElementalResistanceComponent"/> can scale
+    /// ordinary physical damage too, not just elemental hits.
     /// </remarks>
     public class PlayerCombatController : MonoBehaviour
     {
@@ -49,6 +55,7 @@ namespace Project.Character.Combat
         [SerializeField] private PlayerTargetSelector targetSelector;
         [SerializeField] private CharacterMovementController movementController;
         [SerializeField] private PlayerClassController classController;
+        [SerializeField] private PlayerElementController elementController;
         [SerializeField] private EquipmentManager equipment;
         [SerializeField] private ManaComponent mana;
         [SerializeField] private PlayerAnimatorController animatorController;
@@ -167,7 +174,16 @@ namespace Project.Character.Combat
                 }
             }
 
-            DealHit(targetSelector.CurrentDamageable, baseDamage);
+            // Only the Mage's basic attack carries a "real" element today —
+            // every other class deals Neutral damage, which still goes
+            // through a target's ElementalResistanceComponent like any
+            // other element (Neutral is plain physical damage, not "no
+            // element").
+            var attackElement = classController.CurrentClass == CharacterClass.Mage
+                ? elementController.CurrentElement
+                : Element.Neutral;
+
+            DealHit(targetSelector.CurrentDamageable, baseDamage, attackElement);
 
             if (classController.CurrentClass == CharacterClass.Thief && IsDualWielding())
             {
@@ -193,14 +209,14 @@ namespace Project.Character.Combat
             return mainHandItems[0] != offHandItems[0];
         }
 
-        private void DealHit(IDamageable target, int baseDamage)
+        private void DealHit(IDamageable target, int baseDamage, Element element = Element.Neutral)
         {
             var isCriticalHit = Random.value * 100f < playerStats.CurrentSubStats.CriticalRate;
             var damage = isCriticalHit
                 ? Mathf.RoundToInt(baseDamage * CriticalDamageMultiplier)
                 : baseDamage;
 
-            target.TakeDamage(damage);
+            target.TakeDamage(damage, element);
         }
     }
 }

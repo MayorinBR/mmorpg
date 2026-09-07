@@ -15,6 +15,7 @@ namespace Project.Combat
         /// Has no effect if the entity is already dead.
         /// </summary>
         /// <param name="amount">The amount of damage to apply. Non-positive values are ignored.</param>
-        void TakeDamage(int amount);
+        /// <param name="element">The element this damage carries. Defaults to <see cref="Element.Neutral"/> for ordinary, non-elemental damage.</param>
+        void TakeDamage(int amount, Element element = Element.Neutral);
     }
 }

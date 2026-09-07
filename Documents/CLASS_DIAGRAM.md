@@ -136,6 +136,8 @@ References: `Project.Character.Stats`
 classDiagram
     class Element["Element"]
     <<enumeration>> Element
+    class ElementalResistanceComponent["ElementalResistanceComponent"]
+    <<MonoBehaviour>> ElementalResistanceComponent
     class HealthComponent["HealthComponent"]
     <<MonoBehaviour>> HealthComponent
     class IDamageModifier["IDamageModifier"]
@@ -145,6 +147,7 @@ classDiagram
     class ManaComponent["ManaComponent"]
     <<MonoBehaviour>> ManaComponent
     class PlayerFeedbackChannel["PlayerFeedbackChannel"]
+    ElementalResistanceComponent --|> IDamageModifier
     HealthComponent --|> IDamageable
     HealthComponent --> IDamageModifier : uses
     HealthComponent ..> CharacterStatsHolder : uses
@@ -174,7 +177,7 @@ classDiagram
 
 ## `Project.Skills`
 
-References: `Project.Character.Stats`
+References: `Project.Character.Stats`, `Project.Combat`
 
 ```mermaid
 classDiagram
@@ -195,8 +198,11 @@ classDiagram
     SkillDefinition --> SkillEffectType : uses
     SkillDefinition --> SkillTargetType : uses
     SkillDefinition ..> CharacterClass : uses
+    SkillDefinition ..> Element : uses
     class CharacterClass["CharacterClass"]
     <<Project.Character.Stats>> CharacterClass
+    class Element["Element"]
+    <<Project.Combat>> Element
 ```
 
 ## `Project.Items`
@@ -397,6 +403,7 @@ classDiagram
     PlayerStatsController --|> ISaveParticipant
     PlayerBlockController --> PlayerClassController : uses
     PlayerCombatController --> PlayerClassController : uses
+    PlayerCombatController --> PlayerElementController : uses
     PlayerCombatController --> PlayerStatsController : uses
     PlayerExperience --> IExperienceCurve : uses
     PlayerExperience --> PlayerStatsController : uses
@@ -507,6 +514,8 @@ References: `Project.Character.Stats`, `Project.Combat`, `Project.Items`, `Proje
 
 ```mermaid
 classDiagram
+    class EnemyAggroIndicator["EnemyAggroIndicator"]
+    <<MonoBehaviour>> EnemyAggroIndicator
     class EnemyAttackState["EnemyAttackState"]
     class EnemyBehaviorMode["EnemyBehaviorMode"]
     <<enumeration>> EnemyBehaviorMode
@@ -521,6 +530,7 @@ classDiagram
     EnemyAttackState --|> IEnemyState
     EnemyChaseState --|> IEnemyState
     EnemyIdleState --|> IEnemyState
+    EnemyAggroIndicator --> EnemyController : uses
     EnemyController --> EnemyBehaviorMode : uses
     EnemyController --> IEnemyState : uses
     EnemyDeathHandler --> EnemyController : uses
@@ -558,6 +568,10 @@ classDiagram
     <<MonoBehaviour>> AmmoCounterUI
     class CombatTargetIndicatorsUI["CombatTargetIndicatorsUI"]
     <<MonoBehaviour>> CombatTargetIndicatorsUI
+    class DamageNumberSpawner["DamageNumberSpawner"]
+    <<MonoBehaviour>> DamageNumberSpawner
+    class DamagePopup["DamagePopup"]
+    <<MonoBehaviour>> DamagePopup
     class EquipmentPanelUI["EquipmentPanelUI"]
     <<MonoBehaviour>> EquipmentPanelUI
     class EquipmentSlotUI["EquipmentSlotUI"]
@@ -609,6 +623,7 @@ classDiagram
     <<MonoBehaviour>> WorldSpaceHealthBarFollower
     WindowPanel --|> ISaveParticipant
     CombatTargetIndicatorsUI --> GroundRingFollower : uses
+    DamageNumberSpawner --> DamagePopup : uses
     EquipmentPanelUI --> EquipmentSlotUI : uses
     InventoryUI --> InventorySlotUI : uses
     PlayerUIController --> WindowPanel : uses
@@ -619,6 +634,7 @@ classDiagram
     WindowLayoutManager --> WindowPanel : uses
     WindowPanel --> WindowLayoutManager : uses
     CombatTargetIndicatorsUI ..> PlayerTargetSelector : uses
+    DamageNumberSpawner ..> HealthComponent : uses
     EquipmentPanelUI ..> EquipmentManager : uses
     EquipmentSlotUI ..> EquipmentSlot : uses
     EquipmentSlotUI ..> ItemDefinition : uses

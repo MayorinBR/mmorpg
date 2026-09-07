@@ -18,7 +18,12 @@ namespace Project.Character.Combat
         [SerializeField, Range(0f, 1f)] private float blockDamageReduction = 1f;
 
         /// <inheritdoc />
-        public int ModifyIncomingDamage(int amount)
+        /// <remarks>
+        /// Block is a physical mitigation and applies the same way
+        /// regardless of the incoming attack's element — <paramref name="element"/>
+        /// is unused here, unlike <see cref="Project.Combat.ElementalResistanceComponent"/>.
+        /// </remarks>
+        public int ModifyIncomingDamage(int amount, Element element)
         {
             if (classController.CurrentClass != CharacterClass.Swordman)
             {

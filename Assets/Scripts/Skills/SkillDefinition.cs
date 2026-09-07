@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Project.Character.Stats;
+using Project.Combat;
 
 namespace Project.Skills
 {
@@ -27,6 +28,7 @@ namespace Project.Skills
         [Header("Damage (only used if Effect Type is Damage)")]
         [SerializeField] private SkillDamageType damageType;
         [SerializeField] private float damageMultiplierPerLevel = 1f;
+        [SerializeField] private Element element = Element.Neutral;
 
         [Header("Heal (only used if Effect Type is Heal)")]
         [SerializeField] private int healAmount = 10;
@@ -63,6 +65,17 @@ namespace Project.Skills
 
         /// <summary>Gets whether this damage skill scales from Status ATK or Status MATK. Only meaningful when <see cref="EffectType"/> is Damage.</summary>
         public SkillDamageType DamageType => damageType;
+
+        /// <summary>
+        /// Gets the element this skill's damage carries. Defaults to
+        /// <see cref="Element.Neutral"/> (plain physical/magical damage,
+        /// still resistable like any other element) unless explicitly set
+        /// to something else, e.g. FireBolt's <see cref="Element.Fire"/>.
+        /// Read by an optional <see cref="ElementalResistanceComponent"/>
+        /// on the target. Only meaningful when <see cref="EffectType"/> is
+        /// Damage.
+        /// </summary>
+        public Element Element => element;
 
         /// <summary>
         /// Calculates this skill's damage at the given level. Only meaningful when <see cref="EffectType"/> is Damage.

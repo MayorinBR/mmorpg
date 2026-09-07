@@ -156,7 +156,7 @@ namespace Project.Character.Combat
 
             var subStats = statsController.CurrentSubStats;
             var damage = skill.CalculateDamage(subStats.StatusAtk, subStats.StatusMatk, level);
-            targetSelector.CurrentDamageable.TakeDamage(damage);
+            targetSelector.CurrentDamageable.TakeDamage(damage, skill.Element);
             return true;
         }
 

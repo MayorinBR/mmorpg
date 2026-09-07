@@ -1,10 +1,17 @@
 namespace Project.Combat
 {
     /// <summary>
-    /// An elemental affinity an attack can carry. Currently only tracked
-    /// for the Mage's basic attack; has no mechanical effect on damage yet
-    /// since no per-element resistance system exists on enemies (tracked
-    /// as planned work in FUTURE_IMPROVEMENTS.md).
+    /// The affinity an attack carries — an elemental one, or plain physical
+    /// damage, modeled here as <see cref="Neutral"/> rather than as a
+    /// special "no element" case, matching how Ragnarok Online itself
+    /// treats Neutral as a real, resistable property. Carried by the
+    /// Mage's basic attack (<see cref="Project.Character.Combat.PlayerElementController.CurrentElement"/>)
+    /// and optionally by a <see cref="Project.Skills.SkillDefinition"/>, and
+    /// read by an optional <see cref="ElementalResistanceComponent"/> on the
+    /// target to scale incoming damage of any of these values, Neutral
+    /// included. <see cref="Neutral"/> is the default for every source of
+    /// damage that isn't explicitly elemental: basic attacks from every
+    /// non-Mage class, and any skill that doesn't set one.
     /// </summary>
     public enum Element
     {
@@ -12,6 +19,7 @@ namespace Project.Combat
         Fire,
         Grass,
         Ground,
-        Electric
+        Electric,
+        Neutral
     }
 }
