@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Serialization;
@@ -96,6 +97,14 @@ namespace Project.AI
         /// </summary>
         public Transform RememberedAggressor { get; set; }
 
+        /// <summary>
+        /// Raised whenever <see cref="EngagePlayer"/> starts a chase, from
+        /// fresh detection, passive retaliation, or memory-based re-aggro.
+        /// Purely a notification for cosmetic reactions (e.g. an overhead
+        /// aggro icon) — nothing in the state machine depends on it.
+        /// </summary>
+        public event Action PlayerEngaged;
+
         private void Awake()
         {
             SpawnPosition = transform.position;
@@ -161,6 +170,7 @@ namespace Project.AI
             PlayerTarget = player;
             RememberedAggressor = player;
             ChangeState(new EnemyChaseState());
+            PlayerEngaged?.Invoke();
         }
 
         /// <summary>

@@ -35,6 +35,14 @@ namespace Project.Combat
         /// <summary>Raised whenever health changes, with (currentHealth, maxHealth).</summary>
         public event Action<int, int> HealthChanged;
 
+        /// <summary>
+        /// Raised whenever <see cref="TakeDamage"/> actually reduces health,
+        /// with the mitigated amount that was applied. Purely a cosmetic
+        /// notification (e.g. floating damage numbers) — nothing here
+        /// depends on anyone listening to it.
+        /// </summary>
+        public event Action<int> DamageTaken;
+
         /// <summary>Raised once when health reaches zero.</summary>
         public event Action Died;
 
@@ -72,6 +80,7 @@ namespace Project.Combat
             }
 
             currentHealth = Mathf.Max(currentHealth - amount, 0);
+            DamageTaken?.Invoke(amount);
             HealthChanged?.Invoke(currentHealth, MaxHealth);
 
             if (currentHealth == 0)

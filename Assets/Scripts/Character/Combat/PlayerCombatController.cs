@@ -31,8 +31,11 @@ namespace Project.Character.Combat
     /// Whether a swing plays the melee or the ranged (bow) attack
     /// animation is decided by the equipped weapon's
     /// <see cref="WeaponType"/>, the same check already used for the
-    /// Archer's ammo consumption, so it isn't limited to a specific
-    /// class. Damage is applied the instant the attack fires, in step
+    /// Archer's ammo consumption. Mage is the one exception: its basic
+    /// attack always plays the spell cast animation and always reaches out
+    /// to <see cref="mageAttackRange"/>, regardless of the equipped
+    /// weapon — a Mage attacks at range by class, not because of what's in
+    /// its hand. Damage is applied the instant the attack fires, in step
     /// with the animation trigger rather than waiting for the clip to
     /// play out — the same immediate-hit approach skill casts already
     /// use in <see cref="PlayerSkillCaster"/>.
@@ -54,6 +57,11 @@ namespace Project.Character.Combat
 
         [Header("Mage Basic Attack")]
         [SerializeField] private int mageManaCostPerAttack = 2;
+
+        // Less than a bow's range so the Mage doesn't out-range the
+        // Archer, but still enough to cast from a safe distance instead
+        // of standing in melee like an unarmed weapon would put it.
+        [SerializeField] private float mageAttackRange = 4f;
 
         [Header("Archer Basic Attack")]
         [SerializeField, Range(0f, 1f)] private float archerBaseAmmoDamageMultiplier = 0.5f;
@@ -105,6 +113,11 @@ namespace Project.Character.Combat
 
         private float GetAttackRange()
         {
+            if (classController.CurrentClass == CharacterClass.Mage)
+            {
+                return mageAttackRange;
+            }
+
             var mainHandWeapon = GetMainHandWeapon();
             return mainHandWeapon != null ? mainHandWeapon.AttackRange : unarmedRange;
         }
@@ -126,7 +139,11 @@ namespace Project.Character.Combat
         {
             var isRanged = equipment.IsMainHandWeaponRanged();
 
-            if (isRanged)
+            if (classController.CurrentClass == CharacterClass.Mage)
+            {
+                animatorController?.TriggerCast();
+            }
+            else if (isRanged)
             {
                 animatorController?.TriggerRangedAttack();
             }
