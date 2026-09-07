@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ac8772ba691df44989e71fd8e110b57, type: 3}
+  m_Name: ManaPotion
+  m_EditorClassIdentifier: Project.Items::Project.Items.ItemDefinition
+  itemName: Mana Potion
+  description: Restores a large amount of Mana instantly.
+  icon: {fileID: 1621884100, guid: 94d005860aec7034fb6eae4a4b450ffb, type: 3}
+  isStackable: 1
+  maxStackSize: 99
+  itemType: 0
+  requiredSlots: 
+  statBonuses:
+    strength: 0
+    agility: 0
+    vitality: 0
+    intelligence: 0
+    dexterity: 0
+    luck: 0
+  requiredLevel: 1
+  allowedClasses: 
+  weight: 0.5
+  canBeOffHand: 0
+  weaponType: 0
+  attackRange: 1.5
+  buyPrice: 60
+  sellPrice: 30
+  consumableEffectType: 0
+  healthRestore: 0
+  manaRestore: 300
+  effectDurationSeconds: 1
+  tickIntervalSeconds: 1

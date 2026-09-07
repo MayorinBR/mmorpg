@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 using Project.CameraSystem;
@@ -23,6 +24,16 @@ namespace Project.Character.Movement
         private ClickToMoveProvider clickToMoveProvider;
         private ICameraYawProvider cameraYawProvider;
         private Vector2 directionalAxis;
+        private bool isMoving;
+
+        /// <summary>
+        /// Raised the instant the character transitions from standing still
+        /// to moving, regardless of whether the motion came from directional
+        /// input or a click-to-move path. Used by UI such as
+        /// <see cref="Project.UI.ShopWindowUI"/> to close itself as soon as
+        /// the player walks away.
+        /// </summary>
+        public event Action MovementStarted;
 
         private void Awake()
         {
@@ -120,11 +131,17 @@ namespace Project.Character.Movement
                 agent.Move(intent.Direction * moveSpeed * Time.deltaTime);
             }
 
-            var isMoving = intent.Direction.sqrMagnitude > 0.0001f;
+            var wasMoving = isMoving;
+            isMoving = intent.Direction.sqrMagnitude > 0.0001f;
 
             if (isMoving)
             {
                 transform.forward = intent.Direction;
+
+                if (!wasMoving)
+                {
+                    MovementStarted?.Invoke();
+                }
             }
 
             animatorController?.SetMovementSpeed(isMoving ? 1f : 0f);

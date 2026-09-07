@@ -50,6 +50,26 @@ namespace Project.Items
         }
 
         /// <summary>
+        /// Gets how many units of an item could actually be added right
+        /// now, limited only by carry-weight capacity. Lets a caller (e.g.
+        /// a shop purchase) confirm a full add will succeed before
+        /// committing to anything irreversible, since <see cref="TryAddItem"/>
+        /// can otherwise add fewer than requested while still returning false.
+        /// </summary>
+        /// <param name="item">The item to check.</param>
+        /// <param name="quantity">The desired quantity.</param>
+        /// <returns>The number of units that would be added, from 0 up to <paramref name="quantity"/>.</returns>
+        public int GetAddableQuantity(ItemDefinition item, int quantity)
+        {
+            if (item == null || quantity <= 0)
+            {
+                return 0;
+            }
+
+            return ClampToWeightCapacity(item, quantity);
+        }
+
+        /// <summary>
         /// Attempts to add a quantity of an item, filling existing stacks
         /// before using or creating empty slots. New slot pages are added
         /// automatically if needed and weight capacity allows.
@@ -59,12 +79,7 @@ namespace Project.Items
         /// <returns>True only if the full requested quantity was added.</returns>
         public bool TryAddItem(ItemDefinition item, int quantity)
         {
-            if (item == null || quantity <= 0)
-            {
-                return false;
-            }
-
-            var addable = ClampToWeightCapacity(item, quantity);
+            var addable = GetAddableQuantity(item, quantity);
 
             if (addable <= 0)
             {
@@ -101,6 +116,32 @@ namespace Project.Items
 
             slots[index] = InventorySlot.Empty;
             InventoryChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Removes a quantity of the item held at a slot, clearing the slot
+        /// entirely if the removal empties it. Used both for consuming a
+        /// single unit of an item and for selling a stack to an NPC.
+        /// </summary>
+        /// <param name="index">The slot index to remove from.</param>
+        /// <param name="quantity">The number of units to remove. Must be positive and no more than the slot currently holds.</param>
+        /// <returns>True if the removal succeeded.</returns>
+        public bool TryRemoveFromSlot(int index, int quantity)
+        {
+            var slot = slots[index];
+
+            if (slot.IsEmpty || quantity <= 0 || quantity > slot.Quantity)
+            {
+                return false;
+            }
+
+            CurrentWeight -= slot.Item.Weight * quantity;
+
+            var remaining = slot.Quantity - quantity;
+            slots[index] = remaining > 0 ? new InventorySlot(slot.Item, remaining) : InventorySlot.Empty;
+
+            InventoryChanged?.Invoke();
+            return true;
         }
 
         private int ClampToWeightCapacity(ItemDefinition item, int quantity)

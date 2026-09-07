@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -14,6 +15,11 @@ namespace Project.UI
     /// <see cref="WindowDragHandler"/>), the custom position is remembered
     /// for the rest of the session and used on every subsequent open.
     /// Clicking the window (or starting to drag it) brings it to front.
+    /// Whether this window's open/minimized/position state survives to the
+    /// next session is opt-out via the <c>persistBetweenSessions</c>
+    /// Inspector field — most windows want that persistence, but a window
+    /// like the shop should always start closed instead of reopening just
+    /// because it happened to be open when the previous session ended.
     /// </summary>
     public class WindowPanel : MonoBehaviour, IPointerDownHandler, ISaveParticipant
     {
@@ -24,10 +30,22 @@ namespace Project.UI
         [SerializeField] private string id;
         [SerializeField] private WindowLayoutManager layoutManager;
 
+        [Tooltip("When unchecked, this window ignores save/load entirely and always starts closed, e.g. the shop window: it shouldn't reopen just because it happened to be open when the session ended.")]
+        [SerializeField] private bool persistBetweenSessions = true;
+
         private RectTransform rectTransform;
         private bool isMinimized;
         private bool hasCustomPosition;
         private Vector2 customPosition;
+
+        /// <summary>
+        /// Raised whenever this window closes, regardless of cause (its own
+        /// close button, another script calling <see cref="Close"/>, or
+        /// <see cref="Toggle"/>). Lets a window's own content — or an
+        /// outside orchestrator like <see cref="PlayerUIController"/> —
+        /// react to the close without needing to be the one that caused it.
+        /// </summary>
+        public event Action Closed;
 
         /// <summary>
         /// Gets this window's stable identifier, used for lookup by
@@ -106,6 +124,23 @@ namespace Project.UI
             {
                 layoutManager.RegisterClosed(this);
             }
+
+            Closed?.Invoke();
+        }
+
+        /// <summary>
+        /// Overrides the title bar text set from <see cref="WindowTitleLookup"/>
+        /// in <see cref="Awake"/>. Used by windows whose header should show
+        /// something dynamic, such as the shop window showing the merchant's
+        /// name instead of a fixed title.
+        /// </summary>
+        /// <param name="title">The text to display in the title bar.</param>
+        public void SetTitle(string title)
+        {
+            if (titleText != null)
+            {
+                titleText.text = title;
+            }
         }
 
         /// <summary>Opens the window if closed, or closes it if currently open.</summary>
@@ -165,6 +200,11 @@ namespace Project.UI
         /// <inheritdoc />
         public void CaptureState(PlayerSaveData data)
         {
+            if (!persistBetweenSessions)
+            {
+                return;
+            }
+
             data.windowIds.Add(id);
             data.windowIsOpen.Add(IsOpen ? 1 : 0);
             data.windowIsMinimized.Add(isMinimized ? 1 : 0);
@@ -178,6 +218,11 @@ namespace Project.UI
         /// <inheritdoc />
         public void RestoreState(PlayerSaveData data)
         {
+            if (!persistBetweenSessions)
+            {
+                return;
+            }
+
             var index = data.windowIds.IndexOf(id);
 
             if (index < 0)

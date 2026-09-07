@@ -2,24 +2,28 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using Project.Items;
+using Project.NPC;
 
 namespace Project.Character.Movement
 {
     /// <summary>
     /// Reads Input System callbacks (move axis and click/tap point) and
     /// forwards them to a <see cref="CharacterMovementController"/>,
-    /// <see cref="PlayerTargetSelector"/>, or <see cref="PlayerLootController"/>
-    /// depending on what was clicked. Clicks that land on UI elements are ignored.
+    /// <see cref="PlayerTargetSelector"/>, <see cref="PlayerLootController"/>,
+    /// or <see cref="PlayerNpcInteractionController"/> depending on what was
+    /// clicked. Clicks that land on UI elements are ignored.
     /// </summary>
     public class PlayerInputRouter : MonoBehaviour
     {
         [SerializeField] private CharacterMovementController movementController;
         [SerializeField] private PlayerTargetSelector targetSelector;
         [SerializeField] private PlayerLootController lootController;
+        [SerializeField] private PlayerNpcInteractionController npcInteractionController;
         [SerializeField] private Camera worldCamera;
         [SerializeField] private LayerMask groundLayer;
         [SerializeField] private LayerMask enemyLayer;
         [SerializeField] private LayerMask itemLayer;
+        [SerializeField] private LayerMask npcLayer;
 
         private bool isPointerOverUI;
 
@@ -41,7 +45,8 @@ namespace Project.Character.Movement
 
         /// <summary>
         /// Called by the Input System when the Move Click action (left mouse
-        /// button) is performed. Clicking an item pickup sets it as the
+        /// button) is performed. Clicking an NPC sets it as the pending
+        /// interaction target; clicking an item pickup sets it as the
         /// pending loot target; clicking anywhere else on the ground moves
         /// the character there.
         /// </summary>
@@ -55,7 +60,7 @@ namespace Project.Character.Movement
 
             var pointerPosition = Pointer.current.position.ReadValue();
             var ray = worldCamera.ScreenPointToRay(pointerPosition);
-            var combinedMask = groundLayer | itemLayer;
+            var combinedMask = groundLayer | itemLayer | npcLayer;
 
             if (!Physics.Raycast(ray, out var hit, float.MaxValue, combinedMask))
             {
@@ -64,13 +69,22 @@ namespace Project.Character.Movement
 
             targetSelector.ClearTarget();
 
+            if (hit.collider.TryGetComponent(out NpcShopKeeper npc))
+            {
+                lootController.SetTarget(null);
+                npcInteractionController.SetTarget(npc);
+                return;
+            }
+
             if (hit.collider.TryGetComponent(out ItemPickup pickup))
             {
+                npcInteractionController.SetTarget(null);
                 lootController.SetTarget(pickup);
                 return;
             }
 
             lootController.SetTarget(null);
+            npcInteractionController.SetTarget(null);
             movementController.SetClickDestination(hit.point);
         }
 
@@ -107,6 +121,7 @@ namespace Project.Character.Movement
             if (Physics.Raycast(ray, out var hit, float.MaxValue, enemyLayer))
             {
                 lootController.SetTarget(null);
+                npcInteractionController.SetTarget(null);
                 targetSelector.SelectTarget(hit.collider);
             }
         }

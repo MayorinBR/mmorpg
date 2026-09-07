@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Project.Character.Movement;
 
 namespace Project.UI
 {
@@ -9,10 +10,18 @@ namespace Project.UI
     /// entry point used by both HUD buttons and keyboard shortcuts. Adding
     /// a new window later (quests, skills, etc.) only requires dragging it
     /// into the array in the Inspector, not new code here.
+    /// Also wires <see cref="ShopWindowUI"/> to <see cref="PlayerNpcInteractionController"/>
+    /// directly, rather than letting the shop window subscribe to it in its
+    /// own Awake: the shop window's GameObject starts inactive, and Unity
+    /// never runs Awake on an inactive GameObject, so it could never
+    /// subscribe to anything on its own. This controller's GameObject is
+    /// always active, so it can safely mediate.
     /// </summary>
     public class PlayerUIController : MonoBehaviour
     {
         [SerializeField] private WindowPanel[] windows;
+        [SerializeField] private PlayerNpcInteractionController npcInteractionController;
+        [SerializeField] private ShopWindowUI shopWindow;
 
         private Dictionary<string, WindowPanel> windowsById;
 
@@ -23,6 +32,18 @@ namespace Project.UI
             foreach (var window in windows)
             {
                 windowsById[window.Id] = window;
+            }
+
+            if (npcInteractionController != null && shopWindow != null)
+            {
+                npcInteractionController.ShopOpened -= shopWindow.Open;
+                npcInteractionController.ShopOpened += shopWindow.Open;
+
+                npcInteractionController.ShopCloseRequested -= shopWindow.Close;
+                npcInteractionController.ShopCloseRequested += shopWindow.Close;
+
+                shopWindow.Closed -= npcInteractionController.ClearOpenShop;
+                shopWindow.Closed += npcInteractionController.ClearOpenShop;
             }
         }
 

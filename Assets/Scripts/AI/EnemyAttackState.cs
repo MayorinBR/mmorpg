@@ -26,7 +26,7 @@ namespace Project.AI
         {
             if (enemy.PlayerTarget == null)
             {
-                enemy.ChangeState(new EnemyIdleState());
+                enemy.ChangeState(new EnemyWanderState(enemy.transform.position));
                 return;
             }
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
@@ -106,6 +107,11 @@ namespace Project.UI
 
         private string BuildStatsText(ItemDefinition item)
         {
+            if (item.ItemType == ItemType.Consumable)
+            {
+                return BuildConsumableEffectText(item);
+            }
+
             if (item.ItemType != ItemType.Equipment)
             {
                 return string.Empty;
@@ -119,6 +125,27 @@ namespace Project.UI
             AppendIfNonZero(builder, "DEX", item.StatBonuses.Dexterity);
             AppendIfNonZero(builder, "LUK", item.StatBonuses.Luck);
             return builder.ToString();
+        }
+
+        private string BuildConsumableEffectText(ItemDefinition item)
+        {
+            var parts = new List<string>();
+            var isInstant = item.ConsumableEffectType == ConsumableEffectType.Instant;
+            var suffix = isInstant
+                ? "instantly"
+                : $"every {item.TickIntervalSeconds:F0}s for {item.EffectDurationSeconds:F0}s";
+
+            if (item.HealthRestore > 0)
+            {
+                parts.Add($"Restores {item.HealthRestore} HP {suffix}");
+            }
+
+            if (item.ManaRestore > 0)
+            {
+                parts.Add($"Restores {item.ManaRestore} MP {suffix}");
+            }
+
+            return string.Join("\n", parts);
         }
 
         private void AppendIfNonZero(StringBuilder builder, string label, int value)

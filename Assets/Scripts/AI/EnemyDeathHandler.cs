@@ -154,8 +154,7 @@ namespace Project.AI
                 return;
             }
 
-            controller.PlayerTarget = player.transform;
-            controller.ChangeState(new EnemyChaseState());
+            controller.EngagePlayer(player.transform);
         }
 
         private void BeginRespawn(float delaySeconds)
@@ -176,7 +175,8 @@ namespace Project.AI
             isCurrentlyAlive = true;
             health.ResetHealth();
             controller.PlayerTarget = null;
-            controller.ChangeState(new EnemyIdleState());
+            controller.RememberedAggressor = null;
+            controller.ChangeState(new EnemyWanderState());
         }
 
         private void SetAlive(bool isAlive)

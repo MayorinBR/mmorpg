@@ -44,8 +44,32 @@ namespace Project.UI
             }
         }
 
+        /// <summary>
+        /// Retargets both ring followers to this map's local instances.
+        /// Needed on the persisted player (see <see cref="Project.World.PersistentPlayerAnchor"/>):
+        /// the ring GameObjects live in the map scene, not on the player, so
+        /// they're destroyed on every <c>SceneManager.LoadScene</c> and the
+        /// serialized references from the previous map would otherwise go
+        /// stale, exactly like <see cref="WorldSpaceHealthBarFollower.SetViewCamera"/>.
+        /// </summary>
+        /// <param name="newCurrentTargetRing">This map's ring for the player's current combat target.</param>
+        /// <param name="newSkillPickerRing">This map's ring for the skill target picker's hovered enemy.</param>
+        public void SetRings(GroundRingFollower newCurrentTargetRing, GroundRingFollower newSkillPickerRing)
+        {
+            currentTargetRing = newCurrentTargetRing;
+            skillPickerRing = newSkillPickerRing;
+        }
+
         private void HandleTargetChanged(Transform newTarget)
         {
+            // currentTargetRing can be a stale reference to a ring destroyed by a
+            // scene load, in the brief window before SetRings() re-points it at
+            // the new map's ring (see SetRings' doc comment above).
+            if (currentTargetRing == null)
+            {
+                return;
+            }
+
             if (newTarget != null)
             {
                 currentTargetRing.Show(newTarget);
@@ -58,6 +82,11 @@ namespace Project.UI
 
         private void HandleHoveredEnemyChanged(Transform hoveredEnemy)
         {
+            if (skillPickerRing == null)
+            {
+                return;
+            }
+
             if (hoveredEnemy != null)
             {
                 skillPickerRing.Show(hoveredEnemy);

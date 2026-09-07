@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ac8772ba691df44989e71fd8e110b57, type: 3}
+  m_Name: Bread
+  m_EditorClassIdentifier: Project.Items::Project.Items.ItemDefinition
+  itemName: Bread
+  description: Restores a small amount of HP gradually over time.
+  icon: {fileID: -1948396871, guid: 94d005860aec7034fb6eae4a4b450ffb, type: 3}
+  isStackable: 1
+  maxStackSize: 99
+  itemType: 0
+  requiredSlots: 
+  statBonuses:
+    strength: 0
+    agility: 0
+    vitality: 0
+    intelligence: 0
+    dexterity: 0
+    luck: 0
+  requiredLevel: 1
+  allowedClasses: 
+  weight: 0.3
+  canBeOffHand: 0
+  weaponType: 0
+  attackRange: 1.5
+  buyPrice: 20
+  sellPrice: 10
+  consumableEffectType: 1
+  healthRestore: 2
+  manaRestore: 0
+  effectDurationSeconds: 60
+  tickIntervalSeconds: 2

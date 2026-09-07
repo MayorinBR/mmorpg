@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Project.Character.Combat;
 using Project.Items;
 
 namespace Project.UI
@@ -20,6 +21,7 @@ namespace Project.UI
         [SerializeField] private InventorySlotUI slotPrefab;
         [SerializeField] private Transform slotsParent;
         [SerializeField] private EquipmentManager equipment;
+        [SerializeField] private PlayerConsumableUser consumableUser;
         [SerializeField] private Button nextPageButton;
         [SerializeField] private Button previousPageButton;
         [SerializeField] private TMP_Text weightText;
@@ -100,6 +102,14 @@ namespace Project.UI
 
         private void HandleSlotClicked(int inventoryIndex)
         {
+            var slot = playerInventory.Items.GetSlot(inventoryIndex);
+
+            if (!slot.IsEmpty && slot.Item.ItemType == ItemType.Consumable)
+            {
+                consumableUser?.TryConsume(inventoryIndex);
+                return;
+            }
+
             if (equipment != null)
             {
                 equipment.TryEquipFromInventory(inventoryIndex);
@@ -108,6 +118,17 @@ namespace Project.UI
 
         private void RefreshAll()
         {
+            // Guards against Inventory.InventoryChanged firing before this
+            // component's own Start() has run (e.g. PlayerSaveController
+            // restoring saved items on Start(), with no guaranteed order
+            // between sibling components) — slotViews isn't populated yet
+            // at that point. Start() calls RefreshAll() itself once built,
+            // so nothing is missed.
+            if (!isBuilt)
+            {
+                return;
+            }
+
             var totalPages = Mathf.Max(1, Mathf.CeilToInt((float)playerInventory.Items.SlotCount / PageSize));
             currentPage = Mathf.Clamp(currentPage, 0, totalPages - 1);
 

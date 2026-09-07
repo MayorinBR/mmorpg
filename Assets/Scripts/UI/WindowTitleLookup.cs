@@ -14,7 +14,8 @@ namespace Project.UI
         {
             { "Inventory", "Inventory" },
             { "Stats", "Status" },
-            { "Equipment", "Equipment" }
+            { "Equipment", "Equipment" },
+            { "Shop", "Shop" }
         };
 
         /// <summary>

@@ -22,6 +22,7 @@ namespace Project.World
         [SerializeField] private PlayerInputRouter inputRouter;
         [SerializeField] private WorldItemHoverDetector hoverDetector;
         [SerializeField] private WorldSpaceHealthBarFollower statsCanvasFollower;
+        [SerializeField] private CombatTargetIndicatorsUI combatTargetIndicators;
 
         /// <summary>
         /// The single persisted player instance. Null until the player's
@@ -43,6 +44,9 @@ namespace Project.World
 
         /// <summary>The follower positioning the player's own floating HP/MP bar canvas.</summary>
         public WorldSpaceHealthBarFollower StatsCanvasFollower => statsCanvasFollower;
+
+        /// <summary>The persisted player's combat target and skill-picker ring indicators.</summary>
+        public CombatTargetIndicatorsUI CombatTargetIndicators => combatTargetIndicators;
 
         private void Awake()
         {

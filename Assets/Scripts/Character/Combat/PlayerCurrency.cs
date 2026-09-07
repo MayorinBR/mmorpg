@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Project.Combat;
 using Project.Persistence;
 
 namespace Project.Character.Combat
@@ -8,8 +9,11 @@ namespace Project.Character.Combat
     /// Tracks the player's currency (Zeny). This is the first place Zeny
     /// exists in the project — future systems (shops, loot, quest rewards)
     /// should add/spend through this rather than tracking their own copy.
+    /// Implements <see cref="ICurrencyWallet"/> so assemblies like
+    /// <c>Project.NPC</c> can charge/pay Zeny without depending on this
+    /// whole assembly.
     /// </summary>
-    public class PlayerCurrency : MonoBehaviour, ISaveParticipant
+    public class PlayerCurrency : MonoBehaviour, ISaveParticipant, ICurrencyWallet
     {
         [SerializeField] private int startingZeny;
 
