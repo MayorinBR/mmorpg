@@ -10,8 +10,12 @@ namespace Project.Character.Combat
 {
     /// <summary>
     /// Drives player auto-attack: while a target is selected, walks into
-    /// attack range if needed, then attacks on a fixed cooldown using the
-    /// player's calculated sub-stats. Attack range comes from the equipped
+    /// attack range if needed, then attacks on a cooldown derived from the
+    /// player's Aspd sub-stat (<see cref="AttackSpeedCalculator"/>) — higher
+    /// Aspd attacks, and plays the swing animation, faster. Skill casts are
+    /// unaffected: they run on their own per-skill cooldown
+    /// (<see cref="PlayerSkillCaster"/>), never on this one. Attack range
+    /// comes from the equipped
     /// main-hand weapon's own <see cref="ItemDefinition.AttackRange"/>,
     /// for every class — different weapons of the same
     /// <see cref="WeaponType"/> can have different ranges (a dagger isn't
@@ -93,8 +97,6 @@ namespace Project.Character.Combat
         [Header("Archer Basic Attack")]
         [SerializeField, Range(0f, 1f)] private float archerBaseAmmoDamageMultiplier = 0.5f;
 
-        [SerializeField] private float attackCooldownSeconds = 1f;
-
         private float cooldownRemaining;
 
         private void Update()
@@ -134,7 +136,7 @@ namespace Project.Character.Combat
             if (cooldownRemaining <= 0f && CanAttack())
             {
                 PerformAttack();
-                cooldownRemaining = attackCooldownSeconds;
+                cooldownRemaining = AttackSpeedCalculator.GetAttackIntervalSeconds(playerStats.CurrentSubStats.Aspd);
             }
         }
 
@@ -165,6 +167,13 @@ namespace Project.Character.Combat
         private void PerformAttack()
         {
             var isRanged = equipment.IsMainHandWeaponRanged();
+
+            // Only the swing states (Attack, AttackRanged) have their Motion
+            // Speed bound to this parameter in the Animator Controller, so
+            // setting it has no effect on the Mage's Cast state — the Mage's
+            // basic attack always plays at its authored speed, not scaled by
+            // Aspd, since Cast is shared with real skill casts.
+            animatorController?.SetAttackSpeedMultiplier(AttackSpeedCalculator.GetAttackAnimationSpeedMultiplier(playerStats.CurrentSubStats.Aspd));
 
             if (classController.CurrentClass == CharacterClass.Mage)
             {

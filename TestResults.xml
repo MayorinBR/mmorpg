@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="39" result="Passed" total="39" passed="39" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.0860523">
+  <test-suite type="TestSuite" id="1059" name="MMO" fullname="MMO" runstate="Runnable" testcasecount="39" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.086052" total="39" passed="39" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1009" name="Project.Character.Stats.Tests.dll" fullname="C:/GitUnity/MMO/Library/ScriptAssemblies/Project.Character.Stats.Tests.dll" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.033673" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="47872" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1010" name="Project" fullname="Project" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.033201" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1011" name="Character" fullname="Project.Character" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.033021" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1012" name="Stats" fullname="Project.Character.Stats" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.032860" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestSuite" id="1013" name="Tests" fullname="Project.Character.Stats.Tests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.032653" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-suite type="TestFixture" id="1001" name="CharacterBaseStatsTests" fullname="Project.Character.Stats.Tests.CharacterBaseStatsTests" classname="Project.Character.Stats.Tests.CharacterBaseStatsTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.031694" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1008" name="ResetToMinimum_AfterReset_StatCanBeRaisedAgainAtOriginalCost" fullname="Project.Character.Stats.Tests.CharacterBaseStatsTests.ResetToMinimum_AfterReset_StatCanBeRaisedAgainAtOriginalCost" methodname="ResetToMinimum_AfterReset_StatCanBeRaisedAgainAtOriginalCost" classname="Project.Character.Stats.Tests.CharacterBaseStatsTests" runstate="Runnable" seed="696094802" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.015398" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1006" name="ResetToMinimum_WithFlatCostStrategy_RefundsExactlyWhatWasSpent" fullname="Project.Character.Stats.Tests.CharacterBaseStatsTests.ResetToMinimum_WithFlatCostStrategy_RefundsExactlyWhatWasSpent" methodname="ResetToMinimum_WithFlatCostStrategy_RefundsExactlyWhatWasSpent" classname="Project.Character.Stats.Tests.CharacterBaseStatsTests" runstate="Runnable" seed="1613917189" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000264" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1005" name="ResetToMinimum_WithNoPointsSpent_RefundsZeroAndKeepsExistingPoints" fullname="Project.Character.Stats.Tests.CharacterBaseStatsTests.ResetToMinimum_WithNoPointsSpent_RefundsZeroAndKeepsExistingPoints" methodname="ResetToMinimum_WithNoPointsSpent_RefundsZeroAndKeepsExistingPoints" classname="Project.Character.Stats.Tests.CharacterBaseStatsTests" runstate="Runnable" seed="62351644" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000143" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1007" name="ResetToMinimum_WithRagnarokCostStrategy_RefundsBandedCostNotFlatValue" fullname="Project.Character.Stats.Tests.CharacterBaseStatsTests.ResetToMinimum_WithRagnarokCostStrategy_RefundsBandedCostNotFlatValue" methodname="ResetToMinimum_WithRagnarokCostStrategy_RefundsBandedCostNotFlatValue" classname="Project.Character.Stats.Tests.CharacterBaseStatsTests" runstate="Runnable" seed="1596120815" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000166" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1004" name="TryIncreaseStat_AtMaximumValue_ReturnsFalseAndDoesNotSpendPoints" fullname="Project.Character.Stats.Tests.CharacterBaseStatsTests.TryIncreaseStat_AtMaximumValue_ReturnsFalseAndDoesNotSpendPoints" methodname="TryIncreaseStat_AtMaximumValue_ReturnsFalseAndDoesNotSpendPoints" classname="Project.Character.Stats.Tests.CharacterBaseStatsTests" runstate="Runnable" seed="1182504990" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000382" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1002" name="TryIncreaseStat_WhenEnoughPointsAvailable_RaisesValueAndSpendsCost" fullname="Project.Character.Stats.Tests.CharacterBaseStatsTests.TryIncreaseStat_WhenEnoughPointsAvailable_RaisesValueAndSpendsCost" methodname="TryIncreaseStat_WhenEnoughPointsAvailable_RaisesValueAndSpendsCost" classname="Project.Character.Stats.Tests.CharacterBaseStatsTests" runstate="Runnable" seed="2068042257" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000110" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1003" name="TryIncreaseStat_WhenNotEnoughPointsAvailable_LeavesValueUnchanged" fullname="Project.Character.Stats.Tests.CharacterBaseStatsTests.TryIncreaseStat_WhenNotEnoughPointsAvailable_LeavesValueUnchanged" methodname="TryIncreaseStat_WhenNotEnoughPointsAvailable_LeavesValueUnchanged" classname="Project.Character.Stats.Tests.CharacterBaseStatsTests" runstate="Runnable" seed="1889518227" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000089" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1048" name="Project.Items.Tests.dll" fullname="C:/GitUnity/MMO/Library/ScriptAssemblies/Project.Items.Tests.dll" runstate="Runnable" testcasecount="32" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.043549" total="32" passed="32" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="47872" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1049" name="Project" fullname="Project" runstate="Runnable" testcasecount="32" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.041313" total="32" passed="32" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1050" name="Items" fullname="Project.Items" runstate="Runnable" testcasecount="32" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.040795" total="32" passed="32" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1051" name="Tests" fullname="Project.Items.Tests" runstate="Runnable" testcasecount="32" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.040332" total="32" passed="32" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1014" name="EquipmentManagerTests" fullname="Project.Items.Tests.EquipmentManagerTests" classname="Project.Items.Tests.EquipmentManagerTests" runstate="Runnable" testcasecount="14" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.026010" total="14" passed="14" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1028" name="CaptureState_ThenRestoreState_RoundTripsEquippedItemsAndAmmoCount" fullname="Project.Items.Tests.EquipmentManagerTests.CaptureState_ThenRestoreState_RoundTripsEquippedItemsAndAmmoCount" methodname="CaptureState_ThenRestoreState_RoundTripsEquippedItemsAndAmmoCount" classname="Project.Items.Tests.EquipmentManagerTests" runstate="Runnable" seed="1102253873" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.009678" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1027" name="GetBonus_AmmoStatBonus_OnlyCountsWhileRangedWeaponEquipped" fullname="Project.Items.Tests.EquipmentManagerTests.GetBonus_AmmoStatBonus_OnlyCountsWhileRangedWeaponEquipped" methodname="GetBonus_AmmoStatBonus_OnlyCountsWhileRangedWeaponEquipped" classname="Project.Items.Tests.EquipmentManagerTests" runstate="Runnable" seed="240197516" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.001223" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1026" name="GetBonus_SumsStatBonusesAcrossAllEquippedItems" fullname="Project.Items.Tests.EquipmentManagerTests.GetBonus_SumsStatBonusesAcrossAllEquippedItems" methodname="GetBonus_SumsStatBonusesAcrossAllEquippedItems" classname="Project.Items.Tests.EquipmentManagerTests" runstate="Runnable" seed="1364870960" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000886" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1015" name="TryEquipFromInventory_ArmorItem_MovesFromInventoryToEquippedSlot" fullname="Project.Items.Tests.EquipmentManagerTests.TryEquipFromInventory_ArmorItem_MovesFromInventoryToEquippedSlot" methodname="TryEquipFromInventory_ArmorItem_MovesFromInventoryToEquippedSlot" classname="Project.Items.Tests.EquipmentManagerTests" runstate="Runnable" seed="1894030007" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000829" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1021" name="TryEquipFromInventory_BelowRequiredLevel_FailsAndPublishesFeedback" fullname="Project.Items.Tests.EquipmentManagerTests.TryEquipFromInventory_BelowRequiredLevel_FailsAndPublishesFeedback" methodname="TryEquipFromInventory_BelowRequiredLevel_FailsAndPublishesFeedback" classname="Project.Items.Tests.EquipmentManagerTests" runstate="Runnable" seed="1140277724" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.003943" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1022" name="TryEquipFromInventory_ClassNotAllowed_FailsAndPublishesFeedback" fullname="Project.Items.Tests.EquipmentManagerTests.TryEquipFromInventory_ClassNotAllowed_FailsAndPublishesFeedback" methodname="TryEquipFromInventory_ClassNotAllowed_FailsAndPublishesFeedback" classname="Project.Items.Tests.EquipmentManagerTests" runstate="Runnable" seed="2122742951" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.001830" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1024" name="TryEquipFromInventory_DifferentAmmoTypeAlreadyEquipped_SwapsWithInventorySlot" fullname="Project.Items.Tests.EquipmentManagerTests.TryEquipFromInventory_DifferentAmmoTypeAlreadyEquipped_SwapsWithInventorySlot" methodname="TryEquipFromInventory_DifferentAmmoTypeAlreadyEquipped_SwapsWithInventorySlot" classname="Project.Items.Tests.EquipmentManagerTests" runstate="Runnable" seed="1321362170" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000746" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1020" name="TryEquipFromInventory_MainHandWeaponIncompatibleWithCurrentOffHand_AlsoEvictsOffHandWeapon" fullname="Project.Items.Tests.EquipmentManagerTests.TryEquipFromInventory_MainHandWeaponIncompatibleWithCurrentOffHand_AlsoEvictsOffHandWeapon" methodname="TryEquipFromInventory_MainHandWeaponIncompatibleWithCurrentOffHand_AlsoEvictsOffHandWeapon" classname="Project.Items.Tests.EquipmentManagerTests" runstate="Runnable" seed="153375944" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000758" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1018" name="TryEquipFromInventory_OneHandedWeapon_GoesToLeftHandWhenBothHandsAreEmpty" fullname="Project.Items.Tests.EquipmentManagerTests.TryEquipFromInventory_OneHandedWeapon_GoesToLeftHandWhenBothHandsAreEmpty" methodname="TryEquipFromInventory_OneHandedWeapon_GoesToLeftHandWhenBothHandsAreEmpty" classname="Project.Items.Tests.EquipmentManagerTests" runstate="Runnable" seed="1997389787" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000335" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1016" name="TryEquipFromInventory_ReplacingItemInSameSlot_ReturnsPreviousItemToInventory" fullname="Project.Items.Tests.EquipmentManagerTests.TryEquipFromInventory_ReplacingItemInSameSlot_ReturnsPreviousItemToInventory" methodname="TryEquipFromInventory_ReplacingItemInSameSlot_ReturnsPreviousItemToInventory" classname="Project.Items.Tests.EquipmentManagerTests" runstate="Runnable" seed="296583365" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000356" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1023" name="TryEquipFromInventory_SameAmmoTypeAlreadyEquipped_StacksOntoExisting" fullname="Project.Items.Tests.EquipmentManagerTests.TryEquipFromInventory_SameAmmoTypeAlreadyEquipped_StacksOntoExisting" methodname="TryEquipFromInventory_SameAmmoTypeAlreadyEquipped_StacksOntoExisting" classname="Project.Items.Tests.EquipmentManagerTests" runstate="Runnable" seed="2081893754" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000312" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1019" name="TryEquipFromInventory_SecondDualWieldCapableWeapon_GoesToOffHand" fullname="Project.Items.Tests.EquipmentManagerTests.TryEquipFromInventory_SecondDualWieldCapableWeapon_GoesToOffHand" methodname="TryEquipFromInventory_SecondDualWieldCapableWeapon_GoesToOffHand" classname="Project.Items.Tests.EquipmentManagerTests" runstate="Runnable" seed="1604628382" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000361" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1017" name="TryEquipFromInventory_TwoHandedWeapon_OccupiesBothHandSlots" fullname="Project.Items.Tests.EquipmentManagerTests.TryEquipFromInventory_TwoHandedWeapon_OccupiesBothHandSlots" methodname="TryEquipFromInventory_TwoHandedWeapon_OccupiesBothHandSlots" classname="Project.Items.Tests.EquipmentManagerTests" runstate="Runnable" seed="1962659608" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000302" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1025" name="Unequip_ReturnsItemToInventoryAndRaisesEquipmentChanged" fullname="Project.Items.Tests.EquipmentManagerTests.Unequip_ReturnsItemToInventoryAndRaisesEquipmentChanged" methodname="Unequip_ReturnsItemToInventoryAndRaisesEquipmentChanged" classname="Project.Items.Tests.EquipmentManagerTests" runstate="Runnable" seed="1562552329" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000697" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1029" name="InventoryTests" fullname="Project.Items.Tests.InventoryTests" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.013632" total="18" passed="18" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1044" name="EnsureSlotCount_GrowsInWholePagesUntilAtLeastTheRequestedCount" fullname="Project.Items.Tests.InventoryTests.EnsureSlotCount_GrowsInWholePagesUntilAtLeastTheRequestedCount" methodname="EnsureSlotCount_GrowsInWholePagesUntilAtLeastTheRequestedCount" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="790054555" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.002235" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1045" name="EnsureSlotCount_WhenAlreadyEnoughSlots_DoesNothing" fullname="Project.Items.Tests.InventoryTests.EnsureSlotCount_WhenAlreadyEnoughSlots_DoesNothing" methodname="EnsureSlotCount_WhenAlreadyEnoughSlots_DoesNothing" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="965332698" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000203" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1037" name="GetAddableQuantity_ClampsToWhatWeightCapacityAllows" fullname="Project.Items.Tests.InventoryTests.GetAddableQuantity_ClampsToWhatWeightCapacityAllows" methodname="GetAddableQuantity_ClampsToWhatWeightCapacityAllows" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="1276389780" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000266" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1038" name="GetAddableQuantity_WithNullItem_ReturnsZero" fullname="Project.Items.Tests.InventoryTests.GetAddableQuantity_WithNullItem_ReturnsZero" methodname="GetAddableQuantity_WithNullItem_ReturnsZero" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="562408392" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000109" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1047" name="InventoryChanged_DoesNotFireWhenNothingCouldBeAdded" fullname="Project.Items.Tests.InventoryTests.InventoryChanged_DoesNotFireWhenNothingCouldBeAdded" methodname="InventoryChanged_DoesNotFireWhenNothingCouldBeAdded" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="560182106" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000252" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1046" name="InventoryChanged_FiresOnSuccessfulAdd" fullname="Project.Items.Tests.InventoryTests.InventoryChanged_FiresOnSuccessfulAdd" methodname="InventoryChanged_FiresOnSuccessfulAdd" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="2019793167" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000269" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1039" name="RemoveAt_ClearsSlotAndReducesCurrentWeight" fullname="Project.Items.Tests.InventoryTests.RemoveAt_ClearsSlotAndReducesCurrentWeight" methodname="RemoveAt_ClearsSlotAndReducesCurrentWeight" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="645312270" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000675" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1043" name="SetSlot_ReplacesExistingContentsAndUpdatesWeight" fullname="Project.Items.Tests.InventoryTests.SetSlot_ReplacesExistingContentsAndUpdatesWeight" methodname="SetSlot_ReplacesExistingContentsAndUpdatesWeight" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="1418415888" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000320" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1035" name="TryAddItem_AtFullWeightCapacity_AddsNothingAndReturnsFalse" fullname="Project.Items.Tests.InventoryTests.TryAddItem_AtFullWeightCapacity_AddsNothingAndReturnsFalse" methodname="TryAddItem_AtFullWeightCapacity_AddsNothingAndReturnsFalse" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="877628695" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000253" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1034" name="TryAddItem_BeyondWeightCapacity_AddsPartialAmountAndReturnsFalse" fullname="Project.Items.Tests.InventoryTests.TryAddItem_BeyondWeightCapacity_AddsPartialAmountAndReturnsFalse" methodname="TryAddItem_BeyondWeightCapacity_AddsPartialAmountAndReturnsFalse" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="1165499671" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000195" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1032" name="TryAddItem_ExceedsMaxStackSize_SpillsRemainderIntoNextSlot" fullname="Project.Items.Tests.InventoryTests.TryAddItem_ExceedsMaxStackSize_SpillsRemainderIntoNextSlot" methodname="TryAddItem_ExceedsMaxStackSize_SpillsRemainderIntoNextSlot" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="2056408671" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000184" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1030" name="TryAddItem_IntoEmptyInventory_FillsFirstSlot" fullname="Project.Items.Tests.InventoryTests.TryAddItem_IntoEmptyInventory_FillsFirstSlot" methodname="TryAddItem_IntoEmptyInventory_FillsFirstSlot" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="1094030617" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000200" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1036" name="TryAddItem_MoreUnitsThanExistingSlots_GrowsANewPage" fullname="Project.Items.Tests.InventoryTests.TryAddItem_MoreUnitsThanExistingSlots_GrowsANewPage" methodname="TryAddItem_MoreUnitsThanExistingSlots_GrowsANewPage" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="1680094201" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000284" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1033" name="TryAddItem_NonStackableItem_UsesOneSlotPerUnit" fullname="Project.Items.Tests.InventoryTests.TryAddItem_NonStackableItem_UsesOneSlotPerUnit" methodname="TryAddItem_NonStackableItem_UsesOneSlotPerUnit" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="994669739" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000283" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1031" name="TryAddItem_StackableItemAlreadyPresent_FillsExistingStackFirst" fullname="Project.Items.Tests.InventoryTests.TryAddItem_StackableItemAlreadyPresent_FillsExistingStackFirst" methodname="TryAddItem_StackableItemAlreadyPresent_FillsExistingStackFirst" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="969458163" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000216" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1041" name="TryRemoveFromSlot_FullQuantity_EmptiesTheSlot" fullname="Project.Items.Tests.InventoryTests.TryRemoveFromSlot_FullQuantity_EmptiesTheSlot" methodname="TryRemoveFromSlot_FullQuantity_EmptiesTheSlot" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="893093601" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000328" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1042" name="TryRemoveFromSlot_MoreThanAvailable_ReturnsFalseAndLeavesSlotUnchanged" fullname="Project.Items.Tests.InventoryTests.TryRemoveFromSlot_MoreThanAvailable_ReturnsFalseAndLeavesSlotUnchanged" methodname="TryRemoveFromSlot_MoreThanAvailable_ReturnsFalseAndLeavesSlotUnchanged" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="1780630469" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000178" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1040" name="TryRemoveFromSlot_PartialQuantity_KeepsRemainderInSlot" fullname="Project.Items.Tests.InventoryTests.TryRemoveFromSlot_PartialQuantity_KeepsRemainderInSlot" methodname="TryRemoveFromSlot_PartialQuantity_KeepsRemainderInSlot" classname="Project.Items.Tests.InventoryTests" runstate="Runnable" seed="1337966520" result="Passed" start-time="2026-09-08 05:14:03Z" end-time="2026-09-08 05:14:03Z" duration="0.000191" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

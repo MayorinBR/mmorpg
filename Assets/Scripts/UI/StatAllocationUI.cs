@@ -8,7 +8,10 @@ namespace Project.UI
     /// <summary>
     /// Orchestrates the six stat rows and the available-points display,
     /// applying increases through <see cref="PlayerStatsController.BaseStats"/>.
-    /// Also refreshes automatically on level up, since that grants new points.
+    /// Also refreshes automatically on level up, since that grants new points,
+    /// and on <see cref="PlayerStatsController.StatsChanged"/>, which covers
+    /// every other source of a stat change — including one triggered outside
+    /// this panel entirely, such as the Editor's debug reset command.
     /// </summary>
     public class StatAllocationUI : MonoBehaviour
     {
@@ -24,6 +27,8 @@ namespace Project.UI
             {
                 row.IncreaseRequested += HandleIncreaseRequested;
             }
+
+            statsController.StatsChanged += RefreshAll;
 
             if (experience != null)
             {
@@ -42,6 +47,8 @@ namespace Project.UI
             {
                 row.IncreaseRequested -= HandleIncreaseRequested;
             }
+
+            statsController.StatsChanged -= RefreshAll;
 
             if (experience != null)
             {
@@ -63,9 +70,9 @@ namespace Project.UI
         {
             // Goes through PlayerStatsController rather than BaseStats
             // directly, so a successful increase also refreshes the HP/SP
-            // bars if the stat is VIT or INT (see PlayerStatsController.TryIncreaseStat).
+            // bars if the stat is VIT or INT (see PlayerStatsController.TryIncreaseStat),
+            // and raises StatsChanged, which RefreshAll is already subscribed to.
             statsController.TryIncreaseStat(statType);
-            RefreshAll();
         }
 
         private void HandleLeveledUp(int newLevel)
@@ -87,4 +94,4 @@ namespace Project.UI
             }
         }
     }
-}
+}

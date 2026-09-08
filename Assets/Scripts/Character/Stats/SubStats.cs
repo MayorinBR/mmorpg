@@ -11,7 +11,7 @@ namespace Project.Character.Stats
         /// <summary>
         /// Initializes a new set of status-derived sub-stats.
         /// </summary>
-        public SubStats(int statusAtk, int statusMatk, int statusDef, int statusMDef, int hit, int flee, float criticalRate)
+        public SubStats(int statusAtk, int statusMatk, int statusDef, int statusMDef, int hit, int flee, float criticalRate, int aspd)
         {
             StatusAtk = statusAtk;
             StatusMatk = statusMatk;
@@ -20,6 +20,7 @@ namespace Project.Character.Stats
             Hit = hit;
             Flee = flee;
             CriticalRate = criticalRate;
+            Aspd = aspd;
         }
 
         /// <summary>Gets the physical attack rating contributed by base stats alone.</summary>
@@ -42,5 +43,21 @@ namespace Project.Character.Stats
 
         /// <summary>Gets the critical hit chance, expressed as a percentage.</summary>
         public float CriticalRate { get; }
+
+        /// <summary>
+        /// Gets the attack speed rating (higher attacks faster), on
+        /// Ragnarok Online's classic 0-190 display scale — matching the
+        /// original game's own status window, per Victor's request to keep
+        /// every sub-stat's calculation and presentation consistent with
+        /// it. Preliminary: see <see cref="SubStatsCalculator"/>'s remarks
+        /// — real ASPD depends on weapon type and has diminishing returns
+        /// not modeled here yet. Feeds directly into
+        /// <see cref="Combat.AttackSpeedCalculator.GetAttackIntervalSeconds"/>
+        /// (auto-attack cooldown) and, via
+        /// <see cref="Combat.AttackSpeedCalculator.GetAttackAnimationSpeedMultiplier"/>,
+        /// the attack swing animation's playback speed — skills are
+        /// unaffected.
+        /// </summary>
+        public int Aspd { get; }
     }
 }

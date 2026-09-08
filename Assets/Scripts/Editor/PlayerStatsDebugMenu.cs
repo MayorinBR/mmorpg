@@ -32,7 +32,8 @@ namespace Project.EditorTools
                 return;
             }
 
-            statsController.ResetStats();
+            var refunded = statsController.ResetStats();
+            Debug.Log($"PlayerStatsDebugMenu: stats reset, {refunded} points refunded. Note this does not refresh an already-open Stat Allocation panel — close and reopen it, or spend/gain a point, to see the updated values.");
         }
 
         [MenuItem(MenuPath, true)]

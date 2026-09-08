@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Project.Character.Stats;
 using Project.Combat;
@@ -51,6 +52,15 @@ namespace Project.Character.Combat
         private ISubStatsCalculator subStatsCalculator;
         private IStatProvider effectiveStats;
 
+        /// <summary>
+        /// Raised whenever a stat point is spent, stats are reset, a save is
+        /// restored, or equipment changes — anything that can move
+        /// <see cref="CurrentSubStats"/>. Stat-derived UI (the stat
+        /// allocation panel, the sub-stats panel) subscribes to this instead
+        /// of each caller having to remember to refresh it manually.
+        /// </summary>
+        public event Action StatsChanged;
+
         /// <summary>Gets the player's base stat block (STR, AGI, VIT, INT, DEX, LUK).</summary>
         public CharacterBaseStats BaseStats => baseStats;
 
@@ -76,7 +86,7 @@ namespace Project.Character.Combat
         {
             if (equipment != null)
             {
-                equipment.EquipmentChanged -= RefreshDependentMaxValues;
+                equipment.EquipmentChanged -= HandleEquipmentChanged;
             }
         }
 
@@ -105,8 +115,14 @@ namespace Project.Character.Combat
 
             if (equipment != null)
             {
-                equipment.EquipmentChanged += RefreshDependentMaxValues;
+                equipment.EquipmentChanged += HandleEquipmentChanged;
             }
+        }
+
+        private void HandleEquipmentChanged()
+        {
+            RefreshDependentMaxValues();
+            StatsChanged?.Invoke();
         }
 
         /// <summary>
@@ -130,6 +146,7 @@ namespace Project.Character.Combat
             }
 
             RefreshDependentMaxValues();
+            StatsChanged?.Invoke();
             return true;
         }
 
@@ -143,7 +160,8 @@ namespace Project.Character.Combat
         /// Publishes a <see cref="PlayerFeedbackChannel"/> message reporting
         /// how many points were refunded.
         /// </summary>
-        public void ResetStats()
+        /// <returns>The total number of points refunded.</returns>
+        public int ResetStats()
         {
             EnsureInitialized();
 
@@ -153,6 +171,8 @@ namespace Project.Character.Combat
             mana?.ResetMana();
 
             PlayerFeedbackChannel.Publish($"Stats reset: {refunded} points refunded.");
+            StatsChanged?.Invoke();
+            return refunded;
         }
 
         private void RefreshDependentMaxValues()
@@ -235,6 +255,7 @@ namespace Project.Character.Combat
 
             health?.ResetHealth();
             mana?.ResetMana();
+            StatsChanged?.Invoke();
         }
     }
 }

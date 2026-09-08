@@ -15,6 +15,7 @@ namespace Project.Character.Animation
         private static readonly int AttackRangedParameter = Animator.StringToHash("AttackRanged");
         private static readonly int CastParameter = Animator.StringToHash("Cast");
         private static readonly int IsDeadParameter = Animator.StringToHash("IsDead");
+        private static readonly int AttackSpeedMultiplierParameter = Animator.StringToHash("AttackSpeedMultiplier");
 
         [SerializeField] private Animator animator;
 
@@ -25,6 +26,20 @@ namespace Project.Character.Animation
         public void SetMovementSpeed(float normalizedSpeed)
         {
             animator.SetFloat(SpeedParameter, normalizedSpeed);
+        }
+
+        /// <summary>
+        /// Sets the playback speed multiplier for the auto-attack swing
+        /// states (Attack, AttackRanged) — bound to those states' Motion
+        /// Speed field as a parameter in the Animator Controller, so it has
+        /// no effect on Idle, Run, Cast or Death. Call before
+        /// <see cref="TriggerAttack"/>/<see cref="TriggerRangedAttack"/> so
+        /// the upcoming swing plays at the right speed.
+        /// </summary>
+        /// <param name="multiplier">1 = the state's authored speed; above 1 plays faster.</param>
+        public void SetAttackSpeedMultiplier(float multiplier)
+        {
+            animator.SetFloat(AttackSpeedMultiplierParameter, multiplier);
         }
 
         /// <summary>
