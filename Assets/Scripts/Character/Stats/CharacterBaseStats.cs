@@ -116,5 +116,40 @@ namespace Project.Character.Stats
         {
             AvailablePoints = Math.Max(amount, 0);
         }
+
+        /// <summary>
+        /// Resets every stat back to <see cref="MinStatValue"/> and refunds
+        /// every point spent reaching those values into
+        /// <see cref="AvailablePoints"/>, on top of whatever was already
+        /// unspent. Each stat's refund is recomputed step by step through
+        /// <see cref="IStatPointCostStrategy.GetCostForNextPoint"/> rather
+        /// than assumed, since the real cost curve is not linear
+        /// (<see cref="RagnarokStatPointCostStrategy"/> charges more per
+        /// point in higher bands) — a flat "points spent = current value"
+        /// refund would under-pay a heavily-invested stat.
+        /// </summary>
+        /// <returns>The total number of points refunded by this reset.</returns>
+        public int ResetToMinimum()
+        {
+            var statTypes = new StatType[baseValues.Count];
+            baseValues.Keys.CopyTo(statTypes, 0);
+
+            var totalRefunded = 0;
+
+            foreach (var stat in statTypes)
+            {
+                var currentValue = baseValues[stat];
+
+                for (var value = MinStatValue; value < currentValue; value++)
+                {
+                    totalRefunded += costStrategy.GetCostForNextPoint(value);
+                }
+
+                baseValues[stat] = MinStatValue;
+            }
+
+            AvailablePoints += totalRefunded;
+            return totalRefunded;
+        }
     }
 }

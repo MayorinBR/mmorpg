@@ -133,6 +133,28 @@ namespace Project.Character.Combat
             return true;
         }
 
+        /// <summary>
+        /// Resets every base stat back to its minimum and refunds all spent
+        /// points, then refreshes and fully restores HP/SP — resetting VIT/INT
+        /// can only shrink their max value, so topping up avoids leaving the
+        /// player above their new maximum. A simplified respec: unlike
+        /// Ragnarok Online's own NPC-driven reset, this has no Zeny or item
+        /// cost today (see FUTURE_IMPROVEMENTS.md for that possible follow-up).
+        /// Publishes a <see cref="PlayerFeedbackChannel"/> message reporting
+        /// how many points were refunded.
+        /// </summary>
+        public void ResetStats()
+        {
+            EnsureInitialized();
+
+            var refunded = baseStats.ResetToMinimum();
+            RefreshDependentMaxValues();
+            health?.ResetHealth();
+            mana?.ResetMana();
+
+            PlayerFeedbackChannel.Publish($"Stats reset: {refunded} points refunded.");
+        }
+
         private void RefreshDependentMaxValues()
         {
             health?.RefreshMaxHealth();
