@@ -49,9 +49,13 @@ namespace Project.Character.Stats
         /// Ragnarok Online's classic 0-190 display scale — matching the
         /// original game's own status window, per Victor's request to keep
         /// every sub-stat's calculation and presentation consistent with
-        /// it. Preliminary: see <see cref="SubStatsCalculator"/>'s remarks
-        /// — real ASPD depends on weapon type and has diminishing returns
-        /// not modeled here yet. Feeds directly into
+        /// it. Computed from the real, sourced iRO Wiki Classic AGI/DEX
+        /// formula — see <see cref="SubStatsCalculator"/>'s remarks. One
+        /// piece is still a placeholder: the real per-weapon, per-job
+        /// weapon delay table isn't modeled yet, so every weapon and class
+        /// currently share one flat value (see
+        /// <see cref="SubStatsCalculator"/>'s remarks). Feeds
+        /// directly into
         /// <see cref="Combat.AttackSpeedCalculator.GetAttackIntervalSeconds"/>
         /// (auto-attack cooldown) and, via
         /// <see cref="Combat.AttackSpeedCalculator.GetAttackAnimationSpeedMultiplier"/>,
