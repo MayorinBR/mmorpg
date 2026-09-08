@@ -14,7 +14,7 @@ Prototype of a 2.5D/3D MMORPG built in Unity, inspired by Ragnarok Online's clas
 
 - Player movement (WASD, gamepad, click-to-move), camera-relative
 - Isometric camera with rotation and zoom
-- Ragnarok-style base stats (STR, AGI, VIT, INT, DEX, LUK) and derived sub-stats (ATK, MATK, DEF, MDEF, HIT, FLEE, CRIT)
+- Ragnarok-style base stats (STR, AGI, VIT, INT, DEX, LUK), matching real Ragnarok Online's own point curves (48 points at level 1, scaling per-level gains) and sub-stat formulas — STR or DEX drives physical damage depending on the equipped weapon (melee vs. bow/ranged), INT drives the Mage's damage and both skills' Magical damage, and VIT/INT grant bonus max HP/SP
 - Stat point allocation UI
 - Enemy AI (idle, chase, attack) with aggro and leash range
 - Player auto-attack with target selection
@@ -54,7 +54,7 @@ Protótipo de um MMORPG 2.5D/3D feito em Unity, inspirado no gameplay clássico 
 
 - Movimentação do player (WASD, controle, clique para mover), relativa à câmera
 - Câmera isométrica com rotação e zoom
-- Status base estilo Ragnarok (STR, AGI, VIT, INT, DEX, LUK) e sub-status derivados (ATK, MATK, DEF, MDEF, HIT, FLEE, CRIT)
+- Status base estilo Ragnarok (STR, AGI, VIT, INT, DEX, LUK), seguindo as curvas de pontos do Ragnarok Online de verdade (48 pontos no nível 1, ganho por nível escalonado) e as fórmulas reais de sub-status — STR ou DEX define o dano físico dependendo da arma equipada (corpo a corpo vs. arco/à distância), INT define o dano do Mage e o dano Mágico das skills, e VIT/INT concedem bônus de HP/SP máximos
 - UI de distribuição de pontos de status
 - IA de inimigos (idle, perseguição, ataque) com raio de aggro e de coleira (leash)
 - Combate por auto-attack do player com seleção de alvo
@@ -94,7 +94,7 @@ Ragnarok Onlineのクラシックな戦闘(PvE)と探索のゲームプレイに
 
 - プレイヤーの移動(WASD、ゲームパッド、クリック移動)、カメラ基準
 - 回転とズームが可能なアイソメトリックカメラ
-- Ragnarok風の基本ステータス(STR、AGI、VIT、INT、DEX、LUK)と派生サブステータス(ATK、MATK、DEF、MDEF、HIT、FLEE、CRIT)
+- Ragnarok風の基本ステータス(STR、AGI、VIT、INT、DEX、LUK)。実際のRagnarok Onlineのポイント曲線(レベル1で48ポイント、レベルごとの獲得量も段階的に増加)とサブステータス計算式を採用 — 物理ダメージは装備武器(近接か弓/遠距離か)に応じてSTRまたはDEXが決定し、INTはMageのダメージとスキルの魔法ダメージを、VIT/INTは最大HP/SPのボーナスを決定
 - ステータスポイント振り分けUI
 - 敵AI(待機・追跡・攻撃)、索敵範囲とリーシュ範囲付き
 - ターゲット選択付きのプレイヤー自動攻撃

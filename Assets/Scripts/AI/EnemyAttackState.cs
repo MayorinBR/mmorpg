@@ -6,7 +6,8 @@ namespace Project.AI
     /// <summary>
     /// The enemy stands still and attacks its target on a fixed cooldown.
     /// Falls back to <see cref="EnemyChaseState"/> if the target moves out
-    /// of attack range.
+    /// of attack range. Each attack is resolved against the target's Flee
+    /// via <see cref="HitChanceCalculator"/> and can miss outright.
     /// </summary>
     public class EnemyAttackState : IEnemyState
     {
@@ -63,7 +64,18 @@ namespace Project.AI
             // assuming which sibling holds which.
             var damageable = enemy.PlayerTarget.root.GetComponentInChildren<IDamageable>();
 
-            damageable?.TakeDamage(enemy.Stats.AttackPower);
+            if (damageable == null)
+            {
+                return;
+            }
+
+            if (!HitChanceCalculator.RollHit(enemy.Stats.Hit, damageable.FleeRating))
+            {
+                damageable.NotifyDodged();
+                return;
+            }
+
+            damageable.TakeDamage(enemy.Stats.AttackPower);
         }
     }
 }

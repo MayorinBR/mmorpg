@@ -140,6 +140,16 @@ namespace Project.Character.Combat
             return true;
         }
 
+        /// <summary>
+        /// Spends mana and puts the skill on cooldown as soon as the cast is
+        /// committed (in range, affordable), regardless of whether the hit
+        /// actually lands — matching Ragnarok Online, where a missed skill
+        /// still consumes its resources. The hit itself is resolved against
+        /// the target's Flee via <see cref="HitChanceCalculator"/>, applying
+        /// damage as <see cref="DamageCategory.Physical"/> or
+        /// <see cref="DamageCategory.Magical"/> depending on the skill's
+        /// <see cref="SkillDefinition.DamageType"/>.
+        /// </summary>
         private bool TryCastDamage(SkillDefinition skill, int level)
         {
             if (targetSelector.CurrentTarget == null || targetSelector.CurrentDamageable == null)
@@ -154,9 +164,20 @@ namespace Project.Character.Combat
                 return false;
             }
 
-            var subStats = statsController.CurrentSubStats;
-            var damage = skill.CalculateDamage(subStats.StatusAtk, subStats.StatusMatk, level);
-            targetSelector.CurrentDamageable.TakeDamage(damage, skill.Element);
+            var target = targetSelector.CurrentDamageable;
+
+            if (HitChanceCalculator.RollHit(statsController.CurrentSubStats.Hit, target.FleeRating))
+            {
+                var subStats = statsController.CurrentSubStats;
+                var damage = skill.CalculateDamage(subStats.StatusAtk, subStats.StatusMatk, level);
+                var category = skill.DamageType == SkillDamageType.Physical ? DamageCategory.Physical : DamageCategory.Magical;
+                target.TakeDamage(damage, skill.Element, category);
+            }
+            else
+            {
+                target.NotifyDodged();
+            }
+
             return true;
         }
 

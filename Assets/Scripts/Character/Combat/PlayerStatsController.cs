@@ -1,5 +1,6 @@
 using UnityEngine;
 using Project.Character.Stats;
+using Project.Combat;
 using Project.Items;
 using Project.Persistence;
 
@@ -10,13 +11,41 @@ namespace Project.Character.Combat
     /// combat. Acts as the composition root connecting the plain C# stat
     /// classes to the Unity component world. When an
     /// <see cref="EquipmentManager"/> is assigned, equipped item bonuses are
-    /// included in the sub-stats calculation.
+    /// included in the sub-stats calculation. Also implements
+    /// <see cref="IMaxHealthBonusProvider"/> and <see cref="IMaxManaBonusProvider"/>
+    /// so VIT and INT give the player extra HP and SP, the same way they do
+    /// in Ragnarok Online, without <see cref="Project.Combat.HealthComponent"/>
+    /// or <see cref="Project.Combat.ManaComponent"/> needing to know stats exist.
+    /// Also implements <see cref="IDefensiveStatsProvider"/> so the player's
+    /// DEX/AGI/VIT/INT-derived physical defense, magical defense and flee
+    /// rating (see <see cref="CurrentSubStats"/>) feed into
+    /// <see cref="Project.Combat.HealthComponent"/> the same optional-hook way.
+    /// When <see cref="health"/>/<see cref="mana"/> are assigned, <see cref="TryIncreaseStat"/>
+    /// and equipment changes both push a refresh to them, so their max
+    /// value (and any UI bound to it) picks up a VIT/INT change immediately
+    /// instead of waiting for the next damage, heal or mana spend.
     /// </summary>
-    public class PlayerStatsController : MonoBehaviour, IPlayerLevelProvider, ISaveParticipant
+    public class PlayerStatsController : MonoBehaviour, IPlayerLevelProvider, ISaveParticipant, IMaxHealthBonusProvider, IMaxManaBonusProvider, IDefensiveStatsProvider
     {
+        // Real Ragnarok Online value (source: iRO Wiki Classic — Stats,
+        // consulted September 2026): a fresh level-1 character starts with
+        // 48 unspent stat points, not the flat placeholder of 10 used
+        // before this was researched.
+        private const int RealRagnarokStartingStatPoints = 48;
+
+        // Real Ragnarok Online per-point bonus: max HP/SP scale up by 1%
+        // for every point of VIT/INT respectively (source: iRO Wiki
+        // Classic — Stats, consulted September 2026).
+        private const float MaxHealthBonusPerVit = 0.01f;
+        private const float MaxManaBonusPerInt = 0.01f;
+
         [SerializeField] private int startingLevel = 1;
-        [SerializeField] private int startingStatPoints = 10;
+        [SerializeField] private int startingStatPoints = RealRagnarokStartingStatPoints;
         [SerializeField] private EquipmentManager equipment;
+
+        [Tooltip("Optional. When assigned, refreshed automatically whenever a stat point is spent or equipment changes, so the HP/SP bars pick up VIT/INT's bonus without waiting for the next damage, heal or mana spend.")]
+        [SerializeField] private HealthComponent health;
+        [SerializeField] private ManaComponent mana;
 
         private CharacterBaseStats baseStats;
         private ISubStatsCalculator subStatsCalculator;
@@ -28,21 +57,127 @@ namespace Project.Character.Combat
         /// <summary>Gets or sets the player's current base level, driven by the experience system.</summary>
         public int BaseLevel { get; set; }
 
-        /// <summary>Gets the sub-stats calculated from the current effective stats and level.</summary>
-        public SubStats CurrentSubStats => subStatsCalculator.Calculate(effectiveStats, BaseLevel);
+        /// <summary>Gets the sub-stats calculated from the current effective stats, level and equipped weapon type.</summary>
+        public SubStats CurrentSubStats
+        {
+            get
+            {
+                EnsureInitialized();
+                return subStatsCalculator.Calculate(effectiveStats, BaseLevel, equipment != null && equipment.IsMainHandWeaponRanged());
+            }
+        }
 
         private void Awake()
         {
+            EnsureInitialized();
+        }
+
+        private void OnDestroy()
+        {
+            if (equipment != null)
+            {
+                equipment.EquipmentChanged -= RefreshDependentMaxValues;
+            }
+        }
+
+        /// <summary>
+        /// Sets up the stat block on first use. Called from <see cref="Awake"/>
+        /// for the normal startup path, but also guarded at the top of every
+        /// other public member: <see cref="Project.Combat.HealthComponent"/>
+        /// and <see cref="Project.Combat.ManaComponent"/> read their max
+        /// value (and so call <see cref="GetMaxHealthBonus"/>/
+        /// <see cref="GetMaxManaBonus"/>) from their own <c>Awake</c>, and
+        /// Unity does not guarantee that this component's <c>Awake</c> runs
+        /// first.
+        /// </summary>
+        private void EnsureInitialized()
+        {
+            if (baseStats != null)
+            {
+                return;
+            }
+
             BaseLevel = startingLevel;
             baseStats = new CharacterBaseStats(new RagnarokStatPointCostStrategy());
             baseStats.GrantPoints(startingStatPoints);
             subStatsCalculator = new SubStatsCalculator();
             effectiveStats = equipment != null ? new EquippedStatsView(baseStats, equipment) : baseStats;
+
+            if (equipment != null)
+            {
+                equipment.EquipmentChanged += RefreshDependentMaxValues;
+            }
+        }
+
+        /// <summary>
+        /// Attempts to spend one available point raising the given stat.
+        /// Prefer this over reaching into <see cref="BaseStats"/> directly
+        /// (<see cref="CharacterBaseStats.TryIncreaseStat"/>) since VIT and
+        /// INT feed <see cref="GetMaxHealthBonus"/>/<see cref="GetMaxManaBonus"/>,
+        /// and nothing else notifies <see cref="Project.Combat.HealthComponent"/>/
+        /// <see cref="Project.Combat.ManaComponent"/> that a stat just changed —
+        /// going through here keeps the HP/SP bars in sync automatically.
+        /// </summary>
+        /// <param name="stat">The stat to raise.</param>
+        /// <returns>True if the stat was raised; false if it's already at its maximum or there aren't enough available points.</returns>
+        public bool TryIncreaseStat(StatType stat)
+        {
+            EnsureInitialized();
+
+            if (!baseStats.TryIncreaseStat(stat))
+            {
+                return false;
+            }
+
+            RefreshDependentMaxValues();
+            return true;
+        }
+
+        private void RefreshDependentMaxValues()
+        {
+            health?.RefreshMaxHealth();
+            mana?.RefreshMaxMana();
+        }
+
+        /// <inheritdoc />
+        public int GetMaxHealthBonus(int baseMaxHealth)
+        {
+            EnsureInitialized();
+            return Mathf.RoundToInt(baseMaxHealth * effectiveStats.GetValue(StatType.Vitality) * MaxHealthBonusPerVit);
+        }
+
+        /// <inheritdoc />
+        public int GetMaxManaBonus(int baseMaxMana)
+        {
+            EnsureInitialized();
+            return Mathf.RoundToInt(baseMaxMana * effectiveStats.GetValue(StatType.Intelligence) * MaxManaBonusPerInt);
+        }
+
+        /// <inheritdoc />
+        public int GetPhysicalDefense()
+        {
+            EnsureInitialized();
+            return CurrentSubStats.StatusDef;
+        }
+
+        /// <inheritdoc />
+        public int GetMagicalDefense()
+        {
+            EnsureInitialized();
+            return CurrentSubStats.StatusMDef;
+        }
+
+        /// <inheritdoc />
+        public int GetFleeRating()
+        {
+            EnsureInitialized();
+            return CurrentSubStats.Flee;
         }
 
         /// <inheritdoc />
         public void CaptureState(PlayerSaveData data)
         {
+            EnsureInitialized();
             data.strength = baseStats.GetValue(StatType.Strength);
             data.agility = baseStats.GetValue(StatType.Agility);
             data.vitality = baseStats.GetValue(StatType.Vitality);
@@ -53,8 +188,21 @@ namespace Project.Character.Combat
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// Runs from <c>Start()</c> (see <c>PlayerSaveController</c>), after
+        /// every component's own <c>Awake()</c> — so unlike the
+        /// <see cref="EnsureInitialized"/> Awake-ordering concern, <see cref="health"/>/
+        /// <see cref="mana"/> are guaranteed already set up here. Restoring
+        /// a saved VIT/INT can raise the max HP/SP bonus above what
+        /// <see cref="Project.Combat.HealthComponent"/>/<see cref="Project.Combat.ManaComponent"/>
+        /// computed at their own <c>Awake()</c> (before this ran), so both
+        /// are healed to full afterward — the save doesn't carry a current
+        /// HP/SP value of its own, so appearing at full is the correct
+        /// baseline, the same as a fresh level up.
+        /// </remarks>
         public void RestoreState(PlayerSaveData data)
         {
+            EnsureInitialized();
             baseStats.SetValue(StatType.Strength, data.strength);
             baseStats.SetValue(StatType.Agility, data.agility);
             baseStats.SetValue(StatType.Vitality, data.vitality);
@@ -62,6 +210,9 @@ namespace Project.Character.Combat
             baseStats.SetValue(StatType.Dexterity, data.dexterity);
             baseStats.SetValue(StatType.Luck, data.luck);
             baseStats.SetAvailablePoints(data.availableStatPoints);
+
+            health?.ResetHealth();
+            mana?.ResetMana();
         }
     }
 }

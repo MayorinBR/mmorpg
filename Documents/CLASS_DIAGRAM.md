@@ -134,22 +134,34 @@ References: `Project.Character.Stats`
 
 ```mermaid
 classDiagram
+    class DamageCategory["DamageCategory"]
+    <<enumeration>> DamageCategory
     class Element["Element"]
     <<enumeration>> Element
     class ElementalResistanceComponent["ElementalResistanceComponent"]
     <<MonoBehaviour>> ElementalResistanceComponent
     class HealthComponent["HealthComponent"]
     <<MonoBehaviour>> HealthComponent
+    class HitChanceCalculator["HitChanceCalculator"]
     class IDamageModifier["IDamageModifier"]
     <<interface>> IDamageModifier
     class IDamageable["IDamageable"]
     <<interface>> IDamageable
+    class IDefensiveStatsProvider["IDefensiveStatsProvider"]
+    <<interface>> IDefensiveStatsProvider
+    class IMaxHealthBonusProvider["IMaxHealthBonusProvider"]
+    <<interface>> IMaxHealthBonusProvider
+    class IMaxManaBonusProvider["IMaxManaBonusProvider"]
+    <<interface>> IMaxManaBonusProvider
     class ManaComponent["ManaComponent"]
     <<MonoBehaviour>> ManaComponent
     class PlayerFeedbackChannel["PlayerFeedbackChannel"]
     ElementalResistanceComponent --|> IDamageModifier
     HealthComponent --|> IDamageable
     HealthComponent --> IDamageModifier : uses
+    HealthComponent --> IMaxHealthBonusProvider : uses
+    HealthComponent --> IDefensiveStatsProvider : uses
+    ManaComponent --> IMaxManaBonusProvider : uses
     HealthComponent ..> CharacterStatsHolder : uses
     ManaComponent ..> CharacterStatsHolder : uses
     class CharacterStatsHolder["CharacterStatsHolder"]
@@ -401,6 +413,9 @@ classDiagram
     PlayerSkillHotbar --|> ISaveParticipant
     PlayerStatsController --|> IPlayerLevelProvider
     PlayerStatsController --|> ISaveParticipant
+    PlayerStatsController --|> IMaxHealthBonusProvider
+    PlayerStatsController --|> IMaxManaBonusProvider
+    PlayerStatsController --|> IDefensiveStatsProvider
     PlayerBlockController --> PlayerClassController : uses
     PlayerCombatController --> PlayerClassController : uses
     PlayerCombatController --> PlayerElementController : uses
@@ -419,7 +434,9 @@ classDiagram
     EquippedStatsView ..> EquipmentManager : uses
     PlayerClassController ..> CharacterClass : uses
     PlayerCombatController ..> CharacterMovementController : uses
+    PlayerCombatController ..> DamageCategory : uses
     PlayerCombatController ..> EquipmentManager : uses
+    PlayerCombatController ..> HitChanceCalculator : uses
     PlayerCombatController ..> ManaComponent : uses
     PlayerCombatController ..> PlayerAnimatorController : uses
     PlayerCombatController ..> PlayerTargetSelector : uses
@@ -429,7 +446,9 @@ classDiagram
     PlayerExperience ..> ManaComponent : uses
     PlayerSkillBook ..> SkillDatabase : uses
     PlayerSkillBook ..> SkillDefinition : uses
+    PlayerSkillCaster ..> DamageCategory : uses
     PlayerSkillCaster ..> HealthComponent : uses
+    PlayerSkillCaster ..> HitChanceCalculator : uses
     PlayerSkillCaster ..> ManaComponent : uses
     PlayerSkillCaster ..> PlayerAnimatorController : uses
     PlayerSkillCaster ..> PlayerTargetSelector : uses
@@ -448,14 +467,24 @@ classDiagram
     <<Project.Character.Stats>> CharacterClass
     class CharacterMovementController["CharacterMovementController"]
     <<Project.Character.Movement>> CharacterMovementController
+    class DamageCategory["DamageCategory"]
+    <<Project.Combat>> DamageCategory
     class Element["Element"]
     <<Project.Combat>> Element
     class EquipmentManager["EquipmentManager"]
     <<Project.Items>> EquipmentManager
     class HealthComponent["HealthComponent"]
     <<Project.Combat>> HealthComponent
+    class HitChanceCalculator["HitChanceCalculator"]
+    <<Project.Combat>> HitChanceCalculator
     class IDamageModifier["IDamageModifier"]
     <<Project.Combat>> IDamageModifier
+    class IDefensiveStatsProvider["IDefensiveStatsProvider"]
+    <<Project.Combat>> IDefensiveStatsProvider
+    class IMaxHealthBonusProvider["IMaxHealthBonusProvider"]
+    <<Project.Combat>> IMaxHealthBonusProvider
+    class IMaxManaBonusProvider["IMaxManaBonusProvider"]
+    <<Project.Combat>> IMaxManaBonusProvider
     class IPlayerClassProvider["IPlayerClassProvider"]
     <<Project.Character.Stats>> IPlayerClassProvider
     class IPlayerLevelProvider["IPlayerLevelProvider"]
@@ -534,6 +563,7 @@ classDiagram
     EnemyController --> EnemyBehaviorMode : uses
     EnemyController --> IEnemyState : uses
     EnemyDeathHandler --> EnemyController : uses
+    EnemyAttackState ..> HitChanceCalculator : uses
     EnemyController ..> CharacterStatsDefinition : uses
     EnemyController ..> CharacterStatsHolder : uses
     EnemyController ..> HealthComponent : uses
@@ -548,6 +578,8 @@ classDiagram
     <<Project.Character.Stats>> CharacterStatsHolder
     class HealthComponent["HealthComponent"]
     <<Project.Combat>> HealthComponent
+    class HitChanceCalculator["HitChanceCalculator"]
+    <<Project.Combat>> HitChanceCalculator
     class ItemPickup["ItemPickup"]
     <<Project.Items>> ItemPickup
     class LootTableDefinition["LootTableDefinition"]

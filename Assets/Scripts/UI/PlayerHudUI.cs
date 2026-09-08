@@ -16,10 +16,20 @@ namespace Project.UI
     /// since some sources (health, mana) may finish their own <c>Awake</c>
     /// after this component's <c>OnEnable</c> runs.
     /// </summary>
+    /// <remarks>
+    /// <see cref="mana"/>/<see cref="spText"/>/<see cref="spSlider"/> were
+    /// added after discovering <see cref="hpText"/> had been wired, in the
+    /// scene, to the SP row's text object instead of the HP row's — the HUD
+    /// had no SP display of its own at all, so whatever showed "SP" on
+    /// screen was actually rendering <see cref="Project.Combat.HealthComponent"/>'s
+    /// numbers. Fixed alongside adding real SP support rather than just
+    /// pointing <see cref="hpText"/> back at the correct object.
+    /// </remarks>
     public class PlayerHudUI : MonoBehaviour
     {
         [SerializeField] private PlayerNameProvider nameProvider;
         [SerializeField] private HealthComponent health;
+        [SerializeField] private ManaComponent mana;
         [SerializeField] private PlayerExperience experience;
         [SerializeField] private PlayerJobProgress jobProgress;
         [SerializeField] private PlayerInventory inventory;
@@ -30,6 +40,8 @@ namespace Project.UI
         [SerializeField] private TMP_Text nameText;
         [SerializeField] private TMP_Text hpText;
         [SerializeField] private Slider hpSlider;
+        [SerializeField] private TMP_Text spText;
+        [SerializeField] private Slider spSlider;
         [SerializeField] private TMP_Text baseLevelText;
         [SerializeField] private Slider baseExpSlider;
         [SerializeField] private TMP_Text jobLevelText;
@@ -60,6 +72,12 @@ namespace Project.UI
             {
                 health.HealthChanged -= UpdateHealth;
                 health.HealthChanged += UpdateHealth;
+            }
+
+            if (mana != null)
+            {
+                mana.ManaChanged -= UpdateMana;
+                mana.ManaChanged += UpdateMana;
             }
 
             if (experience != null)
@@ -110,6 +128,11 @@ namespace Project.UI
                 health.HealthChanged -= UpdateHealth;
             }
 
+            if (mana != null)
+            {
+                mana.ManaChanged -= UpdateMana;
+            }
+
             if (experience != null)
             {
                 experience.ExperienceChanged -= UpdateBaseExperience;
@@ -153,6 +176,11 @@ namespace Project.UI
             if (health != null)
             {
                 UpdateHealth(health.CurrentHealth, health.MaxHealth);
+            }
+
+            if (mana != null)
+            {
+                UpdateMana(mana.CurrentMana, mana.MaxMana);
             }
 
             if (experience != null)
@@ -201,6 +229,19 @@ namespace Project.UI
             if (hpSlider != null)
             {
                 hpSlider.value = max > 0 ? (float)current / max : 0f;
+            }
+        }
+
+        private void UpdateMana(int current, int max)
+        {
+            if (spText != null)
+            {
+                spText.text = $"{current} / {max}";
+            }
+
+            if (spSlider != null)
+            {
+                spSlider.value = max > 0 ? (float)current / max : 0f;
             }
         }
 

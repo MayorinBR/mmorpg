@@ -46,6 +46,26 @@ namespace Project.Character.Combat
     /// <see cref="Project.Combat.ElementalResistanceComponent"/> can scale
     /// ordinary physical damage too, not just elemental hits.
     /// </remarks>
+    /// <remarks>
+    /// Basic-attack damage is class-dependent the same way Ragnarok Online
+    /// itself is: the Mage's spell scales off <see cref="Character.Stats.SubStats.StatusMatk"/>
+    /// (INT-based), while every other class scales off
+    /// <see cref="Character.Stats.SubStats.StatusAtk"/> — which
+    /// <see cref="Character.Stats.SubStatsCalculator"/> derives from STR for
+    /// a melee weapon or DEX for a ranged one (bow/gun/instrument/whip).
+    /// That weapon check, not the player's job, is what makes an
+    /// Archer's shots scale off DEX; a Swordman who somehow picked up a
+    /// bow would scale off DEX too, exactly as in real Ragnarok Online.
+    /// </remarks>
+    /// <remarks>
+    /// Every hit (see <see cref="DealHit"/>) is resolved against the
+    /// target's Flee via <see cref="HitChanceCalculator"/> before it's
+    /// applied — except a critical hit, which always lands, matching
+    /// Ragnarok Online's own "crits bypass accuracy" rule. The Mage's basic
+    /// attack is <see cref="DamageCategory.Magical"/> (mitigated by the
+    /// target's magical defense); every other class's is
+    /// <see cref="DamageCategory.Physical"/>.
+    /// </remarks>
     public class PlayerCombatController : MonoBehaviour
     {
         private const float CriticalDamageMultiplier = 1.4f;
@@ -164,7 +184,13 @@ namespace Project.Character.Combat
                 mana.TryConsumeMana(mageManaCostPerAttack);
             }
 
-            var baseDamage = playerStats.CurrentSubStats.StatusAtk;
+            var isMage = classController.CurrentClass == CharacterClass.Mage;
+
+            // Every class deals StatusATK damage (STR-based for melee,
+            // DEX-based for a ranged weapon — see SubStatsCalculator) except
+            // the Mage, whose basic attack is a spell and so scales off
+            // StatusMATK (INT-based) instead, the same stat its skills use.
+            var baseDamage = isMage ? playerStats.CurrentSubStats.StatusMatk : playerStats.CurrentSubStats.StatusAtk;
 
             if (classController.CurrentClass == CharacterClass.Archer && isRanged)
             {
@@ -179,11 +205,13 @@ namespace Project.Character.Combat
             // through a target's ElementalResistanceComponent like any
             // other element (Neutral is plain physical damage, not "no
             // element").
-            var attackElement = classController.CurrentClass == CharacterClass.Mage
+            var attackElement = isMage
                 ? elementController.CurrentElement
                 : Element.Neutral;
 
-            DealHit(targetSelector.CurrentDamageable, baseDamage, attackElement);
+            var attackCategory = isMage ? DamageCategory.Magical : DamageCategory.Physical;
+
+            DealHit(targetSelector.CurrentDamageable, baseDamage, attackElement, attackCategory);
 
             if (classController.CurrentClass == CharacterClass.Thief && IsDualWielding())
             {
@@ -209,14 +237,28 @@ namespace Project.Character.Combat
             return mainHandItems[0] != offHandItems[0];
         }
 
-        private void DealHit(IDamageable target, int baseDamage, Element element = Element.Neutral)
+        /// <summary>
+        /// Resolves and applies one hit against a target: a critical hit
+        /// always lands (bypassing the accuracy check entirely, the same
+        /// way Ragnarok Online itself works) and deals bonus damage;
+        /// otherwise the hit is subject to <see cref="HitChanceCalculator"/>
+        /// and can miss outright.
+        /// </summary>
+        private void DealHit(IDamageable target, int baseDamage, Element element = Element.Neutral, DamageCategory category = DamageCategory.Physical)
         {
             var isCriticalHit = Random.value * 100f < playerStats.CurrentSubStats.CriticalRate;
+
+            if (!isCriticalHit && !HitChanceCalculator.RollHit(playerStats.CurrentSubStats.Hit, target.FleeRating))
+            {
+                target.NotifyDodged();
+                return;
+            }
+
             var damage = isCriticalHit
                 ? Mathf.RoundToInt(baseDamage * CriticalDamageMultiplier)
                 : baseDamage;
 
-            target.TakeDamage(damage, element);
+            target.TakeDamage(damage, element, category, isCriticalHit);
         }
     }
 }

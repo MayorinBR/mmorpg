@@ -61,7 +61,10 @@ namespace Project.UI
 
         private void HandleIncreaseRequested(StatType statType)
         {
-            statsController.BaseStats.TryIncreaseStat(statType);
+            // Goes through PlayerStatsController rather than BaseStats
+            // directly, so a successful increase also refreshes the HP/SP
+            // bars if the stat is VIT or INT (see PlayerStatsController.TryIncreaseStat).
+            statsController.TryIncreaseStat(statType);
             RefreshAll();
         }
 
