@@ -7,7 +7,12 @@ namespace Project.AI
     /// The enemy stands still and attacks its target on a fixed cooldown.
     /// Falls back to <see cref="EnemyChaseState"/> if the target moves out
     /// of attack range. Each attack is resolved against the target's Flee
-    /// via <see cref="HitChanceCalculator"/> and can miss outright.
+    /// via <see cref="HitChanceCalculator"/> and can miss outright. Faces
+    /// the target every tick while attacking (see <see cref="FaceTarget"/>)
+    /// — <see cref="EnemyController.Agent"/>'s own rotation stops updating
+    /// once <see cref="Enter"/> resets its path, so without this the enemy
+    /// would keep whatever heading it last had while chasing instead of
+    /// turning to actually look at the player it's attacking.
     /// </summary>
     public class EnemyAttackState : IEnemyState
     {
@@ -39,6 +44,8 @@ namespace Project.AI
                 return;
             }
 
+            FaceTarget(enemy);
+
             cooldownRemaining -= Time.deltaTime;
 
             if (cooldownRemaining <= 0f)
@@ -51,6 +58,25 @@ namespace Project.AI
         /// <inheritdoc />
         public void Exit(EnemyController enemy)
         {
+        }
+
+        /// <summary>
+        /// Rotates the enemy in place to face its target on the horizontal
+        /// plane (ignoring height difference, the same way
+        /// <c>PlayerCombatController.Update</c> faces the player's own
+        /// current target), so an enemy standing still to attack still
+        /// visibly looks at whoever it's hitting instead of staying turned
+        /// wherever its last movement left it.
+        /// </summary>
+        private static void FaceTarget(EnemyController enemy)
+        {
+            var direction = enemy.PlayerTarget.position - enemy.transform.position;
+            direction.y = 0f;
+
+            if (direction.sqrMagnitude > 0.0001f)
+            {
+                enemy.transform.forward = direction.normalized;
+            }
         }
 
         private void PerformAttack(EnemyController enemy)
