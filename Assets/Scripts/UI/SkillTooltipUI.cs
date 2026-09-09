@@ -51,8 +51,8 @@ namespace Project.UI
             iconImage.sprite = skill.Icon;
             nameText.text = skill.SkillName;
             descriptionText.text = skill.Description;
-            manaCostText.text = $"{skill.ManaCost} SP";
-            cooldownText.text = $"{skill.CooldownSeconds:0.#}s";
+            manaCostText.text = skill.EffectType == SkillEffectType.Passive ? "Passive" : $"{skill.ManaCost} SP";
+            cooldownText.text = skill.EffectType == SkillEffectType.Passive ? string.Empty : $"{skill.CooldownSeconds:0.#}s";
 
             rectTransform.position = ClampToScreen(screenPosition + offsetFromPointer);
             root.SetActive(true);

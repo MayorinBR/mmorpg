@@ -6,11 +6,17 @@ namespace Project.Skills
     /// another player) — ally selection isn't implemented yet, so this
     /// currently behaves the same as <see cref="Self"/> until that exists.
     /// <see cref="Enemy"/> uses the caster's currently selected enemy target.
+    /// <see cref="AreaAroundCaster"/> needs no selected target at all: it
+    /// affects every valid target within the skill's own
+    /// <see cref="SkillDefinition.AreaRadius"/> of the caster's own
+    /// position (see <see cref="SkillDefinition.IsAreaOfEffect"/>) — e.g.
+    /// Magnum Break.
     /// </summary>
     public enum SkillTargetType
     {
         Self,
         Ally,
-        Enemy
+        Enemy,
+        AreaAroundCaster
     }
 }

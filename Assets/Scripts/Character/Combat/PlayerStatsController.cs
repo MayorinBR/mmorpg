@@ -24,7 +24,11 @@ namespace Project.Character.Combat
     /// When <see cref="health"/>/<see cref="mana"/> are assigned, <see cref="TryIncreaseStat"/>
     /// and equipment changes both push a refresh to them, so their max
     /// value (and any UI bound to it) picks up a VIT/INT change immediately
-    /// instead of waiting for the next damage, heal or mana spend.
+    /// instead of waiting for the next damage, heal or mana spend. When
+    /// <see cref="passiveSkills"/> is assigned, <see cref="CurrentSubStats"/>
+    /// also folds in any flat Status ATK bonus from learned passive
+    /// skills whose weapon requirement matches the equipped main-hand
+    /// weapon (e.g. Sword Mastery).
     /// </summary>
     public class PlayerStatsController : MonoBehaviour, IPlayerLevelProvider, ISaveParticipant, IMaxHealthBonusProvider, IMaxManaBonusProvider, IDefensiveStatsProvider
     {
@@ -57,6 +61,9 @@ namespace Project.Character.Combat
         [SerializeField] private HealthComponent health;
         [SerializeField] private ManaComponent mana;
 
+        [Tooltip("Optional. Source of flat Status ATK bonuses from learned passive skills (e.g. Sword Mastery), added on top of the stat-derived value in CurrentSubStats whenever the equipped weapon matches.")]
+        [SerializeField] private PlayerPassiveSkillController passiveSkills;
+
         private CharacterBaseStats baseStats;
         private ISubStatsCalculator subStatsCalculator;
         private IStatProvider effectiveStats;
@@ -82,7 +89,12 @@ namespace Project.Character.Combat
             get
             {
                 EnsureInitialized();
-                return subStatsCalculator.Calculate(effectiveStats, BaseLevel, equipment != null && equipment.IsMainHandWeaponRanged(), GetBaseAttackSpeed());
+                var subStats = subStatsCalculator.Calculate(effectiveStats, BaseLevel, equipment != null && equipment.IsMainHandWeaponRanged(), GetBaseAttackSpeed());
+                var passiveAttackBonus = GetPassiveAttackBonus();
+
+                return passiveAttackBonus == 0
+                    ? subStats
+                    : new SubStats(subStats.StatusAtk + passiveAttackBonus, subStats.StatusMatk, subStats.StatusDef, subStats.StatusMDef, subStats.Hit, subStats.Flee, subStats.CriticalRate, subStats.Aspd);
             }
         }
 
@@ -200,6 +212,22 @@ namespace Project.Character.Combat
             return statsHolder != null && statsHolder.Stats != null
                 ? statsHolder.Stats.BaseAttackSpeed
                 : FallbackBaseAttackSpeed;
+        }
+
+        /// <summary>
+        /// Reads the flat Status ATK bonus from learned passive skills
+        /// (see <see cref="PlayerPassiveSkillController"/>) that apply to
+        /// the currently equipped main-hand weapon. Zero if either
+        /// <see cref="passiveSkills"/> or <see cref="equipment"/> isn't wired.
+        /// </summary>
+        private int GetPassiveAttackBonus()
+        {
+            if (passiveSkills == null || equipment == null)
+            {
+                return 0;
+            }
+
+            return passiveSkills.GetAttackBonus(equipment.GetMainHandWeaponSubtype());
         }
 
         /// <inheritdoc />

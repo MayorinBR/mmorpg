@@ -1,23 +1,27 @@
 using UnityEngine;
+using Project.Character.Stats;
 using Project.Combat;
 
 namespace Project.AI
 {
     /// <summary>
-    /// The enemy stands still and attacks its target on a fixed cooldown.
-    /// Falls back to <see cref="EnemyChaseState"/> if the target moves out
-    /// of attack range. Each attack is resolved against the target's Flee
-    /// via <see cref="HitChanceCalculator"/> and can miss outright. Faces
-    /// the target every tick while attacking (see <see cref="FaceTarget"/>)
-    /// — <see cref="EnemyController.Agent"/>'s own rotation stops updating
+    /// The enemy stands still and attacks its target on a cooldown derived
+    /// from its own <see cref="CharacterStatsDefinition.BaseAttackSpeed"/>
+    /// via <see cref="AttackSpeedCalculator.GetAttackIntervalSeconds"/> —
+    /// the same Aspd-to-delay conversion used for the player, so a
+    /// faster-Aspd enemy type genuinely attacks more often instead of every
+    /// mob sharing one flat cadence regardless of its stats. Falls back to
+    /// <see cref="EnemyChaseState"/> if the target moves out of attack
+    /// range. Each attack is resolved against the target's Flee via
+    /// <see cref="HitChanceCalculator"/> and can miss outright. Faces the
+    /// target every tick while attacking (see <see cref="FaceTarget"/>) —
+    /// <see cref="EnemyController.Agent"/>'s own rotation stops updating
     /// once <see cref="Enter"/> resets its path, so without this the enemy
     /// would keep whatever heading it last had while chasing instead of
     /// turning to actually look at the player it's attacking.
     /// </summary>
     public class EnemyAttackState : IEnemyState
     {
-        private const float AttackCooldownSeconds = 1.5f;
-
         private float cooldownRemaining;
 
         /// <inheritdoc />
@@ -51,7 +55,7 @@ namespace Project.AI
             if (cooldownRemaining <= 0f)
             {
                 PerformAttack(enemy);
-                cooldownRemaining = AttackCooldownSeconds;
+                cooldownRemaining = AttackSpeedCalculator.GetAttackIntervalSeconds(enemy.Stats.BaseAttackSpeed);
             }
         }
 

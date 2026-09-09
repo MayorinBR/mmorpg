@@ -55,8 +55,8 @@ namespace Project.UI
             skillBook = book;
             iconImage.sprite = skill.Icon;
             nameText.text = skill.SkillName;
-            manaCostText.text = $"{skill.ManaCost} SP";
-            cooldownText.text = $"{skill.CooldownSeconds:0.#}s";
+            manaCostText.text = skill.EffectType == SkillEffectType.Passive ? "Passive" : $"{skill.ManaCost} SP";
+            cooldownText.text = skill.EffectType == SkillEffectType.Passive ? string.Empty : $"{skill.CooldownSeconds:0.#}s";
             Refresh();
         }
 
@@ -91,8 +91,11 @@ namespace Project.UI
                 SkillTooltipUI.Instance.Hide();
             }
 
-            if (skillBook.GetLevel(Skill) <= 0 || rootCanvas == null)
+            if (skillBook.GetLevel(Skill) <= 0 || Skill.EffectType == SkillEffectType.Passive || rootCanvas == null)
             {
+                // A passive skill applies its bonus automatically while
+                // learned (see PlayerPassiveSkillController) and is never
+                // cast, so it can't be dragged onto the hotbar.
                 return;
             }
 

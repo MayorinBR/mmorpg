@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Project.Character.Stats;
 using Project.Combat;
+using Project.Items;
 
 namespace Project.Skills
 {
@@ -29,6 +30,22 @@ namespace Project.Skills
         [SerializeField] private SkillDamageType damageType;
         [SerializeField] private float damageMultiplierPerLevel = 1f;
         [SerializeField] private Element element = Element.Neutral;
+
+        [Tooltip("Extra flat Hit rating this skill's damage roll gets on top of the caster's own Hit, scaling with level — e.g. Bash's real 5-50% Ragnarok Online accuracy bonus. Zero for skills without one.")]
+        [SerializeField] private int accuracyBonusPerLevel;
+
+        [Tooltip("If true, this Damage skill needs no pre-selected target at all: it hits every living IDamageable within AreaRadius of the CASTER's own position instead of a single selected target — e.g. Magnum Break.")]
+        [SerializeField] private bool isAreaOfEffect;
+
+        [Tooltip("Radius, in meters, around the caster that an area-of-effect skill damages. Only meaningful when IsAreaOfEffect is true.")]
+        [SerializeField] private float areaRadius = 3f;
+
+        [Header("Passive (only used if Effect Type is Passive)")]
+        [Tooltip("Flat bonus to Status ATK per skill level, applied automatically while this passive skill is learned and (if PassiveRequiredWeaponSubtypes is non-empty) a matching weapon is equipped in the main hand — e.g. Sword Mastery.")]
+        [SerializeField] private float passiveAttackBonusPerLevel;
+
+        [Tooltip("If non-empty, this passive's attack bonus only applies while the equipped main-hand weapon's subtype is one of these — e.g. Sword Mastery requires Dagger or One-Hand Sword. Empty means the bonus always applies once learned.")]
+        [SerializeField] private WeaponSubtype[] passiveRequiredWeaponSubtypes;
 
         [Header("Heal (only used if Effect Type is Heal)")]
         [SerializeField] private int healAmount = 10;
@@ -60,7 +77,12 @@ namespace Project.Skills
         /// <summary>Gets the cooldown, in seconds, after casting this skill.</summary>
         public float CooldownSeconds => cooldownSeconds;
 
-        /// <summary>Gets the maximum distance from which this skill can be cast. Ignored for Self-targeted skills.</summary>
+        /// <summary>
+        /// Gets the maximum distance from which this skill can be cast.
+        /// Ignored for Self-targeted skills, and for an area-of-effect
+        /// skill (see <see cref="IsAreaOfEffect"/>), which is always
+        /// centered on the caster rather than cast "at" a distant target.
+        /// </summary>
         public float Range => range;
 
         /// <summary>Gets whether this damage skill scales from Status ATK or Status MATK. Only meaningful when <see cref="EffectType"/> is Damage.</summary>
@@ -76,6 +98,30 @@ namespace Project.Skills
         /// Damage.
         /// </summary>
         public Element Element => element;
+
+        /// <summary>
+        /// Gets whether this Damage skill hits every living
+        /// <see cref="Project.Combat.IDamageable"/> within
+        /// <see cref="AreaRadius"/> of the caster instead of a single
+        /// pre-selected target — see <see cref="SkillTargetType.AreaAroundCaster"/>.
+        /// Only meaningful when <see cref="EffectType"/> is Damage.
+        /// </summary>
+        public bool IsAreaOfEffect => isAreaOfEffect;
+
+        /// <summary>
+        /// Gets the radius, in meters, around the caster that an
+        /// area-of-effect skill damages. Only meaningful when
+        /// <see cref="IsAreaOfEffect"/> is true.
+        /// </summary>
+        public float AreaRadius => areaRadius;
+
+        /// <summary>
+        /// Gets the weapon subtypes this passive's attack bonus requires
+        /// the equipped main-hand weapon to match. Empty means the bonus
+        /// always applies once the skill is learned. Only meaningful when
+        /// <see cref="EffectType"/> is Passive.
+        /// </summary>
+        public IReadOnlyList<WeaponSubtype> PassiveRequiredWeaponSubtypes => passiveRequiredWeaponSubtypes;
 
         /// <summary>
         /// Calculates this skill's damage at the given level. Only meaningful when <see cref="EffectType"/> is Damage.
@@ -98,6 +144,31 @@ namespace Project.Skills
         public int CalculateHeal()
         {
             return healAmount;
+        }
+
+        /// <summary>
+        /// Calculates the extra Hit rating this skill's damage roll gets on
+        /// top of the caster's own Hit, at the given level. Only meaningful
+        /// when <see cref="EffectType"/> is Damage.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated accuracy bonus, zero for skills without one.</returns>
+        public int GetAccuracyBonus(int skillLevel)
+        {
+            return accuracyBonusPerLevel * skillLevel;
+        }
+
+        /// <summary>
+        /// Calculates the flat Status ATK bonus this passive skill grants
+        /// at the given level, before <see cref="PassiveRequiredWeaponSubtypes"/>
+        /// is checked against the equipped weapon. Only meaningful when
+        /// <see cref="EffectType"/> is Passive.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated attack bonus, zero for passives without one.</returns>
+        public int GetPassiveAttackBonus(int skillLevel)
+        {
+            return Mathf.RoundToInt(passiveAttackBonusPerLevel * skillLevel);
         }
     }
 }

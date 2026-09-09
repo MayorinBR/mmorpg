@@ -11,10 +11,14 @@ namespace Project.AI
     /// when a chase is abandoned, so the enemy keeps wandering around
     /// wherever it ended up rather than snapping back home).
     /// While wandering, an Aggressive mob keeps scanning for a player
-    /// entering its aggro range, and any mob — Passive included — checks
-    /// whether its <see cref="EnemyController.RememberedAggressor"/> has
-    /// come back within <see cref="EnemyController.ChaseGiveUpRange"/>.
-    /// Either detection transitions to <see cref="EnemyChaseState"/>.
+    /// entering its aggro range — at most every
+    /// <see cref="EnemyController.DetectionIntervalSeconds"/> rather than
+    /// every single frame, since <see cref="EnemyController.DetectPlayer"/>
+    /// is a physics query and most ticks in between wouldn't have changed
+    /// its answer anyway — and any mob — Passive included — checks whether
+    /// its <see cref="EnemyController.RememberedAggressor"/> has come back
+    /// within <see cref="EnemyController.ChaseGiveUpRange"/>. Either
+    /// detection transitions to <see cref="EnemyChaseState"/>.
     /// </summary>
     public class EnemyWanderState : IEnemyState
     {
@@ -24,6 +28,7 @@ namespace Project.AI
         private Vector3 wanderCenter;
         private bool isWaitingAtDestination;
         private float waitTimeRemaining;
+        private float timeUntilNextDetectionCheck;
 
         /// <summary>
         /// Creates the wander state.
@@ -41,6 +46,7 @@ namespace Project.AI
         public void Enter(EnemyController enemy)
         {
             wanderCenter = explicitWanderCenter ?? enemy.SpawnPosition;
+            timeUntilNextDetectionCheck = 0f;
             PickNewDestination(enemy);
         }
 
@@ -54,12 +60,18 @@ namespace Project.AI
 
             if (enemy.BehaviorMode == EnemyBehaviorMode.Aggressive)
             {
-                var detectedPlayer = enemy.DetectPlayer();
+                timeUntilNextDetectionCheck -= Time.deltaTime;
 
-                if (detectedPlayer != null)
+                if (timeUntilNextDetectionCheck <= 0f)
                 {
-                    enemy.EngagePlayer(detectedPlayer);
-                    return;
+                    timeUntilNextDetectionCheck = enemy.DetectionIntervalSeconds;
+                    var detectedPlayer = enemy.DetectPlayer();
+
+                    if (detectedPlayer != null)
+                    {
+                        enemy.EngagePlayer(detectedPlayer);
+                        return;
+                    }
                 }
             }
 
