@@ -171,7 +171,7 @@ namespace Project.Character.Combat
                 var subStats = statsController.CurrentSubStats;
                 var damage = skill.CalculateDamage(subStats.StatusAtk, subStats.StatusMatk, level);
                 var category = skill.DamageType == SkillDamageType.Physical ? DamageCategory.Physical : DamageCategory.Magical;
-                target.TakeDamage(damage, skill.Element, category);
+                target.TakeDamage(damage, skill.Element, category, attacker: transform);
             }
             else
             {

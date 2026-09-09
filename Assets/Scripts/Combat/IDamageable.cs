@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace Project.Combat
 {
     /// <summary>
@@ -21,7 +23,14 @@ namespace Project.Combat
         /// <param name="element">The element this damage carries. Defaults to <see cref="Element.Neutral"/> for ordinary, non-elemental damage.</param>
         /// <param name="category">Whether this damage is mitigated by physical or magical defense. Defaults to <see cref="DamageCategory.Physical"/>.</param>
         /// <param name="isCritical">Whether this hit is a critical hit, purely for cosmetic feedback (e.g. floating damage numbers). Defaults to false.</param>
-        void TakeDamage(int amount, Element element = Element.Neutral, DamageCategory category = DamageCategory.Physical, bool isCritical = false);
+        /// <param name="attacker">
+        /// Who dealt this damage, if known. Lets the entity being hit react
+        /// to exactly who attacked it — e.g. <see cref="Project.AI.EnemyController"/>
+        /// targets this transform immediately, regardless of its own
+        /// detection range — instead of having to guess. Null when the
+        /// source doesn't need that (e.g. an enemy hitting the player).
+        /// </param>
+        void TakeDamage(int amount, Element element = Element.Neutral, DamageCategory category = DamageCategory.Physical, bool isCritical = false, Transform attacker = null);
 
         /// <summary>
         /// Notifies this entity that an incoming attack missed it, purely

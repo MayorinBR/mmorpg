@@ -20,7 +20,14 @@ namespace Project.Character.Stats
         /// an Archer's bow scale off DEX while a Swordman's sword scales
         /// off STR.
         /// </param>
+        /// <param name="baseAspd">
+        /// The Aspd rating (classic Ragnarok Online's 0-190 display scale)
+        /// before AGI/DEX are added on top — supplied by the caller (see
+        /// <see cref="Combat.PlayerStatsController"/>) instead of being a
+        /// fixed constant here, so base attack speed can be tuned per
+        /// design pass without changing this formula.
+        /// </param>
         /// <returns>The calculated status-derived sub-stats.</returns>
-        SubStats Calculate(IStatProvider stats, int baseLevel, bool weaponIsRanged);
+        SubStats Calculate(IStatProvider stats, int baseLevel, bool weaponIsRanged, int baseAspd);
     }
 }

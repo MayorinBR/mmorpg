@@ -19,6 +19,26 @@ namespace Project.Character.Animation
 
         [SerializeField] private Animator animator;
 
+        [Tooltip("The exact clip bound to the Attack state's Motion field in the Animator Controller — read only for its authored AnimationClip.length, so SetAttackDuration can scale it to match the real Aspd interval regardless of that length.")]
+        [SerializeField] private AnimationClip meleeAttackClip;
+
+        [Tooltip("The exact clip bound to the AttackRanged state's Motion field, for the same reason as meleeAttackClip.")]
+        [SerializeField] private AnimationClip rangedAttackClip;
+
+        /// <summary>
+        /// Retargets this controller at a different <see cref="Animator"/> —
+        /// used when the player's model changes at runtime (a gender swap:
+        /// see <see cref="Combat.PlayerGenderController"/>), since a single
+        /// Animator component can only ever point at one Avatar, so each
+        /// gendered model needs its own. Every method below simply acts on
+        /// whichever Animator was set most recently.
+        /// </summary>
+        /// <param name="newAnimator">The Animator component now driving the player's visible model.</param>
+        public void SetAnimator(Animator newAnimator)
+        {
+            animator = newAnimator;
+        }
+
         /// <summary>
         /// Updates the Speed parameter that blends between the Idle and Run states.
         /// </summary>
@@ -29,16 +49,23 @@ namespace Project.Character.Animation
         }
 
         /// <summary>
-        /// Sets the playback speed multiplier for the auto-attack swing
-        /// states (Attack, AttackRanged) — bound to those states' Motion
-        /// Speed field as a parameter in the Animator Controller, so it has
-        /// no effect on Idle, Run, Cast or Death. Call before
+        /// Sets the auto-attack swing's playback speed so its real duration
+        /// matches <paramref name="targetSeconds"/> — the same Aspd-derived
+        /// interval the next auto-attack actually waits for (see
+        /// <see cref="Combat.AttackSpeedCalculator.GetAttackIntervalSeconds"/>)
+        /// — regardless of the clip's own authored length or the Attack/
+        /// AttackRanged state's base Speed in the Animator Controller (both
+        /// bound to this via the AttackSpeedMultiplier parameter, so this
+        /// has no effect on Idle, Run, Cast or Death). Call before
         /// <see cref="TriggerAttack"/>/<see cref="TriggerRangedAttack"/> so
         /// the upcoming swing plays at the right speed.
         /// </summary>
-        /// <param name="multiplier">1 = the state's authored speed; above 1 plays faster.</param>
-        public void SetAttackSpeedMultiplier(float multiplier)
+        /// <param name="targetSeconds">How long the swing should actually take to play, in seconds.</param>
+        /// <param name="isRanged">True to scale <see cref="rangedAttackClip"/>; false for <see cref="meleeAttackClip"/>.</param>
+        public void SetAttackDuration(float targetSeconds, bool isRanged)
         {
+            var clip = isRanged ? rangedAttackClip : meleeAttackClip;
+            var multiplier = clip != null && targetSeconds > 0f ? clip.length / targetSeconds : 1f;
             animator.SetFloat(AttackSpeedMultiplierParameter, multiplier);
         }
 

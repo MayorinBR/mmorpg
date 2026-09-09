@@ -34,7 +34,6 @@ namespace Project.AI
 
         private CharacterStatsHolder statsHolder;
         private IEnemyState currentState;
-        private int? lastKnownHealth;
 
         private CharacterStatsHolder StatsHolder
         {
@@ -115,7 +114,7 @@ namespace Project.AI
         {
             if (health != null)
             {
-                health.HealthChanged += HandleHealthChanged;
+                health.AttackedBy += HandleAttacked;
             }
         }
 
@@ -123,7 +122,7 @@ namespace Project.AI
         {
             if (health != null)
             {
-                health.HealthChanged -= HandleHealthChanged;
+                health.AttackedBy -= HandleAttacked;
             }
         }
 
@@ -189,27 +188,25 @@ namespace Project.AI
             return hits.Length > 0 ? hits[0].transform : null;
         }
 
-        private void HandleHealthChanged(int current, int max)
+        /// <summary>
+        /// Targets whoever just landed a hit, immediately and regardless of
+        /// distance — being hit is proof enough of who the attacker is, so
+        /// this doesn't need <see cref="DetectPlayer"/>'s range-limited scan
+        /// the way proximity aggro does (see <see cref="EnemyWanderState"/>).
+        /// Applies to both <see cref="EnemyBehaviorMode.Aggressive"/> and
+        /// <see cref="EnemyBehaviorMode.Passive"/> mobs alike: an Aggressive
+        /// mob sniped from outside its own <see cref="AggroRange"/> reacts
+        /// just as reliably as a Passive one retaliating.
+        /// </summary>
+        /// <param name="attacker">The transform that dealt the hit.</param>
+        private void HandleAttacked(Transform attacker)
         {
-            var previous = lastKnownHealth ?? max;
-            lastKnownHealth = current;
-
-            if (current >= previous)
+            if (attacker == null || PlayerTarget == attacker)
             {
                 return;
             }
 
-            if (behaviorMode != EnemyBehaviorMode.Passive || PlayerTarget != null)
-            {
-                return;
-            }
-
-            var attacker = DetectPlayer();
-
-            if (attacker != null)
-            {
-                EngagePlayer(attacker);
-            }
+            EngagePlayer(attacker);
         }
 
         private void OnDrawGizmosSelected()

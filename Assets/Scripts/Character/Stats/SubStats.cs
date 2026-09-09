@@ -57,10 +57,10 @@ namespace Project.Character.Stats
         /// <see cref="SubStatsCalculator"/>'s remarks). Feeds
         /// directly into
         /// <see cref="Combat.AttackSpeedCalculator.GetAttackIntervalSeconds"/>
-        /// (auto-attack cooldown) and, via
-        /// <see cref="Combat.AttackSpeedCalculator.GetAttackAnimationSpeedMultiplier"/>,
-        /// the attack swing animation's playback speed — skills are
-        /// unaffected.
+        /// (auto-attack cooldown), which
+        /// <see cref="Character.Animation.PlayerAnimatorController.SetAttackDuration"/>
+        /// also uses to keep the attack swing animation's playback speed in
+        /// sync with it — skills are unaffected.
         /// </summary>
         public int Aspd { get; }
     }

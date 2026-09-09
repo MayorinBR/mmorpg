@@ -23,11 +23,24 @@ namespace Project.Character.Movement
         /// <summary>
         /// Selects a new target from a hit collider.
         /// </summary>
+        /// <remarks>
+        /// <see cref="CurrentTarget"/> is resolved to the GameObject that
+        /// owns <see cref="CurrentDamageable"/> — typically an ancestor of
+        /// <paramref name="hitCollider"/> — rather than the collider's own
+        /// transform. An enemy's collider commonly sits on a separate,
+        /// purely cosmetic geometry child (e.g. one that bounces via its
+        /// own animation), while the damageable/AI root stays put; anything
+        /// that follows <see cref="CurrentTarget"/> (such as
+        /// <see cref="Project.UI.GroundRingFollower"/>) would otherwise
+        /// drift away from the enemy's actual position as that animation
+        /// plays. Falls back to the collider's own transform if it isn't
+        /// parented under an <see cref="IDamageable"/> at all.
+        /// </remarks>
         /// <param name="hitCollider">The collider that was clicked or otherwise targeted.</param>
         public void SelectTarget(Collider hitCollider)
         {
-            CurrentTarget = hitCollider.transform;
             CurrentDamageable = hitCollider.GetComponentInParent<IDamageable>();
+            CurrentTarget = (CurrentDamageable as Component)?.transform ?? hitCollider.transform;
             TargetChanged?.Invoke(CurrentTarget);
         }
 

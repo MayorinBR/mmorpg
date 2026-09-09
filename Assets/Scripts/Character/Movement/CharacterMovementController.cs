@@ -25,6 +25,7 @@ namespace Project.Character.Movement
         private ICameraYawProvider cameraYawProvider;
         private Vector2 directionalAxis;
         private bool isMoving;
+        private bool movementLocked;
 
         /// <summary>
         /// Raised the instant the character transitions from standing still
@@ -46,6 +47,11 @@ namespace Project.Character.Movement
 
         private void Update()
         {
+            if (movementLocked)
+            {
+                return;
+            }
+
             var cameraYaw = cameraYawProvider != null ? cameraYawProvider.CurrentYaw : 0f;
             var directionalIntent = directionalProvider.BuildIntent(directionalAxis, cameraYaw);
 
@@ -93,6 +99,35 @@ namespace Project.Character.Movement
         public void StopMovement()
         {
             agent.ResetPath();
+        }
+
+        /// <summary>
+        /// Locks or unlocks this component's own control of the character
+        /// entirely — while locked, <see cref="Update"/> does nothing: no
+        /// facing changes, no directional or click-to-move motion is
+        /// applied, and the <see cref="NavMeshAgent"/> is stopped outright
+        /// (<see cref="NavMeshAgent.isStopped"/>), which also freezes its
+        /// own local-avoidance nudging against nearby agents. Used by
+        /// combat (see <see cref="Combat.PlayerCombatController"/>) so it
+        /// can own both facing and stillness while attacking in range,
+        /// without this component's own rotation, its
+        /// <see cref="NavMeshAgent"/> residual velocity/avoidance, or a
+        /// still-held directional key fighting it or making the Animator's
+        /// Speed parameter flicker mid-swing (which was making the attack
+        /// animation's feet drift, since a flicker to 1 blends toward the
+        /// Run pose for a frame).
+        /// </summary>
+        /// <param name="movementLocked">True to stop this component from moving or rotating the character.</param>
+        public void SetMovementLocked(bool movementLocked)
+        {
+            this.movementLocked = movementLocked;
+            agent.isStopped = movementLocked;
+
+            if (movementLocked)
+            {
+                isMoving = false;
+                animatorController?.SetMovementSpeed(0f);
+            }
         }
 
         /// <summary>

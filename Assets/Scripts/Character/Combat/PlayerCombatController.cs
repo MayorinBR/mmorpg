@@ -103,11 +103,13 @@ namespace Project.Character.Combat
         {
             if (targetSelector.CurrentTarget == null || targetSelector.CurrentDamageable == null)
             {
+                movementController.SetMovementLocked(false);
                 return;
             }
 
             if (targetSelector.CurrentDamageable.IsDead)
             {
+                movementController.SetMovementLocked(false);
                 targetSelector.ClearTarget();
                 return;
             }
@@ -117,26 +119,48 @@ namespace Project.Character.Combat
 
             if (distanceToTarget > attackRange)
             {
+                // Still closing the distance — let movement keep facing
+                // where it's walking until the player is actually in range.
+                movementController.SetMovementLocked(false);
                 movementController.SetClickDestination(targetSelector.CurrentTarget.position);
                 return;
             }
 
-            movementController.StopMovement();
-
-            var directionToTarget = targetSelector.CurrentTarget.position - transform.position;
-            directionToTarget.y = 0f;
-
-            if (directionToTarget.sqrMagnitude > 0.0001f)
-            {
-                transform.forward = directionToTarget.normalized;
-            }
+            // In range: combat owns the character entirely from here on,
+            // so movement's own rotation, its NavMeshAgent (residual
+            // velocity, local avoidance) and a still-held directional key
+            // never fight this frame's target-facing, or make the
+            // Animator's Speed parameter flicker mid-swing — which was
+            // what made the attack animation's feet drift.
+            movementController.SetMovementLocked(true);
 
             cooldownRemaining -= Time.deltaTime;
 
             if (cooldownRemaining <= 0f && CanAttack())
             {
+                // Faced only once, right as this swing starts — not every
+                // frame the player stays in range. Reassigning
+                // transform.forward every frame kept nudging the whole
+                // character (legs included, since nothing else was
+                // rotating them) throughout the swing, which is what made
+                // the legs look like they were still turning instead of
+                // holding the animation's own stance; a single snap here
+                // still guarantees every swing faces wherever the target
+                // currently is.
+                FaceTarget(targetSelector.CurrentTarget.position);
                 PerformAttack();
                 cooldownRemaining = AttackSpeedCalculator.GetAttackIntervalSeconds(playerStats.CurrentSubStats.Aspd);
+            }
+        }
+
+        private void FaceTarget(Vector3 targetPosition)
+        {
+            var directionToTarget = targetPosition - transform.position;
+            directionToTarget.y = 0f;
+
+            if (directionToTarget.sqrMagnitude > 0.0001f)
+            {
+                transform.forward = directionToTarget.normalized;
             }
         }
 
@@ -168,12 +192,15 @@ namespace Project.Character.Combat
         {
             var isRanged = equipment.IsMainHandWeaponRanged();
 
-            // Only the swing states (Attack, AttackRanged) have their Motion
-            // Speed bound to this parameter in the Animator Controller, so
-            // setting it has no effect on the Mage's Cast state — the Mage's
-            // basic attack always plays at its authored speed, not scaled by
-            // Aspd, since Cast is shared with real skill casts.
-            animatorController?.SetAttackSpeedMultiplier(AttackSpeedCalculator.GetAttackAnimationSpeedMultiplier(playerStats.CurrentSubStats.Aspd));
+            // Only the swing states (Attack, AttackRanged) are bound to the
+            // AttackSpeedMultiplier parameter this sets, so it has no effect
+            // on the Mage's Cast state — the Mage's basic attack always
+            // plays at its authored speed, not scaled by Aspd, since Cast is
+            // shared with real skill casts. The swing's actual playback
+            // duration is made to equal this same interval — not just
+            // scaled proportionally to it — so the animation and the
+            // cooldown it's tied to are never out of sync.
+            animatorController?.SetAttackDuration(AttackSpeedCalculator.GetAttackIntervalSeconds(playerStats.CurrentSubStats.Aspd), isRanged);
 
             if (classController.CurrentClass == CharacterClass.Mage)
             {
@@ -267,7 +294,7 @@ namespace Project.Character.Combat
                 ? Mathf.RoundToInt(baseDamage * CriticalDamageMultiplier)
                 : baseDamage;
 
-            target.TakeDamage(damage, element, category, isCriticalHit);
+            target.TakeDamage(damage, element, category, isCriticalHit, transform);
         }
     }
 }

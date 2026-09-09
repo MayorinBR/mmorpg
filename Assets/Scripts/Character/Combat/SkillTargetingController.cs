@@ -119,6 +119,15 @@ namespace Project.Character.Combat
             SetHoveredEnemy(null);
         }
 
+        /// <summary>
+        /// Raises <see cref="HoveredEnemyChanged"/> with the GameObject that
+        /// owns the collider's <see cref="IDamageable"/> rather than the
+        /// collider's own transform — the same reasoning as
+        /// <see cref="PlayerTargetSelector.SelectTarget"/>, so the skill
+        /// picker's ring doesn't drift away from the enemy's actual
+        /// position while a purely cosmetic geometry animation plays.
+        /// </summary>
+        /// <param name="collider">The currently hovered enemy's collider, or null.</param>
         private void SetHoveredEnemy(Collider collider)
         {
             if (hoveredEnemyCollider == collider)
@@ -127,7 +136,12 @@ namespace Project.Character.Combat
             }
 
             hoveredEnemyCollider = collider;
-            HoveredEnemyChanged?.Invoke(collider != null ? collider.transform : null);
+
+            var hoveredEnemy = collider != null
+                ? (collider.GetComponentInParent<IDamageable>() as Component)?.transform ?? collider.transform
+                : null;
+
+            HoveredEnemyChanged?.Invoke(hoveredEnemy);
         }
 
         private void ConfirmPicking()
