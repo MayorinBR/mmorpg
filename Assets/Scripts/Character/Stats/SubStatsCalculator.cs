@@ -32,22 +32,22 @@ namespace Project.Character.Stats
     /// depends on the equipped weapon's base delay and has diminishing
     /// returns from AGI/DEX past certain thresholds — not yet verified
     /// enough to commit to code (see FUTURE_IMPROVEMENTS.md). Until that formula is
-    /// researched, this uses a simple linear approximation
-    /// (<see cref="BaseAspd"/> plus a flat AGI/DEX contribution, clamped to
-    /// the real game's 0-190 display range) purely so the status window has
-    /// a number to show, matching the original game's own presentation
-    /// (Victor asked for every sub-stat's calculation and display to stay
-    /// consistent with classic Ragnarok Online's status window, after
-    /// briefly trying a base-1.0 multiplier representation instead — see
-    /// FUTURE_IMPROVEMENTS.md for that reverted attempt). This value
-    /// already drives real auto-attack timing and animation speed via
-    /// <see cref="Combat.AttackSpeedCalculator"/> — replace this whole
-    /// calculation once the real per-weapon formula is verified.</item>
+    /// researched, this uses a simple linear approximation (the caller-
+    /// supplied base Aspd — see <see cref="Calculate"/>'s
+    /// <c>baseAspd</c> parameter — plus a flat AGI/DEX contribution,
+    /// clamped to the real game's 0-190 display range) purely so the
+    /// status window has a number to show, matching the original game's
+    /// own presentation (Victor asked for every sub-stat's calculation and
+    /// display to stay consistent with classic Ragnarok Online's status
+    /// window, after briefly trying a base-1.0 multiplier representation
+    /// instead — see FUTURE_IMPROVEMENTS.md for that reverted attempt).
+    /// This value already drives real auto-attack timing and animation
+    /// speed via <see cref="Combat.AttackSpeedCalculator"/> — replace this
+    /// whole calculation once the real per-weapon formula is verified.</item>
     /// </list>
     /// </remarks>
     public class SubStatsCalculator : ISubStatsCalculator
     {
-        private const int BaseAspd = 140;
         private const int MaxAspd = 190;
         private const float AgiAspdWeight = 0.25f;
         private const float DexAspdWeight = 0.1f;
@@ -62,7 +62,7 @@ namespace Project.Character.Stats
         /// the same way. LUK adds a small universal bonus on top,
         /// regardless of weapon.
         /// </remarks>
-        public SubStats Calculate(IStatProvider stats, int baseLevel, bool weaponIsRanged)
+        public SubStats Calculate(IStatProvider stats, int baseLevel, bool weaponIsRanged, int baseAspd)
         {
             var str = stats.GetValue(StatType.Strength);
             var agi = stats.GetValue(StatType.Agility);
@@ -83,19 +83,19 @@ namespace Project.Character.Stats
             var hit = baseLevel + dex;
             var flee = agi + baseLevel;
             var criticalRate = (luk * 0.3f) + 1f;
-            var aspd = CalculatePreliminaryAspd(agi, dex);
+            var aspd = CalculatePreliminaryAspd(baseAspd, agi, dex);
 
             return new SubStats(statusAtk, statusMatk, statusDef, statusMDef, hit, flee, criticalRate, aspd);
         }
 
         /// <summary>
         /// Preliminary Aspd approximation — see the placeholder note in this
-        /// class's remarks. Linear in AGI and DEX, clamped to the real
-        /// game's 0-190 display range.
+        /// class's remarks. Linear in AGI and DEX on top of the caller-
+        /// supplied base, clamped to the real game's 0-190 display range.
         /// </summary>
-        private static int CalculatePreliminaryAspd(int agi, int dex)
+        private static int CalculatePreliminaryAspd(int baseAspd, int agi, int dex)
         {
-            var raw = BaseAspd + (int)(agi * AgiAspdWeight) + (int)(dex * DexAspdWeight);
+            var raw = baseAspd + (int)(agi * AgiAspdWeight) + (int)(dex * DexAspdWeight);
             return Math.Clamp(raw, 0, MaxAspd);
         }
     }

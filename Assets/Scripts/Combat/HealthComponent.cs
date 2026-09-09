@@ -70,6 +70,15 @@ namespace Project.Combat
         public event Action Died;
 
         /// <summary>
+        /// Raised whenever <see cref="TakeDamage"/> actually reduces health
+        /// and the caller identified itself via its <c>attacker</c>
+        /// parameter. AI (see <see cref="Project.AI.EnemyController"/>)
+        /// listens for this to target whoever just hit it immediately,
+        /// without needing to detect them by proximity first.
+        /// </summary>
+        public event Action<Transform> AttackedBy;
+
+        /// <summary>
         /// Gets the maximum health defined by the character's stats, plus
         /// any bonus from <see cref="maxHealthBonusSource"/> (e.g. the
         /// player's VIT-derived bonus).
@@ -105,7 +114,7 @@ namespace Project.Combat
         }
 
         /// <inheritdoc />
-        public void TakeDamage(int amount, Element element = Element.Neutral, DamageCategory category = DamageCategory.Physical, bool isCritical = false)
+        public void TakeDamage(int amount, Element element = Element.Neutral, DamageCategory category = DamageCategory.Physical, bool isCritical = false, Transform attacker = null)
         {
             if (IsDead || amount <= 0)
             {
@@ -128,6 +137,11 @@ namespace Project.Combat
             currentHealth = Mathf.Max(currentHealth - amount, 0);
             DamageTaken?.Invoke(amount, isCritical);
             HealthChanged?.Invoke(currentHealth, MaxHealth);
+
+            if (attacker != null)
+            {
+                AttackedBy?.Invoke(attacker);
+            }
 
             if (currentHealth == 0)
             {

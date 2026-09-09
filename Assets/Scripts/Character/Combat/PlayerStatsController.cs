@@ -40,8 +40,17 @@ namespace Project.Character.Combat
         private const float MaxHealthBonusPerVit = 0.01f;
         private const float MaxManaBonusPerInt = 0.01f;
 
+        // Used only if statsHolder (or its Stats asset) isn't wired, so a
+        // missing reference degrades gracefully instead of throwing.
+        // Matches CharacterStatsDefinition.BaseAttackSpeed's own default.
+        private const int FallbackBaseAttackSpeed = 140;
+
         [SerializeField] private int startingLevel = 1;
         [SerializeField] private int startingStatPoints = RealRagnarokStartingStatPoints;
+
+        [Tooltip("Source of the player's base Aspd (see CharacterStatsDefinition.BaseAttackSpeed) and other shared base stats.")]
+        [SerializeField] private CharacterStatsHolder statsHolder;
+
         [SerializeField] private EquipmentManager equipment;
 
         [Tooltip("Optional. When assigned, refreshed automatically whenever a stat point is spent or equipment changes, so the HP/SP bars pick up VIT/INT's bonus without waiting for the next damage, heal or mana spend.")]
@@ -73,7 +82,7 @@ namespace Project.Character.Combat
             get
             {
                 EnsureInitialized();
-                return subStatsCalculator.Calculate(effectiveStats, BaseLevel, equipment != null && equipment.IsMainHandWeaponRanged());
+                return subStatsCalculator.Calculate(effectiveStats, BaseLevel, equipment != null && equipment.IsMainHandWeaponRanged(), GetBaseAttackSpeed());
             }
         }
 
@@ -179,6 +188,18 @@ namespace Project.Character.Combat
         {
             health?.RefreshMaxHealth();
             mana?.RefreshMaxMana();
+        }
+
+        /// <summary>
+        /// Reads the base Aspd from <see cref="statsHolder"/>'s
+        /// <see cref="CharacterStatsDefinition"/>, falling back to
+        /// <see cref="FallbackBaseAttackSpeed"/> if either isn't wired.
+        /// </summary>
+        private int GetBaseAttackSpeed()
+        {
+            return statsHolder != null && statsHolder.Stats != null
+                ? statsHolder.Stats.BaseAttackSpeed
+                : FallbackBaseAttackSpeed;
         }
 
         /// <inheritdoc />

@@ -17,6 +17,21 @@ namespace Project.Persistence
     [Serializable]
     public class PlayerSaveData
     {
+        /// <summary>
+        /// The character's name, as typed on the Character Selection screen.
+        /// Also the key used to find this save on disk (see
+        /// <see cref="CharacterSaveLookup"/>) — kept in the data itself too
+        /// so <see cref="ISaveParticipant"/>s that just receive a
+        /// <see cref="PlayerSaveData"/> (rather than a file path) can still
+        /// read it. Empty for a save written before this field existed;
+        /// readers should fall back to whatever name they already have
+        /// rather than overwriting it with an empty string.
+        /// </summary>
+        public string characterName = "";
+
+        /// <summary>The underlying int value of the player's chosen <c>CharacterGender</c>.</summary>
+        public int characterGenderIndex;
+
         /// <summary>The player's current Base Level.</summary>
         public int baseLevel = 1;
 

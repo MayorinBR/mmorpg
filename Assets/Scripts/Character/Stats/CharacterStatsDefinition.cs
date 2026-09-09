@@ -21,6 +21,9 @@ namespace Project.Character.Stats
         [SerializeField] private int experienceReward = 10;
         [SerializeField] private int jobExperienceReward = 5;
 
+        [Tooltip("Aspd rating (classic Ragnarok Online's 0-190 display scale) before AGI/DEX are added on top. Raising this makes every auto-attack — and its swing animation — play faster; see Project.Combat.AttackSpeedCalculator.")]
+        [SerializeField] private int baseAttackSpeed = 140;
+
         /// <summary>Gets the maximum health points for this character type.</summary>
         public int MaxHealth => maxHealth;
 
@@ -55,5 +58,17 @@ namespace Project.Character.Stats
 
         /// <summary>Gets the job experience granted when this character (typically an enemy) is defeated.</summary>
         public int JobExperienceReward => jobExperienceReward;
+
+        /// <summary>
+        /// Gets the base Aspd rating (classic Ragnarok Online's 0-190
+        /// display scale) before AGI/DEX are added on top — see
+        /// <see cref="SubStatsCalculator"/>. Feeds directly into
+        /// <see cref="Project.Combat.AttackSpeedCalculator.GetAttackIntervalSeconds"/>
+        /// (auto-attack cooldown), which
+        /// <see cref="Project.Character.Animation.PlayerAnimatorController.SetAttackDuration"/>
+        /// then also uses to scale the attack swing animation's playback
+        /// speed, so the swing always finishes in exactly that interval.
+        /// </summary>
+        public int BaseAttackSpeed => baseAttackSpeed;
     }
 }
