@@ -1,18 +1,31 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Project.Skills
 {
     /// <summary>
-    /// Resolves a stable string id to a <see cref="SkillDefinition"/> asset
-    /// and back, using the asset's own name. Exists so the save system
-    /// (which cannot serialize a direct ScriptableObject reference through
-    /// JSON) can record and later look up "which skill" without depending
-    /// on any particular UI component's own list of known skills.
+    /// Lists a set of skills (<see cref="AllSkills"/>) and resolves a
+    /// stable string id to one of them and back (<see cref="GetId"/>/
+    /// <see cref="FindById"/>), using each skill asset's own name as its
+    /// id. Authored as two different kinds of instance of this same type:
+    /// one per <see cref="Project.Character.Stats.CharacterClass"/> (see
+    /// <see cref="ClassSkillDatabaseLookup"/>), listing only that class's
+    /// skills for the Skill Book window; and a single master instance
+    /// covering every skill in the game, used by the save system
+    /// (<see cref="Project.Character.Combat.PlayerSkillBook"/>,
+    /// <see cref="Project.Character.Combat.PlayerSkillHotbar"/>) to
+    /// resolve a learned or hotbarred skill by id regardless of the
+    /// player's current class.
     /// </summary>
     [CreateAssetMenu(fileName = "SkillDatabase", menuName = "Project/Skills/Skill Database")]
     public class SkillDatabase : ScriptableObject
     {
         [SerializeField] private SkillDefinition[] allSkills;
+
+        /// <summary>
+        /// Gets every skill in the database, in author order.
+        /// </summary>
+        public IReadOnlyList<SkillDefinition> AllSkills => allSkills;
 
         /// <summary>
         /// Gets the stable id for a skill, currently its asset name.

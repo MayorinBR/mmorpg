@@ -1,19 +1,24 @@
 using Project.Character.Combat;
+using Project.Character.Stats;
 using Project.Skills;
-using System.Linq;
 using UnityEngine;
 
 namespace Project.UI
 {
     /// <summary>
     /// Populates the Skill Book window with one <see cref="SkillBookEntryUI"/>
-    /// row per skill available to the player's current class, refreshing
-    /// whenever a skill is learned/upgraded or the player's Base Level
-    /// changes (since some skills require a minimum level to learn).
+    /// row per skill in the current class's <see cref="SkillDatabase"/>,
+    /// resolved through <see cref="ClassSkillDatabaseLookup"/> so each
+    /// class's skill list lives only in its own database asset. Refreshes
+    /// whenever a skill is learned/upgraded or the player's class changes,
+    /// so a newly authored skill on a class's database shows up here
+    /// automatically and the window always reflects whichever class is
+    /// currently chosen — no Inspector change on this component required
+    /// for either case.
     /// </summary>
     public class SkillBookWindowUI : MonoBehaviour
     {
-        [SerializeField] private SkillDefinition[] allSkills;
+        [SerializeField] private ClassSkillDatabaseLookup skillDatabaseLookup;
         [SerializeField] private PlayerSkillBook skillBook;
         [SerializeField] private PlayerClassController classController;
         [SerializeField] private PlayerExperience experience;
@@ -24,25 +29,26 @@ namespace Project.UI
         {
             Populate();
             skillBook.SkillLeveledUp += OnSkillLeveledUp;
+            classController.ClassChanged += OnClassChanged;
         }
 
         private void OnDestroy()
         {
             skillBook.SkillLeveledUp -= OnSkillLeveledUp;
+            classController.ClassChanged -= OnClassChanged;
         }
 
         private void Populate()
         {
-            foreach (var skill in allSkills)
+            var database = skillDatabaseLookup.GetDatabase(classController.CurrentClass);
+
+            if (database == null)
             {
-                var restrictedToOtherClass = skill.AllowedClasses.Count > 0
-                    && !skill.AllowedClasses.Contains(classController.CurrentClass);
+                return;
+            }
 
-                if (restrictedToOtherClass)
-                {
-                    continue;
-                }
-
+            foreach (var skill in database.AllSkills)
+            {
                 var entry = Instantiate(entryPrefab, contentRoot);
                 entry.Setup(skill, skillBook);
             }
@@ -51,6 +57,20 @@ namespace Project.UI
         private void OnSkillLeveledUp(SkillDefinition skill, int newLevel)
         {
             RefreshAllEntries();
+        }
+
+        private void OnClassChanged(CharacterClass newClass)
+        {
+            ClearEntries();
+            Populate();
+        }
+
+        private void ClearEntries()
+        {
+            for (var i = contentRoot.childCount - 1; i >= 0; i--)
+            {
+                Destroy(contentRoot.GetChild(i).gameObject);
+            }
         }
 
         private void RefreshAllEntries()

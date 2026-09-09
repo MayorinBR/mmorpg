@@ -25,6 +25,13 @@ namespace Project.AI
         // field name so this rename doesn't silently reset it to default.
         [FormerlySerializedAs("leashRange")]
         [SerializeField] private float chaseGiveUpRange = 10f;
+
+        [Tooltip("While chasing, landing a hit on this enemy refreshes this grace window — it won't give up on ChaseGiveUpRange alone until this many seconds have passed since the last hit it took. Keeps a ranged/spell attacker sniping from beyond that range from hitting it for free: as long as they keep attacking, the enemy keeps trying to close the distance instead of repeatedly re-engaging and giving up.")]
+        [SerializeField] private float chaseGiveUpGraceSeconds = 3f;
+
+        [Tooltip("While wandering, how often (in seconds) an Aggressive mob re-runs DetectPlayer's Physics.OverlapSphere check, instead of every single frame. A player can't cross from outside AggroRange to inside it faster than this interval matters for gameplay feel, so this trades an imperceptible detection delay for a much cheaper wander loop when many enemies are on screen at once.")]
+        [SerializeField] private float detectionIntervalSeconds = 0.2f;
+
         [SerializeField] private float attackRange = 1.5f;
         [SerializeField] private float wanderRadius = 6f;
         [SerializeField] private float minWanderPauseSeconds = 2f;
@@ -34,6 +41,7 @@ namespace Project.AI
 
         private CharacterStatsHolder statsHolder;
         private IEnemyState currentState;
+        private float lastAttackedTime = float.NegativeInfinity;
 
         private CharacterStatsHolder StatsHolder
         {
@@ -62,6 +70,28 @@ namespace Project.AI
         /// map as long as it stays close enough to the target.
         /// </summary>
         public float ChaseGiveUpRange => chaseGiveUpRange;
+
+        /// <summary>
+        /// Gets the grace window, in seconds, that a landed hit buys against
+        /// giving up on <see cref="ChaseGiveUpRange"/> alone — see
+        /// <see cref="LastAttackedTime"/> and <see cref="EnemyChaseState"/>.
+        /// </summary>
+        public float ChaseGiveUpGraceSeconds => chaseGiveUpGraceSeconds;
+
+        /// <summary>
+        /// Gets the <see cref="Time.time"/> this enemy last took a hit (see
+        /// <see cref="HandleAttacked"/>), or negative infinity if it never
+        /// has. <see cref="EnemyChaseState"/> checks this against
+        /// <see cref="ChaseGiveUpGraceSeconds"/> before giving up a chase.
+        /// </summary>
+        public float LastAttackedTime => lastAttackedTime;
+
+        /// <summary>
+        /// Gets how often, in seconds, <see cref="EnemyWanderState"/>
+        /// re-runs <see cref="DetectPlayer"/>'s physics overlap check while
+        /// wandering, instead of every frame.
+        /// </summary>
+        public float DetectionIntervalSeconds => detectionIntervalSeconds;
 
         /// <summary>Gets the distance within which the enemy can attack its target.</summary>
         public float AttackRange => attackRange;
@@ -197,11 +227,24 @@ namespace Project.AI
         /// <see cref="EnemyBehaviorMode.Passive"/> mobs alike: an Aggressive
         /// mob sniped from outside its own <see cref="AggroRange"/> reacts
         /// just as reliably as a Passive one retaliating.
+        /// <see cref="LastAttackedTime"/> refreshes on every hit — even a
+        /// repeat hit from the already-current target — so
+        /// <see cref="EnemyChaseState"/> keeps pursuing for as long as the
+        /// attacks keep landing, instead of giving up mid-chase against a
+        /// ranged or spell attacker standing beyond
+        /// <see cref="ChaseGiveUpRange"/>.
         /// </summary>
         /// <param name="attacker">The transform that dealt the hit.</param>
         private void HandleAttacked(Transform attacker)
         {
-            if (attacker == null || PlayerTarget == attacker)
+            if (attacker == null)
+            {
+                return;
+            }
+
+            lastAttackedTime = Time.time;
+
+            if (PlayerTarget == attacker)
             {
                 return;
             }

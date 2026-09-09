@@ -10,19 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 37c0de08ccf18a54d96a55cce435c377, type: 3}
-  m_Name: Bash
+  m_Name: MagnumBreak
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
-  skillName: Bash
-  description: Bash Skill
-  icon: {fileID: 296196239, guid: ef4ed4eb516e342469b4a565db4798a7, type: 3}
+  skillName: Magnum Break
+  description: Deals Fire property damage to every enemy around the caster.
+  icon: {fileID: 0}
   allowedClasses: 00000000
   effectType: 0
-  targetType: 2
+  targetType: 3
   maxLevel: 5
-  manaCost: 10
-  cooldownSeconds: 5
-  range: 2
+  manaCost: 15
+  cooldownSeconds: 8
+  range: 0
   damageType: 0
-  damageMultiplierPerLevel: 1
-  accuracyBonusPerLevel: 10
+  damageMultiplierPerLevel: 0.6
+  element: 1
+  accuracyBonusPerLevel: 0
+  isAreaOfEffect: 1
+  areaRadius: 4
   healAmount: 10

@@ -24,6 +24,14 @@ namespace Project.Character.Combat
         public event Action<SkillDefinition, int> SkillLeveledUp;
 
         /// <summary>
+        /// Gets a read-only view of every skill the player has learned,
+        /// keyed by skill with its current level. Used by
+        /// <see cref="PlayerPassiveSkillController"/> to sum passive
+        /// bonuses without needing its own separate list of known skills.
+        /// </summary>
+        public IReadOnlyDictionary<SkillDefinition, int> LearnedSkills => skillLevels;
+
+        /// <summary>
         /// Gets the current level of a skill, or 0 if it hasn't been learned yet.
         /// </summary>
         /// <param name="skill">The skill to check.</param>

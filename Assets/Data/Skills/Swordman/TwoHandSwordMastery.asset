@@ -10,19 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 37c0de08ccf18a54d96a55cce435c377, type: 3}
-  m_Name: Bash
+  m_Name: TwoHandSwordMastery
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
-  skillName: Bash
-  description: Bash Skill
-  icon: {fileID: 296196239, guid: ef4ed4eb516e342469b4a565db4798a7, type: 3}
+  skillName: Two-Handed Sword Mastery
+  description: Passively increases ATK while wielding a two-handed sword.
+  icon: {fileID: 0}
   allowedClasses: 00000000
-  effectType: 0
-  targetType: 2
+  effectType: 2
+  targetType: 0
   maxLevel: 5
-  manaCost: 10
-  cooldownSeconds: 5
-  range: 2
+  manaCost: 0
+  cooldownSeconds: 0
+  range: 0
   damageType: 0
   damageMultiplierPerLevel: 1
-  accuracyBonusPerLevel: 10
+  element: 0
+  accuracyBonusPerLevel: 0
+  isAreaOfEffect: 0
+  areaRadius: 3
+  passiveAttackBonusPerLevel: 8
+  passiveRequiredWeaponSubtypes: 03000000
   healAmount: 10

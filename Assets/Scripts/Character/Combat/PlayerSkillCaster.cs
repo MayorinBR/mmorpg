@@ -21,6 +21,9 @@ namespace Project.Character.Combat
         [SerializeField] private PlayerTargetSelector targetSelector;
         [SerializeField] private PlayerAnimatorController animatorController;
 
+        [Tooltip("Layer containing enemy colliders, used by an area-of-effect skill (see SkillDefinition.IsAreaOfEffect, e.g. Magnum Break) to find every target within range of the caster. Should be set to the same layer as SkillTargetingController's own enemyLayer.")]
+        [SerializeField] private LayerMask enemyLayer;
+
         private readonly Dictionary<SkillDefinition, float> cooldownEndTimes = new Dictionary<SkillDefinition, float>();
 
         /// <summary>
@@ -45,6 +48,14 @@ namespace Project.Character.Combat
 
             if (level <= 0 || Time.time < GetCooldownEndTime(skill))
             {
+                return false;
+            }
+
+            if (skill.EffectType == SkillEffectType.Passive)
+            {
+                // Passive skills apply their bonus automatically while
+                // learned (see PlayerPassiveSkillController) and are
+                // never actually cast.
                 return false;
             }
 
@@ -113,12 +124,21 @@ namespace Project.Character.Combat
         /// Checks whether the current combat target is a usable target
         /// for this skill (selected, alive, and within range). Public so
         /// <see cref="SkillTargetingController"/> can re-check it right
-        /// after the player confirms a picked target.
+        /// after the player confirms a picked target. An area-of-effect
+        /// skill (see <see cref="SkillDefinition.IsAreaOfEffect"/>) needs
+        /// no pre-selected target at all, so this is always true for one —
+        /// it can never fall into <see cref="SkillTargetingController"/>'s
+        /// picking flow.
         /// </summary>
         /// <param name="skill">The damage skill to check range against.</param>
         /// <returns>True if the current target can be hit by this skill right now.</returns>
         public bool HasValidDamageTarget(SkillDefinition skill)
         {
+            if (skill.IsAreaOfEffect)
+            {
+                return true;
+            }
+
             if (targetSelector.CurrentTarget == null || targetSelector.CurrentDamageable == null)
             {
                 return false;
@@ -144,14 +164,23 @@ namespace Project.Character.Combat
         /// Spends mana and puts the skill on cooldown as soon as the cast is
         /// committed (in range, affordable), regardless of whether the hit
         /// actually lands — matching Ragnarok Online, where a missed skill
-        /// still consumes its resources. The hit itself is resolved against
-        /// the target's Flee via <see cref="HitChanceCalculator"/>, applying
-        /// damage as <see cref="DamageCategory.Physical"/> or
+        /// still consumes its resources. Delegates to
+        /// <see cref="TryCastAreaDamage"/> for an area-of-effect skill (see
+        /// <see cref="SkillDefinition.IsAreaOfEffect"/>), since that needs
+        /// no single pre-selected target at all. Otherwise the hit is
+        /// resolved against the target's Flee via
+        /// <see cref="HitChanceCalculator"/>, applying damage as
+        /// <see cref="DamageCategory.Physical"/> or
         /// <see cref="DamageCategory.Magical"/> depending on the skill's
         /// <see cref="SkillDefinition.DamageType"/>.
         /// </summary>
         private bool TryCastDamage(SkillDefinition skill, int level)
         {
+            if (skill.IsAreaOfEffect)
+            {
+                return TryCastAreaDamage(skill, level);
+            }
+
             if (targetSelector.CurrentTarget == null || targetSelector.CurrentDamageable == null)
             {
                 return false;
@@ -165,10 +194,10 @@ namespace Project.Character.Combat
             }
 
             var target = targetSelector.CurrentDamageable;
+            var subStats = statsController.CurrentSubStats;
 
-            if (HitChanceCalculator.RollHit(statsController.CurrentSubStats.Hit, target.FleeRating))
+            if (HitChanceCalculator.RollHit(subStats.Hit + skill.GetAccuracyBonus(level), target.FleeRating))
             {
-                var subStats = statsController.CurrentSubStats;
                 var damage = skill.CalculateDamage(subStats.StatusAtk, subStats.StatusMatk, level);
                 var category = skill.DamageType == SkillDamageType.Physical ? DamageCategory.Physical : DamageCategory.Magical;
                 target.TakeDamage(damage, skill.Element, category, attacker: transform);
@@ -176,6 +205,57 @@ namespace Project.Character.Combat
             else
             {
                 target.NotifyDodged();
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Casts an area-of-effect damage skill (e.g. Magnum Break): spends
+        /// mana as soon as the cast is committed, the same as
+        /// <see cref="TryCastDamage"/>, then rolls a separate hit check
+        /// against every distinct, living <see cref="IDamageable"/> found
+        /// within <see cref="SkillDefinition.AreaRadius"/> of the caster's
+        /// own position via <see cref="enemyLayer"/> — unlike a
+        /// single-target skill, this needs no pre-selected target and
+        /// can't fail for lack of one, matching how the real Magnum Break
+        /// always fires (and consumes its cost) whether or not anything
+        /// was actually standing in range.
+        /// </summary>
+        /// <param name="skill">The area-of-effect skill being cast.</param>
+        /// <param name="level">The skill's current level.</param>
+        /// <returns>True once the cast is committed (mana spent), regardless of how many targets were hit.</returns>
+        private bool TryCastAreaDamage(SkillDefinition skill, int level)
+        {
+            if (!mana.TryConsumeMana(skill.ManaCost))
+            {
+                return false;
+            }
+
+            var subStats = statsController.CurrentSubStats;
+            var accuracy = subStats.Hit + skill.GetAccuracyBonus(level);
+            var category = skill.DamageType == SkillDamageType.Physical ? DamageCategory.Physical : DamageCategory.Magical;
+            var hitColliders = Physics.OverlapSphere(transform.position, skill.AreaRadius, enemyLayer);
+            var alreadyHit = new HashSet<IDamageable>();
+
+            foreach (var hitCollider in hitColliders)
+            {
+                var target = hitCollider.GetComponentInParent<IDamageable>();
+
+                if (target == null || target.IsDead || !alreadyHit.Add(target))
+                {
+                    continue;
+                }
+
+                if (HitChanceCalculator.RollHit(accuracy, target.FleeRating))
+                {
+                    var damage = skill.CalculateDamage(subStats.StatusAtk, subStats.StatusMatk, level);
+                    target.TakeDamage(damage, skill.Element, category, attacker: transform);
+                }
+                else
+                {
+                    target.NotifyDodged();
+                }
             }
 
             return true;

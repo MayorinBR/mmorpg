@@ -342,6 +342,20 @@ namespace Project.Items
             return mainHandWeapon != null && mainHandWeapon.WeaponType == WeaponType.Ranged;
         }
 
+        /// <summary>
+        /// Gets the weapon subtype of the currently equipped main-hand
+        /// weapon, or <see cref="WeaponSubtype.Unarmed"/> if no weapon is
+        /// equipped there. Mirrors <see cref="IsMainHandWeaponRanged"/>'s
+        /// own lookup; used by
+        /// <see cref="Character.Combat.PlayerPassiveSkillController"/> to
+        /// check weapon-mastery passive skill requirements.
+        /// </summary>
+        public WeaponSubtype GetMainHandWeaponSubtype()
+        {
+            var mainHandWeapon = GetEquippedItems(EquipmentSlot.LeftHand).FirstOrDefault();
+            return mainHandWeapon != null ? mainHandWeapon.WeaponSubtype : WeaponSubtype.Unarmed;
+        }
+
         private void MakeRoomFor(IReadOnlyList<EquipmentSlot> requiredSlots)
         {
             foreach (var slot in requiredSlots)

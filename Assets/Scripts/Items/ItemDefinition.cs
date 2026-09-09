@@ -26,6 +26,7 @@ namespace Project.Items
         [SerializeField] private float weight = 1f;
         [SerializeField] private bool canBeOffHand;
         [SerializeField] private WeaponType weaponType = WeaponType.Melee;
+        [SerializeField] private WeaponSubtype weaponSubtype = WeaponSubtype.Unarmed;
         [SerializeField] private float attackRange = 1.5f;
         [SerializeField] private int buyPrice;
         [SerializeField] private int sellPrice;
@@ -73,6 +74,9 @@ namespace Project.Items
 
         /// <summary>Gets whether this weapon is melee or ranged. Only meaningful for hand-slot equipment.</summary>
         public WeaponType WeaponType => weaponType;
+
+        /// <summary>Gets the specific weapon category (dagger, one-hand sword, bow, etc.), used by weapon-mastery passive skills. Only meaningful for hand-slot equipment; <see cref="Project.Items.WeaponSubtype.Unarmed"/> for anything else.</summary>
+        public WeaponSubtype WeaponSubtype => weaponSubtype;
 
         /// <summary>Gets the basic-attack range this weapon grants while equipped. Only meaningful for hand-slot weapons.</summary>
         public float AttackRange => attackRange;

@@ -4193,7 +4193,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Project.Character.Movement.CharacterMovementController
   agent: {fileID: 401280839}
-  moveSpeed: 4
+  moveSpeed: 4.5
   cameraYawSource: {fileID: 330585548}
   animatorController: {fileID: 401280901}
 --- !u!195 &401280839
@@ -16165,6 +16165,7 @@ GameObject:
   - component: {fileID: 1466862094}
   - component: {fileID: 1466862093}
   - component: {fileID: 1466862092}
+  - component: {fileID: 1466862096}
   m_Layer: 7
   m_Name: SkillsData
   m_TagString: Untagged
@@ -16199,7 +16200,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 629d5599df9d8b64d8aa8efb14548b4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Project.Character.Combat::Project.Character.Combat.PlayerElementController
-  startingElement: 1
+  startingElement: 5
 --- !u!114 &1466862093
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16238,7 +16239,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  skillDatabase: {fileID: 11400000, guid: 6745807489204ff89ffd51b5945effd4, type: 2}
+  skillDatabase: {fileID: 11400000, guid: 5a7106c7c0f382445b58fce3b44a25b2, type: 2}
 --- !u!114 &1466862095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16253,7 +16254,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Character.Combat::Project.Character.Combat.PlayerSkillBook
   jobProgress: {fileID: 1696850565}
   classController: {fileID: 1696850564}
-  skillDatabase: {fileID: 11400000, guid: 6745807489204ff89ffd51b5945effd4, type: 2}
+  skillDatabase: {fileID: 11400000, guid: 5a7106c7c0f382445b58fce3b44a25b2, type: 2}
+--- !u!114 &1466862096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1466862090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54217b96f46d493e80238513ab3d0d31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Character.Combat::Project.Character.Combat.PlayerPassiveSkillController
+  skillBook: {fileID: 1466862095}
 --- !u!1 &1473881039
 GameObject:
   m_ObjectHideFlags: 0
@@ -18253,14 +18267,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 297040d0b3ecd1d4db9cbfcfdc9bcf95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Project.UI::Project.UI.SkillBookWindowUI
-  allSkills:
-  - {fileID: 11400000, guid: 1cc33e3d848183b42b028ef4b8def3d6, type: 2}
-  - {fileID: 11400000, guid: 023c463efa310c44397ea4dd4bb226d6, type: 2}
-  - {fileID: 11400000, guid: 99418ce20ee103b4ebe06402a3aada3c, type: 2}
-  - {fileID: 11400000, guid: cd59af5583263c8449504b7da93d8586, type: 2}
-  - {fileID: 11400000, guid: dcb25a02c824e7a4c85b505122a017d4, type: 2}
-  - {fileID: 11400000, guid: e4c0afd41744fd240a2fe0f240b424fb, type: 2}
-  - {fileID: 11400000, guid: 37f1fdc8083463d4a95e0e3a639db6b9, type: 2}
+  skillDatabaseLookup: {fileID: 11400000, guid: 433051164ce846628b1e97ed3d1ea7a1, type: 2}
   skillBook: {fileID: 1466862095}
   classController: {fileID: 1696850564}
   experience: {fileID: 1696850560}
@@ -18993,6 +19000,7 @@ MonoBehaviour:
   equipment: {fileID: 26099406}
   health: {fileID: 1374932851}
   mana: {fileID: 1374932850}
+  passiveSkills: {fileID: 1466862096}
 --- !u!114 &1696850562
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20859,6 +20867,9 @@ MonoBehaviour:
   ownHealth: {fileID: 1374932851}
   targetSelector: {fileID: 401280844}
   animatorController: {fileID: 401280901}
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!1 &1948768125
 GameObject:
   m_ObjectHideFlags: 0
@@ -24732,10 +24743,6 @@ PrefabInstance:
       propertyPath: viewCamera
       value: 
       objectReference: {fileID: 330585545}
-    - target: {fileID: 3451313833103779264, guid: e2c9362fd44fba94cabd85bef8fe388b, type: 3}
-      propertyPath: attackRange
-      value: 1.5
-      objectReference: {fileID: 0}
     - target: {fileID: 6191344707893608728, guid: e2c9362fd44fba94cabd85bef8fe388b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -24779,10 +24786,6 @@ PrefabInstance:
     - target: {fileID: 6638017485894401303, guid: e2c9362fd44fba94cabd85bef8fe388b, type: 3}
       propertyPath: m_Name
       value: Poring
-      objectReference: {fileID: 0}
-    - target: {fileID: 7396215187248360374, guid: e2c9362fd44fba94cabd85bef8fe388b, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7542552280490181138, guid: e2c9362fd44fba94cabd85bef8fe388b, type: 3}
       propertyPath: m_AnchorMax.x
