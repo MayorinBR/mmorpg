@@ -28,7 +28,11 @@ namespace Project.Character.Combat
     /// <see cref="passiveSkills"/> is assigned, <see cref="CurrentSubStats"/>
     /// also folds in any flat Status ATK bonus from learned passive
     /// skills whose weapon requirement matches the equipped main-hand
-    /// weapon (e.g. Sword Mastery).
+    /// weapon (e.g. Sword Mastery). When <see cref="classController"/>,
+    /// <see cref="jobProgress"/> and <see cref="jobLevelBonusLookup"/> are
+    /// all assigned, the class's Job Level stat bonus (see
+    /// <see cref="ClassJobLevelBonusLookup"/>) is folded into every derived
+    /// stat the same way equipment is, through <see cref="JobBonusStatsView"/>.
     /// </summary>
     public class PlayerStatsController : MonoBehaviour, IPlayerLevelProvider, ISaveParticipant, IMaxHealthBonusProvider, IMaxManaBonusProvider, IDefensiveStatsProvider
     {
@@ -63,6 +67,11 @@ namespace Project.Character.Combat
 
         [Tooltip("Optional. Source of flat Status ATK bonuses from learned passive skills (e.g. Sword Mastery), added on top of the stat-derived value in CurrentSubStats whenever the equipped weapon matches.")]
         [SerializeField] private PlayerPassiveSkillController passiveSkills;
+
+        [Tooltip("Optional, all three required together. Source of the class's automatic Job Level stat bonus (e.g. Swordman's +7 STR at Job 50), folded into every derived stat alongside equipment.")]
+        [SerializeField] private PlayerClassController classController;
+        [SerializeField] private PlayerJobProgress jobProgress;
+        [SerializeField] private ClassJobLevelBonusLookup jobLevelBonusLookup;
 
         private CharacterBaseStats baseStats;
         private ISubStatsCalculator subStatsCalculator;
@@ -109,6 +118,11 @@ namespace Project.Character.Combat
             {
                 equipment.EquipmentChanged -= HandleEquipmentChanged;
             }
+
+            if (jobProgress != null)
+            {
+                jobProgress.JobLeveledUp -= HandleJobLeveledUp;
+            }
         }
 
         /// <summary>
@@ -132,15 +146,31 @@ namespace Project.Character.Combat
             baseStats = new CharacterBaseStats(new RagnarokStatPointCostStrategy());
             baseStats.GrantPoints(startingStatPoints);
             subStatsCalculator = new SubStatsCalculator();
-            effectiveStats = equipment != null ? new EquippedStatsView(baseStats, equipment) : baseStats;
+
+            IStatProvider derivedStats = equipment != null ? new EquippedStatsView(baseStats, equipment) : baseStats;
+            var canApplyJobBonus = classController != null && jobProgress != null && jobLevelBonusLookup != null;
+            effectiveStats = canApplyJobBonus
+                ? new JobBonusStatsView(derivedStats, () => jobLevelBonusLookup.GetBonus(classController.CurrentClass, jobProgress.JobLevel))
+                : derivedStats;
 
             if (equipment != null)
             {
                 equipment.EquipmentChanged += HandleEquipmentChanged;
             }
+
+            if (jobProgress != null)
+            {
+                jobProgress.JobLeveledUp += HandleJobLeveledUp;
+            }
         }
 
         private void HandleEquipmentChanged()
+        {
+            RefreshDependentMaxValues();
+            StatsChanged?.Invoke();
+        }
+
+        private void HandleJobLeveledUp(int newJobLevel)
         {
             RefreshDependentMaxValues();
             StatsChanged?.Invoke();
