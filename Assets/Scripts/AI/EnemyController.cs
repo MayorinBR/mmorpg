@@ -39,6 +39,9 @@ namespace Project.AI
         [SerializeField] private EnemyBehaviorMode behaviorMode = EnemyBehaviorMode.Aggressive;
         [SerializeField] private HealthComponent health;
 
+        [Tooltip("Optional. Source of temporary buff/debuff modifiers (see BuffController) affecting this enemy's outgoing attack power — e.g. a Provoke debuff landed on it. Left empty, this enemy is never affected by one.")]
+        [SerializeField] private BuffController buffs;
+
         private CharacterStatsHolder statsHolder;
         private IEnemyState currentState;
         private float lastAttackedTime = float.NegativeInfinity;
@@ -107,6 +110,14 @@ namespace Project.AI
 
         /// <summary>Gets the enemy's base combat stats.</summary>
         public CharacterStatsDefinition Stats => StatsHolder.Stats;
+
+        /// <summary>
+        /// Gets the temporary buff/debuff modifiers currently affecting
+        /// this enemy (see <see cref="BuffController"/>), or null if none
+        /// is wired — read by <see cref="EnemyAttackState"/> to apply an
+        /// active attack-power modifier, e.g. from Provoke.
+        /// </summary>
+        public BuffController Buffs => buffs;
 
         /// <summary>Gets whether this mob auto-aggros (Aggressive) or only retaliates when attacked (Passive).</summary>
         public EnemyBehaviorMode BehaviorMode => behaviorMode;

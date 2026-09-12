@@ -14769,6 +14769,7 @@ MonoBehaviour:
   damageModifierSource: {fileID: 1466862093}
   maxHealthBonusSource: {fileID: 1696850561}
   defensiveStatsSource: {fileID: 1696850561}
+  buffs: {fileID: 1696850567}
 --- !u!114 &1374932852
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18945,6 +18946,7 @@ GameObject:
   - component: {fileID: 1696850561}
   - component: {fileID: 1696850560}
   - component: {fileID: 1696850566}
+  - component: {fileID: 1696850567}
   m_Layer: 7
   m_Name: Meta
   m_TagString: Untagged
@@ -19001,6 +19003,9 @@ MonoBehaviour:
   health: {fileID: 1374932851}
   mana: {fileID: 1374932850}
   passiveSkills: {fileID: 1466862096}
+  classController: {fileID: 1696850564}
+  jobProgress: {fileID: 1696850565}
+  jobLevelBonusLookup: {fileID: 11400000, guid: 04cec98ecfec40e0acb153b479b78f70, type: 2}
 --- !u!114 &1696850562
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19072,6 +19077,18 @@ MonoBehaviour:
   femalePrefab: {fileID: 919132149155446097, guid: ad97a6a968094294e86add64e20020e5, type: 3}
   sharedAnimatorController: {fileID: 9100000, guid: 4a3a42b9687649ecb7e3c2a8a3288eee, type: 2}
   animatorController: {fileID: 401280901}
+--- !u!114 &1696850567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1696850558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d03c7d1fcc2469ab7777f079fc06dad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Combat::Project.Combat.BuffController
 --- !u!1001 &1701028264
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20867,6 +20884,7 @@ MonoBehaviour:
   ownHealth: {fileID: 1374932851}
   targetSelector: {fileID: 401280844}
   animatorController: {fileID: 401280901}
+  ownBuffs: {fileID: 1696850567}
   enemyLayer:
     serializedVersion: 2
     m_Bits: 256

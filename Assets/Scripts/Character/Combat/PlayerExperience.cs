@@ -90,6 +90,19 @@ namespace Project.Character.Combat
             ExperienceChanged?.Invoke(currentExperience, requiredForNextLevel);
         }
 
+        /// <summary>
+        /// Resets base level and experience back to a fresh character's
+        /// starting values (see <see cref="PlayerStatsController.StartingLevel"/>).
+        /// Does not touch stat points — call
+        /// <see cref="PlayerStatsController.ResetStats"/> for that.
+        /// </summary>
+        public void ResetProgress()
+        {
+            statsController.BaseLevel = statsController.StartingLevel;
+            currentExperience = 0;
+            ExperienceChanged?.Invoke(currentExperience, experienceCurve.GetRequiredExperience(CurrentLevel));
+        }
+
         /// <inheritdoc />
         public void CaptureState(PlayerSaveData data)
         {

@@ -68,7 +68,10 @@ namespace Project.Character.Combat
     /// Ragnarok Online's own "crits bypass accuracy" rule. The Mage's basic
     /// attack is <see cref="DamageCategory.Magical"/> (mitigated by the
     /// target's magical defense); every other class's is
-    /// <see cref="DamageCategory.Physical"/>.
+    /// <see cref="DamageCategory.Physical"/> — and, being physical, also
+    /// scaled by <see cref="WeaponSizeModifiers"/> for the equipped
+    /// weapon's subtype against the target's size (e.g. a dagger dealing
+    /// half damage to a Large monster).
     /// </remarks>
     public class PlayerCombatController : MonoBehaviour
     {
@@ -294,6 +297,7 @@ namespace Project.Character.Combat
                 ? Mathf.RoundToInt(baseDamage * CriticalDamageMultiplier)
                 : baseDamage;
 
+            damage = WeaponSizeModifiers.Apply(damage, category, equipment.GetMainHandWeaponSubtype(), target.Size);
             target.TakeDamage(damage, element, category, isCriticalHit, transform);
         }
     }

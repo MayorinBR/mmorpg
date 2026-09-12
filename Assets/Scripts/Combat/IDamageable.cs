@@ -1,4 +1,5 @@
 using UnityEngine;
+using Project.Character.Stats;
 
 namespace Project.Combat
 {
@@ -14,6 +15,9 @@ namespace Project.Combat
 
         /// <summary>Gets the dodge rating an attacker's Hit is checked against to resolve hit chance.</summary>
         int FleeRating { get; }
+
+        /// <summary>Gets this entity's size class, read by the attacker to scale incoming physical damage by weapon type (e.g. a dagger vs. a Large monster).</summary>
+        MonsterSize Size { get; }
 
         /// <summary>
         /// Applies damage, reducing current health down to a minimum of zero.

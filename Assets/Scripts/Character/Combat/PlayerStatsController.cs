@@ -28,7 +28,10 @@ namespace Project.Character.Combat
     /// <see cref="passiveSkills"/> is assigned, <see cref="CurrentSubStats"/>
     /// also folds in any flat Status ATK bonus from learned passive
     /// skills whose weapon requirement matches the equipped main-hand
-    /// weapon (e.g. Sword Mastery). When <see cref="classController"/>,
+    /// weapon (e.g. Sword Mastery). When <see cref="buffs"/> is assigned,
+    /// <see cref="CurrentSubStats"/> also multiplies the resulting Status
+    /// ATK by <see cref="Project.Combat.BuffController.AttackMultiplier"/>
+    /// (e.g. Berserk's persistent +32% ATK). When <see cref="classController"/>,
     /// <see cref="jobProgress"/> and <see cref="jobLevelBonusLookup"/> are
     /// all assigned, the class's Job Level stat bonus (see
     /// <see cref="ClassJobLevelBonusLookup"/>) is folded into every derived
@@ -68,6 +71,9 @@ namespace Project.Character.Combat
         [Tooltip("Optional. Source of flat Status ATK bonuses from learned passive skills (e.g. Sword Mastery), added on top of the stat-derived value in CurrentSubStats whenever the equipped weapon matches.")]
         [SerializeField] private PlayerPassiveSkillController passiveSkills;
 
+        [Tooltip("Optional. Source of temporary/persistent attack buffs (e.g. Berserk), multiplied into Status ATK in CurrentSubStats. Left empty, the player is never affected by one.")]
+        [SerializeField] private BuffController buffs;
+
         [Tooltip("Optional, all three required together. Source of the class's automatic Job Level stat bonus (e.g. Swordman's +7 STR at Job 50), folded into every derived stat alongside equipment.")]
         [SerializeField] private PlayerClassController classController;
         [SerializeField] private PlayerJobProgress jobProgress;
@@ -92,6 +98,9 @@ namespace Project.Character.Combat
         /// <summary>Gets or sets the player's current base level, driven by the experience system.</summary>
         public int BaseLevel { get; set; }
 
+        /// <summary>Gets the base level a fresh character starts at, e.g. for <see cref="PlayerExperience.ResetProgress"/> to reset back to.</summary>
+        public int StartingLevel => startingLevel;
+
         /// <summary>Gets the sub-stats calculated from the current effective stats, level and equipped weapon type.</summary>
         public SubStats CurrentSubStats
         {
@@ -99,11 +108,16 @@ namespace Project.Character.Combat
             {
                 EnsureInitialized();
                 var subStats = subStatsCalculator.Calculate(effectiveStats, BaseLevel, equipment != null && equipment.IsMainHandWeaponRanged(), GetBaseAttackSpeed());
-                var passiveAttackBonus = GetPassiveAttackBonus();
+                var statusAtk = subStats.StatusAtk + GetPassiveAttackBonus();
 
-                return passiveAttackBonus == 0
+                if (buffs != null)
+                {
+                    statusAtk = Mathf.RoundToInt(statusAtk * buffs.AttackMultiplier);
+                }
+
+                return statusAtk == subStats.StatusAtk
                     ? subStats
-                    : new SubStats(subStats.StatusAtk + passiveAttackBonus, subStats.StatusMatk, subStats.StatusDef, subStats.StatusMDef, subStats.Hit, subStats.Flee, subStats.CriticalRate, subStats.Aspd);
+                    : new SubStats(statusAtk, subStats.StatusMatk, subStats.StatusDef, subStats.StatusMDef, subStats.Hit, subStats.Flee, subStats.CriticalRate, subStats.Aspd);
             }
         }
 

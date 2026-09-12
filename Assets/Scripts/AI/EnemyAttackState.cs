@@ -18,7 +18,11 @@ namespace Project.AI
     /// <see cref="EnemyController.Agent"/>'s own rotation stops updating
     /// once <see cref="Enter"/> resets its path, so without this the enemy
     /// would keep whatever heading it last had while chasing instead of
-    /// turning to actually look at the player it's attacking.
+    /// turning to actually look at the player it's attacking. Base attack
+    /// power is scaled by <see cref="EnemyController.Buffs"/>'s
+    /// <see cref="Combat.BuffController.AttackMultiplier"/> when a
+    /// <see cref="Combat.BuffController"/> is wired — e.g. a landed Provoke
+    /// debuff.
     /// </summary>
     public class EnemyAttackState : IEnemyState
     {
@@ -105,7 +109,11 @@ namespace Project.AI
                 return;
             }
 
-            damageable.TakeDamage(enemy.Stats.AttackPower);
+            var attackPower = enemy.Buffs != null
+                ? Mathf.RoundToInt(enemy.Stats.AttackPower * enemy.Buffs.AttackMultiplier)
+                : enemy.Stats.AttackPower;
+
+            damageable.TakeDamage(attackPower);
         }
     }
 }

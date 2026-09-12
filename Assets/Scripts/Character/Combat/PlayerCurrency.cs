@@ -60,6 +60,13 @@ namespace Project.Character.Combat
             return true;
         }
 
+        /// <summary>Resets Zeny back to a fresh character's starting amount.</summary>
+        public void ResetToStarting()
+        {
+            CurrentZeny = startingZeny;
+            ZenyChanged?.Invoke(CurrentZeny);
+        }
+
         /// <inheritdoc />
         public void CaptureState(PlayerSaveData data)
         {

@@ -4,13 +4,16 @@ using Project.Skills;
 using Project.Character.Animation;
 using Project.Character.Movement;
 using Project.Combat;
+using Project.Items;
 
 namespace Project.Character.Combat
 {
     /// <summary>
     /// Casts skills: checks the skill is known, off cooldown, and
-    /// affordable, then either damages the current enemy target (in range)
-    /// or heals the caster, depending on the skill's effect and target type.
+    /// affordable, then damages the current enemy target (in range), heals
+    /// the caster, or applies a timed buff/debuff (see
+    /// <see cref="ownBuffs"/>) to the caster or the current enemy target,
+    /// depending on the skill's effect and target type.
     /// </summary>
     public class PlayerSkillCaster : MonoBehaviour
     {
@@ -20,6 +23,12 @@ namespace Project.Character.Combat
         [SerializeField] private HealthComponent ownHealth;
         [SerializeField] private PlayerTargetSelector targetSelector;
         [SerializeField] private PlayerAnimatorController animatorController;
+
+        [Tooltip("Optional. Source of the equipped main-hand weapon's subtype, used to scale a Physical damage skill's damage against the target's size (see WeaponSizeModifiers). Left empty, Physical skills deal full damage regardless of target size.")]
+        [SerializeField] private EquipmentManager equipment;
+
+        [Tooltip("The caster's own buff modifiers, for a Self-targeted Buff skill (e.g. Endure). Left empty, a Self-targeted Buff skill can't be cast.")]
+        [SerializeField] private BuffController ownBuffs;
 
         [Tooltip("Layer containing enemy colliders, used by an area-of-effect skill (see SkillDefinition.IsAreaOfEffect, e.g. Magnum Break) to find every target within range of the caster. Should be set to the same layer as SkillTargetingController's own enemyLayer.")]
         [SerializeField] private LayerMask enemyLayer;
@@ -59,15 +68,18 @@ namespace Project.Character.Combat
                 return false;
             }
 
-            if (skill.EffectType == SkillEffectType.Damage && !HasValidDamageTarget(skill))
+            if (NeedsEnemyTarget(skill) && !HasValidDamageTarget(skill))
             {
                 SkillTargetingController.Instance?.BeginPicking(skill);
                 return false;
             }
 
-            var cast = skill.EffectType == SkillEffectType.Heal
-                ? TryCastHeal(skill)
-                : TryCastDamage(skill, level);
+            var cast = skill.EffectType switch
+            {
+                SkillEffectType.Heal => TryCastHeal(skill),
+                SkillEffectType.Buff => TryCastBuff(skill, level),
+                _ => TryCastDamage(skill, level)
+            };
 
             if (cast)
             {
@@ -102,12 +114,26 @@ namespace Project.Character.Combat
                 return SkillAvailability.InsufficientMana;
             }
 
-            if (skill.EffectType == SkillEffectType.Damage && !HasValidDamageTarget(skill))
+            if (NeedsEnemyTarget(skill) && !HasValidDamageTarget(skill))
             {
                 return SkillAvailability.NoValidTarget;
             }
 
             return SkillAvailability.Ready;
+        }
+
+        /// <summary>
+        /// Checks whether a skill needs a valid current enemy target before
+        /// it can be cast — every Damage skill, plus an Enemy-targeted Buff
+        /// skill (e.g. Provoke). A Self-targeted Buff skill (e.g. Endure)
+        /// and Heal need no such target.
+        /// </summary>
+        /// <param name="skill">The skill to check.</param>
+        /// <returns>True if the skill requires a targeted enemy in range.</returns>
+        private static bool NeedsEnemyTarget(SkillDefinition skill)
+        {
+            return skill.EffectType == SkillEffectType.Damage
+                || (skill.EffectType == SkillEffectType.Buff && skill.TargetType == SkillTargetType.Enemy);
         }
 
         /// <summary>
@@ -122,7 +148,9 @@ namespace Project.Character.Combat
 
         /// <summary>
         /// Checks whether the current combat target is a usable target
-        /// for this skill (selected, alive, and within range). Public so
+        /// for this skill (selected, alive, and within range) — used for
+        /// every Damage skill and for an Enemy-targeted Buff skill (see
+        /// <see cref="NeedsEnemyTarget"/>), e.g. Provoke. Public so
         /// <see cref="SkillTargetingController"/> can re-check it right
         /// after the player confirms a picked target. An area-of-effect
         /// skill (see <see cref="SkillDefinition.IsAreaOfEffect"/>) needs
@@ -130,7 +158,7 @@ namespace Project.Character.Combat
         /// it can never fall into <see cref="SkillTargetingController"/>'s
         /// picking flow.
         /// </summary>
-        /// <param name="skill">The damage skill to check range against.</param>
+        /// <param name="skill">The skill to check range against.</param>
         /// <returns>True if the current target can be hit by this skill right now.</returns>
         public bool HasValidDamageTarget(SkillDefinition skill)
         {
@@ -161,6 +189,37 @@ namespace Project.Character.Combat
         }
 
         /// <summary>
+        /// Casts a buff/debuff skill (e.g. Provoke, Endure): applies a
+        /// timed stat modifier via <see cref="BuffController"/> to the
+        /// caster itself (<see cref="SkillTargetType.Self"/>, using
+        /// <see cref="ownBuffs"/>) or to the current enemy target
+        /// (<see cref="SkillTargetType.Enemy"/>), found through a
+        /// <see cref="BuffController"/> on the same
+        /// <see cref="IDamageable"/> hierarchy <see cref="targetSelector"/>
+        /// already resolved — the same lookup <see cref="HealthComponent"/>
+        /// itself reads from. Spends mana as soon as the cast is committed,
+        /// the same as a Damage skill; fails without spending anything if
+        /// the resolved target has no <see cref="BuffController"/> wired.
+        /// </summary>
+        /// <param name="skill">The buff/debuff skill being cast.</param>
+        /// <param name="level">The skill's current level.</param>
+        /// <returns>True if the buff was applied.</returns>
+        private bool TryCastBuff(SkillDefinition skill, int level)
+        {
+            var buffs = skill.TargetType == SkillTargetType.Self
+                ? ownBuffs
+                : targetSelector.CurrentTarget?.GetComponentInParent<BuffController>();
+
+            if (buffs == null || !mana.TryConsumeMana(skill.ManaCost))
+            {
+                return false;
+            }
+
+            buffs.ApplyBuff(skill.GetBuffAtkPercent(level), skill.GetBuffDefPercent(level), skill.GetBuffMdefBonus(level), skill.GetBuffDuration(level));
+            return true;
+        }
+
+        /// <summary>
         /// Spends mana and puts the skill on cooldown as soon as the cast is
         /// committed (in range, affordable), regardless of whether the hit
         /// actually lands — matching Ragnarok Online, where a missed skill
@@ -172,7 +231,10 @@ namespace Project.Character.Combat
         /// <see cref="HitChanceCalculator"/>, applying damage as
         /// <see cref="DamageCategory.Physical"/> or
         /// <see cref="DamageCategory.Magical"/> depending on the skill's
-        /// <see cref="SkillDefinition.DamageType"/>.
+        /// <see cref="SkillDefinition.DamageType"/> — a Physical skill is
+        /// also scaled by <see cref="WeaponSizeModifiers"/> for the
+        /// equipped weapon against the target's size, the same as a basic
+        /// attack.
         /// </summary>
         private bool TryCastDamage(SkillDefinition skill, int level)
         {
@@ -200,6 +262,7 @@ namespace Project.Character.Combat
             {
                 var damage = skill.CalculateDamage(subStats.StatusAtk, subStats.StatusMatk, level);
                 var category = skill.DamageType == SkillDamageType.Physical ? DamageCategory.Physical : DamageCategory.Magical;
+                damage = WeaponSizeModifiers.Apply(damage, category, GetMainHandWeaponSubtype(), target.Size);
                 target.TakeDamage(damage, skill.Element, category, attacker: transform);
             }
             else
@@ -250,6 +313,7 @@ namespace Project.Character.Combat
                 if (HitChanceCalculator.RollHit(accuracy, target.FleeRating))
                 {
                     var damage = skill.CalculateDamage(subStats.StatusAtk, subStats.StatusMatk, level);
+                    damage = WeaponSizeModifiers.Apply(damage, category, GetMainHandWeaponSubtype(), target.Size);
                     target.TakeDamage(damage, skill.Element, category, attacker: transform);
                 }
                 else
@@ -264,6 +328,17 @@ namespace Project.Character.Combat
         private float GetCooldownEndTime(SkillDefinition skill)
         {
             return cooldownEndTimes.TryGetValue(skill, out var endTime) ? endTime : 0f;
+        }
+
+        /// <summary>
+        /// Gets the equipped main-hand weapon's subtype, or
+        /// <see cref="WeaponSubtype.Unarmed"/> if <see cref="equipment"/>
+        /// isn't wired — <see cref="WeaponSizeModifiers"/> already treats
+        /// Unarmed as no size penalty, so this degrades safely.
+        /// </summary>
+        private WeaponSubtype GetMainHandWeaponSubtype()
+        {
+            return equipment != null ? equipment.GetMainHandWeaponSubtype() : WeaponSubtype.Unarmed;
         }
     }
 }
