@@ -92,6 +92,20 @@ namespace Project.Character.Combat
             JobExperienceChanged?.Invoke(currentExperience, requiredForNextLevel);
         }
 
+        /// <summary>
+        /// Resets job level, job experience and unspent skill points back
+        /// to a fresh character's starting values. Does not unlearn any
+        /// already-learned skills — call
+        /// <see cref="PlayerSkillBook.ResetLearnedSkills"/> for that.
+        /// </summary>
+        public void ResetProgress()
+        {
+            JobLevel = startingJobLevel;
+            currentExperience = 0;
+            AvailableSkillPoints = 0;
+            JobExperienceChanged?.Invoke(currentExperience, experienceCurve.GetRequiredExperience(JobLevel));
+        }
+
         /// <inheritdoc />
         public void CaptureState(PlayerSaveData data)
         {

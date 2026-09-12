@@ -50,6 +50,22 @@ namespace Project.Skills
         [Header("Heal (only used if Effect Type is Heal)")]
         [SerializeField] private int healAmount = 10;
 
+        [Header("Buff/Debuff (only used if Effect Type is Buff)")]
+        [Tooltip("Attack power multiplier bonus per skill level, e.g. Provoke's +32% at this project's max level.")]
+        [SerializeField] private float buffAtkPercentPerLevel;
+
+        [Tooltip("Physical defense multiplier bonus per skill level. Negative for a debuff, e.g. Provoke's -55% DEF at this project's max level.")]
+        [SerializeField] private float buffDefPercentPerLevel;
+
+        [Tooltip("Flat magical defense bonus per skill level, e.g. Endure's +10 MDEF at this project's max level.")]
+        [SerializeField] private int buffMdefBonusPerLevel;
+
+        [Tooltip("Flat duration in seconds, before any per-level component — e.g. Provoke's fixed 30s (BuffDurationPerLevel left at zero).")]
+        [SerializeField] private float buffDurationSeconds;
+
+        [Tooltip("Extra duration in seconds per skill level, added on top of BuffDurationSeconds — e.g. Endure's level-scaling duration, reaching the wiki's 37s at this project's max level.")]
+        [SerializeField] private float buffDurationPerLevel;
+
         /// <summary>Gets the skill's display name.</summary>
         public string SkillName => skillName;
 
@@ -169,6 +185,54 @@ namespace Project.Skills
         public int GetPassiveAttackBonus(int skillLevel)
         {
             return Mathf.RoundToInt(passiveAttackBonusPerLevel * skillLevel);
+        }
+
+        /// <summary>
+        /// Calculates the attack power multiplier bonus this buff/debuff
+        /// skill applies at the given level (e.g. 0.32 for Provoke's +32%
+        /// ATK). Only meaningful when <see cref="EffectType"/> is Buff.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated bonus. Zero for a buff without an ATK component.</returns>
+        public float GetBuffAtkPercent(int skillLevel)
+        {
+            return buffAtkPercentPerLevel * skillLevel;
+        }
+
+        /// <summary>
+        /// Calculates the physical defense multiplier bonus this buff/debuff
+        /// skill applies at the given level (e.g. -0.55 for Provoke's -55%
+        /// DEF). Only meaningful when <see cref="EffectType"/> is Buff.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated bonus. Zero for a buff without a DEF component.</returns>
+        public float GetBuffDefPercent(int skillLevel)
+        {
+            return buffDefPercentPerLevel * skillLevel;
+        }
+
+        /// <summary>
+        /// Calculates the flat magical defense bonus this buff/debuff skill
+        /// grants at the given level. Only meaningful when
+        /// <see cref="EffectType"/> is Buff.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated bonus. Zero for a buff without an MDEF component.</returns>
+        public int GetBuffMdefBonus(int skillLevel)
+        {
+            return Mathf.RoundToInt(buffMdefBonusPerLevel * skillLevel);
+        }
+
+        /// <summary>
+        /// Calculates how long, in seconds, this buff/debuff lasts once
+        /// applied at the given level. Only meaningful when
+        /// <see cref="EffectType"/> is Buff.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated duration in seconds.</returns>
+        public float GetBuffDuration(int skillLevel)
+        {
+            return buffDurationSeconds + buffDurationPerLevel * skillLevel;
         }
     }
 }

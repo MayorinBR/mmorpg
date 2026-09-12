@@ -21,6 +21,9 @@ namespace Project.Character.Stats
         [SerializeField] private int experienceReward = 10;
         [SerializeField] private int jobExperienceReward = 5;
 
+        [Tooltip("This character's size class, read by WeaponSizeModifiers to scale physical damage by the attacker's weapon type. Irrelevant on the player's own stats — players aren't sized in Ragnarok Online.")]
+        [SerializeField] private MonsterSize size = MonsterSize.Medium;
+
         [Tooltip("Aspd rating (classic Ragnarok Online's 0-190 display scale) before AGI/DEX are added on top. Raising this makes every auto-attack — and its swing animation — play faster; see Project.Combat.AttackSpeedCalculator.")]
         [SerializeField] private int baseAttackSpeed = 140;
 
@@ -49,6 +52,9 @@ namespace Project.Character.Stats
 
         /// <summary>Gets the base dodge rating used to resolve an attacker's hit chance against this character.</summary>
         public int Flee => flee;
+
+        /// <summary>Gets this character's size class (see <see cref="MonsterSize"/>).</summary>
+        public MonsterSize Size => size;
 
         /// <summary>Gets the movement speed in units per second.</summary>
         public float MoveSpeed => moveSpeed;

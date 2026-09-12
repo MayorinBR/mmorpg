@@ -242,6 +242,22 @@ namespace Project.Items
         }
 
         /// <summary>
+        /// Unconditionally clears every equipped item and equipped ammo,
+        /// without returning anything to the inventory and without the
+        /// <see cref="playerHealth"/> dead check <see cref="Unequip"/>
+        /// applies. Intended for debug/reset tooling where the inventory
+        /// is wiped separately in the same operation; mirrors
+        /// <see cref="RestoreState"/>'s bare-clear pattern.
+        /// </summary>
+        public void ClearAllEquipment()
+        {
+            equippedRecords.Clear();
+            equippedAmmoCount = 0;
+            EquipmentChanged?.Invoke();
+            AmmoCountChanged?.Invoke();
+        }
+
+        /// <summary>
         /// Decides which slot(s) an item should occupy when equipped, and
         /// whether equipping it should also evict whatever's in the off
         /// hand. Most items (armor, two-handed weapons) just use their

@@ -13,8 +13,12 @@ namespace Project.Combat
     /// <see cref="IDefensiveStatsProvider"/> and <see cref="defensiveStatsSource"/>),
     /// sourced the same optional-hook way, falling back to
     /// <see cref="CharacterStatsDefinition"/>'s flat values for characters
-    /// with no provider wired. Raises events on change and death so other
-    /// systems (UI, AI, loot) can react without polling.
+    /// with no provider wired. A <see cref="BuffController"/> (see
+    /// <see cref="buffs"/>), if wired, layers a further temporary
+    /// multiplier/bonus on top of whichever physical/magical defense
+    /// source above applies — e.g. Provoke's DEF debuff on an enemy, or
+    /// Endure's MDEF buff on the player. Raises events on change and
+    /// death so other systems (UI, AI, loot) can react without polling.
     /// </summary>
     [RequireComponent(typeof(CharacterStatsHolder))]
     public class HealthComponent : MonoBehaviour, IDamageable
@@ -26,6 +30,9 @@ namespace Project.Combat
 
         [Tooltip("Optional component supplying physical/magical defense and flee rating (e.g. the player's stats controller). Left empty, enemies fall back to their flat Stats values.")]
         [SerializeField] private MonoBehaviour defensiveStatsSource;
+
+        [Tooltip("Optional. Source of temporary buff/debuff modifiers (see BuffController) affecting this character's defense — e.g. Provoke's DEF debuff on an enemy, Endure's MDEF buff on the player. Left empty, this character is never affected by one.")]
+        [SerializeField] private BuffController buffs;
 
         private CharacterStatsHolder statsHolder;
         private int currentHealth;
@@ -101,9 +108,26 @@ namespace Project.Combat
         /// <inheritdoc />
         public int FleeRating => defensiveStatsProvider?.GetFleeRating() ?? StatsHolder.Stats.Flee;
 
-        private int PhysicalDefense => defensiveStatsProvider?.GetPhysicalDefense() ?? StatsHolder.Stats.Defense;
+        /// <inheritdoc />
+        public MonsterSize Size => StatsHolder.Stats.Size;
 
-        private int MagicalDefense => defensiveStatsProvider?.GetMagicalDefense() ?? StatsHolder.Stats.MagicalDefense;
+        private int PhysicalDefense
+        {
+            get
+            {
+                var baseDefense = defensiveStatsProvider?.GetPhysicalDefense() ?? StatsHolder.Stats.Defense;
+                return buffs != null ? Mathf.RoundToInt(baseDefense * buffs.DefenseMultiplier) : baseDefense;
+            }
+        }
+
+        private int MagicalDefense
+        {
+            get
+            {
+                var baseDefense = defensiveStatsProvider?.GetMagicalDefense() ?? StatsHolder.Stats.MagicalDefense;
+                return buffs != null ? baseDefense + buffs.MagicalDefenseBonus : baseDefense;
+            }
+        }
 
         private void Awake()
         {

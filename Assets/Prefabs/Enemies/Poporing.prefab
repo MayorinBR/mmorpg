@@ -54,6 +54,7 @@ GameObject:
   - component: {fileID: 7074495270484842540}
   - component: {fileID: 7195787887805325730}
   - component: {fileID: 8033295745302646128}
+  - component: {fileID: 56637467334832613}
   m_Layer: 8
   m_Name: Poporing
   m_TagString: Untagged
@@ -119,12 +120,15 @@ MonoBehaviour:
     m_Bits: 128
   aggroRange: 5
   chaseGiveUpRange: 20
+  chaseGiveUpGraceSeconds: 3
+  detectionIntervalSeconds: 0.2
   attackRange: 1.5
   wanderRadius: 6
   minWanderPauseSeconds: 2
   maxWanderPauseSeconds: 5
   behaviorMode: 0
   health: {fileID: 8729646936949443446}
+  buffs: {fileID: 0}
 --- !u!114 &8729646936949443446
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -140,6 +144,7 @@ MonoBehaviour:
   damageModifierSource: {fileID: 7074495270484842540}
   maxHealthBonusSource: {fileID: 0}
   defensiveStatsSource: {fileID: 0}
+  buffs: {fileID: 56637467334832613}
 --- !u!114 &1779097833141928456
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -249,6 +254,18 @@ MonoBehaviour:
   controller: {fileID: 7424619469386716032}
   indicatorRoot: {fileID: 3985621188299408578}
   displaySeconds: 1.5
+--- !u!114 &56637467334832613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2301299987623212396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d03c7d1fcc2469ab7777f079fc06dad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Combat::Project.Combat.BuffController
 --- !u!1 &2809848501221703555
 GameObject:
   m_ObjectHideFlags: 0

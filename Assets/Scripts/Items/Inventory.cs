@@ -119,6 +119,21 @@ namespace Project.Items
         }
 
         /// <summary>
+        /// Clears every slot, discarding all carried items. The allocated
+        /// slot pages themselves aren't freed, only their contents.
+        /// </summary>
+        public void Clear()
+        {
+            for (var i = 0; i < slots.Count; i++)
+            {
+                slots[i] = InventorySlot.Empty;
+            }
+
+            CurrentWeight = 0f;
+            InventoryChanged?.Invoke();
+        }
+
+        /// <summary>
         /// Removes a quantity of the item held at a slot, clearing the slot
         /// entirely if the removal empties it. Used both for consuming a
         /// single unit of an item and for selling a stack to an NPC.

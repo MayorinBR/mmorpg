@@ -385,6 +385,7 @@ GameObject:
   - component: {fileID: 1004917611901676788}
   - component: {fileID: 7850064497544797645}
   - component: {fileID: 1319228893814348985}
+  - component: {fileID: 517221237455455100}
   m_Layer: 8
   m_Name: Poring
   m_TagString: Untagged
@@ -458,6 +459,7 @@ MonoBehaviour:
   maxWanderPauseSeconds: 5
   behaviorMode: 1
   health: {fileID: 4831875017803827334}
+  buffs: {fileID: 0}
 --- !u!114 &4831875017803827334
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -473,6 +475,7 @@ MonoBehaviour:
   damageModifierSource: {fileID: 1004917611901676788}
   maxHealthBonusSource: {fileID: 0}
   defensiveStatsSource: {fileID: 0}
+  buffs: {fileID: 517221237455455100}
 --- !u!114 &8075923787613613762
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -582,6 +585,18 @@ MonoBehaviour:
   controller: {fileID: 3451313833103779264}
   indicatorRoot: {fileID: 7126033327699707323}
   displaySeconds: 1.5
+--- !u!114 &517221237455455100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6638017485894401303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d03c7d1fcc2469ab7777f079fc06dad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Combat::Project.Combat.BuffController
 --- !u!1 &6808703629625854916
 GameObject:
   m_ObjectHideFlags: 0

@@ -71,6 +71,18 @@ namespace Project.Character.Combat
             return true;
         }
 
+        /// <summary>
+        /// Unlearns every skill. Does not refund the skill points spent
+        /// learning them — call <see cref="PlayerJobProgress.ResetProgress"/>
+        /// to also reset available skill points. Doesn't refresh an
+        /// already-open Skill Book panel; close and reopen it to see the
+        /// change.
+        /// </summary>
+        public void ResetLearnedSkills()
+        {
+            skillLevels.Clear();
+        }
+
         /// <inheritdoc />
         public void CaptureState(PlayerSaveData data)
         {
