@@ -34,7 +34,7 @@ namespace Project.Skills
         [Tooltip("Extra flat Hit rating this skill's damage roll gets on top of the caster's own Hit, scaling with level — e.g. Bash's real 5-50% Ragnarok Online accuracy bonus. Zero for skills without one.")]
         [SerializeField] private int accuracyBonusPerLevel;
 
-        [Tooltip("If true, this Damage skill needs no pre-selected target at all: it hits every living IDamageable within AreaRadius of the CASTER's own position instead of a single selected target — e.g. Magnum Break.")]
+        [Tooltip("If true, this Damage skill hits every living IDamageable within AreaRadius of a center point instead of a single selected target. TargetType decides the center: AreaAroundCaster needs no pre-selected target (e.g. Magnum Break), AreaAroundTarget still needs one in range and centers on it instead (e.g. Fire Ball).")]
         [SerializeField] private bool isAreaOfEffect;
 
         [Tooltip("Radius, in meters, around the caster that an area-of-effect skill damages. Only meaningful when IsAreaOfEffect is true.")]
@@ -46,6 +46,21 @@ namespace Project.Skills
 
         [Tooltip("If non-empty, this passive's attack bonus only applies while the equipped main-hand weapon's subtype is one of these — e.g. Sword Mastery requires Dagger or One-Hand Sword. Empty means the bonus always applies once learned.")]
         [SerializeField] private WeaponSubtype[] passiveRequiredWeaponSubtypes;
+
+        [Tooltip("If set, this passive gives a chance to stun whenever the referenced skill lands a hit — e.g. Fatal Blow augmenting Bash. Null means this passive doesn't augment any skill.")]
+        [SerializeField] private SkillDefinition augmentsSkill;
+
+        [Tooltip("Stun chance per level of the AUGMENTED skill (not this passive's own level) — e.g. Fatal Blow's 5% per Bash level. Only meaningful when AugmentsSkill is set.")]
+        [SerializeField] private float stunChancePerAugmentedLevel;
+
+        [Tooltip("How long the stun lasts, in seconds, when it procs. Only meaningful when AugmentsSkill is set.")]
+        [SerializeField] private float stunDurationSeconds;
+
+        [Tooltip("Multiplier bonus to natural HP regen per level, e.g. 0.20 for Increase HP Recovery reaching +100% at this project's max level. Zero for passives without one.")]
+        [SerializeField] private float passiveRegenMultiplierPerLevel;
+
+        [Tooltip("If true and learned (any level), removes the reduced-regen-while-moving penalty — e.g. HP Recovery While Moving.")]
+        [SerializeField] private bool passiveRemovesMovementRegenPenalty;
 
         [Header("Heal (only used if Effect Type is Heal)")]
         [SerializeField] private int healAmount = 10;
@@ -65,6 +80,15 @@ namespace Project.Skills
 
         [Tooltip("Extra duration in seconds per skill level, added on top of BuffDurationSeconds — e.g. Endure's level-scaling duration, reaching the wiki's 37s at this project's max level.")]
         [SerializeField] private float buffDurationPerLevel;
+
+        [Tooltip("Flat bonus to STR/AGI/VIT/INT/DEX/LUK per skill level, e.g. Blessing's flat STR/DEX/INT. Zero stats for a buff without a stat component.")]
+        [SerializeField] private StatModifiers buffStatBonusPerLevel;
+
+        [Tooltip("Attack speed multiplier bonus per skill level, e.g. Increase AGI's ASPD% component.")]
+        [SerializeField] private float buffAspdPercentPerLevel;
+
+        [Tooltip("Flat Max HP bonus per skill level, e.g. Angelus's flat Max HP component.")]
+        [SerializeField] private int buffMaxHealthPerLevel;
 
         /// <summary>Gets the skill's display name.</summary>
         public string SkillName => skillName;
@@ -118,9 +142,13 @@ namespace Project.Skills
         /// <summary>
         /// Gets whether this Damage skill hits every living
         /// <see cref="Project.Combat.IDamageable"/> within
-        /// <see cref="AreaRadius"/> of the caster instead of a single
-        /// pre-selected target — see <see cref="SkillTargetType.AreaAroundCaster"/>.
-        /// Only meaningful when <see cref="EffectType"/> is Damage.
+        /// <see cref="AreaRadius"/> of a center point instead of a single
+        /// pre-selected target. <see cref="TargetType"/> decides the
+        /// center: <see cref="SkillTargetType.AreaAroundCaster"/> (no
+        /// target needed, e.g. Magnum Break) or
+        /// <see cref="SkillTargetType.AreaAroundTarget"/> (needs a target
+        /// in range, e.g. Fire Ball). Only meaningful when
+        /// <see cref="EffectType"/> is Damage.
         /// </summary>
         public bool IsAreaOfEffect => isAreaOfEffect;
 
@@ -138,6 +166,19 @@ namespace Project.Skills
         /// <see cref="EffectType"/> is Passive.
         /// </summary>
         public IReadOnlyList<WeaponSubtype> PassiveRequiredWeaponSubtypes => passiveRequiredWeaponSubtypes;
+
+        /// <summary>
+        /// Gets the skill this passive augments with a stun chance (e.g.
+        /// Fatal Blow augmenting Bash), or null if it doesn't augment any
+        /// skill. Only meaningful when <see cref="EffectType"/> is Passive.
+        /// </summary>
+        public SkillDefinition AugmentsSkill => augmentsSkill;
+
+        /// <summary>Gets how long the stun lasts, in seconds, when it procs. Only meaningful when <see cref="AugmentsSkill"/> is set.</summary>
+        public float StunDurationSeconds => stunDurationSeconds;
+
+        /// <summary>Gets whether this passive removes the reduced-regen-while-moving penalty once learned. Only meaningful when <see cref="EffectType"/> is Passive.</summary>
+        public bool PassiveRemovesMovementRegenPenalty => passiveRemovesMovementRegenPenalty;
 
         /// <summary>
         /// Calculates this skill's damage at the given level. Only meaningful when <see cref="EffectType"/> is Damage.
@@ -224,6 +265,43 @@ namespace Project.Skills
         }
 
         /// <summary>
+        /// Calculates the flat STR/AGI/VIT/INT/DEX/LUK bonus this
+        /// buff/debuff skill grants at the given level (e.g. Blessing's
+        /// flat STR/DEX/INT). Only meaningful when <see cref="EffectType"/>
+        /// is Buff.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated bonus. Zero stats for a buff without a stat component.</returns>
+        public StatModifiers GetBuffStatBonus(int skillLevel)
+        {
+            return buffStatBonusPerLevel * skillLevel;
+        }
+
+        /// <summary>
+        /// Calculates the attack speed multiplier bonus this buff/debuff
+        /// skill applies at the given level (e.g. Increase AGI's ASPD%
+        /// component). Only meaningful when <see cref="EffectType"/> is Buff.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated bonus. Zero for a buff without an ASPD component.</returns>
+        public float GetBuffAspdPercent(int skillLevel)
+        {
+            return buffAspdPercentPerLevel * skillLevel;
+        }
+
+        /// <summary>
+        /// Calculates the flat Max HP bonus this buff/debuff skill grants
+        /// at the given level (e.g. Angelus's flat Max HP component). Only
+        /// meaningful when <see cref="EffectType"/> is Buff.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated bonus. Zero for a buff without a Max HP component.</returns>
+        public int GetBuffMaxHealthBonus(int skillLevel)
+        {
+            return buffMaxHealthPerLevel * skillLevel;
+        }
+
+        /// <summary>
         /// Calculates how long, in seconds, this buff/debuff lasts once
         /// applied at the given level. Only meaningful when
         /// <see cref="EffectType"/> is Buff.
@@ -233,6 +311,34 @@ namespace Project.Skills
         public float GetBuffDuration(int skillLevel)
         {
             return buffDurationSeconds + buffDurationPerLevel * skillLevel;
+        }
+
+        /// <summary>
+        /// Calculates the chance for this passive's stun to proc, scaled by
+        /// the CURRENT level of the skill it augments (e.g. Fatal Blow's
+        /// chance scales with Bash's level, not Fatal Blow's own — Fatal
+        /// Blow is single-rank). Only meaningful when
+        /// <see cref="AugmentsSkill"/> is set.
+        /// </summary>
+        /// <param name="augmentedSkillLevel">The current level of the skill being augmented.</param>
+        /// <returns>The calculated stun chance, from 0 to 1.</returns>
+        public float GetStunChance(int augmentedSkillLevel)
+        {
+            return stunChancePerAugmentedLevel * augmentedSkillLevel;
+        }
+
+        /// <summary>
+        /// Calculates this passive's bonus to natural HP regen at the given
+        /// level (e.g. 0.4 for Increase HP Recovery at level 2, a +40%
+        /// bonus). Summed across every learned regen passive by the
+        /// player's passive-skill controller. Only meaningful when
+        /// <see cref="EffectType"/> is Passive.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated bonus. Zero for a passive without a regen component.</returns>
+        public float GetPassiveRegenBonus(int skillLevel)
+        {
+            return passiveRegenMultiplierPerLevel * skillLevel;
         }
     }
 }

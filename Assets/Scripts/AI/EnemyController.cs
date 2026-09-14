@@ -42,6 +42,9 @@ namespace Project.AI
         [Tooltip("Optional. Source of temporary buff/debuff modifiers (see BuffController) affecting this enemy's outgoing attack power — e.g. a Provoke debuff landed on it. Left empty, this enemy is never affected by one.")]
         [SerializeField] private BuffController buffs;
 
+        [Tooltip("Optional. Source of active status effects (see StatusEffectController) affecting this enemy — e.g. a Fatal Blow stun. Left empty, this enemy is never stunned.")]
+        [SerializeField] private StatusEffectController statusEffects;
+
         private CharacterStatsHolder statsHolder;
         private IEnemyState currentState;
         private float lastAttackedTime = float.NegativeInfinity;
@@ -119,6 +122,14 @@ namespace Project.AI
         /// </summary>
         public BuffController Buffs => buffs;
 
+        /// <summary>
+        /// Gets the active status effects affecting this enemy (see
+        /// <see cref="StatusEffectController"/>), or null if none is
+        /// wired — read by <see cref="Update"/> to freeze this enemy's
+        /// movement and state-machine behavior while stunned.
+        /// </summary>
+        public StatusEffectController StatusEffects => statusEffects;
+
         /// <summary>Gets whether this mob auto-aggros (Aggressive) or only retaliates when attacked (Passive).</summary>
         public EnemyBehaviorMode BehaviorMode => behaviorMode;
 
@@ -184,7 +195,13 @@ namespace Project.AI
 
         private void Update()
         {
-            currentState?.Tick(this);
+            var stunned = statusEffects != null && statusEffects.IsStunned;
+            agent.isStopped = stunned;
+
+            if (!stunned)
+            {
+                currentState?.Tick(this);
+            }
         }
 
         /// <summary>

@@ -29,9 +29,15 @@ namespace Project.Character.Combat
     /// also folds in any flat Status ATK bonus from learned passive
     /// skills whose weapon requirement matches the equipped main-hand
     /// weapon (e.g. Sword Mastery). When <see cref="buffs"/> is assigned,
-    /// <see cref="CurrentSubStats"/> also multiplies the resulting Status
-    /// ATK by <see cref="Project.Combat.BuffController.AttackMultiplier"/>
-    /// (e.g. Berserk's persistent +32% ATK). When <see cref="classController"/>,
+    /// its combined <see cref="Project.Combat.BuffController.Total"/>
+    /// payload (e.g. Berserk's persistent ATK/DEF, or a future Blessing's
+    /// flat STR/DEX/INT) flows through <see cref="CurrentSubStats"/> and
+    /// <see cref="GetMaxHealthBonus"/> the same way equipment and Job
+    /// Level bonuses do: its STR/AGI/VIT/INT/DEX/LUK component is folded
+    /// into <see cref="effectiveStats"/> through another
+    /// <see cref="JobBonusStatsView"/> layer, its ATK%/ASPD% components
+    /// multiply <see cref="CurrentSubStats"/>, and its flat Max HP adds to
+    /// <see cref="GetMaxHealthBonus"/>. When <see cref="classController"/>,
     /// <see cref="jobProgress"/> and <see cref="jobLevelBonusLookup"/> are
     /// all assigned, the class's Job Level stat bonus (see
     /// <see cref="ClassJobLevelBonusLookup"/>) is folded into every derived
@@ -71,7 +77,7 @@ namespace Project.Character.Combat
         [Tooltip("Optional. Source of flat Status ATK bonuses from learned passive skills (e.g. Sword Mastery), added on top of the stat-derived value in CurrentSubStats whenever the equipped weapon matches.")]
         [SerializeField] private PlayerPassiveSkillController passiveSkills;
 
-        [Tooltip("Optional. Source of temporary/persistent attack buffs (e.g. Berserk), multiplied into Status ATK in CurrentSubStats. Left empty, the player is never affected by one.")]
+        [Tooltip("Optional. Source of temporary/persistent buffs (e.g. Berserk), folded into CurrentSubStats and GetMaxHealthBonus. Left empty, the player is never affected by one.")]
         [SerializeField] private BuffController buffs;
 
         [Tooltip("Optional, all three required together. Source of the class's automatic Job Level stat bonus (e.g. Swordman's +7 STR at Job 50), folded into every derived stat alongside equipment.")]
@@ -109,15 +115,17 @@ namespace Project.Character.Combat
                 EnsureInitialized();
                 var subStats = subStatsCalculator.Calculate(effectiveStats, BaseLevel, equipment != null && equipment.IsMainHandWeaponRanged(), GetBaseAttackSpeed());
                 var statusAtk = subStats.StatusAtk + GetPassiveAttackBonus();
+                var aspd = subStats.Aspd;
 
                 if (buffs != null)
                 {
                     statusAtk = Mathf.RoundToInt(statusAtk * buffs.AttackMultiplier);
+                    aspd = Mathf.RoundToInt(aspd * buffs.AspdMultiplier);
                 }
 
-                return statusAtk == subStats.StatusAtk
+                return statusAtk == subStats.StatusAtk && aspd == subStats.Aspd
                     ? subStats
-                    : new SubStats(statusAtk, subStats.StatusMatk, subStats.StatusDef, subStats.StatusMDef, subStats.Hit, subStats.Flee, subStats.CriticalRate, subStats.Aspd);
+                    : new SubStats(statusAtk, subStats.StatusMatk, subStats.StatusDef, subStats.StatusMDef, subStats.Hit, subStats.Flee, subStats.CriticalRate, aspd);
             }
         }
 
@@ -163,9 +171,12 @@ namespace Project.Character.Combat
 
             IStatProvider derivedStats = equipment != null ? new EquippedStatsView(baseStats, equipment) : baseStats;
             var canApplyJobBonus = classController != null && jobProgress != null && jobLevelBonusLookup != null;
-            effectiveStats = canApplyJobBonus
+            IStatProvider jobStats = canApplyJobBonus
                 ? new JobBonusStatsView(derivedStats, () => jobLevelBonusLookup.GetBonus(classController.CurrentClass, jobProgress.JobLevel))
                 : derivedStats;
+            effectiveStats = buffs != null
+                ? new JobBonusStatsView(jobStats, () => ToStatModifiers(buffs.Total))
+                : jobStats;
 
             if (equipment != null)
             {
@@ -274,11 +285,27 @@ namespace Project.Character.Combat
             return passiveSkills.GetAttackBonus(equipment.GetMainHandWeaponSubtype());
         }
 
+        /// <summary>
+        /// Converts a <see cref="Project.Combat.BuffPayload"/>'s
+        /// STR/AGI/VIT/INT/DEX/LUK component into a <see cref="StatModifiers"/>,
+        /// so it can be folded into <see cref="effectiveStats"/> through
+        /// <see cref="JobBonusStatsView"/> the same way equipment and Job
+        /// Level bonuses are. Lives here rather than on
+        /// <see cref="Project.Combat.BuffPayload"/> itself since
+        /// Project.Combat cannot reference Project.Items (see
+        /// <see cref="Project.Combat.BuffPayload"/>'s own remarks).
+        /// </summary>
+        private static StatModifiers ToStatModifiers(BuffPayload payload)
+        {
+            return new StatModifiers(payload.Strength, payload.Agility, payload.Vitality, payload.Intelligence, payload.Dexterity, payload.Luck);
+        }
+
         /// <inheritdoc />
         public int GetMaxHealthBonus(int baseMaxHealth)
         {
             EnsureInitialized();
-            return Mathf.RoundToInt(baseMaxHealth * effectiveStats.GetValue(StatType.Vitality) * MaxHealthBonusPerVit);
+            var bonus = Mathf.RoundToInt(baseMaxHealth * effectiveStats.GetValue(StatType.Vitality) * MaxHealthBonusPerVit);
+            return buffs != null ? bonus + buffs.MaxHealthBonus : bonus;
         }
 
         /// <inheritdoc />

@@ -66,9 +66,7 @@ namespace Project.Character.Combat
 
             buffs.SetPersistentModifier(
                 this,
-                active ? berserkSkill.GetBuffAtkPercent(level) : 0f,
-                active ? berserkSkill.GetBuffDefPercent(level) : 0f,
-                0);
+                active ? new BuffPayload(berserkSkill.GetBuffAtkPercent(level), berserkSkill.GetBuffDefPercent(level)) : default);
         }
     }
 }
