@@ -36,6 +36,13 @@ namespace Project.Character.Movement
         /// </summary>
         public event Action MovementStarted;
 
+        /// <summary>
+        /// Gets whether the character is currently moving, from either
+        /// directional input or an in-progress click-to-move path. Used for
+        /// the reduced-regen-while-moving penalty on natural HP regen.
+        /// </summary>
+        public bool IsMoving => isMoving;
+
         private void Awake()
         {
             directionalProvider = new DirectionalMovementProvider();

@@ -5,11 +5,17 @@ using Project.Items;
 namespace Project.Character.Combat
 {
     /// <summary>
-    /// Adds a class's Job Level stat bonus (see <see cref="ClassJobLevelBonusLookup"/>)
-    /// on top of another <see cref="IStatProvider"/>, mirroring how
-    /// <see cref="EquippedStatsView"/> layers in equipment bonuses. The
-    /// bonus is re-read on every <see cref="GetValue"/> call, so it
-    /// reacts live to Job Level ups without needing to be rebuilt.
+    /// Adds a live-read <see cref="StatModifiers"/> bonus on top of
+    /// another <see cref="IStatProvider"/>, mirroring how
+    /// <see cref="EquippedStatsView"/> layers in equipment bonuses.
+    /// Despite the name, this is generic enough to layer any such bonus:
+    /// <see cref="PlayerStatsController"/> uses it both for a class's Job
+    /// Level stat bonus (see <see cref="ClassJobLevelBonusLookup"/>) and,
+    /// stacked a second time, for the STR/AGI/VIT/INT/DEX/LUK component of
+    /// a <see cref="Project.Combat.BuffController"/>'s active buffs (e.g.
+    /// a future Blessing). The bonus is re-read on every
+    /// <see cref="GetValue"/> call, so it reacts live to Job Level ups or
+    /// buffs expiring without needing to be rebuilt.
     /// </summary>
     public class JobBonusStatsView : IStatProvider
     {

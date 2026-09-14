@@ -50,7 +50,25 @@ namespace Project.Items
                 a.luck + b.luck);
         }
 
-        private StatModifiers(int strength, int agility, int vitality, int intelligence, int dexterity, int luck)
+        /// <summary>
+        /// Scales every stat by a flat integer factor, e.g. turning a
+        /// per-level bonus into its total at a given skill level.
+        /// </summary>
+        public static StatModifiers operator *(StatModifiers a, int factor)
+        {
+            return new StatModifiers(
+                a.strength * factor,
+                a.agility * factor,
+                a.vitality * factor,
+                a.intelligence * factor,
+                a.dexterity * factor,
+                a.luck * factor);
+        }
+
+        /// <summary>
+        /// Initializes a new set of stat modifiers.
+        /// </summary>
+        public StatModifiers(int strength, int agility, int vitality, int intelligence, int dexterity, int luck)
         {
             this.strength = strength;
             this.agility = agility;

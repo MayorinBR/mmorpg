@@ -56,5 +56,50 @@ namespace Project.Character.Combat
             var requiredSubtypes = skill.PassiveRequiredWeaponSubtypes;
             return requiredSubtypes.Count == 0 || requiredSubtypes.Contains(equippedWeaponSubtype);
         }
+
+        /// <summary>
+        /// Calculates the combined multiplier to apply to natural HP regen
+        /// (see <see cref="PlayerHealthRegenController"/>) from every
+        /// learned passive with a regen bonus — e.g. Increase HP Recovery.
+        /// </summary>
+        /// <returns>The combined multiplier, where 1 means no bonus.</returns>
+        public float GetRegenMultiplier()
+        {
+            var total = 1f;
+
+            foreach (var entry in skillBook.LearnedSkills)
+            {
+                var skill = entry.Key;
+                var level = entry.Value;
+
+                if (skill.EffectType == SkillEffectType.Passive && level > 0)
+                {
+                    total += skill.GetPassiveRegenBonus(level);
+                }
+            }
+
+            return total;
+        }
+
+        /// <summary>
+        /// Checks whether any learned passive removes the reduced-regen-
+        /// while-moving penalty — e.g. HP Recovery While Moving.
+        /// </summary>
+        /// <returns>True if such a passive is learned, at any level.</returns>
+        public bool IgnoresMovementRegenPenalty()
+        {
+            foreach (var entry in skillBook.LearnedSkills)
+            {
+                var skill = entry.Key;
+                var level = entry.Value;
+
+                if (skill.EffectType == SkillEffectType.Passive && level > 0 && skill.PassiveRemovesMovementRegenPenalty)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

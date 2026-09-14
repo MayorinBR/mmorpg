@@ -152,17 +152,20 @@ namespace Project.Character.Combat
         /// every Damage skill and for an Enemy-targeted Buff skill (see
         /// <see cref="NeedsEnemyTarget"/>), e.g. Provoke. Public so
         /// <see cref="SkillTargetingController"/> can re-check it right
-        /// after the player confirms a picked target. An area-of-effect
-        /// skill (see <see cref="SkillDefinition.IsAreaOfEffect"/>) needs
-        /// no pre-selected target at all, so this is always true for one —
-        /// it can never fall into <see cref="SkillTargetingController"/>'s
-        /// picking flow.
+        /// after the player confirms a picked target. A
+        /// <see cref="SkillTargetType.AreaAroundCaster"/> skill (see
+        /// <see cref="SkillDefinition.IsAreaOfEffect"/>) needs no
+        /// pre-selected target at all, so this is always true for one — it
+        /// can never fall into <see cref="SkillTargetingController"/>'s
+        /// picking flow. A <see cref="SkillTargetType.AreaAroundTarget"/>
+        /// skill still needs one in range, same as a single-target skill,
+        /// since the burst is centered on it.
         /// </summary>
         /// <param name="skill">The skill to check range against.</param>
         /// <returns>True if the current target can be hit by this skill right now.</returns>
         public bool HasValidDamageTarget(SkillDefinition skill)
         {
-            if (skill.IsAreaOfEffect)
+            if (skill.IsAreaOfEffect && skill.TargetType == SkillTargetType.AreaAroundCaster)
             {
                 return true;
             }
@@ -190,8 +193,8 @@ namespace Project.Character.Combat
 
         /// <summary>
         /// Casts a buff/debuff skill (e.g. Provoke, Endure): applies a
-        /// timed stat modifier via <see cref="BuffController"/> to the
-        /// caster itself (<see cref="SkillTargetType.Self"/>, using
+        /// timed <see cref="BuffPayload"/> via <see cref="BuffController"/>
+        /// to the caster itself (<see cref="SkillTargetType.Self"/>, using
         /// <see cref="ownBuffs"/>) or to the current enemy target
         /// (<see cref="SkillTargetType.Enemy"/>), found through a
         /// <see cref="BuffController"/> on the same
@@ -215,7 +218,21 @@ namespace Project.Character.Combat
                 return false;
             }
 
-            buffs.ApplyBuff(skill.GetBuffAtkPercent(level), skill.GetBuffDefPercent(level), skill.GetBuffMdefBonus(level), skill.GetBuffDuration(level));
+            var statBonus = skill.GetBuffStatBonus(level);
+            var payload = new BuffPayload(
+                skill.GetBuffAtkPercent(level),
+                skill.GetBuffDefPercent(level),
+                skill.GetBuffMdefBonus(level),
+                skill.GetBuffAspdPercent(level),
+                skill.GetBuffMaxHealthBonus(level),
+                statBonus.Strength,
+                statBonus.Agility,
+                statBonus.Vitality,
+                statBonus.Intelligence,
+                statBonus.Dexterity,
+                statBonus.Luck);
+
+            buffs.ApplyBuff(payload, skill.GetBuffDuration(level));
             return true;
         }
 
@@ -224,12 +241,16 @@ namespace Project.Character.Combat
         /// committed (in range, affordable), regardless of whether the hit
         /// actually lands — matching Ragnarok Online, where a missed skill
         /// still consumes its resources. Delegates to
-        /// <see cref="TryCastAreaDamage"/> for an area-of-effect skill (see
+        /// <see cref="TryCastAreaDamage"/> for a
+        /// <see cref="SkillTargetType.AreaAroundCaster"/> skill (see
         /// <see cref="SkillDefinition.IsAreaOfEffect"/>), since that needs
-        /// no single pre-selected target at all. Otherwise the hit is
-        /// resolved against the target's Flee via
-        /// <see cref="HitChanceCalculator"/>, applying damage as
-        /// <see cref="DamageCategory.Physical"/> or
+        /// no pre-selected target at all. A
+        /// <see cref="SkillTargetType.AreaAroundTarget"/> skill still goes
+        /// through the same range/mana gate as a single-target skill, but
+        /// bursts via <see cref="ApplyAreaDamage"/> centered on that target
+        /// instead of hitting only it. Otherwise the hit is resolved
+        /// against the target's Flee via <see cref="HitChanceCalculator"/>,
+        /// applying damage as <see cref="DamageCategory.Physical"/> or
         /// <see cref="DamageCategory.Magical"/> depending on the skill's
         /// <see cref="SkillDefinition.DamageType"/> — a Physical skill is
         /// also scaled by <see cref="WeaponSizeModifiers"/> for the
@@ -238,7 +259,7 @@ namespace Project.Character.Combat
         /// </summary>
         private bool TryCastDamage(SkillDefinition skill, int level)
         {
-            if (skill.IsAreaOfEffect)
+            if (skill.IsAreaOfEffect && skill.TargetType == SkillTargetType.AreaAroundCaster)
             {
                 return TryCastAreaDamage(skill, level);
             }
@@ -253,6 +274,12 @@ namespace Project.Character.Combat
             if (distance > skill.Range || !mana.TryConsumeMana(skill.ManaCost))
             {
                 return false;
+            }
+
+            if (skill.IsAreaOfEffect)
+            {
+                ApplyAreaDamage(skill, level, targetSelector.CurrentTarget.position);
+                return true;
             }
 
             var target = targetSelector.CurrentDamageable;
@@ -275,16 +302,14 @@ namespace Project.Character.Combat
         }
 
         /// <summary>
-        /// Casts an area-of-effect damage skill (e.g. Magnum Break): spends
-        /// mana as soon as the cast is committed, the same as
-        /// <see cref="TryCastDamage"/>, then rolls a separate hit check
-        /// against every distinct, living <see cref="IDamageable"/> found
-        /// within <see cref="SkillDefinition.AreaRadius"/> of the caster's
-        /// own position via <see cref="enemyLayer"/> — unlike a
-        /// single-target skill, this needs no pre-selected target and
-        /// can't fail for lack of one, matching how the real Magnum Break
-        /// always fires (and consumes its cost) whether or not anything
-        /// was actually standing in range.
+        /// Casts a <see cref="SkillTargetType.AreaAroundCaster"/> damage
+        /// skill (e.g. Magnum Break): spends mana as soon as the cast is
+        /// committed, the same as <see cref="TryCastDamage"/>, then bursts
+        /// via <see cref="ApplyAreaDamage"/> centered on the caster's own
+        /// position — unlike a single-target skill, this needs no
+        /// pre-selected target and can't fail for lack of one, matching how
+        /// the real Magnum Break always fires (and consumes its cost)
+        /// whether or not anything was actually standing in range.
         /// </summary>
         /// <param name="skill">The area-of-effect skill being cast.</param>
         /// <param name="level">The skill's current level.</param>
@@ -296,10 +321,29 @@ namespace Project.Character.Combat
                 return false;
             }
 
+            ApplyAreaDamage(skill, level, transform.position);
+            return true;
+        }
+
+        /// <summary>
+        /// Rolls a separate hit check against every distinct, living
+        /// <see cref="IDamageable"/> found within
+        /// <see cref="SkillDefinition.AreaRadius"/> of <paramref name="center"/>
+        /// via <see cref="enemyLayer"/>. Shared by <see cref="TryCastAreaDamage"/>
+        /// (centered on the caster) and <see cref="TryCastDamage"/>'s
+        /// <see cref="SkillTargetType.AreaAroundTarget"/> branch (centered
+        /// on the resolved target) — mana and range/target validity are
+        /// already handled by whichever of those called this.
+        /// </summary>
+        /// <param name="skill">The area-of-effect skill being cast.</param>
+        /// <param name="level">The skill's current level.</param>
+        /// <param name="center">The world position the burst is centered on.</param>
+        private void ApplyAreaDamage(SkillDefinition skill, int level, Vector3 center)
+        {
             var subStats = statsController.CurrentSubStats;
             var accuracy = subStats.Hit + skill.GetAccuracyBonus(level);
             var category = skill.DamageType == SkillDamageType.Physical ? DamageCategory.Physical : DamageCategory.Magical;
-            var hitColliders = Physics.OverlapSphere(transform.position, skill.AreaRadius, enemyLayer);
+            var hitColliders = Physics.OverlapSphere(center, skill.AreaRadius, enemyLayer);
             var alreadyHit = new HashSet<IDamageable>();
 
             foreach (var hitCollider in hitColliders)
@@ -323,8 +367,6 @@ namespace Project.Character.Combat
                     target.NotifyDodged();
                 }
             }
-
-            return true;
         }
 
         /// <summary>
@@ -348,7 +390,7 @@ namespace Project.Character.Combat
             {
                 var passive = entry.Key;
 
-                if (entry.Value <= 0 || passive.AugmentsSkill != castSkill)
+                if (passive.EffectType != SkillEffectType.Passive || entry.Value <= 0 || passive.AugmentsSkill != castSkill)
                 {
                     continue;
                 }
