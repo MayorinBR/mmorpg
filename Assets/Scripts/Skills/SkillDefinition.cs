@@ -26,7 +26,7 @@ namespace Project.Skills
         [SerializeField] private float cooldownSeconds = 2f;
         [SerializeField] private float range = 3f;
 
-        [Header("Damage (only used if Effect Type is Damage)")]
+        [Header("Damage (used if Effect Type is Damage or Zone)")]
         [SerializeField] private SkillDamageType damageType;
         [SerializeField] private float damageMultiplierPerLevel = 1f;
         [SerializeField] private Element element = Element.Neutral;
@@ -37,7 +37,7 @@ namespace Project.Skills
         [Tooltip("If true, this Damage skill hits every living IDamageable within AreaRadius of a center point instead of a single selected target. TargetType decides the center: AreaAroundCaster needs no pre-selected target (e.g. Magnum Break), AreaAroundTarget still needs one in range and centers on it instead (e.g. Fire Ball).")]
         [SerializeField] private bool isAreaOfEffect;
 
-        [Tooltip("Radius, in meters, around the caster that an area-of-effect skill damages. Only meaningful when IsAreaOfEffect is true.")]
+        [Tooltip("Radius, in meters, around the caster that an area-of-effect skill damages (only meaningful when IsAreaOfEffect is true), or the radius of a Zone skill's spawned zone (only meaningful when Effect Type is Zone).")]
         [SerializeField] private float areaRadius = 3f;
 
         [Header("Passive (only used if Effect Type is Passive)")]
@@ -90,6 +90,19 @@ namespace Project.Skills
         [Tooltip("Flat Max HP bonus per skill level, e.g. Angelus's flat Max HP component.")]
         [SerializeField] private int buffMaxHealthPerLevel;
 
+        [Header("Zone (only used if Effect Type is Zone)")]
+        [Tooltip("Optional visual spawned at the zone's position. Left empty, the zone is logic-only — still applies its effect, just invisible, useful before a real wall/fire visual is authored.")]
+        [SerializeField] private GameObject zonePrefab;
+
+        [Tooltip("How long the zone lasts, in seconds, before it despawns, before any per-level component — e.g. Fire Wall's duration.")]
+        [SerializeField] private float zoneDurationSeconds = 15f;
+
+        [Tooltip("Extra duration in seconds per skill level, added on top of ZoneDurationSeconds.")]
+        [SerializeField] private float zoneDurationPerLevel;
+
+        [Tooltip("Seconds between damage ticks against anything standing inside the zone, e.g. Fire Wall's repeated damage while a target stays in it.")]
+        [SerializeField] private float zoneTickIntervalSeconds = 1f;
+
         /// <summary>Gets the skill's display name.</summary>
         public string SkillName => skillName;
 
@@ -135,7 +148,7 @@ namespace Project.Skills
         /// to something else, e.g. FireBolt's <see cref="Element.Fire"/>.
         /// Read by an optional <see cref="ElementalResistanceComponent"/>
         /// on the target. Only meaningful when <see cref="EffectType"/> is
-        /// Damage.
+        /// Damage or Zone.
         /// </summary>
         public Element Element => element;
 
@@ -159,6 +172,12 @@ namespace Project.Skills
         /// </summary>
         public float AreaRadius => areaRadius;
 
+        /// <summary>Gets the optional visual prefab spawned at a Zone skill's position. Null means the zone is logic-only. Only meaningful when <see cref="EffectType"/> is Zone.</summary>
+        public GameObject ZonePrefab => zonePrefab;
+
+        /// <summary>Gets the interval, in seconds, between a Zone skill's damage ticks against anything standing inside it. Only meaningful when <see cref="EffectType"/> is Zone.</summary>
+        public float ZoneTickIntervalSeconds => zoneTickIntervalSeconds;
+
         /// <summary>
         /// Gets the weapon subtypes this passive's attack bonus requires
         /// the equipped main-hand weapon to match. Empty means the bonus
@@ -181,7 +200,7 @@ namespace Project.Skills
         public bool PassiveRemovesMovementRegenPenalty => passiveRemovesMovementRegenPenalty;
 
         /// <summary>
-        /// Calculates this skill's damage at the given level. Only meaningful when <see cref="EffectType"/> is Damage.
+        /// Calculates this skill's damage at the given level. Only meaningful when <see cref="EffectType"/> is Damage or Zone.
         /// </summary>
         /// <param name="statusAtk">The caster's current Status ATK.</param>
         /// <param name="statusMatk">The caster's current Status MATK.</param>
@@ -311,6 +330,18 @@ namespace Project.Skills
         public float GetBuffDuration(int skillLevel)
         {
             return buffDurationSeconds + buffDurationPerLevel * skillLevel;
+        }
+
+        /// <summary>
+        /// Calculates how long, in seconds, this Zone skill's spawned zone
+        /// lasts before despawning at the given level. Only meaningful when
+        /// <see cref="EffectType"/> is Zone.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated duration in seconds.</returns>
+        public float GetZoneDuration(int skillLevel)
+        {
+            return zoneDurationSeconds + zoneDurationPerLevel * skillLevel;
         }
 
         /// <summary>

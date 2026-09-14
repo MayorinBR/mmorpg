@@ -39,10 +39,16 @@ namespace Project.Character.Combat
     /// attack always plays the spell cast animation and always reaches out
     /// to <see cref="mageAttackRange"/>, regardless of the equipped
     /// weapon — a Mage attacks at range by class, not because of what's in
-    /// its hand. Damage is applied the instant the attack fires, in step
-    /// with the animation trigger rather than waiting for the clip to
-    /// play out — the same immediate-hit approach skill casts already
-    /// use in <see cref="PlayerSkillCaster"/>. The Mage's basic attack also
+    /// its hand. Hit/miss and damage are always decided the instant the
+    /// attack fires (see <see cref="DealHit"/>), the same immediate-resolve
+    /// approach skill casts already use in <see cref="PlayerSkillCaster"/>.
+    /// Applying that outcome to the target happens in step with the
+    /// animation trigger too, UNLESS a ranged basic attack has a
+    /// <see cref="Project.Combat.Projectile"/> prefab assigned
+    /// (<see cref="arrowProjectilePrefab"/>/<see cref="boltProjectilePrefab"/>),
+    /// in which case it's deferred until that projectile visually reaches
+    /// the target (see <see cref="ResolveOutcome"/>) — purely a visual
+    /// travel delay, the outcome itself doesn't change. The Mage's basic attack also
     /// carries its <see cref="PlayerElementController.CurrentElement"/>
     /// into the hit; every other class's basic attack deals
     /// <see cref="Project.Combat.Element.Neutral"/> damage — modeled as a
@@ -100,7 +106,24 @@ namespace Project.Character.Combat
         [Header("Archer Basic Attack")]
         [SerializeField, Range(0f, 1f)] private float archerBaseAmmoDamageMultiplier = 0.5f;
 
+        [Header("Ranged Projectile (Archer arrow / Mage bolt)")]
+        [Tooltip("Visual prefab spawned for the Archer's basic attack while wielding a Ranged weapon. Left empty, that attack hits instantly with no travel delay, same as every melee attack.")]
+        [SerializeField] private GameObject arrowProjectilePrefab;
+
+        [Tooltip("Visual prefab spawned for the Mage's basic attack. Left empty, it hits instantly with no travel delay.")]
+        [SerializeField] private GameObject boltProjectilePrefab;
+
+        [Tooltip("Speed, in meters/second, a basic-attack projectile travels at.")]
+        [SerializeField] private float projectileSpeed = 15f;
+
+        [Tooltip("World position a basic-attack projectile spawns from, e.g. a bow/staff hand socket. Left empty, falls back to this transform's position.")]
+        [SerializeField] private Transform projectileOrigin;
+
+        [Tooltip("If true, a ranged basic attack's projectile only spawns once ReleaseProjectile() is called — wire it as an Animation Event on the AttackRanged/Cast clip, at the frame the arrow/bolt should leave the hand. If false (default), the projectile spawns immediately when the attack triggers, same as before this option existed.")]
+        [SerializeField] private bool releaseProjectileOnAnimationEvent;
+
         private float cooldownRemaining;
+        private System.Action pendingProjectileRelease;
 
         private void Update()
         {
@@ -193,6 +216,13 @@ namespace Project.Character.Combat
 
         private void PerformAttack()
         {
+            // Safety net: if the previous attack queued a projectile release
+            // (releaseProjectileOnAnimationEvent) and its Animation Event
+            // never fired — clip not wired yet — fire it now instead of
+            // dropping that hit's outcome silently. Worst case it lands one
+            // attack late instead of never.
+            ReleaseProjectile();
+
             var isRanged = equipment.IsMainHandWeaponRanged();
 
             // Only the swing states (Attack, AttackRanged) are bound to the
@@ -250,7 +280,12 @@ namespace Project.Character.Combat
 
             var attackCategory = isMage ? DamageCategory.Magical : DamageCategory.Physical;
 
-            DealHit(targetSelector.CurrentDamageable, baseDamage, attackElement, attackCategory);
+            // Melee attacks (and a ranged one with no prefab assigned) get
+            // null here, which DealHit treats as "resolve instantly" — see
+            // its own doc.
+            var projectilePrefab = isMage ? boltProjectilePrefab : (isRanged ? arrowProjectilePrefab : null);
+
+            DealHit(targetSelector.CurrentDamageable, baseDamage, attackElement, attackCategory, projectilePrefab);
 
             if (classController.CurrentClass == CharacterClass.Thief && IsDualWielding())
             {
@@ -277,19 +312,22 @@ namespace Project.Character.Combat
         }
 
         /// <summary>
-        /// Resolves and applies one hit against a target: a critical hit
-        /// always lands (bypassing the accuracy check entirely, the same
-        /// way Ragnarok Online itself works) and deals bonus damage;
-        /// otherwise the hit is subject to <see cref="HitChanceCalculator"/>
-        /// and can miss outright.
+        /// Resolves one hit against a target: a critical hit always lands
+        /// (bypassing the accuracy check entirely, the same way Ragnarok
+        /// Online itself works) and deals bonus damage; otherwise the hit
+        /// is subject to <see cref="HitChanceCalculator"/> and can miss
+        /// outright. Hit, crit and damage are always decided instantly,
+        /// right here — <paramref name="projectilePrefab"/> only affects
+        /// when the resolved outcome (damage or a dodge notification) is
+        /// applied to <paramref name="target"/>, via <see cref="ResolveOutcome"/>.
         /// </summary>
-        private void DealHit(IDamageable target, int baseDamage, Element element = Element.Neutral, DamageCategory category = DamageCategory.Physical)
+        private void DealHit(IDamageable target, int baseDamage, Element element = Element.Neutral, DamageCategory category = DamageCategory.Physical, GameObject projectilePrefab = null)
         {
             var isCriticalHit = Random.value * 100f < playerStats.CurrentSubStats.CriticalRate;
 
             if (!isCriticalHit && !HitChanceCalculator.RollHit(playerStats.CurrentSubStats.Hit, target.FleeRating))
             {
-                target.NotifyDodged();
+                ResolveOutcome(target, projectilePrefab, target.NotifyDodged);
                 return;
             }
 
@@ -298,7 +336,80 @@ namespace Project.Character.Combat
                 : baseDamage;
 
             damage = WeaponSizeModifiers.Apply(damage, category, equipment.GetMainHandWeaponSubtype(), target.Size);
-            target.TakeDamage(damage, element, category, isCriticalHit, transform);
+            ResolveOutcome(target, projectilePrefab, () => target.TakeDamage(damage, element, category, isCriticalHit, transform));
+        }
+
+        /// <summary>
+        /// Applies an already-resolved hit outcome (damage or a dodge
+        /// notification) immediately, or — when <paramref name="projectilePrefab"/>
+        /// is assigned — after a <see cref="Project.Combat.Projectile"/>
+        /// visually travels from <see cref="projectileOrigin"/> to the
+        /// target first, purely for the arrow/bolt's travel time; the
+        /// outcome itself was already decided in <see cref="DealHit"/> and
+        /// doesn't change based on whether the projectile "connects". With
+        /// <see cref="releaseProjectileOnAnimationEvent"/> on, the
+        /// projectile doesn't spawn here at all — it's queued for
+        /// <see cref="ReleaseProjectile"/> to spawn once the attack's
+        /// animation actually reaches its release frame.
+        /// </summary>
+        /// <param name="target">The target the outcome applies to.</param>
+        /// <param name="projectilePrefab">Visual prefab to travel first, or null to apply instantly.</param>
+        /// <param name="applyOutcome">Applies the already-decided damage or dodge notification.</param>
+        private void ResolveOutcome(IDamageable target, GameObject projectilePrefab, System.Action applyOutcome)
+        {
+            var targetTransform = (target as Component)?.transform;
+
+            if (projectilePrefab == null || targetTransform == null)
+            {
+                applyOutcome();
+                return;
+            }
+
+            if (releaseProjectileOnAnimationEvent)
+            {
+                pendingProjectileRelease = () => SpawnProjectile(projectilePrefab, targetTransform, applyOutcome);
+                return;
+            }
+
+            SpawnProjectile(projectilePrefab, targetTransform, applyOutcome);
+        }
+
+        private void SpawnProjectile(GameObject projectilePrefab, Transform targetTransform, System.Action applyOutcome)
+        {
+            var origin = projectileOrigin != null ? projectileOrigin.position : transform.position;
+
+            Projectile.Spawn(projectilePrefab, origin, targetTransform, projectileSpeed, () =>
+            {
+                // The target may have been destroyed while the projectile
+                // was still travelling (e.g. despawned on death, or the
+                // player warped away) — drop the outcome instead of
+                // calling into a destroyed object.
+                if (targetTransform != null)
+                {
+                    applyOutcome();
+                }
+            });
+        }
+
+        /// <summary>
+        /// Spawns the projectile queued by the most recent ranged basic
+        /// attack, if <see cref="releaseProjectileOnAnimationEvent"/> is on
+        /// and one is still pending — call this from an Animation Event on
+        /// the Archer's AttackRanged clip or the Mage's Cast clip, at the
+        /// exact frame the arrow leaves the bow or the bolt leaves the
+        /// hand. Hit/miss and damage were already decided the instant the
+        /// attack triggered (see <see cref="DealHit"/>); this only decides
+        /// when the visual leaves and, with it, when that already-decided
+        /// outcome lands. Also called defensively at the start of every
+        /// <see cref="PerformAttack"/>, so a clip that never fires this
+        /// event doesn't silently drop the previous attack's outcome — it
+        /// lands at worst one attack late instead of never.
+        /// </summary>
+        public void ReleaseProjectile()
+        {
+            var release = pendingProjectileRelease;
+            pendingProjectileRelease = null;
+            release?.Invoke();
         }
     }
 }

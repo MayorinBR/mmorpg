@@ -22,6 +22,12 @@ namespace Project.Character.Combat
     /// <see cref="animatorController"/> at that <see cref="Animator"/> so
     /// every existing trigger/parameter call
     /// (<see cref="PlayerAnimatorController"/>) keeps working unchanged.
+    /// Also adds a <see cref="PlayerAnimationEventRelay"/> to the new
+    /// instance's <see cref="Animator"/> GameObject, forwarding its
+    /// Animation Events to <see cref="combatController"/> — Unity calls an
+    /// Animation Event's function on whatever GameObject owns the
+    /// Animator, which is this swappable clone rather than the player
+    /// root.
     /// </summary>
     /// <remarks>
     /// Deliberately independent of any specific scene: nothing here assumes
@@ -39,6 +45,14 @@ namespace Project.Character.Combat
         [SerializeField] private GameObject femalePrefab;
         [SerializeField] private RuntimeAnimatorController sharedAnimatorController;
         [SerializeField] private PlayerAnimatorController animatorController;
+
+        [Tooltip("Optional. The player's combat controller — wired to a " +
+            "PlayerAnimationEventRelay added to each new model instance, so " +
+            "its Animation Events (e.g. ReleaseProjectile) reach it. Left " +
+            "empty (e.g. a Character Selection preview rig with no combat " +
+            "controller), no relay is added and Animation Events on that " +
+            "rig simply have no receiver.")]
+        [SerializeField] private PlayerCombatController combatController;
 
         private GameObject currentGeometry;
 
@@ -113,6 +127,16 @@ namespace Project.Character.Combat
                 if (animatorController != null)
                 {
                     animatorController.SetAnimator(activeAnimator);
+                }
+
+                // Animation Events call a function on whatever GameObject
+                // owns the Animator — this freshly instantiated clone, not
+                // the player root — so the receiver has to be (re)added
+                // here every swap instead of wired once in the Editor.
+                if (combatController != null)
+                {
+                    var relay = activeAnimator.gameObject.AddComponent<PlayerAnimationEventRelay>();
+                    relay.Initialize(combatController);
                 }
             }
 

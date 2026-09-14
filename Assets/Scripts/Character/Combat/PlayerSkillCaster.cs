@@ -11,9 +11,11 @@ namespace Project.Character.Combat
     /// <summary>
     /// Casts skills: checks the skill is known, off cooldown, and
     /// affordable, then damages the current enemy target (in range), heals
-    /// the caster, or applies a timed buff/debuff (see
-    /// <see cref="ownBuffs"/>) to the caster or the current enemy target,
-    /// depending on the skill's effect and target type.
+    /// the caster, applies a timed buff/debuff (see <see cref="ownBuffs"/>)
+    /// to the caster or the current enemy target, or spawns a persistent
+    /// damaging zone (see <see cref="TryCastSkillAtPosition"/>) at a
+    /// ground position the player picked, depending on the skill's effect
+    /// and target type.
     /// </summary>
     public class PlayerSkillCaster : MonoBehaviour
     {
@@ -30,7 +32,7 @@ namespace Project.Character.Combat
         [Tooltip("The caster's own buff modifiers, for a Self-targeted Buff skill (e.g. Endure). Left empty, a Self-targeted Buff skill can't be cast.")]
         [SerializeField] private BuffController ownBuffs;
 
-        [Tooltip("Layer containing enemy colliders, used by an area-of-effect skill (see SkillDefinition.IsAreaOfEffect, e.g. Magnum Break) to find every target within range of the caster. Should be set to the same layer as SkillTargetingController's own enemyLayer.")]
+        [Tooltip("Layer containing enemy colliders, used by an area-of-effect skill (see SkillDefinition.IsAreaOfEffect, e.g. Magnum Break) to find every target within range of the caster, and by a Zone skill's spawned SkillZoneController (e.g. Fire Wall) to find who's standing inside it. Should be set to the same layer as SkillTargetingController's own enemyLayer.")]
         [SerializeField] private LayerMask enemyLayer;
 
         private readonly Dictionary<SkillDefinition, float> cooldownEndTimes = new Dictionary<SkillDefinition, float>();
@@ -68,6 +70,16 @@ namespace Project.Character.Combat
                 return false;
             }
 
+            if (skill.TargetType == SkillTargetType.Ground)
+            {
+                // A Ground skill has no "already selected" position the
+                // way an Enemy target can already be selected — every
+                // cast needs a fresh pick. TryCastSkillAtPosition does the
+                // actual casting once SkillTargetingController confirms one.
+                SkillTargetingController.Instance?.BeginPicking(skill);
+                return false;
+            }
+
             if (NeedsEnemyTarget(skill) && !HasValidDamageTarget(skill))
             {
                 SkillTargetingController.Instance?.BeginPicking(skill);
@@ -88,6 +100,37 @@ namespace Project.Character.Combat
             }
 
             return cast;
+        }
+
+        /// <summary>
+        /// Casts a <see cref="SkillTargetType.Ground"/> skill (e.g. Fire
+        /// Wall) at a world position the player just picked via
+        /// <see cref="SkillTargetingController"/>'s ground-picking mode.
+        /// Mirrors <see cref="TryCastSkill"/>'s own learned/cooldown/dead
+        /// checks, since a Ground skill's mana cost and cooldown are only
+        /// spent once a position has actually been confirmed — picking is
+        /// free to cancel.
+        /// </summary>
+        /// <param name="skill">The Ground-targeted skill being cast.</param>
+        /// <param name="position">The world position the skill's zone should spawn at.</param>
+        /// <returns>True if the zone was spawned.</returns>
+        public bool TryCastSkillAtPosition(SkillDefinition skill, Vector3 position)
+        {
+            if (ownHealth.IsDead)
+            {
+                return false;
+            }
+
+            var level = skillBook.GetLevel(skill);
+
+            if (level <= 0 || Time.time < GetCooldownEndTime(skill) || !TryCastZone(skill, level, position))
+            {
+                return false;
+            }
+
+            animatorController?.TriggerCast();
+            cooldownEndTimes[skill] = Time.time + skill.CooldownSeconds;
+            return true;
         }
 
         /// <summary>
@@ -367,6 +410,37 @@ namespace Project.Character.Combat
                     target.NotifyDodged();
                 }
             }
+        }
+
+        /// <summary>
+        /// Casts a <see cref="SkillEffectType.Zone"/> skill (e.g. Fire
+        /// Wall): spends mana as soon as the cast is committed, the same as
+        /// a Damage skill, then spawns a <see cref="SkillZoneController"/>
+        /// at <paramref name="position"/> that deals this skill's damage,
+        /// on its own tick interval, to every living enemy standing inside
+        /// it until its duration runs out. Damage and accuracy are fixed at
+        /// cast time from the caster's current stats, the same as every
+        /// other skill here — the zone itself never re-reads them.
+        /// </summary>
+        /// <param name="skill">The zone skill being cast.</param>
+        /// <param name="level">The skill's current level.</param>
+        /// <param name="position">The world position the zone spawns at.</param>
+        /// <returns>True if the zone was spawned.</returns>
+        private bool TryCastZone(SkillDefinition skill, int level, Vector3 position)
+        {
+            if (!mana.TryConsumeMana(skill.ManaCost))
+            {
+                return false;
+            }
+
+            var subStats = statsController.CurrentSubStats;
+            var accuracy = subStats.Hit + skill.GetAccuracyBonus(level);
+            var damage = skill.CalculateDamage(subStats.StatusAtk, subStats.StatusMatk, level);
+            var category = skill.DamageType == SkillDamageType.Physical ? DamageCategory.Physical : DamageCategory.Magical;
+
+            var zone = SkillZoneController.Spawn(skill.ZonePrefab, position, skill.AreaRadius, skill.GetZoneDuration(level), skill.ZoneTickIntervalSeconds);
+            zone.Initialize(enemyLayer, accuracy, damage, skill.Element, category, transform);
+            return true;
         }
 
         /// <summary>

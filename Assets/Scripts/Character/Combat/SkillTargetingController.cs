@@ -9,17 +9,22 @@ using Project.Skills;
 namespace Project.Character.Combat
 {
     /// <summary>
-    /// Lets an Enemy-targeted skill be cast without already having a
-    /// valid combat target selected. When
-    /// <see cref="PlayerSkillCaster.TryCastSkill"/> has no valid target to
-    /// cast on, it hands off here instead of just failing: this enters
-    /// "picking" mode, raycasting the mouse against the enemy layer every
-    /// frame so a UI layer can show a ring around whatever enemy is
-    /// currently hovered (see <see cref="HoveredEnemyChanged"/>).
-    /// Right-clicking a hovered enemy confirms it as both the pending
-    /// skill's target and the player's new combat target, then
-    /// re-attempts the cast; Escape, or a different skill being
-    /// requested, cancels (or replaces) the pending pick instead.
+    /// Lets a skill be cast without already having what it needs selected.
+    /// When <see cref="PlayerSkillCaster.TryCastSkill"/> has no valid enemy
+    /// target to cast an Enemy-targeted skill on, or the skill is
+    /// <see cref="SkillTargetType.Ground"/>-targeted (which never has one
+    /// already selected), it hands off here instead of just failing: this
+    /// enters "picking" mode, raycasting the mouse every frame — against
+    /// the enemy layer for an enemy pick (so a UI layer can show a ring
+    /// around whatever's hovered, see <see cref="HoveredEnemyChanged"/>),
+    /// or against the ground layer for a Ground skill (see
+    /// <see cref="HoveredGroundPointChanged"/>). Right-clicking a hovered
+    /// enemy confirms it as both the pending skill's target and the
+    /// player's new combat target, then re-attempts the cast; right-clicking
+    /// a hovered ground point instead calls
+    /// <see cref="PlayerSkillCaster.TryCastSkillAtPosition"/> directly, since
+    /// a ground position isn't a combat target. Escape, or a different
+    /// skill being requested, cancels (or replaces) the pending pick either way.
     /// </summary>
     [RequireComponent(typeof(PlayerSkillCaster))]
     public class SkillTargetingController : MonoBehaviour
@@ -28,9 +33,13 @@ namespace Project.Character.Combat
         [SerializeField] private Camera worldCamera;
         [SerializeField] private LayerMask enemyLayer;
 
+        [Tooltip("Layer raycast against while picking a ground position for a SkillTargetType.Ground skill (e.g. Fire Wall) — typically the terrain/ground layer.")]
+        [SerializeField] private LayerMask groundLayer;
+
         private PlayerSkillCaster caster;
         private SkillDefinition pendingSkill;
         private Collider hoveredEnemyCollider;
+        private Vector3? hoveredGroundPoint;
 
         /// <summary>
         /// The single active instance, set in <see cref="Awake"/>. Mirrors
@@ -43,6 +52,9 @@ namespace Project.Character.Combat
 
         /// <summary>Raised when the hovered enemy changes while picking a target, including to null.</summary>
         public event Action<Transform> HoveredEnemyChanged;
+
+        /// <summary>Raised when the hovered ground point changes while picking a Ground skill's position, including to null.</summary>
+        public event Action<Vector3?> HoveredGroundPointChanged;
 
         /// <summary>Gets whether a skill is currently waiting for the player to pick a target.</summary>
         public bool IsPicking => pendingSkill != null;
@@ -74,6 +86,18 @@ namespace Project.Character.Combat
                 return;
             }
 
+            if (pendingSkill.TargetType == SkillTargetType.Ground)
+            {
+                UpdateGroundHover();
+
+                if (hoveredGroundPoint.HasValue && Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
+                {
+                    ConfirmGroundPicking();
+                }
+
+                return;
+            }
+
             UpdateHover();
 
             if (hoveredEnemyCollider != null && Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
@@ -86,13 +110,15 @@ namespace Project.Character.Combat
         /// Enters picking mode for the given skill, replacing whatever
         /// skill was already being picked, if any. Called by
         /// <see cref="PlayerSkillCaster.TryCastSkill"/> when it has no
-        /// valid target to cast the skill on.
+        /// valid target to cast the skill on, or when the skill is
+        /// <see cref="SkillTargetType.Ground"/>-targeted.
         /// </summary>
         /// <param name="skill">The skill waiting for a target.</param>
         public void BeginPicking(SkillDefinition skill)
         {
             pendingSkill = skill;
             SetHoveredEnemy(null);
+            SetHoveredGroundPoint(null);
         }
 
         private void UpdateHover()
@@ -158,10 +184,51 @@ namespace Project.Character.Combat
             }
         }
 
+        private void UpdateGroundHover()
+        {
+            if (worldCamera == null || Mouse.current == null || IsPointerOverUI())
+            {
+                SetHoveredGroundPoint(null);
+                return;
+            }
+
+            var ray = worldCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
+
+            if (Physics.Raycast(ray, out var hit, float.MaxValue, groundLayer))
+            {
+                SetHoveredGroundPoint(hit.point);
+            }
+            else
+            {
+                SetHoveredGroundPoint(null);
+            }
+        }
+
+        private void SetHoveredGroundPoint(Vector3? point)
+        {
+            if (hoveredGroundPoint == point)
+            {
+                return;
+            }
+
+            hoveredGroundPoint = point;
+            HoveredGroundPointChanged?.Invoke(point);
+        }
+
+        private void ConfirmGroundPicking()
+        {
+            var skill = pendingSkill;
+            var position = hoveredGroundPoint.Value;
+
+            CancelPicking();
+            caster.TryCastSkillAtPosition(skill, position);
+        }
+
         private void CancelPicking()
         {
             pendingSkill = null;
             SetHoveredEnemy(null);
+            SetHoveredGroundPoint(null);
         }
 
         private bool IsPointerOverUI()
