@@ -47,6 +47,15 @@ namespace Project.Skills
         [Tooltip("If non-empty, this passive's attack bonus only applies while the equipped main-hand weapon's subtype is one of these — e.g. Sword Mastery requires Dagger or One-Hand Sword. Empty means the bonus always applies once learned.")]
         [SerializeField] private WeaponSubtype[] passiveRequiredWeaponSubtypes;
 
+        [Tooltip("If set, this passive gives a chance to stun whenever the referenced skill lands a hit — e.g. Fatal Blow augmenting Bash. Null means this passive doesn't augment any skill.")]
+        [SerializeField] private SkillDefinition augmentsSkill;
+
+        [Tooltip("Stun chance per level of the AUGMENTED skill (not this passive's own level) — e.g. Fatal Blow's 5% per Bash level. Only meaningful when AugmentsSkill is set.")]
+        [SerializeField] private float stunChancePerAugmentedLevel;
+
+        [Tooltip("How long the stun lasts, in seconds, when it procs. Only meaningful when AugmentsSkill is set.")]
+        [SerializeField] private float stunDurationSeconds;
+
         [Header("Heal (only used if Effect Type is Heal)")]
         [SerializeField] private int healAmount = 10;
 
@@ -138,6 +147,16 @@ namespace Project.Skills
         /// <see cref="EffectType"/> is Passive.
         /// </summary>
         public IReadOnlyList<WeaponSubtype> PassiveRequiredWeaponSubtypes => passiveRequiredWeaponSubtypes;
+
+        /// <summary>
+        /// Gets the skill this passive augments with a stun chance (e.g.
+        /// Fatal Blow augmenting Bash), or null if it doesn't augment any
+        /// skill. Only meaningful when <see cref="EffectType"/> is Passive.
+        /// </summary>
+        public SkillDefinition AugmentsSkill => augmentsSkill;
+
+        /// <summary>Gets how long the stun lasts, in seconds, when it procs. Only meaningful when <see cref="AugmentsSkill"/> is set.</summary>
+        public float StunDurationSeconds => stunDurationSeconds;
 
         /// <summary>
         /// Calculates this skill's damage at the given level. Only meaningful when <see cref="EffectType"/> is Damage.
@@ -233,6 +252,20 @@ namespace Project.Skills
         public float GetBuffDuration(int skillLevel)
         {
             return buffDurationSeconds + buffDurationPerLevel * skillLevel;
+        }
+
+        /// <summary>
+        /// Calculates the chance for this passive's stun to proc, scaled by
+        /// the CURRENT level of the skill it augments (e.g. Fatal Blow's
+        /// chance scales with Bash's level, not Fatal Blow's own — Fatal
+        /// Blow is single-rank). Only meaningful when
+        /// <see cref="AugmentsSkill"/> is set.
+        /// </summary>
+        /// <param name="augmentedSkillLevel">The current level of the skill being augmented.</param>
+        /// <returns>The calculated stun chance, from 0 to 1.</returns>
+        public float GetStunChance(int augmentedSkillLevel)
+        {
+            return stunChancePerAugmentedLevel * augmentedSkillLevel;
         }
     }
 }

@@ -264,6 +264,7 @@ namespace Project.Character.Combat
                 var category = skill.DamageType == SkillDamageType.Physical ? DamageCategory.Physical : DamageCategory.Magical;
                 damage = WeaponSizeModifiers.Apply(damage, category, GetMainHandWeaponSubtype(), target.Size);
                 target.TakeDamage(damage, skill.Element, category, attacker: transform);
+                TryProcStunAugment(skill, level, targetSelector.CurrentTarget.GetComponentInParent<StatusEffectController>());
             }
             else
             {
@@ -315,6 +316,7 @@ namespace Project.Character.Combat
                     var damage = skill.CalculateDamage(subStats.StatusAtk, subStats.StatusMatk, level);
                     damage = WeaponSizeModifiers.Apply(damage, category, GetMainHandWeaponSubtype(), target.Size);
                     target.TakeDamage(damage, skill.Element, category, attacker: transform);
+                    TryProcStunAugment(skill, level, hitCollider.GetComponentInParent<StatusEffectController>());
                 }
                 else
                 {
@@ -323,6 +325,39 @@ namespace Project.Character.Combat
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Rolls every learned passive that augments <paramref name="castSkill"/>
+        /// with a stun chance (see <see cref="SkillDefinition.AugmentsSkill"/>,
+        /// e.g. Fatal Blow augmenting Bash) and applies a stun to
+        /// <paramref name="targetStatus"/> on a successful proc. No-ops
+        /// safely if the target has no <see cref="StatusEffectController"/> wired.
+        /// </summary>
+        /// <param name="castSkill">The skill that was just cast and landed a hit.</param>
+        /// <param name="castSkillLevel">The cast skill's current level, used to scale the augmenting passive's stun chance.</param>
+        /// <param name="targetStatus">The hit target's status effects, or null if it has none wired.</param>
+        private void TryProcStunAugment(SkillDefinition castSkill, int castSkillLevel, StatusEffectController targetStatus)
+        {
+            if (targetStatus == null)
+            {
+                return;
+            }
+
+            foreach (var entry in skillBook.LearnedSkills)
+            {
+                var passive = entry.Key;
+
+                if (entry.Value <= 0 || passive.AugmentsSkill != castSkill)
+                {
+                    continue;
+                }
+
+                if (Random.value < passive.GetStunChance(castSkillLevel))
+                {
+                    targetStatus.ApplyStun(passive.StunDurationSeconds);
+                }
+            }
         }
 
         private float GetCooldownEndTime(SkillDefinition skill)
