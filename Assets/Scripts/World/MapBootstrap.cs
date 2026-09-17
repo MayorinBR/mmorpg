@@ -1,6 +1,8 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Project.CameraSystem;
 using Project.Character.Combat;
+using Project.Maps;
 using Project.UI;
 
 namespace Project.World
@@ -10,10 +12,15 @@ namespace Project.World
     /// this map's local objects. Unity cannot serialize a reference between
     /// two different scene files, so this replaces what would otherwise be a
     /// direct Inspector reference from the player to the camera and respawn
-    /// point.
+    /// point. Also publishes this scene's own <see cref="MapDefinition"/>
+    /// to <see cref="CurrentMapTracker"/>, which is how the World Map
+    /// window learns the player changed map.
     /// </summary>
     public class MapBootstrap : MonoBehaviour
     {
+        /// <summary>Looked up by this scene's own name to find its <see cref="MapDefinition"/>.</summary>
+        [SerializeField] private MapDatabase mapDatabase;
+
         /// <summary>This map's local camera rig, retargeted to follow the persisted player.</summary>
         [SerializeField] private IsometricCameraController localCamera;
 
@@ -35,6 +42,8 @@ namespace Project.World
 
         private void Start()
         {
+            PublishCurrentMap();
+
             var player = PersistentPlayerAnchor.Instance;
             if (player == null)
             {
@@ -66,6 +75,25 @@ namespace Project.World
             }
 
             WarpToPendingSpawnPoint(player);
+        }
+
+        private void PublishCurrentMap()
+        {
+            if (mapDatabase == null)
+            {
+                return;
+            }
+
+            var map = mapDatabase.FindById(SceneManager.GetActiveScene().name);
+
+            if (map != null)
+            {
+                CurrentMapTracker.SetCurrentMap(map);
+            }
+            else
+            {
+                Debug.LogWarning($"MapBootstrap: no MapDefinition found for scene '{SceneManager.GetActiveScene().name}'. World Map window won't show a current-map marker.");
+            }
         }
 
         private static void WarpToPendingSpawnPoint(PersistentPlayerAnchor player)

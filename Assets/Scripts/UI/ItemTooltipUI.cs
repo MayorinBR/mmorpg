@@ -33,6 +33,15 @@ namespace Project.UI
 
         private void Awake()
         {
+            if (Instance != null && Instance != this)
+            {
+                // A short-lived duplicate from a map scene being reloaded
+                // (e.g. warping back into a previously visited map) — its
+                // parent Canvas is already being destroyed as a duplicate.
+                // Don't let it steal Instance from the real, persisted panel.
+                return;
+            }
+
             Instance = this;
             parentCanvas = GetComponentInParent<Canvas>();
             Hide();

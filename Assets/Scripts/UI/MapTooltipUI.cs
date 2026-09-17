@@ -1,28 +1,21 @@
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
-using Project.Skills;
 
 namespace Project.UI
 {
     /// <summary>
-    /// A single shared tooltip panel showing a skill's icon, name,
-    /// description, mana cost, and cooldown. Mirrors <see cref="ItemTooltipUI"/>:
-    /// hover triggers across the UI (currently the hotbar) show and hide
-    /// this same instance rather than each owning their own panel.
+    /// A single shared tooltip panel showing a map's display name. Mirrors
+    /// <see cref="SkillTooltipUI"/>: hover sources across the UI show and
+    /// hide this same instance rather than each owning their own panel.
     /// </summary>
-    public class SkillTooltipUI : MonoBehaviour
+    public class MapTooltipUI : MonoBehaviour
     {
         /// <summary>Gets the active tooltip instance in the scene.</summary>
-        public static SkillTooltipUI Instance { get; private set; }
+        public static MapTooltipUI Instance { get; private set; }
 
         [SerializeField] private GameObject root;
         [SerializeField] private RectTransform rectTransform;
-        [SerializeField] private Image iconImage;
         [SerializeField] private TMP_Text nameText;
-        [SerializeField] private TMP_Text descriptionText;
-        [SerializeField] private TMP_Text manaCostText;
-        [SerializeField] private TMP_Text cooldownText;
         [SerializeField] private Vector2 offsetFromPointer = new Vector2(16f, -16f);
 
         private Canvas parentCanvas;
@@ -44,25 +37,19 @@ namespace Project.UI
         }
 
         /// <summary>
-        /// Shows the tooltip for the given skill at the given screen position.
+        /// Shows the tooltip with the given map name at the given screen position.
         /// </summary>
-        /// <param name="skill">The skill to describe. If null, the tooltip hides instead.</param>
+        /// <param name="mapName">The map name to display. If null or empty, the tooltip hides instead.</param>
         /// <param name="screenPosition">The screen-space position to anchor the tooltip near (typically the pointer position).</param>
-        public void Show(SkillDefinition skill, Vector2 screenPosition)
+        public void Show(string mapName, Vector2 screenPosition)
         {
-            if (skill == null)
+            if (string.IsNullOrEmpty(mapName))
             {
                 Hide();
                 return;
             }
 
-            iconImage.enabled = skill.Icon != null;
-            iconImage.sprite = skill.Icon;
-            nameText.text = skill.SkillName;
-            descriptionText.text = skill.Description;
-            manaCostText.text = skill.EffectType == SkillEffectType.Passive ? "Passive" : $"{skill.ManaCost} SP";
-            cooldownText.text = skill.EffectType == SkillEffectType.Passive ? string.Empty : $"{skill.CooldownSeconds:0.#}s";
-
+            nameText.text = mapName;
             rectTransform.position = ClampToScreen(screenPosition + offsetFromPointer);
             root.SetActive(true);
         }

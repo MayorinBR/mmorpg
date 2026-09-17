@@ -60,5 +60,15 @@ namespace Project.UI
                 uiController.ToggleWindow("SkillBook");
             }
         }
+
+        /// <summary>Called by the Input System when the Toggle World Map shortcut is pressed.</summary>
+        /// <param name="context">Callback context for the action.</param>
+        public void OnToggleWorldMap(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+            {
+                uiController.ToggleWindow("WorldMap");
+            }
+        }
     }
 }

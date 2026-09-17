@@ -18,6 +18,14 @@ namespace Project.World
         {
             if (!PersistedNames.Add(gameObject.name))
             {
+                // Destroy() is deferred to the end of the frame, so without
+                // deactivating first, every component on this duplicate
+                // (including any child singleton reachable through it, e.g.
+                // MapTooltipUI) still runs Awake()/OnEnable() this frame
+                // before dying. Those singletons now guard their own
+                // Instance field, but disabling first keeps this duplicate
+                // fully inert regardless.
+                gameObject.SetActive(false);
                 Destroy(gameObject);
                 return;
             }

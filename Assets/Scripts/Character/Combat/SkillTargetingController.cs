@@ -61,6 +61,15 @@ namespace Project.Character.Combat
 
         private void Awake()
         {
+            if (Instance != null && Instance != this)
+            {
+                // A short-lived duplicate from a map scene being reloaded
+                // (e.g. warping back into a previously visited map) — this
+                // GameObject is already being destroyed as a duplicate.
+                // Don't let it steal Instance from the real, persisted player.
+                return;
+            }
+
             Instance = this;
             caster = GetComponent<PlayerSkillCaster>();
         }

@@ -128,5 +128,12 @@ namespace Project.Persistence
 
         /// <summary>Y component of each saved window's anchored position, parallel to <see cref="windowIds"/>.</summary>
         public List<float> windowPositionY = new List<float>();
+
+        /// <summary>
+        /// Id (matching a Unity scene name) of the map the player was on
+        /// when this save was captured. Not yet used to choose which scene
+        /// loads on login — see <c>Project.Maps.CurrentMapSaveParticipant</c>.
+        /// </summary>
+        public string currentMapId = "";
     }
 }
