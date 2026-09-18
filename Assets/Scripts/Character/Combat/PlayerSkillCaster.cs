@@ -22,15 +22,20 @@ namespace Project.Character.Combat
     /// spawns a persistent damaging or attack-blocking zone (e.g. Fire
     /// Wall, Safety Wall — see <see cref="TryCastSkillAtPosition"/>) at a
     /// ground position the player picked, flips a status toggle (e.g.
-    /// Hiding) on the caster, reveals (and optionally damages) hidden
-    /// targets around the caster (e.g. Sight, Ruwach), clears every
-    /// active debuff on the caster (e.g. Cure, Detoxify), or instantly
-    /// pushes the caster back (e.g. Back Slide), depending on the skill's
-    /// effect and target type. A Damage skill can also carry its own
-    /// knockback, pushing the hit target back instead (e.g. Arrow Repel).
+    /// Hiding) on the caster, flips an ongoing SP-draining damage-reduction
+    /// buff (e.g. Energy Coat, see <see cref="PlayerEnergyCoatController"/>),
+    /// reveals (and optionally damages) hidden targets around the caster
+    /// (e.g. Sight, Ruwach), clears every active debuff on the caster (e.g.
+    /// Cure, Detoxify), instantly pushes the caster back (e.g. Back Slide),
+    /// or crafts a recipe's result item from materials in the caster's own
+    /// inventory (e.g. Arrow Crafting, Aqua Benedicta), depending on the
+    /// skill's effect and target type. A Damage skill can also carry its
+    /// own knockback, pushing the hit target back instead (e.g. Arrow Repel).
     /// </summary>
     public class PlayerSkillCaster : MonoBehaviour
     {
+        private const float NearWaterRadius = 3f;
+
         [SerializeField] private PlayerSkillBook skillBook;
         [SerializeField] private PlayerStatsController statsController;
         [SerializeField] private ManaComponent mana;
@@ -55,6 +60,15 @@ namespace Project.Character.Combat
 
         [Tooltip("Optional. Source of the player's Zeny, spent by a Damage skill with a nonzero SkillDefinition.ZenyCost (e.g. Mammonite), on top of its mana cost. Left empty, such a skill can't be cast; every skill with no Zeny cost is unaffected.")]
         [SerializeField] private PlayerCurrency currency;
+
+        [Tooltip("Optional. Drives an ongoing SP-draining damage-reduction toggle (e.g. Energy Coat). Left empty, a ToggleDrain skill can't be cast.")]
+        [SerializeField] private PlayerEnergyCoatController energyCoat;
+
+        [Tooltip("Optional. The caster's own inventory, crafted into by a Craft skill (e.g. Arrow Crafting, Aqua Benedicta). Left empty, a Craft skill can't be cast.")]
+        [SerializeField] private PlayerInventory inventory;
+
+        [Tooltip("Layer containing Water colliders, checked by a Craft skill with SkillDefinition.RequiresNearWater (e.g. Aqua Benedicta). Left at its default (nothing), such a skill can never find water — ready for the moment a map actually tags one.")]
+        [SerializeField] private LayerMask waterLayer;
 
         private readonly Dictionary<SkillDefinition, float> cooldownEndTimes = new Dictionary<SkillDefinition, float>();
 
@@ -112,9 +126,11 @@ namespace Project.Character.Combat
                 SkillEffectType.Heal => TryCastHeal(skill),
                 SkillEffectType.Buff => TryCastBuff(skill, level),
                 SkillEffectType.Toggle => TryCastToggle(skill),
+                SkillEffectType.ToggleDrain => TryCastToggleDrain(skill, level),
                 SkillEffectType.Reveal => TryCastReveal(skill, level),
                 SkillEffectType.Cleanse => TryCastCleanse(skill),
                 SkillEffectType.Displacement => TryCastDisplacement(skill),
+                SkillEffectType.Craft => TryCastCraft(skill),
                 _ => TryCastDamage(skill, level)
             };
 
@@ -712,6 +728,61 @@ namespace Project.Character.Combat
             }
 
             statusEffects.SetHidden(!statusEffects.IsHidden);
+            return true;
+        }
+
+        /// <summary>
+        /// Casts a <see cref="SkillEffectType.ToggleDrain"/> skill (e.g.
+        /// Energy Coat): spends this skill's <see cref="SkillDefinition.ManaCost"/>
+        /// (paid on/off, mirroring <see cref="TryCastToggle"/>'s own
+        /// Hiding convention) and flips <see cref="energyCoat"/>'s active
+        /// state. The ongoing SP drain while active is paid separately, on
+        /// its own timer, by <see cref="PlayerEnergyCoatController"/> itself.
+        /// </summary>
+        /// <param name="skill">The toggle-drain skill being cast.</param>
+        /// <param name="level">The skill's current level.</param>
+        /// <returns>True if the toggle was applied.</returns>
+        private bool TryCastToggleDrain(SkillDefinition skill, int level)
+        {
+            if (energyCoat == null || !mana.TryConsumeMana(skill.ManaCost))
+            {
+                return false;
+            }
+
+            energyCoat.Toggle(skill, level);
+            return true;
+        }
+
+        /// <summary>
+        /// Casts a <see cref="SkillEffectType.Craft"/> skill (e.g. Arrow
+        /// Crafting, Aqua Benedicta): spends mana, then attempts
+        /// <see cref="SkillDefinition.CraftingRecipe"/> via
+        /// <see cref="inventory"/>. If <see cref="SkillDefinition.RequiresNearWater"/>
+        /// is true, the caster must also be within <see cref="NearWaterRadius"/>
+        /// of a <see cref="waterLayer"/> collider — ponytail: no map in
+        /// this prototype tags anything Water yet, so this check is ready
+        /// but unexercised, the same "ready the moment one exists" pattern
+        /// already used for the Undead/Demon race bonuses before any such
+        /// enemy existed. Mana is still spent even if the craft itself
+        /// fails (not enough materials, no water nearby, or inventory too
+        /// full for the result), matching every other skill here that
+        /// spends its cost as soon as the cast is committed.
+        /// </summary>
+        /// <param name="skill">The craft skill being cast.</param>
+        /// <returns>True if the cast was committed (mana spent), regardless of whether the craft itself succeeded.</returns>
+        private bool TryCastCraft(SkillDefinition skill)
+        {
+            if (inventory == null || !mana.TryConsumeMana(skill.ManaCost))
+            {
+                return false;
+            }
+
+            if (skill.RequiresNearWater && !Physics.CheckSphere(transform.position, NearWaterRadius, waterLayer))
+            {
+                return true;
+            }
+
+            inventory.Items.TryCraft(skill.CraftingRecipe);
             return true;
         }
 

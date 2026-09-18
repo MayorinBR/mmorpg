@@ -154,6 +154,116 @@ namespace Project.Items
         }
 
         /// <summary>
+        /// Gets how many total units of an item this inventory currently
+        /// holds, summed across every slot — a stackable item can span more
+        /// than one stack once <see cref="ItemDefinition.MaxStackSize"/> is
+        /// reached.
+        /// </summary>
+        /// <param name="item">The item to count.</param>
+        /// <returns>The total quantity held, zero if none or <paramref name="item"/> is null.</returns>
+        public int GetQuantity(ItemDefinition item)
+        {
+            if (item == null)
+            {
+                return 0;
+            }
+
+            var total = 0;
+
+            foreach (var slot in slots)
+            {
+                if (!slot.IsEmpty && slot.Item == item)
+                {
+                    total += slot.Quantity;
+                }
+            }
+
+            return total;
+        }
+
+        /// <summary>
+        /// Removes a quantity of an item from wherever it's held, spanning
+        /// multiple slots/stacks if needed. Fails atomically (removes
+        /// nothing) if the inventory doesn't hold at least
+        /// <paramref name="quantity"/> units.
+        /// </summary>
+        /// <param name="item">The item to remove.</param>
+        /// <param name="quantity">The number of units to remove.</param>
+        /// <returns>True if the full quantity was removed.</returns>
+        public bool TryRemoveItem(ItemDefinition item, int quantity)
+        {
+            if (item == null || quantity <= 0 || GetQuantity(item) < quantity)
+            {
+                return false;
+            }
+
+            var remaining = quantity;
+
+            for (var i = 0; i < slots.Count && remaining > 0; i++)
+            {
+                var slot = slots[i];
+
+                if (slot.IsEmpty || slot.Item != item)
+                {
+                    continue;
+                }
+
+                var amountToRemove = Math.Min(slot.Quantity, remaining);
+                TryRemoveFromSlot(i, amountToRemove);
+                remaining -= amountToRemove;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Attempts to craft <paramref name="recipe"/>: consumes its
+        /// required materials (see <see cref="CraftingRecipe.Materials"/>)
+        /// and adds its result item, or does nothing if the materials
+        /// aren't all held or the result wouldn't fully fit under
+        /// <see cref="MaxCarryWeight"/>. Both are checked before anything
+        /// is removed, so a failed craft never partially consumes
+        /// materials.
+        /// </summary>
+        /// <param name="recipe">The recipe to craft.</param>
+        /// <returns>True if the craft succeeded.</returns>
+        public bool TryCraft(CraftingRecipe recipe)
+        {
+            if (recipe == null || recipe.ResultItem == null)
+            {
+                return false;
+            }
+
+            var materials = recipe.Materials;
+
+            if (materials != null)
+            {
+                foreach (var material in materials)
+                {
+                    if (GetQuantity(material.Item) < material.Quantity)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            if (GetAddableQuantity(recipe.ResultItem, recipe.ResultQuantity) < recipe.ResultQuantity)
+            {
+                return false;
+            }
+
+            if (materials != null)
+            {
+                foreach (var material in materials)
+                {
+                    TryRemoveItem(material.Item, material.Quantity);
+                }
+            }
+
+            return TryAddItem(recipe.ResultItem, recipe.ResultQuantity);
+        }
+
+        /// <summary>
         /// Removes a quantity of the item held at a slot, clearing the slot
         /// entirely if the removal empties it. Used both for consuming a
         /// single unit of an item and for selling a stack to an NPC.

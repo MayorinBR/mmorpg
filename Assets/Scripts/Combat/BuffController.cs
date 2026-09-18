@@ -63,6 +63,9 @@ namespace Project.Combat
         /// <summary>Gets the combined flat bonus to apply to Max HP.</summary>
         public int MaxHealthBonus => Total.MaxHealthFlat;
 
+        /// <summary>Gets the combined multiplier to apply to incoming damage after defense mitigation, e.g. 0.7 for a 30% reduction (1 = no change) — e.g. Energy Coat. Clamped so a reduction over 100% never inverts into damage amplification.</summary>
+        public float IncomingDamageMultiplier => Mathf.Clamp01(1f - Total.IncomingDamageReductionPercent);
+
         /// <summary>
         /// Applies a new timed buff, stacking with any others already
         /// active — e.g. a Provoke debuff on an enemy and a self Endure

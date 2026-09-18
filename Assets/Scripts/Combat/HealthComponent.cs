@@ -183,6 +183,15 @@ namespace Project.Combat
             var defense = category == DamageCategory.Physical ? PhysicalDefense + GetRaceDefenseBonus(attacker) : MagicalDefense;
             amount = Mathf.Max(1, amount - defense);
 
+            if (buffs != null)
+            {
+                // e.g. Energy Coat's incoming-damage reduction — applied
+                // after defense mitigation, re-clamped to at least 1 so it
+                // narrows the same "always at least 1 damage" floor rather
+                // than being able to zero a hit out entirely.
+                amount = Mathf.Max(1, Mathf.RoundToInt(amount * buffs.IncomingDamageMultiplier));
+            }
+
             currentHealth = Mathf.Max(currentHealth - amount, 0);
             DamageTaken?.Invoke(amount, isCritical, element);
             HealthChanged?.Invoke(currentHealth, MaxHealth);

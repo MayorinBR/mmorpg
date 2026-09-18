@@ -16896,6 +16896,7 @@ GameObject:
   - component: {fileID: 1466862093}
   - component: {fileID: 1466862092}
   - component: {fileID: 1466862096}
+  - component: {fileID: 1466862097}
   m_Layer: 7
   m_Name: SkillsData
   m_TagString: Untagged
@@ -16998,6 +16999,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Project.Character.Combat::Project.Character.Combat.PlayerPassiveSkillController
   skillBook: {fileID: 1466862095}
+--- !u!114 &1466862097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1466862090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c67db5ad376d4340ab239e2b51468491, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Character.Combat::Project.Character.Combat.PlayerEnergyCoatController
+  mana: {fileID: 1374932850}
+  buffs: {fileID: 1696850567}
 --- !u!1 &1473881039
 GameObject:
   m_ObjectHideFlags: 0
@@ -19826,6 +19841,7 @@ MonoBehaviour:
   equipment: {fileID: 26099406}
   health: {fileID: 1374932851}
   mana: {fileID: 1374932850}
+  inventory: {fileID: 0}
   passiveSkills: {fileID: 1466862096}
   buffs: {fileID: 1696850567}
   classController: {fileID: 1696850564}
@@ -21872,6 +21888,11 @@ MonoBehaviour:
     m_Bits: 256
   agent: {fileID: 401280839}
   currency: {fileID: 1696850563}
+  energyCoat: {fileID: 1466862097}
+  inventory: {fileID: 26099407}
+  waterLayer:
+    serializedVersion: 2
+    m_Bits: 16
 --- !u!1 &1948768125
 GameObject:
   m_ObjectHideFlags: 0

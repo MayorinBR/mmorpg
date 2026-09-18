@@ -154,6 +154,20 @@ namespace Project.Skills
         [Tooltip("Which weapon range this zone blocks when BlocksAttacks is true — e.g. Safety Wall blocks Melee, Pneuma blocks Ranged. Only meaningful when BlocksAttacks is true.")]
         [SerializeField] private WeaponType blockedWeaponType;
 
+        [Header("Toggle Drain (only used if Effect Type is ToggleDrain)")]
+        [Tooltip("Incoming-damage multiplier reduction per skill level while this toggle is active, e.g. 0.06 for Energy Coat reaching -30% incoming damage at this project's max level.")]
+        [SerializeField] private float toggleDrainIncomingDamageReductionPercentPerLevel;
+
+        [Tooltip("Flat mana drained per second while this toggle stays active, regardless of level — e.g. Energy Coat's SP drain. Zero for a Toggle skill without an ongoing drain (that's plain Toggle, e.g. Hiding, which only pays ManaCost on/off).")]
+        [SerializeField] private float toggleDrainManaPerSecond;
+
+        [Header("Crafting (only used if Effect Type is Craft)")]
+        [Tooltip("The recipe this skill produces — e.g. Arrow Crafting's ammo recipe, Aqua Benedicta's holy water recipe. Null means this Craft skill can't actually produce anything.")]
+        [SerializeField] private CraftingRecipe craftingRecipe;
+
+        [Tooltip("If true, this Craft skill can only be cast near a Water-layer collider (see PlayerSkillCaster's waterLayer) — e.g. Aqua Benedicta. False means it can be cast anywhere, e.g. Arrow Crafting.")]
+        [SerializeField] private bool requiresNearWater;
+
         /// <summary>Gets the skill's display name.</summary>
         public string SkillName => skillName;
 
@@ -585,5 +599,43 @@ namespace Project.Skills
         {
             return passiveSpRegenMultiplierPerLevel * skillLevel;
         }
+
+        /// <summary>
+        /// Calculates the incoming-damage multiplier reduction this
+        /// toggle-drain skill grants while active, at the given level (e.g.
+        /// 0.3 for Energy Coat at this project's max level, a 30%
+        /// reduction). Only meaningful when <see cref="EffectType"/> is
+        /// <see cref="SkillEffectType.ToggleDrain"/>.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated reduction, from 0 to 1.</returns>
+        public float GetToggleDrainIncomingDamageReductionPercent(int skillLevel)
+        {
+            return toggleDrainIncomingDamageReductionPercentPerLevel * skillLevel;
+        }
+
+        /// <summary>
+        /// Gets the flat mana drained per second while this toggle-drain
+        /// skill stays active, regardless of level (e.g. Energy Coat's SP
+        /// drain). Only meaningful when <see cref="EffectType"/> is
+        /// <see cref="SkillEffectType.ToggleDrain"/>.
+        /// </summary>
+        public float ToggleDrainManaPerSecond => toggleDrainManaPerSecond;
+
+        /// <summary>
+        /// Gets the recipe this Craft skill produces (e.g. Arrow Crafting,
+        /// Aqua Benedicta). Null means this skill can't actually produce
+        /// anything. Only meaningful when <see cref="EffectType"/> is
+        /// <see cref="SkillEffectType.Craft"/>.
+        /// </summary>
+        public CraftingRecipe CraftingRecipe => craftingRecipe;
+
+        /// <summary>
+        /// Gets whether this Craft skill requires the caster be near a
+        /// Water-layer collider to succeed (e.g. Aqua Benedicta). Only
+        /// meaningful when <see cref="EffectType"/> is
+        /// <see cref="SkillEffectType.Craft"/>.
+        /// </summary>
+        public bool RequiresNearWater => requiresNearWater;
     }
 }

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37c0de08ccf18a54d96a55cce435c377, type: 3}
+  m_Name: AquaBenedicta
+  m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
+  skillName: Aqua Benedicta
+  description: Blesses nearby water into Holy Water. Can only be cast near a water source.
+  icon: {fileID: 0}
+  allowedClasses: 03000000
+  effectType: 10
+  targetType: 0
+  maxLevel: 1
+  manaCost: 1
+  cooldownSeconds: 2
+  range: 0
+  damageType: 0
+  damageMultiplierPerLevel: 1
+  healAmount: 10
+  craftingRecipe: {fileID: 11400000, guid: 2422eef1dc834c6aae390b3348a3bba9, type: 2}
+  requiresNearWater: 1
