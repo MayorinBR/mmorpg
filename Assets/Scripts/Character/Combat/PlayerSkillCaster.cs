@@ -268,12 +268,8 @@ namespace Project.Character.Combat
 
             if (undeadTarget != null)
             {
-                // ponytail: ships as plain Neutral damage rather than Holy
-                // (real RO's own element for this) — the same open
-                // question item 9 of the shared systems plan already
-                // tracks for Ruwach's damage, not resolved here either.
                 var damage = Mathf.Max(1, skill.CalculateHeal() / 2);
-                undeadTarget.TakeDamage(damage, Element.Neutral, DamageCategory.Magical, attacker: transform);
+                undeadTarget.TakeDamage(damage, Element.Holy, DamageCategory.Magical, attacker: transform);
                 return true;
             }
 

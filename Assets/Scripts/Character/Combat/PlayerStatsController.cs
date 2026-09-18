@@ -75,6 +75,9 @@ namespace Project.Character.Combat
         [SerializeField] private HealthComponent health;
         [SerializeField] private ManaComponent mana;
 
+        [Tooltip("Optional. Refreshed automatically whenever a skill levels up (alongside health/mana), so a learned Enlarge Weight Limit passive's carry-weight bonus applies immediately. Left empty, or when passiveSkills isn't wired, carry weight never benefits from a passive.")]
+        [SerializeField] private PlayerInventory inventory;
+
         [Tooltip("Optional. Source of flat Status ATK bonuses from learned passive skills (e.g. Sword Mastery), added on top of the stat-derived value in CurrentSubStats whenever the equipped weapon matches.")]
         [SerializeField] private PlayerPassiveSkillController passiveSkills;
 
@@ -287,6 +290,11 @@ namespace Project.Character.Combat
         {
             health?.RefreshMaxHealth();
             mana?.RefreshMaxMana();
+
+            if (inventory != null && inventory.Items != null && passiveSkills != null)
+            {
+                inventory.Items.RefreshWeightCapacityBonus(passiveSkills.GetWeightLimitBonus());
+            }
         }
 
         /// <summary>
@@ -496,6 +504,7 @@ namespace Project.Character.Combat
 
             health?.ResetHealth();
             mana?.ResetMana();
+            RefreshDependentMaxValues();
             StatsChanged?.Invoke();
         }
     }

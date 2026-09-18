@@ -16,12 +16,18 @@ namespace Project.Items
         private const int SlotsPerPage = 20;
 
         private readonly List<InventorySlot> slots = new List<InventorySlot>();
+        private readonly float baseMaxCarryWeight;
+        private float weightCapacityBonus;
 
         /// <summary>Raised whenever any slot's contents change.</summary>
         public event Action InventoryChanged;
 
-        /// <summary>Gets the maximum total weight this inventory can carry.</summary>
-        public float MaxCarryWeight { get; }
+        /// <summary>
+        /// Gets the maximum total weight this inventory can carry, including
+        /// any bonus set via <see cref="RefreshWeightCapacityBonus"/> (e.g.
+        /// a learned Enlarge Weight Limit passive).
+        /// </summary>
+        public float MaxCarryWeight => baseMaxCarryWeight + weightCapacityBonus;
 
         /// <summary>Gets the combined weight of everything currently carried.</summary>
         public float CurrentWeight { get; private set; }
@@ -32,11 +38,25 @@ namespace Project.Items
         /// <summary>
         /// Initializes an inventory with one starting page of empty slots.
         /// </summary>
-        /// <param name="maxCarryWeight">The maximum total weight this inventory can carry.</param>
+        /// <param name="maxCarryWeight">The base maximum total weight this inventory can carry, before any bonus.</param>
         public Inventory(float maxCarryWeight)
         {
-            MaxCarryWeight = maxCarryWeight;
+            baseMaxCarryWeight = maxCarryWeight;
             AddPage();
+        }
+
+        /// <summary>
+        /// Sets the total bonus to add on top of <see cref="baseMaxCarryWeight"/>,
+        /// e.g. from a learned Enlarge Weight Limit passive skill. Replaces
+        /// any previously set bonus rather than stacking — call again with
+        /// the new total whenever the source changes (matching
+        /// <see cref="Combat.HealthComponent.RefreshMaxHealth"/>'s own
+        /// re-pull pattern), not incrementally.
+        /// </summary>
+        /// <param name="bonus">The total weight-capacity bonus. Zero clears it.</param>
+        public void RefreshWeightCapacityBonus(float bonus)
+        {
+            weightCapacityBonus = bonus;
         }
 
         /// <summary>

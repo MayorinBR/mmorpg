@@ -1,6 +1,10 @@
 namespace Project.Combat
 {
     /// <summary>
+    /// Ghost, Holy and Poison were appended later than the other six
+    /// (append-only, per this enum's own Unity raw-int serialization
+    /// convention) to cover Soul Strike/Napalm Beat, Holy Light/Ruwach/
+    /// Heal's Undead-damage interaction, and Envenom respectively.
     /// The affinity an attack carries — an elemental one, or plain physical
     /// damage, modeled here as <see cref="Neutral"/> rather than as a
     /// special "no element" case, matching how Ragnarok Online itself
@@ -20,6 +24,9 @@ namespace Project.Combat
         Grass,
         Ground,
         Electric,
-        Neutral
+        Neutral,
+        Ghost,
+        Holy,
+        Poison
     }
 }

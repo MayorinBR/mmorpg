@@ -80,6 +80,9 @@ namespace Project.Skills
         [Tooltip("Flat Flee rating bonus per skill level, applied the same way as PassiveAttackBonusPerLevel, but never weapon-gated — e.g. Improve Dodge.")]
         [SerializeField] private float passiveFleeBonusPerLevel;
 
+        [Tooltip("Flat bonus to max carry weight per skill level, never weapon-gated — e.g. Enlarge Weight Limit. Zero for passives without one.")]
+        [SerializeField] private float passiveWeightLimitBonusPerLevel;
+
         [Tooltip("Flat physical damage bonus per skill level against Demon/Undead race targets only — e.g. Demon Bane. Never weapon-gated. Zero for passives without one.")]
         [SerializeField] private float passiveRaceDamageBonusPerLevel;
 
@@ -97,6 +100,9 @@ namespace Project.Skills
 
         [Tooltip("Multiplier bonus to natural HP regen per level, e.g. 0.20 for Increase HP Recovery reaching +100% at this project's max level. Zero for passives without one.")]
         [SerializeField] private float passiveRegenMultiplierPerLevel;
+
+        [Tooltip("Multiplier bonus to natural SP regen per level, e.g. 0.20 for Increase SP Recovery reaching +100% at this project's max level. Zero for passives without one.")]
+        [SerializeField] private float passiveSpRegenMultiplierPerLevel;
 
         [Tooltip("If true and learned (any level), removes the reduced-regen-while-moving penalty — e.g. HP Recovery While Moving.")]
         [SerializeField] private bool passiveRemovesMovementRegenPenalty;
@@ -405,6 +411,18 @@ namespace Project.Skills
         }
 
         /// <summary>
+        /// Calculates the flat max carry weight bonus this passive skill
+        /// grants at the given level (e.g. Enlarge Weight Limit). Never
+        /// weapon-gated. Only meaningful when <see cref="EffectType"/> is Passive.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated bonus, zero for passives without one.</returns>
+        public float GetPassiveWeightLimitBonus(int skillLevel)
+        {
+            return passiveWeightLimitBonusPerLevel * skillLevel;
+        }
+
+        /// <summary>
         /// Calculates the flat physical damage bonus this passive skill
         /// grants at the given level against Demon/Undead race targets
         /// (e.g. Demon Bane). Only meaningful when <see cref="EffectType"/>
@@ -553,6 +571,19 @@ namespace Project.Skills
         public float GetPassiveRegenBonus(int skillLevel)
         {
             return passiveRegenMultiplierPerLevel * skillLevel;
+        }
+
+        /// <summary>
+        /// Calculates this passive's bonus to natural SP regen at the given
+        /// level (e.g. 0.4 for Increase SP Recovery at level 2, a +40%
+        /// bonus), mirroring <see cref="GetPassiveRegenBonus"/> exactly for
+        /// mana instead of health. Only meaningful when <see cref="EffectType"/> is Passive.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated bonus. Zero for a passive without an SP regen component.</returns>
+        public float GetPassiveSpRegenBonus(int skillLevel)
+        {
+            return passiveSpRegenMultiplierPerLevel * skillLevel;
         }
     }
 }

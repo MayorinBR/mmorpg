@@ -10,20 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 37c0de08ccf18a54d96a55cce435c377, type: 3}
-  m_Name: Ruwach
+  m_Name: EnlargeWeightLimit
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
-  skillName: Ruwach
-  description: Summons an orb of holy fire that reveals hidden enemies around the caster and deals Holy-element magic damage to each one revealed.
+  skillName: Enlarge Weight Limit
+  description: Passively increases the maximum weight that can be carried.
   icon: {fileID: 0}
-  allowedClasses: 03000000
-  effectType: 6
+  allowedClasses: 02000000
+  effectType: 2
   targetType: 0
-  maxLevel: 1
-  manaCost: 10
-  cooldownSeconds: 1
-  range: 3
-  damageType: 1
-  damageMultiplierPerLevel: 1.45
-  element: 7
-  areaRadius: 4
+  maxLevel: 5
+  manaCost: 0
+  cooldownSeconds: 0
+  range: 0
+  damageType: 0
+  damageMultiplierPerLevel: 1
   healAmount: 10
+  passiveWeightLimitBonusPerLevel: 1000

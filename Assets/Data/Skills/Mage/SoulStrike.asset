@@ -10,20 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 37c0de08ccf18a54d96a55cce435c377, type: 3}
-  m_Name: Ruwach
+  m_Name: SoulStrike
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
-  skillName: Ruwach
-  description: Summons an orb of holy fire that reveals hidden enemies around the caster and deals Holy-element magic damage to each one revealed.
+  skillName: Soul Strike
+  description: Launches ghostly projectiles at a single target, dealing Ghost-element magic damage that scales with MATK and skill level.
   icon: {fileID: 0}
-  allowedClasses: 03000000
-  effectType: 6
-  targetType: 0
-  maxLevel: 1
+  allowedClasses: 05000000
+  effectType: 0
+  targetType: 2
+  maxLevel: 5
   manaCost: 10
-  cooldownSeconds: 1
-  range: 3
+  cooldownSeconds: 3
+  range: 4
   damageType: 1
-  damageMultiplierPerLevel: 1.45
-  element: 7
-  areaRadius: 4
+  damageMultiplierPerLevel: 1
+  element: 6
   healAmount: 10

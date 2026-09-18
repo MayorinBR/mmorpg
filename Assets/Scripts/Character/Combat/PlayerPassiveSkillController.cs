@@ -215,6 +215,56 @@ namespace Project.Character.Combat
         }
 
         /// <summary>
+        /// Calculates the combined multiplier to apply to natural SP regen
+        /// (see <see cref="PlayerManaRegenController"/>) from every learned
+        /// passive with an SP regen bonus — e.g. Increase SP Recovery.
+        /// Mirrors <see cref="GetRegenMultiplier"/> exactly for mana
+        /// instead of health.
+        /// </summary>
+        /// <returns>The combined multiplier, where 1 means no bonus.</returns>
+        public float GetSpRegenMultiplier()
+        {
+            var total = 1f;
+
+            foreach (var entry in skillBook.LearnedSkills)
+            {
+                var skill = entry.Key;
+                var level = entry.Value;
+
+                if (skill.EffectType == SkillEffectType.Passive && level > 0)
+                {
+                    total += skill.GetPassiveSpRegenBonus(level);
+                }
+            }
+
+            return total;
+        }
+
+        /// <summary>
+        /// Calculates the total flat max carry weight bonus from every
+        /// learned passive skill with a weight-limit bonus — e.g. Enlarge
+        /// Weight Limit. Never weapon-gated.
+        /// </summary>
+        /// <returns>The combined bonus. Zero if no applicable passive skill is learned.</returns>
+        public float GetWeightLimitBonus()
+        {
+            var total = 0f;
+
+            foreach (var entry in skillBook.LearnedSkills)
+            {
+                var skill = entry.Key;
+                var level = entry.Value;
+
+                if (skill.EffectType == SkillEffectType.Passive && level > 0)
+                {
+                    total += skill.GetPassiveWeightLimitBonus(level);
+                }
+            }
+
+            return total;
+        }
+
+        /// <summary>
         /// Checks whether any learned passive removes the reduced-regen-
         /// while-moving penalty — e.g. HP Recovery While Moving.
         /// </summary>
