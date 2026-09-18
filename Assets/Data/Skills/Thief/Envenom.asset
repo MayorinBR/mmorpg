@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Envenom
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
   skillName: Envenom
-  description: A venom-laced melee strike, dealing physical damage that scales with skill level.
+  description: A venom-laced melee strike, dealing physical damage that scales with skill level, with a chance to poison the target.
   icon: {fileID: 1051228104, guid: f729df008cd8cd74595fdf6b0f77ca08, type: 3}
   allowedClasses: 04000000
   effectType: 0
@@ -24,4 +24,9 @@ MonoBehaviour:
   range: 2
   damageType: 0
   damageMultiplierPerLevel: 1
+  inflictedStatus: 2
+  inflictedStatusDurationSeconds: 10
+  inflictedStatusDurationPerLevel: 2
+  poisonDamagePerTickPerLevel: 3
+  successChancePerLevel: 0.1
   healAmount: 10

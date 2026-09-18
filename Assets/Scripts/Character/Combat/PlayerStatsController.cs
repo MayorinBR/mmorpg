@@ -4,6 +4,7 @@ using Project.Character.Stats;
 using Project.Combat;
 using Project.Items;
 using Project.Persistence;
+using Project.Skills;
 
 namespace Project.Character.Combat
 {
@@ -115,6 +116,8 @@ namespace Project.Character.Combat
                 EnsureInitialized();
                 var subStats = subStatsCalculator.Calculate(effectiveStats, BaseLevel, equipment != null && equipment.IsMainHandWeaponRanged(), GetBaseAttackSpeed());
                 var statusAtk = subStats.StatusAtk + GetPassiveAttackBonus();
+                var hit = subStats.Hit + GetPassiveHitBonus();
+                var flee = subStats.Flee + GetPassiveFleeBonus();
                 var aspd = subStats.Aspd;
 
                 if (buffs != null)
@@ -123,9 +126,9 @@ namespace Project.Character.Combat
                     aspd = Mathf.RoundToInt(aspd * buffs.AspdMultiplier);
                 }
 
-                return statusAtk == subStats.StatusAtk && aspd == subStats.Aspd
+                return statusAtk == subStats.StatusAtk && hit == subStats.Hit && flee == subStats.Flee && aspd == subStats.Aspd
                     ? subStats
-                    : new SubStats(statusAtk, subStats.StatusMatk, subStats.StatusDef, subStats.StatusMDef, subStats.Hit, subStats.Flee, subStats.CriticalRate, aspd);
+                    : new SubStats(statusAtk, subStats.StatusMatk, subStats.StatusDef, subStats.StatusMDef, hit, flee, subStats.CriticalRate, aspd);
             }
         }
 
@@ -144,6 +147,11 @@ namespace Project.Character.Combat
             if (jobProgress != null)
             {
                 jobProgress.JobLeveledUp -= HandleJobLeveledUp;
+            }
+
+            if (passiveSkills != null && passiveSkills.SkillBook != null)
+            {
+                passiveSkills.SkillBook.SkillLeveledUp -= HandleSkillLeveledUp;
             }
         }
 
@@ -178,6 +186,11 @@ namespace Project.Character.Combat
                 ? new JobBonusStatsView(jobStats, () => ToStatModifiers(buffs.Total))
                 : jobStats;
 
+            if (passiveSkills != null && equipment != null)
+            {
+                effectiveStats = new JobBonusStatsView(effectiveStats, () => new StatModifiers(0, 0, 0, 0, GetPassiveDexBonus(), 0));
+            }
+
             if (equipment != null)
             {
                 equipment.EquipmentChanged += HandleEquipmentChanged;
@@ -186,6 +199,11 @@ namespace Project.Character.Combat
             if (jobProgress != null)
             {
                 jobProgress.JobLeveledUp += HandleJobLeveledUp;
+            }
+
+            if (passiveSkills != null && passiveSkills.SkillBook != null)
+            {
+                passiveSkills.SkillBook.SkillLeveledUp += HandleSkillLeveledUp;
             }
         }
 
@@ -196,6 +214,20 @@ namespace Project.Character.Combat
         }
 
         private void HandleJobLeveledUp(int newJobLevel)
+        {
+            RefreshDependentMaxValues();
+            StatsChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Refreshes derived stats whenever a learned skill changes level —
+        /// covers a passive's stat bonus changing (e.g. Sword Mastery,
+        /// Owl's Eye) and <see cref="PlayerSkillBook.ResetLearnedSkills"/>
+        /// resetting every skill back to level 0.
+        /// </summary>
+        /// <param name="skill">The skill that changed level.</param>
+        /// <param name="level">The skill's new level (0 when reset).</param>
+        private void HandleSkillLeveledUp(SkillDefinition skill, int level)
         {
             RefreshDependentMaxValues();
             StatsChanged?.Invoke();
@@ -286,6 +318,73 @@ namespace Project.Character.Combat
         }
 
         /// <summary>
+        /// Reads the flat DEX bonus from learned passive skills (e.g. Owl's
+        /// Eye) that apply to the currently equipped main-hand weapon.
+        /// Zero if either <see cref="passiveSkills"/> or <see cref="equipment"/>
+        /// isn't wired.
+        /// </summary>
+        private int GetPassiveDexBonus()
+        {
+            if (passiveSkills == null || equipment == null)
+            {
+                return 0;
+            }
+
+            return passiveSkills.GetDexBonus(equipment.GetMainHandWeaponSubtype());
+        }
+
+        /// <summary>
+        /// Reads the flat Hit bonus from learned passive skills (e.g.
+        /// Vulture's Eye) that apply to the currently equipped main-hand
+        /// weapon. Zero if either <see cref="passiveSkills"/> or
+        /// <see cref="equipment"/> isn't wired.
+        /// </summary>
+        private int GetPassiveHitBonus()
+        {
+            if (passiveSkills == null || equipment == null)
+            {
+                return 0;
+            }
+
+            return passiveSkills.GetHitBonus(equipment.GetMainHandWeaponSubtype());
+        }
+
+        /// <summary>
+        /// Reads the flat Flee bonus from learned passive skills (e.g.
+        /// Improve Dodge). Zero if <see cref="passiveSkills"/> isn't wired
+        /// — unlike the other passive bonuses, this one isn't weapon-gated,
+        /// but still routes through <see cref="PlayerPassiveSkillController"/>
+        /// for a consistent single place that sums learned passives.
+        /// </summary>
+        private int GetPassiveFleeBonus()
+        {
+            if (passiveSkills == null)
+            {
+                return 0;
+            }
+
+            return passiveSkills.GetFleeBonus(equipment != null ? equipment.GetMainHandWeaponSubtype() : WeaponSubtype.Unarmed);
+        }
+
+        /// <summary>
+        /// Gets the flat attack range bonus, in meters, granted by learned
+        /// passive skills (e.g. Vulture's Eye) for the currently equipped
+        /// main-hand weapon. Read by
+        /// <see cref="Character.Combat.PlayerCombatController"/> to extend
+        /// the player's effective attack range.
+        /// </summary>
+        /// <returns>The calculated range bonus, zero if no passive applies.</returns>
+        public float GetPassiveRangeBonus()
+        {
+            if (passiveSkills == null || equipment == null)
+            {
+                return 0f;
+            }
+
+            return passiveSkills.GetRangeBonus(equipment.GetMainHandWeaponSubtype());
+        }
+
+        /// <summary>
         /// Converts a <see cref="Project.Combat.BuffPayload"/>'s
         /// STR/AGI/VIT/INT/DEX/LUK component into a <see cref="StatModifiers"/>,
         /// so it can be folded into <see cref="effectiveStats"/> through
@@ -334,6 +433,28 @@ namespace Project.Character.Combat
         {
             EnsureInitialized();
             return CurrentSubStats.Flee;
+        }
+
+        /// <inheritdoc />
+        public int GetRaceDefenseBonus(MonsterRace attackerRace)
+        {
+            return passiveSkills != null ? passiveSkills.GetRaceDefenseBonus(attackerRace) : 0;
+        }
+
+        /// <summary>
+        /// Gets the flat physical damage bonus from learned "race bane"
+        /// passive skills (e.g. Demon Bane) against the given target's
+        /// race. Zero if <see cref="passiveSkills"/> isn't wired. Called
+        /// per-hit by whoever is dealing the damage (<see cref="PlayerCombatController"/>,
+        /// <see cref="PlayerSkillCaster"/>) rather than folded into
+        /// <see cref="CurrentSubStats"/>, since — unlike every other
+        /// passive bonus here — it depends on which specific target is
+        /// being hit, not a flat, always-on modifier.
+        /// </summary>
+        /// <param name="targetRace">The race of the target being hit.</param>
+        public int GetRaceDamageBonus(MonsterRace targetRace)
+        {
+            return passiveSkills != null ? passiveSkills.GetRaceDamageBonus(targetRace) : 0;
         }
 
         /// <inheritdoc />

@@ -94,7 +94,7 @@ namespace Project.AI
 
             var distanceToRemembered = Vector3.Distance(enemy.transform.position, rememberedPlayer.position);
 
-            if (distanceToRemembered > enemy.ChaseGiveUpRange)
+            if (distanceToRemembered > enemy.ChaseGiveUpRange || (!enemy.SeesThroughHiding && EnemyController.IsPlayerHidden(rememberedPlayer)))
             {
                 return false;
             }

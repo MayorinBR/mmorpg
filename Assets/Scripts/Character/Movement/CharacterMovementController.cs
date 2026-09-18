@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using Project.CameraSystem;
 using Project.Character.Animation;
+using Project.Combat;
 
 namespace Project.Character.Movement
 {
@@ -19,6 +20,9 @@ namespace Project.Character.Movement
         [SerializeField] private float moveSpeed = 4f;
         [SerializeField] private MonoBehaviour cameraYawSource;
         [SerializeField] private PlayerAnimatorController animatorController;
+
+        [Tooltip("Optional. Source of active status effects (see StatusEffectController) affecting this character — e.g. a Stun/Freeze/Petrify landed on them. Left empty, this character is never immobilized by one.")]
+        [SerializeField] private StatusEffectController statusEffects;
 
         private DirectionalMovementProvider directionalProvider;
         private ClickToMoveProvider clickToMoveProvider;
@@ -54,8 +58,17 @@ namespace Project.Character.Movement
 
         private void Update()
         {
-            if (movementLocked)
+            var isLocked = movementLocked || (statusEffects != null && statusEffects.IsImmobilized);
+            agent.isStopped = isLocked;
+
+            if (isLocked)
             {
+                if (isMoving)
+                {
+                    isMoving = false;
+                    animatorController?.SetMovementSpeed(0f);
+                }
+
                 return;
             }
 

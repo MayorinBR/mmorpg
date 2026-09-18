@@ -19,6 +19,9 @@ namespace Project.Combat
         /// <summary>Gets this entity's size class, read by the attacker to scale incoming physical damage by weapon type (e.g. a dagger vs. a Large monster).</summary>
         MonsterSize Size { get; }
 
+        /// <summary>Gets this entity's race classification, read by race-conditional bonuses (e.g. Demon Bane's damage bonus vs. Demon/Undead targets).</summary>
+        MonsterRace Race { get; }
+
         /// <summary>
         /// Applies damage, reducing current health down to a minimum of zero.
         /// Has no effect if the entity is already dead.

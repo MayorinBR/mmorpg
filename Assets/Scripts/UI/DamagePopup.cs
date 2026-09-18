@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Project.Combat;
 
 namespace Project.UI
 {
@@ -24,13 +26,32 @@ namespace Project.UI
         // extra emphasis reads at a glance without a different layout.
         private const float CriticalSizeMultiplier = 1.2f;
 
-        // Placeholder colors so the feedback is readable and a critical
-        // hit is visually distinct before real art exists: black for a
-        // normal hit, brown for a critical one. Swap these for real
-        // sprites/colors later without touching the popup's rise/fade
-        // behavior.
-        private static readonly Color NormalBackgroundColor = Color.black;
-        private static readonly Color CriticalBackgroundColor = new Color32(101, 67, 33, 255);
+        // Background color by damage element, so the element reads at a
+        // glance without needing an icon. Text is white except where the
+        // background is already light (Electric, Neutral), which use black
+        // instead.
+        private static readonly Dictionary<Element, Color> ElementBackgroundColors = new Dictionary<Element, Color>
+        {
+            { Element.Neutral, Color.white },
+            { Element.Fire, new Color32(210, 40, 30, 255) },
+            { Element.Water, new Color32(40, 110, 210, 255) },
+            { Element.Grass, new Color32(60, 150, 60, 255) },
+            { Element.Ground, new Color32(140, 100, 60, 255) },
+            { Element.Electric, new Color32(230, 210, 30, 255) },
+        };
+
+        private static readonly Dictionary<Element, Color> ElementTextColors = new Dictionary<Element, Color>
+        {
+            { Element.Neutral, Color.black },
+            { Element.Electric, Color.black },
+        };
+
+        // A critical hit overrides the element background with orange
+        // (black text, since orange is light enough) so it stands out
+        // regardless of the damage's element, on top of the larger size
+        // from CriticalSizeMultiplier.
+        private static readonly Color CriticalBackgroundColor = new Color32(255, 140, 0, 255);
+        private static readonly Color CriticalTextColor = Color.black;
 
         // Placeholder colors for the dodge popup: a white background with
         // black text, distinct from the damage popups above. Swap for real
@@ -48,21 +69,36 @@ namespace Project.UI
 
         /// <summary>
         /// Builds a new floating damage number at the given world position
-        /// and starts its rise/fade lifecycle immediately. A critical hit
-        /// gets a larger, differently colored background and larger text
-        /// (see <see cref="CriticalSizeMultiplier"/>) so it stands out from
-        /// a normal hit.
+        /// and starts its rise/fade lifecycle immediately. The background
+        /// color reflects the damage's <paramref name="element"/> (see
+        /// <see cref="ElementBackgroundColors"/>), except a critical hit
+        /// always shows <see cref="CriticalBackgroundColor"/> instead, on
+        /// top of a larger size (see <see cref="CriticalSizeMultiplier"/>).
         /// </summary>
         /// <param name="amount">The damage amount to display.</param>
         /// <param name="worldPosition">Where to spawn the popup.</param>
+        /// <param name="element">The element the damage carried, used to pick the background color for a non-critical hit.</param>
         /// <param name="isCritical">Whether this popup represents a critical hit.</param>
         /// <returns>The spawned popup's component.</returns>
-        public static DamagePopup Create(int amount, Vector3 worldPosition, bool isCritical = false)
+        public static DamagePopup Create(int amount, Vector3 worldPosition, Element element, bool isCritical = false)
         {
             var sizeMultiplier = isCritical ? CriticalSizeMultiplier : 1f;
-            var backgroundColor = isCritical ? CriticalBackgroundColor : NormalBackgroundColor;
 
-            return CreatePopup(amount.ToString(), worldPosition, backgroundColor, Color.white, sizeMultiplier);
+            Color backgroundColor;
+            Color textColor;
+
+            if (isCritical)
+            {
+                backgroundColor = CriticalBackgroundColor;
+                textColor = CriticalTextColor;
+            }
+            else
+            {
+                backgroundColor = ElementBackgroundColors.TryGetValue(element, out var color) ? color : Color.black;
+                textColor = ElementTextColors.TryGetValue(element, out var text) ? text : Color.white;
+            }
+
+            return CreatePopup(amount.ToString(), worldPosition, backgroundColor, textColor, sizeMultiplier);
         }
 
         /// <summary>

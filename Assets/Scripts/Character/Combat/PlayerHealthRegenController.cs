@@ -65,7 +65,7 @@ namespace Project.Character.Combat
             ApplyRegenTick();
         }
 
-        private void HandleDamageTaken(int amount, bool isCritical)
+        private void HandleDamageTaken(int amount, bool isCritical, Element element)
         {
             regenTimer = 0f;
         }

@@ -74,13 +74,20 @@ namespace Project.Character.Combat
         /// <summary>
         /// Unlearns every skill. Does not refund the skill points spent
         /// learning them — call <see cref="PlayerJobProgress.ResetProgress"/>
-        /// to also reset available skill points. Doesn't refresh an
-        /// already-open Skill Book panel; close and reopen it to see the
-        /// change.
+        /// to also reset available skill points. Raises
+        /// <see cref="SkillLeveledUp"/> for each previously learned skill so
+        /// an open Skill Book panel (and any derived stat display) refreshes
+        /// immediately.
         /// </summary>
         public void ResetLearnedSkills()
         {
+            var previouslyLearned = new List<SkillDefinition>(skillLevels.Keys);
             skillLevels.Clear();
+
+            foreach (var skill in previouslyLearned)
+            {
+                SkillLeveledUp?.Invoke(skill, 0);
+            }
         }
 
         /// <inheritdoc />

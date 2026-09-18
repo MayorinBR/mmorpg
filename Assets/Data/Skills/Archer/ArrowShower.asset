@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37c0de08ccf18a54d96a55cce435c377, type: 3}
+  m_Name: ArrowShower
+  m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
+  skillName: Arrow Shower
+  description: Rains arrows on the target and everyone near it, dealing physical damage that scales with skill level.
+  icon: {fileID: 0}
+  allowedClasses: 01000000
+  effectType: 0
+  targetType: 4
+  maxLevel: 5
+  manaCost: 20
+  cooldownSeconds: 6
+  range: 5
+  damageType: 0
+  damageMultiplierPerLevel: 0.5
+  isAreaOfEffect: 1
+  areaRadius: 4
+  healAmount: 10

@@ -113,7 +113,7 @@ namespace Project.AI
                 ? Mathf.RoundToInt(enemy.Stats.AttackPower * enemy.Buffs.AttackMultiplier)
                 : enemy.Stats.AttackPower;
 
-            damageable.TakeDamage(attackPower);
+            damageable.TakeDamage(attackPower, attacker: enemy.transform);
         }
     }
 }

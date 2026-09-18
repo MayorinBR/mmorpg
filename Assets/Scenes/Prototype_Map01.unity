@@ -4199,6 +4199,7 @@ MonoBehaviour:
   moveSpeed: 4.5
   cameraYawSource: {fileID: 330585548}
   animatorController: {fileID: 401280901}
+  statusEffects: {fileID: 1696850568}
 --- !u!195 &401280839
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -4552,6 +4553,7 @@ MonoBehaviour:
   equipment: {fileID: 26099406}
   mana: {fileID: 1374932850}
   animatorController: {fileID: 401280901}
+  statusEffects: {fileID: 1696850568}
   unarmedRange: 1.5
   mageManaCostPerAttack: 2
   mageAttackRange: 4
@@ -9049,10 +9051,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Poporing
       objectReference: {fileID: 0}
-    - target: {fileID: 2301299987623212396, guid: e7e330151deae694e9fd530bac1c1b83, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3326884195266179666, guid: e7e330151deae694e9fd530bac1c1b83, type: 3}
       propertyPath: m_LocalPosition.x
       value: 12.85
@@ -9097,14 +9095,6 @@ PrefabInstance:
       propertyPath: viewCamera
       value: 
       objectReference: {fileID: 330585545}
-    - target: {fileID: 9187712603825771941, guid: e7e330151deae694e9fd530bac1c1b83, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0.049
-      objectReference: {fileID: 0}
-    - target: {fileID: 9187712603825771941, guid: e7e330151deae694e9fd530bac1c1b83, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -19780,6 +19770,7 @@ GameObject:
   - component: {fileID: 1696850560}
   - component: {fileID: 1696850566}
   - component: {fileID: 1696850567}
+  - component: {fileID: 1696850568}
   m_Layer: 7
   m_Name: Meta
   m_TagString: Untagged
@@ -19924,6 +19915,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d03c7d1fcc2469ab7777f079fc06dad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Project.Combat::Project.Combat.BuffController
+--- !u!114 &1696850568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1696850558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3dac15e67bbc484baa5911640358c137, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Combat::Project.Combat.StatusEffectController
+  health: {fileID: 1374932851}
+  poisonTickIntervalSeconds: 1
 --- !u!1001 &1701028264
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21859,6 +21864,7 @@ MonoBehaviour:
   ownHealth: {fileID: 1374932851}
   targetSelector: {fileID: 401280844}
   animatorController: {fileID: 401280901}
+  statusEffects: {fileID: 1696850568}
   equipment: {fileID: 26099406}
   ownBuffs: {fileID: 1696850567}
   enemyLayer:

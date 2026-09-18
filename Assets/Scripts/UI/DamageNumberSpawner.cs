@@ -38,9 +38,9 @@ namespace Project.UI
             health.Dodged -= HandleDodged;
         }
 
-        private void HandleDamageTaken(int amount, bool isCritical)
+        private void HandleDamageTaken(int amount, bool isCritical, Element element)
         {
-            DamagePopup.Create(amount, GetSpawnPosition(), isCritical);
+            DamagePopup.Create(amount, GetSpawnPosition(), element, isCritical);
         }
 
         private void HandleDodged()

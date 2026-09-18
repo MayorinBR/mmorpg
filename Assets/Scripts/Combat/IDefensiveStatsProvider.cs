@@ -1,3 +1,5 @@
+using Project.Character.Stats;
+
 namespace Project.Combat
 {
     /// <summary>
@@ -30,5 +32,17 @@ namespace Project.Combat
 
         /// <summary>Gets the dodge rating used to resolve an attacker's hit chance against this character.</summary>
         int GetFleeRating();
+
+        /// <summary>
+        /// Gets the flat physical defense bonus from any learned "race
+        /// bane resistance" passive (e.g. Divine Protection) against the
+        /// given attacker's race. Zero unless the attacker is Demon or
+        /// Undead and such a passive is learned. Queried per-hit by
+        /// <see cref="HealthComponent"/>, unlike the other two members
+        /// here, since it depends on which specific attacker just landed
+        /// the hit rather than being a flat, always-on value.
+        /// </summary>
+        /// <param name="attackerRace">The attacking entity's race.</param>
+        int GetRaceDefenseBonus(MonsterRace attackerRace);
     }
 }

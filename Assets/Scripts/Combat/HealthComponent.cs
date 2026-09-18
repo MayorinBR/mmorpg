@@ -58,12 +58,12 @@ namespace Project.Combat
 
         /// <summary>
         /// Raised whenever <see cref="TakeDamage"/> actually reduces health,
-        /// with the mitigated amount that was applied and whether the hit
-        /// was a critical hit. Purely a cosmetic notification (e.g.
-        /// floating damage numbers) — nothing here depends on anyone
-        /// listening to it.
+        /// with the mitigated amount that was applied, whether the hit was
+        /// a critical hit, and the element it carried. Purely a cosmetic
+        /// notification (e.g. floating damage numbers, colored by element)
+        /// — nothing here depends on anyone listening to it.
         /// </summary>
-        public event Action<int, bool> DamageTaken;
+        public event Action<int, bool, Element> DamageTaken;
 
         /// <summary>
         /// Raised whenever <see cref="NotifyDodged"/> is called, i.e. an
@@ -111,6 +111,9 @@ namespace Project.Combat
         /// <inheritdoc />
         public MonsterSize Size => StatsHolder.Stats.Size;
 
+        /// <inheritdoc />
+        public MonsterRace Race => StatsHolder.Stats.Race;
+
         private int PhysicalDefense
         {
             get
@@ -127,6 +130,28 @@ namespace Project.Combat
                 var baseDefense = defensiveStatsProvider?.GetMagicalDefense() ?? StatsHolder.Stats.MagicalDefense;
                 return buffs != null ? baseDefense + buffs.MagicalDefenseBonus : baseDefense;
             }
+        }
+
+        /// <summary>
+        /// Gets the flat physical defense bonus granted by any learned
+        /// "race bane resistance" passive (e.g. Divine Protection) against
+        /// the given attacker's race — zero if the attacker's race isn't
+        /// one such a passive cares about (or the attacker has no
+        /// <see cref="IDamageable"/> to read a race from), or if
+        /// <see cref="defensiveStatsSource"/> isn't wired. Enemies have no
+        /// implementer and simply never get this bonus, same as every
+        /// other <see cref="IDefensiveStatsProvider"/> value.
+        /// </summary>
+        /// <param name="attacker">The attacker's transform, or null if unknown.</param>
+        private int GetRaceDefenseBonus(Transform attacker)
+        {
+            if (defensiveStatsProvider == null || attacker == null)
+            {
+                return 0;
+            }
+
+            var attackerRace = attacker.GetComponentInParent<IDamageable>()?.Race ?? MonsterRace.Formless;
+            return defensiveStatsProvider.GetRaceDefenseBonus(attackerRace);
         }
 
         private void Awake()
@@ -155,11 +180,11 @@ namespace Project.Combat
                 return;
             }
 
-            var defense = category == DamageCategory.Physical ? PhysicalDefense : MagicalDefense;
+            var defense = category == DamageCategory.Physical ? PhysicalDefense + GetRaceDefenseBonus(attacker) : MagicalDefense;
             amount = Mathf.Max(1, amount - defense);
 
             currentHealth = Mathf.Max(currentHealth - amount, 0);
-            DamageTaken?.Invoke(amount, isCritical);
+            DamageTaken?.Invoke(amount, isCritical, element);
             HealthChanged?.Invoke(currentHealth, MaxHealth);
 
             if (attacker != null)

@@ -93,6 +93,9 @@ namespace Project.Character.Combat
         [SerializeField] private ManaComponent mana;
         [SerializeField] private PlayerAnimatorController animatorController;
 
+        [Tooltip("Optional. Source of active status effects (see StatusEffectController) affecting the player — e.g. a Stun/Freeze/Petrify landed on them. Left empty, the player is never immobilized by one.")]
+        [SerializeField] private StatusEffectController statusEffects;
+
         [SerializeField] private float unarmedRange = 1.5f;
 
         [Header("Mage Basic Attack")]
@@ -198,11 +201,17 @@ namespace Project.Character.Combat
             }
 
             var mainHandWeapon = GetMainHandWeapon();
-            return mainHandWeapon != null ? mainHandWeapon.AttackRange : unarmedRange;
+            var baseRange = mainHandWeapon != null ? mainHandWeapon.AttackRange : unarmedRange;
+            return baseRange + (playerStats != null ? playerStats.GetPassiveRangeBonus() : 0f);
         }
 
         private bool CanAttack()
         {
+            if (statusEffects != null && statusEffects.IsImmobilized)
+            {
+                return false;
+            }
+
             if (classController.CurrentClass == CharacterClass.Mage)
             {
                 return mana.CurrentMana >= mageManaCostPerAttack;
@@ -336,6 +345,12 @@ namespace Project.Character.Combat
                 : baseDamage;
 
             damage = WeaponSizeModifiers.Apply(damage, category, equipment.GetMainHandWeaponSubtype(), target.Size);
+
+            if (category == DamageCategory.Physical)
+            {
+                damage += playerStats.GetRaceDamageBonus(target.Race);
+            }
+
             ResolveOutcome(target, projectilePrefab, () => target.TakeDamage(damage, element, category, isCriticalHit, transform));
         }
 

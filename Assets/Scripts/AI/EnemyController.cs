@@ -42,7 +42,7 @@ namespace Project.AI
         [Tooltip("Optional. Source of temporary buff/debuff modifiers (see BuffController) affecting this enemy's outgoing attack power — e.g. a Provoke debuff landed on it. Left empty, this enemy is never affected by one.")]
         [SerializeField] private BuffController buffs;
 
-        [Tooltip("Optional. Source of active status effects (see StatusEffectController) affecting this enemy — e.g. a Fatal Blow stun. Left empty, this enemy is never stunned.")]
+        [Tooltip("Optional. Source of active status effects (see StatusEffectController) affecting this enemy — e.g. a Fatal Blow stun, or a future Freeze/Petrify skill. Left empty, this enemy is never immobilized by one.")]
         [SerializeField] private StatusEffectController statusEffects;
 
         private CharacterStatsHolder statsHolder;
@@ -113,6 +113,15 @@ namespace Project.AI
 
         /// <summary>Gets the enemy's base combat stats.</summary>
         public CharacterStatsDefinition Stats => StatsHolder.Stats;
+
+        /// <summary>
+        /// Gets whether this enemy sees through Hiding entirely, ignoring
+        /// <see cref="IsPlayerHidden"/> in both <see cref="DetectPlayer"/>
+        /// and <see cref="EnemyWanderState"/>'s remembered-aggressor
+        /// re-engage check — matching real Ragnarok Online's Insect/Demon
+        /// race and Boss-monster exceptions to Hiding.
+        /// </summary>
+        public bool SeesThroughHiding => Stats.IsBoss || Stats.Race == MonsterRace.Insect || Stats.Race == MonsterRace.Demon;
 
         /// <summary>
         /// Gets the temporary buff/debuff modifiers currently affecting
@@ -195,10 +204,10 @@ namespace Project.AI
 
         private void Update()
         {
-            var stunned = statusEffects != null && statusEffects.IsStunned;
-            agent.isStopped = stunned;
+            var immobilized = statusEffects != null && statusEffects.IsImmobilized;
+            agent.isStopped = immobilized;
 
-            if (!stunned)
+            if (!immobilized)
             {
                 currentState?.Tick(this);
             }
@@ -231,9 +240,14 @@ namespace Project.AI
         }
 
         /// <summary>
-        /// Searches for a player within <see cref="AggroRange"/>.
+        /// Searches for a player within <see cref="AggroRange"/>, ignoring
+        /// one that's currently hidden (see <see cref="IsPlayerHidden"/>)
+        /// unless this enemy <see cref="SeesThroughHiding"/> — Hiding is
+        /// meant to prevent fresh detection, same as in real Ragnarok
+        /// Online, except against the same Insect/Demon/Boss monsters real
+        /// RO exempts.
         /// </summary>
-        /// <returns>The closest player transform found, or null if none are in range.</returns>
+        /// <returns>The closest player transform found, or null if none are in range or all in range are hidden.</returns>
         public Transform DetectPlayer()
         {
             var hits = Physics.OverlapSphere(transform.position, aggroRange, playerLayer);
@@ -243,7 +257,28 @@ namespace Project.AI
             //     Debug.Log($"{name} overlap check: {hits.Length} hit(s), layer mask value = {playerLayer.value}");
             // }
 
-            return hits.Length > 0 ? hits[0].transform : null;
+            foreach (var hit in hits)
+            {
+                if (SeesThroughHiding || !IsPlayerHidden(hit.transform))
+                {
+                    return hit.transform;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets whether the given player transform is currently hidden (see
+        /// <see cref="StatusEffectController.IsHidden"/>), via a
+        /// <see cref="StatusEffectController"/> on it or a parent. A player
+        /// with no such component wired is never considered hidden.
+        /// </summary>
+        /// <param name="player">The player transform to check.</param>
+        internal static bool IsPlayerHidden(Transform player)
+        {
+            var status = player.GetComponentInParent<StatusEffectController>();
+            return status != null && status.IsHidden;
         }
 
         /// <summary>

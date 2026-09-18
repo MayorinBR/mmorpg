@@ -8,7 +8,13 @@ namespace Project.Skills
     /// <see cref="Combat.BuffController"/>, or spawns a persistent,
     /// ground-placed damaging area (<see cref="Zone"/> — e.g. Fire Wall)
     /// that ticks damage against anything standing inside it for a limited
-    /// duration via <see cref="Combat.SkillZoneController"/>. A passive
+    /// duration via <see cref="Combat.SkillZoneController"/>, flips an
+    /// untimed status flag on the caster (<see cref="Toggle"/> — currently
+    /// only Hiding, recast to turn back off), or clears Hiding from every
+    /// hidden target within <see cref="SkillDefinition.AreaRadius"/> of the
+    /// caster (<see cref="Reveal"/> — e.g. Sight, Ruwach), optionally also
+    /// damaging each one revealed this way if the skill's own damage
+    /// fields are non-zero (e.g. Ruwach). A passive
     /// skill is never actually cast: its bonus is read directly from
     /// <see cref="SkillDefinition"/> by whatever system it affects (see
     /// <see cref="Character.Combat.PlayerPassiveSkillController"/>)
@@ -21,6 +27,8 @@ namespace Project.Skills
         Heal,
         Passive,
         Buff,
-        Zone
+        Zone,
+        Toggle,
+        Reveal
     }
 }

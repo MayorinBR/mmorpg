@@ -37,8 +37,23 @@ namespace Project.Skills
         [Tooltip("If true, this Damage skill hits every living IDamageable within AreaRadius of a center point instead of a single selected target. TargetType decides the center: AreaAroundCaster needs no pre-selected target (e.g. Magnum Break), AreaAroundTarget still needs one in range and centers on it instead (e.g. Fire Ball).")]
         [SerializeField] private bool isAreaOfEffect;
 
-        [Tooltip("Radius, in meters, around the caster that an area-of-effect skill damages (only meaningful when IsAreaOfEffect is true), or the radius of a Zone skill's spawned zone (only meaningful when Effect Type is Zone).")]
+        [Tooltip("Radius, in meters, around the caster that an area-of-effect skill damages (only meaningful when IsAreaOfEffect is true), the radius of a Zone skill's spawned zone (only meaningful when Effect Type is Zone), or the radius a Reveal skill scans around the caster for hidden targets (only meaningful when Effect Type is Reveal).")]
         [SerializeField] private float areaRadius = 3f;
+
+        [Tooltip("Status effect this skill has a chance to inflict on a hit target, in addition to its damage — e.g. Envenom's Poison, Frost Driver's Freeze, Stone Fling/Sand Attack's Stun or Blind. None means this skill never inflicts one.")]
+        [SerializeField] private StatusEffectType inflictedStatus;
+
+        [Tooltip("How long InflictedStatus lasts, in seconds, when it procs, before any per-level component. Only meaningful when InflictedStatus is not None.")]
+        [SerializeField] private float inflictedStatusDurationSeconds;
+
+        [Tooltip("Extra duration in seconds per skill level, added on top of InflictedStatusDurationSeconds. Only meaningful when InflictedStatus is not None.")]
+        [SerializeField] private float inflictedStatusDurationPerLevel;
+
+        [Tooltip("Flat damage per tick, per skill level, when InflictedStatus is Poison — e.g. Envenom's poison DoT. Only meaningful when InflictedStatus is Poison.")]
+        [SerializeField] private float poisonDamagePerTickPerLevel;
+
+        [Tooltip("Chance per skill level, from 0 to 1, used by two different mechanics depending on EffectType: for a Damage skill, the chance InflictedStatus actually procs on a hit (e.g. Envenom's poison chance); for an Enemy-targeted Buff (i.e. a debuff, e.g. Decrease AGI), the chance the debuff lands at all instead of being resisted. Left at zero, a Damage skill's InflictedStatus never procs and a debuff always lands — matching every skill authored before this field existed.")]
+        [SerializeField] private float successChancePerLevel;
 
         [Header("Passive (only used if Effect Type is Passive)")]
         [Tooltip("Flat bonus to Status ATK per skill level, applied automatically while this passive skill is learned and (if PassiveRequiredWeaponSubtypes is non-empty) a matching weapon is equipped in the main hand — e.g. Sword Mastery.")]
@@ -46,6 +61,24 @@ namespace Project.Skills
 
         [Tooltip("If non-empty, this passive's attack bonus only applies while the equipped main-hand weapon's subtype is one of these — e.g. Sword Mastery requires Dagger or One-Hand Sword. Empty means the bonus always applies once learned.")]
         [SerializeField] private WeaponSubtype[] passiveRequiredWeaponSubtypes;
+
+        [Tooltip("Flat DEX bonus per skill level, applied the same way as PassiveAttackBonusPerLevel — e.g. Owl's Eye.")]
+        [SerializeField] private float passiveDexBonusPerLevel;
+
+        [Tooltip("Flat Hit rating bonus per skill level, applied the same way as PassiveAttackBonusPerLevel — e.g. Vulture's Eye.")]
+        [SerializeField] private float passiveHitBonusPerLevel;
+
+        [Tooltip("Flat attack range bonus, in meters, per skill level, applied the same way as PassiveAttackBonusPerLevel — e.g. Vulture's Eye.")]
+        [SerializeField] private float passiveRangeBonusPerLevel;
+
+        [Tooltip("Flat Flee rating bonus per skill level, applied the same way as PassiveAttackBonusPerLevel, but never weapon-gated — e.g. Improve Dodge.")]
+        [SerializeField] private float passiveFleeBonusPerLevel;
+
+        [Tooltip("Flat physical damage bonus per skill level against Demon/Undead race targets only — e.g. Demon Bane. Never weapon-gated. Zero for passives without one.")]
+        [SerializeField] private float passiveRaceDamageBonusPerLevel;
+
+        [Tooltip("Flat physical defense bonus per skill level against Demon/Undead race attackers only — e.g. Divine Protection. Never weapon-gated. Zero for passives without one.")]
+        [SerializeField] private float passiveRaceDefenseBonusPerLevel;
 
         [Tooltip("If set, this passive gives a chance to stun whenever the referenced skill lands a hit — e.g. Fatal Blow augmenting Bash. Null means this passive doesn't augment any skill.")]
         [SerializeField] private SkillDefinition augmentsSkill;
@@ -172,6 +205,14 @@ namespace Project.Skills
         /// </summary>
         public float AreaRadius => areaRadius;
 
+        /// <summary>
+        /// Gets the status effect this Damage skill has a chance to inflict
+        /// on a hit target, in addition to its damage (e.g. Envenom's
+        /// Poison). <see cref="StatusEffectType.None"/> means it never
+        /// inflicts one. Only meaningful when <see cref="EffectType"/> is Damage.
+        /// </summary>
+        public StatusEffectType InflictedStatus => inflictedStatus;
+
         /// <summary>Gets the optional visual prefab spawned at a Zone skill's position. Null means the zone is logic-only. Only meaningful when <see cref="EffectType"/> is Zone.</summary>
         public GameObject ZonePrefab => zonePrefab;
 
@@ -235,6 +276,45 @@ namespace Project.Skills
         }
 
         /// <summary>
+        /// Calculates how long, in seconds, <see cref="InflictedStatus"/>
+        /// lasts when it procs at the given level. Only meaningful when
+        /// <see cref="InflictedStatus"/> is not <see cref="StatusEffectType.None"/>.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated duration in seconds.</returns>
+        public float GetInflictedStatusDuration(int skillLevel)
+        {
+            return inflictedStatusDurationSeconds + inflictedStatusDurationPerLevel * skillLevel;
+        }
+
+        /// <summary>
+        /// Calculates the flat damage per Poison tick at the given level.
+        /// Only meaningful when <see cref="InflictedStatus"/> is
+        /// <see cref="StatusEffectType.Poison"/>.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated tick damage.</returns>
+        public int GetPoisonDamagePerTick(int skillLevel)
+        {
+            return Mathf.RoundToInt(poisonDamagePerTickPerLevel * skillLevel);
+        }
+
+        /// <summary>
+        /// Calculates the chance, from 0 to 1, for <see cref="InflictedStatus"/>
+        /// to proc on a hit (Damage skills) or for an enemy-targeted debuff
+        /// to land instead of being resisted (Buff skills), at the given
+        /// level. Zero means the effect is unconditional — a Damage skill's
+        /// InflictedStatus never procs, or a debuff always lands — matching
+        /// every skill authored before this field existed.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated chance, from 0 to 1.</returns>
+        public float GetSuccessChance(int skillLevel)
+        {
+            return successChancePerLevel * skillLevel;
+        }
+
+        /// <summary>
         /// Calculates the flat Status ATK bonus this passive skill grants
         /// at the given level, before <see cref="PassiveRequiredWeaponSubtypes"/>
         /// is checked against the equipped weapon. Only meaningful when
@@ -245,6 +325,85 @@ namespace Project.Skills
         public int GetPassiveAttackBonus(int skillLevel)
         {
             return Mathf.RoundToInt(passiveAttackBonusPerLevel * skillLevel);
+        }
+
+        /// <summary>
+        /// Calculates the flat DEX bonus this passive skill grants at the
+        /// given level, before <see cref="PassiveRequiredWeaponSubtypes"/>
+        /// is checked against the equipped weapon. Only meaningful when
+        /// <see cref="EffectType"/> is Passive.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated DEX bonus, zero for passives without one.</returns>
+        public int GetPassiveDexBonus(int skillLevel)
+        {
+            return Mathf.RoundToInt(passiveDexBonusPerLevel * skillLevel);
+        }
+
+        /// <summary>
+        /// Calculates the flat Hit rating bonus this passive skill grants
+        /// at the given level, before
+        /// <see cref="PassiveRequiredWeaponSubtypes"/> is checked against
+        /// the equipped weapon. Only meaningful when <see cref="EffectType"/>
+        /// is Passive.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated Hit bonus, zero for passives without one.</returns>
+        public int GetPassiveHitBonus(int skillLevel)
+        {
+            return Mathf.RoundToInt(passiveHitBonusPerLevel * skillLevel);
+        }
+
+        /// <summary>
+        /// Calculates the flat attack range bonus, in meters, this passive
+        /// skill grants at the given level, before
+        /// <see cref="PassiveRequiredWeaponSubtypes"/> is checked against
+        /// the equipped weapon. Only meaningful when <see cref="EffectType"/>
+        /// is Passive.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated range bonus, zero for passives without one.</returns>
+        public float GetPassiveRangeBonus(int skillLevel)
+        {
+            return passiveRangeBonusPerLevel * skillLevel;
+        }
+
+        /// <summary>
+        /// Calculates the flat Flee rating bonus this passive skill grants
+        /// at the given level. Only meaningful when <see cref="EffectType"/>
+        /// is Passive.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated Flee bonus, zero for passives without one.</returns>
+        public int GetPassiveFleeBonus(int skillLevel)
+        {
+            return Mathf.RoundToInt(passiveFleeBonusPerLevel * skillLevel);
+        }
+
+        /// <summary>
+        /// Calculates the flat physical damage bonus this passive skill
+        /// grants at the given level against Demon/Undead race targets
+        /// (e.g. Demon Bane). Only meaningful when <see cref="EffectType"/>
+        /// is Passive.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated damage bonus, zero for passives without one.</returns>
+        public int GetPassiveRaceDamageBonus(int skillLevel)
+        {
+            return Mathf.RoundToInt(passiveRaceDamageBonusPerLevel * skillLevel);
+        }
+
+        /// <summary>
+        /// Calculates the flat physical defense bonus this passive skill
+        /// grants at the given level against Demon/Undead race attackers
+        /// (e.g. Divine Protection). Only meaningful when
+        /// <see cref="EffectType"/> is Passive.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated defense bonus, zero for passives without one.</returns>
+        public int GetPassiveRaceDefenseBonus(int skillLevel)
+        {
+            return Mathf.RoundToInt(passiveRaceDefenseBonusPerLevel * skillLevel);
         }
 
         /// <summary>
