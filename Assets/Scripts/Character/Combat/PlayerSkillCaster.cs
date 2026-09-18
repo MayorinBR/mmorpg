@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using Project.Skills;
 using Project.Character.Animation;
 using Project.Character.Movement;
@@ -18,11 +19,15 @@ namespace Project.Character.Combat
     /// Ragnarok Online's Heal), applies a timed buff/debuff (see
     /// <see cref="ownBuffs"/>) to the caster, the current enemy target, or
     /// every Demon/Undead target around the caster (e.g. Signum Crucis),
-    /// spawns a persistent damaging zone (see <see cref="TryCastSkillAtPosition"/>)
-    /// at a ground position the player picked, flips a status toggle (e.g.
-    /// Hiding) on the caster, or reveals (and optionally damages) hidden
-    /// targets around the caster (e.g. Sight, Ruwach), depending on the
-    /// skill's effect and target type.
+    /// spawns a persistent damaging or attack-blocking zone (e.g. Fire
+    /// Wall, Safety Wall — see <see cref="TryCastSkillAtPosition"/>) at a
+    /// ground position the player picked, flips a status toggle (e.g.
+    /// Hiding) on the caster, reveals (and optionally damages) hidden
+    /// targets around the caster (e.g. Sight, Ruwach), clears every
+    /// active debuff on the caster (e.g. Cure, Detoxify), or instantly
+    /// pushes the caster back (e.g. Back Slide), depending on the skill's
+    /// effect and target type. A Damage skill can also carry its own
+    /// knockback, pushing the hit target back instead (e.g. Arrow Repel).
     /// </summary>
     public class PlayerSkillCaster : MonoBehaviour
     {
@@ -44,6 +49,12 @@ namespace Project.Character.Combat
 
         [Tooltip("Layer containing enemy colliders, used by an area-of-effect skill (see SkillDefinition.IsAreaOfEffect, e.g. Magnum Break) to find every target within range of the caster, and by a Zone skill's spawned SkillZoneController (e.g. Fire Wall) to find who's standing inside it. Should be set to the same layer as SkillTargetingController's own enemyLayer.")]
         [SerializeField] private LayerMask enemyLayer;
+
+        [Tooltip("Optional. The caster's own NavMeshAgent, used by a Displacement skill (e.g. Back Slide) to push the caster back via KnockbackUtility. Left empty, a Displacement skill can't be cast.")]
+        [SerializeField] private NavMeshAgent agent;
+
+        [Tooltip("Optional. Source of the player's Zeny, spent by a Damage skill with a nonzero SkillDefinition.ZenyCost (e.g. Mammonite), on top of its mana cost. Left empty, such a skill can't be cast; every skill with no Zeny cost is unaffected.")]
+        [SerializeField] private PlayerCurrency currency;
 
         private readonly Dictionary<SkillDefinition, float> cooldownEndTimes = new Dictionary<SkillDefinition, float>();
 
@@ -102,6 +113,8 @@ namespace Project.Character.Combat
                 SkillEffectType.Buff => TryCastBuff(skill, level),
                 SkillEffectType.Toggle => TryCastToggle(skill),
                 SkillEffectType.Reveal => TryCastReveal(skill, level),
+                SkillEffectType.Cleanse => TryCastCleanse(skill),
+                SkillEffectType.Displacement => TryCastDisplacement(skill),
                 _ => TryCastDamage(skill, level)
             };
 
@@ -460,11 +473,25 @@ namespace Project.Character.Combat
                 return false;
             }
 
+            if (skill.ZenyCost > 0 && (currency == null || currency.CurrentZeny < skill.ZenyCost))
+            {
+                // Checked (not spent) before ManaCost below, so a skill
+                // that can't be afforded never partially spends mana.
+                return false;
+            }
+
             var distance = CombatRangeMath.HorizontalDistance(transform.position, targetSelector.CurrentTarget.position);
 
             if (distance > skill.Range || !mana.TryConsumeMana(skill.ManaCost))
             {
                 return false;
+            }
+
+            if (skill.ZenyCost > 0)
+            {
+                // Guaranteed to succeed: affordability was already checked
+                // above and nothing else can spend Zeny mid-cast.
+                currency.TrySpend(skill.ZenyCost);
             }
 
             if (skill.IsAreaOfEffect)
@@ -486,6 +513,12 @@ namespace Project.Character.Combat
                 var targetStatus = targetSelector.CurrentTarget.GetComponentInParent<StatusEffectController>();
                 TryProcStunAugment(skill, level, targetStatus);
                 TryProcInflictedStatus(skill, level, targetStatus);
+
+                if (skill.KnockbackDistance > 0f)
+                {
+                    var targetAgent = targetSelector.CurrentTarget.GetComponentInParent<NavMeshAgent>();
+                    KnockbackUtility.Apply(targetAgent, transform.position, skill.KnockbackDistance);
+                }
             }
             else
             {
@@ -567,14 +600,19 @@ namespace Project.Character.Combat
         }
 
         /// <summary>
-        /// Casts a <see cref="SkillEffectType.Zone"/> skill (e.g. Fire
-        /// Wall): spends mana as soon as the cast is committed, the same as
-        /// a Damage skill, then spawns a <see cref="SkillZoneController"/>
-        /// at <paramref name="position"/> that deals this skill's damage,
-        /// on its own tick interval, to every living enemy standing inside
-        /// it until its duration runs out. Damage and accuracy are fixed at
-        /// cast time from the caster's current stats, the same as every
-        /// other skill here — the zone itself never re-reads them.
+        /// Casts a <see cref="SkillEffectType.Zone"/> skill: spends mana as
+        /// soon as the cast is committed, the same as a Damage skill, then
+        /// spawns a <see cref="SkillZoneController"/> at
+        /// <paramref name="position"/>. If <see cref="SkillDefinition.BlocksAttacks"/>
+        /// is true (e.g. Safety Wall, Pneuma), the zone blocks attacks of
+        /// its <see cref="SkillDefinition.BlockedWeaponType"/> within
+        /// range instead of damaging (see
+        /// <see cref="SkillZoneController.InitializeBlock"/>); otherwise it
+        /// deals this skill's damage, on its own tick interval, to every
+        /// living enemy standing inside it until its duration runs out
+        /// (e.g. Fire Wall). Damage and accuracy are fixed at cast time
+        /// from the caster's current stats, the same as every other skill
+        /// here — the zone itself never re-reads them.
         /// </summary>
         /// <param name="skill">The zone skill being cast.</param>
         /// <param name="level">The skill's current level.</param>
@@ -587,12 +625,18 @@ namespace Project.Character.Combat
                 return false;
             }
 
+            var zone = SkillZoneController.Spawn(skill.ZonePrefab, position, skill.AreaRadius, skill.GetZoneDuration(level), skill.ZoneTickIntervalSeconds);
+
+            if (skill.BlocksAttacks)
+            {
+                zone.InitializeBlock(skill.BlockedWeaponType == WeaponType.Melee ? AttackRangeKind.Melee : AttackRangeKind.Ranged);
+                return true;
+            }
+
             var subStats = statsController.CurrentSubStats;
             var accuracy = subStats.Hit + skill.GetAccuracyBonus(level);
             var damage = skill.CalculateDamage(subStats.StatusAtk, subStats.StatusMatk, level);
             var category = skill.DamageType == SkillDamageType.Physical ? DamageCategory.Physical : DamageCategory.Magical;
-
-            var zone = SkillZoneController.Spawn(skill.ZonePrefab, position, skill.AreaRadius, skill.GetZoneDuration(level), skill.ZoneTickIntervalSeconds);
             zone.Initialize(enemyLayer, accuracy, damage, skill.Element, category, transform);
             return true;
         }
@@ -672,6 +716,52 @@ namespace Project.Character.Combat
             }
 
             statusEffects.SetHidden(!statusEffects.IsHidden);
+            return true;
+        }
+
+        /// <summary>
+        /// Casts a <see cref="SkillEffectType.Cleanse"/> skill (e.g. Cure,
+        /// Detoxify): spends mana and clears every active debuff on the
+        /// caster via <see cref="StatusEffectController.ClearAllDebuffs"/>.
+        /// Ally targeting resolves to the caster itself, the same stopgap
+        /// <see cref="TryCastBuff"/> already uses, until real ally
+        /// selection exists.
+        /// </summary>
+        /// <param name="skill">The cleanse skill being cast.</param>
+        /// <returns>True if the cleanse was applied.</returns>
+        private bool TryCastCleanse(SkillDefinition skill)
+        {
+            if (statusEffects == null || !mana.TryConsumeMana(skill.ManaCost))
+            {
+                return false;
+            }
+
+            statusEffects.ClearAllDebuffs();
+            return true;
+        }
+
+        /// <summary>
+        /// Casts a <see cref="SkillEffectType.Displacement"/> skill (e.g.
+        /// Back Slide): spends mana, then pushes the caster
+        /// <see cref="SkillDefinition.KnockbackDistance"/> meters away from
+        /// the current target via <see cref="KnockbackUtility"/> — or
+        /// straight back along the caster's own facing if no target is
+        /// selected.
+        /// </summary>
+        /// <param name="skill">The displacement skill being cast.</param>
+        /// <returns>True if the cast was committed (mana spent).</returns>
+        private bool TryCastDisplacement(SkillDefinition skill)
+        {
+            if (agent == null || !mana.TryConsumeMana(skill.ManaCost))
+            {
+                return false;
+            }
+
+            var source = targetSelector.CurrentTarget != null
+                ? targetSelector.CurrentTarget.position
+                : transform.position - transform.forward;
+
+            KnockbackUtility.Apply(agent, source, skill.KnockbackDistance);
             return true;
         }
 

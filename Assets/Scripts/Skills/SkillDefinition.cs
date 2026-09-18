@@ -26,6 +26,9 @@ namespace Project.Skills
         [SerializeField] private float cooldownSeconds = 2f;
         [SerializeField] private float range = 3f;
 
+        [Tooltip("Zeny spent, on top of ManaCost, regardless of level — e.g. Mammonite. Zero for every skill without one (the vast majority).")]
+        [SerializeField] private int zenyCost;
+
         [Header("Damage (used if Effect Type is Damage or Zone)")]
         [SerializeField] private SkillDamageType damageType;
         [SerializeField] private float damageMultiplierPerLevel = 1f;
@@ -54,6 +57,9 @@ namespace Project.Skills
 
         [Tooltip("Chance per skill level, from 0 to 1, used by two different mechanics depending on EffectType: for a Damage skill, the chance InflictedStatus actually procs on a hit (e.g. Envenom's poison chance); for an Enemy-targeted Buff (i.e. a debuff, e.g. Decrease AGI), the chance the debuff lands at all instead of being resisted. Left at zero, a Damage skill's InflictedStatus never procs and a debuff always lands — matching every skill authored before this field existed.")]
         [SerializeField] private float successChancePerLevel;
+
+        [Tooltip("How far, in meters, this skill pushes something back via KnockbackUtility: the hit target for a Damage skill (e.g. Arrow Repel) or the caster itself for a Displacement skill (e.g. Back Slide). Zero means a Damage skill has no knockback; a Displacement skill needs this set to actually move.")]
+        [SerializeField] private float knockbackDistance;
 
         [Header("Passive (only used if Effect Type is Passive)")]
         [Tooltip("Flat bonus to Status ATK per skill level, applied automatically while this passive skill is learned and (if PassiveRequiredWeaponSubtypes is non-empty) a matching weapon is equipped in the main hand — e.g. Sword Mastery.")]
@@ -133,8 +139,14 @@ namespace Project.Skills
         [Tooltip("Extra duration in seconds per skill level, added on top of ZoneDurationSeconds.")]
         [SerializeField] private float zoneDurationPerLevel;
 
-        [Tooltip("Seconds between damage ticks against anything standing inside the zone, e.g. Fire Wall's repeated damage while a target stays in it.")]
+        [Tooltip("Seconds between damage ticks against anything standing inside the zone, e.g. Fire Wall's repeated damage while a target stays in it. Ignored when BlocksAttacks is true.")]
         [SerializeField] private float zoneTickIntervalSeconds = 1f;
+
+        [Tooltip("If true, this Zone skill's spawned zone blocks attacks of BlockedWeaponType instead of damaging — e.g. Safety Wall blocking melee, Pneuma blocking ranged. False means the zone only damages, the same as every zone skill before this field existed.")]
+        [SerializeField] private bool blocksAttacks;
+
+        [Tooltip("Which weapon range this zone blocks when BlocksAttacks is true — e.g. Safety Wall blocks Melee, Pneuma blocks Ranged. Only meaningful when BlocksAttacks is true.")]
+        [SerializeField] private WeaponType blockedWeaponType;
 
         /// <summary>Gets the skill's display name.</summary>
         public string SkillName => skillName;
@@ -159,6 +171,9 @@ namespace Project.Skills
 
         /// <summary>Gets the mana cost to cast this skill, regardless of its level.</summary>
         public int ManaCost => manaCost;
+
+        /// <summary>Gets the Zeny cost to cast this skill, on top of <see cref="ManaCost"/>, regardless of its level. Zero for every skill without one — e.g. Mammonite is the only one today.</summary>
+        public int ZenyCost => zenyCost;
 
         /// <summary>Gets the cooldown, in seconds, after casting this skill.</summary>
         public float CooldownSeconds => cooldownSeconds;
@@ -216,8 +231,14 @@ namespace Project.Skills
         /// <summary>Gets the optional visual prefab spawned at a Zone skill's position. Null means the zone is logic-only. Only meaningful when <see cref="EffectType"/> is Zone.</summary>
         public GameObject ZonePrefab => zonePrefab;
 
-        /// <summary>Gets the interval, in seconds, between a Zone skill's damage ticks against anything standing inside it. Only meaningful when <see cref="EffectType"/> is Zone.</summary>
+        /// <summary>Gets the interval, in seconds, between a Zone skill's damage ticks against anything standing inside it. Ignored when <see cref="BlocksAttacks"/> is true. Only meaningful when <see cref="EffectType"/> is Zone.</summary>
         public float ZoneTickIntervalSeconds => zoneTickIntervalSeconds;
+
+        /// <summary>Gets whether this Zone skill's spawned zone blocks attacks of <see cref="BlockedWeaponType"/> instead of damaging — e.g. Safety Wall, Pneuma. Only meaningful when <see cref="EffectType"/> is Zone.</summary>
+        public bool BlocksAttacks => blocksAttacks;
+
+        /// <summary>Gets which weapon range this zone blocks when <see cref="BlocksAttacks"/> is true. Only meaningful when <see cref="BlocksAttacks"/> is true.</summary>
+        public WeaponType BlockedWeaponType => blockedWeaponType;
 
         /// <summary>
         /// Gets the weapon subtypes this passive's attack bonus requires
@@ -313,6 +334,9 @@ namespace Project.Skills
         {
             return successChancePerLevel * skillLevel;
         }
+
+        /// <summary>Gets how far, in meters, this skill pushes something back via <see cref="Combat.KnockbackUtility"/>. Zero for a Damage skill without knockback; meaningful for every Displacement skill.</summary>
+        public float KnockbackDistance => knockbackDistance;
 
         /// <summary>
         /// Calculates the flat Status ATK bonus this passive skill grants

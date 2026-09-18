@@ -103,6 +103,15 @@ namespace Project.AI
                 return;
             }
 
+            // ponytail: always checked as Melee — every enemy in this
+            // project attacks by standing next to its target (this very
+            // state), so there's no ranged enemy attack to check as
+            // AttackRangeKind.Ranged yet. Revisit if one is added.
+            if (SkillZoneController.BlocksAttack(enemy.PlayerTarget.position, AttackRangeKind.Melee))
+            {
+                return;
+            }
+
             if (!HitChanceCalculator.RollHit(enemy.Stats.Hit, damageable.FleeRating))
             {
                 damageable.NotifyDodged();

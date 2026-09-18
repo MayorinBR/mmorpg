@@ -14,7 +14,11 @@ namespace Project.Skills
     /// hidden target within <see cref="SkillDefinition.AreaRadius"/> of the
     /// caster (<see cref="Reveal"/> — e.g. Sight, Ruwach), optionally also
     /// damaging each one revealed this way if the skill's own damage
-    /// fields are non-zero (e.g. Ruwach). A passive
+    /// fields are non-zero (e.g. Ruwach), or clears every active debuff
+    /// on the caster (<see cref="Cleanse"/> — e.g. Cure, Detoxify, see
+    /// <see cref="Combat.StatusEffectController.ClearAllDebuffs"/>), or
+    /// instantly pushes the caster back (<see cref="Displacement"/> — e.g.
+    /// Back Slide, see <see cref="Combat.KnockbackUtility"/>). A passive
     /// skill is never actually cast: its bonus is read directly from
     /// <see cref="SkillDefinition"/> by whatever system it affects (see
     /// <see cref="Character.Combat.PlayerPassiveSkillController"/>)
@@ -29,6 +33,8 @@ namespace Project.Skills
         Buff,
         Zone,
         Toggle,
-        Reveal
+        Reveal,
+        Cleanse,
+        Displacement
     }
 }

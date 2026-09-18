@@ -10,19 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 37c0de08ccf18a54d96a55cce435c377, type: 3}
-  m_Name: ArrowRepel
+  m_Name: Cure
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
-  skillName: Arrow Repel
-  description: Fires a heavy arrow that deals physical damage to the target and knocks it back.
+  skillName: Cure
+  description: Removes the caster's negative status effects. Currently applies to the caster only — party support isn't implemented yet.
   icon: {fileID: 0}
-  allowedClasses: 01000000
-  effectType: 0
-  targetType: 2
+  allowedClasses: 03000000
+  effectType: 7
+  targetType: 1
   maxLevel: 1
-  manaCost: 15
-  cooldownSeconds: 8
+  manaCost: 10
+  cooldownSeconds: 1
   range: 5
   damageType: 0
-  damageMultiplierPerLevel: 1.5
+  damageMultiplierPerLevel: 1
   healAmount: 10
-  knockbackDistance: 2

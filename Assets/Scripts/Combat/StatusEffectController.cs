@@ -134,6 +134,27 @@ namespace Project.Combat
         }
 
         /// <summary>
+        /// Clears every active timed debuff (Stun, Poison, Silence, Blind,
+        /// Freeze, Petrify) immediately — e.g. Cure, Detoxify. Doesn't touch
+        /// <see cref="IsHidden"/>, which isn't a debuff.
+        /// ponytail: clears everything rather than the specific subset real
+        /// Ragnarok Online's Cure (Stun/Silence/Blind) or Detoxify (Poison)
+        /// remove individually — this project already treats "one status
+        /// per skill" as an accepted simplification elsewhere (e.g. Stone
+        /// Fling's single inflicted status), so a single clear-everything
+        /// method covers both real skills without a new per-skill status list.
+        /// </summary>
+        public void ClearAllDebuffs()
+        {
+            stunExpireTime = 0f;
+            poisonExpireTime = 0f;
+            silenceExpireTime = 0f;
+            blindExpireTime = 0f;
+            freezeExpireTime = 0f;
+            petrifyExpireTime = 0f;
+        }
+
+        /// <summary>
         /// Applies the named status effect for the given duration, dispatching
         /// to the matching Apply* method — e.g. lets a skill (see
         /// <see cref="Project.Skills.SkillDefinition.InflictedStatus"/>) name

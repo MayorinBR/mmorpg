@@ -11,10 +11,16 @@ namespace Project.Combat
     /// element/category are fixed at <see cref="Initialize"/> time — the
     /// caster's stats when the skill was cast — the same as every other
     /// skill in this project resolving its effect once at cast time rather
-    /// than re-reading live stats on every tick.
+    /// than re-reading live stats on every tick. A zone can instead be
+    /// initialized via <see cref="InitializeBlock"/> (e.g. Safety Wall,
+    /// Pneuma) to block attacks of a given <see cref="AttackRangeKind"/>
+    /// within its radius instead of damaging — see
+    /// <see cref="BlocksAttack"/>.
     /// </summary>
     public class SkillZoneController : MonoBehaviour
     {
+        private static readonly List<SkillZoneController> blockingZones = new List<SkillZoneController>();
+
         private LayerMask targetLayer;
         private int accuracy;
         private int damage;
@@ -25,6 +31,7 @@ namespace Project.Combat
         private float tickIntervalSeconds;
         private float durationRemaining;
         private float tickRemaining;
+        private AttackRangeKind? blockedRangeKind;
 
         /// <summary>
         /// Spawns a new zone at <paramref name="position"/>, using
@@ -76,6 +83,49 @@ namespace Project.Combat
             this.caster = caster;
         }
 
+        /// <summary>
+        /// Marks this zone as attack-blocking instead of damaging — e.g.
+        /// Safety Wall blocking melee, Pneuma blocking ranged. Call instead
+        /// of <see cref="Initialize"/> right after <see cref="Spawn"/>; a
+        /// blocking zone never ticks damage. Registers this zone so
+        /// <see cref="BlocksAttack"/> can find it until it despawns.
+        /// </summary>
+        /// <param name="rangeKind">Which attack range this zone blocks.</param>
+        public void InitializeBlock(AttackRangeKind rangeKind)
+        {
+            blockedRangeKind = rangeKind;
+            blockingZones.Add(this);
+        }
+
+        private void OnDestroy()
+        {
+            blockingZones.Remove(this);
+        }
+
+        /// <summary>
+        /// Checks whether any active blocking zone (see
+        /// <see cref="InitializeBlock"/>) of the given
+        /// <paramref name="rangeKind"/> covers <paramref name="position"/>
+        /// — e.g. an enemy's melee attack against a player standing inside
+        /// Safety Wall. Used by <see cref="AI.EnemyAttackState"/> before it
+        /// resolves an attack against the player.
+        /// </summary>
+        /// <param name="position">The position being attacked, e.g. the target's own position.</param>
+        /// <param name="rangeKind">The attack's range kind.</param>
+        /// <returns>True if a matching blocking zone covers the position.</returns>
+        public static bool BlocksAttack(Vector3 position, AttackRangeKind rangeKind)
+        {
+            foreach (var zone in blockingZones)
+            {
+                if (zone.blockedRangeKind == rangeKind && Vector3.Distance(zone.transform.position, position) <= zone.radius)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void Update()
         {
             durationRemaining -= Time.deltaTime;
@@ -83,6 +133,14 @@ namespace Project.Combat
             if (durationRemaining <= 0f)
             {
                 Destroy(gameObject);
+                return;
+            }
+
+            if (blockedRangeKind.HasValue)
+            {
+                // A blocking zone (Safety Wall, Pneuma) never ticks damage
+                // — BlocksAttack is a static query against blockingZones,
+                // not something resolved here.
                 return;
             }
 
