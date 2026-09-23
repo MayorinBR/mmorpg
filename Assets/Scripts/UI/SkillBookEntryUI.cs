@@ -25,6 +25,7 @@ namespace Project.UI
 
         private Canvas rootCanvas;
         private PlayerSkillBook skillBook;
+        private PlayerExperience experience;
         private Image dragIcon;
 
         /// <summary>Gets the skill this row represents.</summary>
@@ -49,10 +50,12 @@ namespace Project.UI
         /// </summary>
         /// <param name="skill">The skill to represent.</param>
         /// <param name="book">The player's skill book, used to read/spend levels.</param>
-        public void Setup(SkillDefinition skill, PlayerSkillBook book)
+        /// <param name="playerExperience">Optional. The player's level, used to gray out the Learn button below <see cref="SkillDefinition.RequiredLevel"/>. Left null, the button ignores the level requirement (the underlying check in <see cref="PlayerSkillBook.TryLearnOrUpgrade"/> still applies either way).</param>
+        public void Setup(SkillDefinition skill, PlayerSkillBook book, PlayerExperience playerExperience = null)
         {
             Skill = skill;
             skillBook = book;
+            experience = playerExperience;
             iconImage.sprite = skill.Icon;
             nameText.text = skill.SkillName;
             manaCostText.text = skill.EffectType == SkillEffectType.Passive ? "Passive" : $"{skill.ManaCost} SP";
@@ -65,7 +68,8 @@ namespace Project.UI
         {
             var level = skillBook.GetLevel(Skill);
             levelText.text = $"{level}/{Skill.MaxLevel}";
-            learnButton.interactable = level < Skill.MaxLevel;
+            var meetsLevelRequirement = experience == null || experience.CurrentLevel >= Skill.RequiredLevel;
+            learnButton.interactable = level < Skill.MaxLevel && meetsLevelRequirement;
         }
 
         public void OnPointerEnter(PointerEventData eventData)

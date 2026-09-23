@@ -1,17 +1,17 @@
 {
     "characterName": "Player_Name",
     "characterGenderIndex": 0,
-    "baseLevel": 1,
-    "baseExperience": 30,
+    "baseLevel": 4,
+    "baseExperience": 25,
     "strength": 12,
     "agility": 1,
     "vitality": 1,
     "intelligence": 1,
     "dexterity": 1,
     "luck": 1,
-    "availableStatPoints": 73,
+    "availableStatPoints": 82,
     "jobLevel": 6,
-    "jobExperience": 30,
+    "jobExperience": 75,
     "availableSkillPoints": 3,
     "characterClassIndex": 0,
     "zeny": 0,
@@ -38,14 +38,14 @@
         "TestItem",
         "TestDualHand",
         "AmmoTest 1",
-        "TestWeapon",
+        "",
         "TestDualHand",
         "TestWeapon",
         "AmmoTest",
-        "",
-        "",
-        "",
-        "",
+        "TestDualHand",
+        "TestWeapon",
+        "TestWeapon",
+        "TestDualHand",
         "",
         "",
         "",
@@ -57,17 +57,17 @@
         ""
     ],
     "inventoryQuantities": [
-        6,
+        10,
         1,
-        5,
+        10,
+        0,
+        1,
+        1,
+        13,
         1,
         1,
         1,
-        4,
-        0,
-        0,
-        0,
-        0,
+        1,
         0,
         0,
         0,
@@ -78,15 +78,19 @@
         0,
         0
     ],
-    "equippedItemIds": [],
-    "equippedSlotMasks": [],
+    "equippedItemIds": [
+        "TestWeapon"
+    ],
+    "equippedSlotMasks": [
+        8
+    ],
     "equippedAmmoCount": 0,
     "windowIds": [
         "SkillBook",
-        "Equipment",
-        "Stats",
         "Inventory",
-        "SkillHotbar"
+        "Equipment",
+        "SkillHotbar",
+        "Stats"
     ],
     "windowIsOpen": [
         0,
@@ -111,17 +115,17 @@
     ],
     "windowPositionX": [
         455.2705078125,
-        1191.33203125,
-        670.8531494140625,
         762.8125610351563,
-        765.0042114257813
+        1191.33203125,
+        765.0042114257813,
+        670.8531494140625
     ],
     "windowPositionY": [
         -56.18365478515625,
-        -357.81500244140627,
-        -83.109130859375,
         -351.1456298828125,
-        -657.5772705078125
+        -357.81500244140627,
+        -657.5772705078125,
+        -83.109130859375
     ],
     "currentMapId": ""
 }

@@ -26,6 +26,9 @@ namespace Project.Skills
         [SerializeField] private float cooldownSeconds = 2f;
         [SerializeField] private float range = 3f;
 
+        [Tooltip("Minimum Base Level required to learn this skill, checked alongside AllowedClasses by PlayerSkillBook.TryLearnOrUpgrade. Zero (the default) means no requirement, matching every skill authored before this field existed.")]
+        [SerializeField] private int requiredLevel;
+
         [Tooltip("Zeny spent, on top of ManaCost, regardless of level — e.g. Mammonite. Zero for every skill without one (the vast majority).")]
         [SerializeField] private int zenyCost;
 
@@ -191,6 +194,9 @@ namespace Project.Skills
 
         /// <summary>Gets the mana cost to cast this skill, regardless of its level.</summary>
         public int ManaCost => manaCost;
+
+        /// <summary>Gets the minimum Base Level required to learn this skill. Zero means no requirement.</summary>
+        public int RequiredLevel => requiredLevel;
 
         /// <summary>Gets the Zeny cost to cast this skill, on top of <see cref="ManaCost"/>, regardless of its level. Zero for every skill without one — e.g. Mammonite is the only one today.</summary>
         public int ZenyCost => zenyCost;

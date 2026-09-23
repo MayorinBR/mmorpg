@@ -39,7 +39,7 @@ namespace Project.Character.Combat
 
         private void Awake()
         {
-            experienceCurve = new LinearExperienceCurve();
+            experienceCurve = new RealRagnarokExperienceCurve();
             pointsPerLevelStrategy = new RagnarokStatPointsPerLevelStrategy();
         }
 

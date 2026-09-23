@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Project.Character.Stats;
+using Project.Combat;
 using Project.Persistence;
 using Project.Skills;
 
@@ -10,7 +12,8 @@ namespace Project.Character.Combat
     /// <summary>
     /// Tracks which skills the player has learned and their current level.
     /// Learning or upgrading a skill spends one point from
-    /// <see cref="PlayerJobProgress"/> and respects the skill's class restriction.
+    /// <see cref="PlayerJobProgress"/> and respects the skill's class
+    /// restriction and minimum level requirement.
     /// </summary>
     public class PlayerSkillBook : MonoBehaviour, ISaveParticipant
     {
@@ -18,7 +21,16 @@ namespace Project.Character.Combat
         [SerializeField] private PlayerClassController classController;
         [SerializeField] private SkillDatabase skillDatabase;
 
+        [Tooltip("Optional. Source of the player's Base Level, used to enforce SkillDefinition.RequiredLevel. Left empty, skills can be learned regardless of level.")]
+        [SerializeField] private MonoBehaviour playerStatsSource;
+
+        private IPlayerLevelProvider levelProvider;
         private readonly Dictionary<SkillDefinition, int> skillLevels = new Dictionary<SkillDefinition, int>();
+
+        private void Awake()
+        {
+            levelProvider = playerStatsSource as IPlayerLevelProvider;
+        }
 
         /// <summary>Raised whenever a skill is learned or leveled up, with the skill and its new level.</summary>
         public event Action<SkillDefinition, int> SkillLeveledUp;
@@ -45,9 +57,15 @@ namespace Project.Character.Combat
         /// Attempts to learn (if unlearned) or upgrade (if already learned) a skill by one level.
         /// </summary>
         /// <param name="skill">The skill to learn or upgrade.</param>
-        /// <returns>True if the skill was learned/upgraded; false if the class doesn't allow it, it's already at max level, or no skill points are available.</returns>
+        /// <returns>True if the skill was learned/upgraded; false if the class doesn't allow it, the level requirement isn't met, it's already at max level, or no skill points are available.</returns>
         public bool TryLearnOrUpgrade(SkillDefinition skill)
         {
+            if (levelProvider != null && levelProvider.BaseLevel < skill.RequiredLevel)
+            {
+                PlayerFeedbackChannel.Publish($"Level {skill.RequiredLevel} required to learn {skill.SkillName}.");
+                return false;
+            }
+
             if (skill.AllowedClasses.Count > 0 && !skill.AllowedClasses.Contains(classController.CurrentClass))
             {
                 return false;
