@@ -22,6 +22,10 @@ namespace Project.Character.Combat
     /// DEX/AGI/VIT/INT-derived physical defense, magical defense and flee
     /// rating (see <see cref="CurrentSubStats"/>) feed into
     /// <see cref="Project.Combat.HealthComponent"/> the same optional-hook way.
+    /// Also implements <see cref="Project.Combat.IStatusResistanceProvider"/>
+    /// so the player's VIT gives a chance to fully resist an incoming
+    /// status effect, the same optional-hook way, feeding into
+    /// <see cref="Project.Combat.StatusEffectController"/>.
     /// When <see cref="health"/>/<see cref="mana"/> are assigned, <see cref="TryIncreaseStat"/>
     /// and equipment changes both push a refresh to them, so their max
     /// value (and any UI bound to it) picks up a VIT/INT change immediately
@@ -44,7 +48,7 @@ namespace Project.Character.Combat
     /// <see cref="ClassJobLevelBonusLookup"/>) is folded into every derived
     /// stat the same way equipment is, through <see cref="JobBonusStatsView"/>.
     /// </summary>
-    public class PlayerStatsController : MonoBehaviour, IPlayerLevelProvider, ISaveParticipant, IMaxHealthBonusProvider, IMaxManaBonusProvider, IDefensiveStatsProvider
+    public class PlayerStatsController : MonoBehaviour, IPlayerLevelProvider, ISaveParticipant, IMaxHealthBonusProvider, IMaxManaBonusProvider, IDefensiveStatsProvider, IStatusResistanceProvider
     {
         // Real Ragnarok Online value (source: iRO Wiki Classic — Stats,
         // consulted September 2026): a fresh level-1 character starts with
@@ -57,6 +61,14 @@ namespace Project.Character.Combat
         // Classic — Stats, consulted September 2026).
         private const float MaxHealthBonusPerVit = 0.01f;
         private const float MaxManaBonusPerInt = 0.01f;
+
+        // Real Ragnarok Online formula (source: ragnarokjobguides.blogspot.com
+        // "How stats affect statuses", consulted September 2026): VIT+3 = %
+        // resist chance against Stun/Poison/Silence/Bleeding, with immunity
+        // around 97 VIT. Applied here to all six StatusEffectType values as
+        // a deliberate simplification — see StatusEffectController's own
+        // RollResisted ponytail note for why.
+        private const int VitStatusResistOffset = 3;
 
         // Used only if statsHolder (or its Stats asset) isn't wired, so a
         // missing reference degrades gracefully instead of throwing.
@@ -447,6 +459,13 @@ namespace Project.Character.Combat
         public int GetRaceDefenseBonus(MonsterRace attackerRace)
         {
             return passiveSkills != null ? passiveSkills.GetRaceDefenseBonus(attackerRace) : 0;
+        }
+
+        /// <inheritdoc />
+        public float GetStatusResistChance()
+        {
+            EnsureInitialized();
+            return Mathf.Clamp01((effectiveStats.GetValue(StatType.Vitality) + VitStatusResistOffset) / 100f);
         }
 
         /// <summary>

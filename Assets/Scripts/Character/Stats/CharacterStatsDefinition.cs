@@ -33,6 +33,9 @@ namespace Project.Character.Stats
         [Tooltip("Aspd rating (classic Ragnarok Online's 0-190 display scale) before AGI/DEX are added on top. Raising this makes every auto-attack — and its swing animation — play faster; see Project.Combat.AttackSpeedCalculator.")]
         [SerializeField] private int baseAttackSpeed = 140;
 
+        [Tooltip("Flat chance (0 to 1) to fully resist an incoming status effect (Stun, Poison, Silence, Blind, Freeze, Petrify) — read by StatusEffectController when no IStatusResistanceProvider is wired, i.e. for enemies (the player's resistance is VIT-derived instead, see IStatusResistanceProvider). Zero means every status always lands, matching the behavior before this existed.")]
+        [SerializeField, Range(0f, 1f)] private float statusResistChance;
+
         /// <summary>Gets the maximum health points for this character type.</summary>
         public int MaxHealth => maxHealth;
 
@@ -88,5 +91,8 @@ namespace Project.Character.Stats
         /// speed, so the swing always finishes in exactly that interval.
         /// </summary>
         public int BaseAttackSpeed => baseAttackSpeed;
+
+        /// <summary>Gets the flat chance (0 to 1) to fully resist an incoming status effect, for characters with no IStatusResistanceProvider wired (see Project.Combat.StatusEffectController). Zero by default.</summary>
+        public float StatusResistChance => statusResistChance;
     }
 }

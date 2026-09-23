@@ -1,4 +1,5 @@
 using UnityEngine;
+using Project.Character.Stats;
 
 namespace Project.Combat
 {
@@ -10,7 +11,10 @@ namespace Project.Combat
     /// all fully immobilize a character in real Ragnarok Online, so they
     /// share <see cref="IsImmobilized"/> as a single check for the
     /// movement/basic-attack/skill-cast gates that don't care which of the
-    /// three caused it.
+    /// three caused it. Every Apply* method first rolls this character's
+    /// chance to fully resist the effect (see <see cref="RollResisted"/>
+    /// and <see cref="IStatusResistanceProvider"/>), so resistance applies
+    /// uniformly no matter which caller applies the status.
     /// </summary>
     public class StatusEffectController : MonoBehaviour
     {
@@ -19,6 +23,14 @@ namespace Project.Combat
 
         [Tooltip("Seconds between each Poison damage tick.")]
         [SerializeField] private float poisonTickIntervalSeconds = 1f;
+
+        [Tooltip("Optional component supplying this character's chance to fully resist an incoming status effect (e.g. the player's VIT-derived resistance). Left empty, falls back to statsHolder's flat Stats value.")]
+        [SerializeField] private MonoBehaviour resistanceSource;
+
+        [Tooltip("Optional. Source of this character's flat status-resist chance (see CharacterStatsDefinition.StatusResistChance), used when resistanceSource isn't wired — e.g. an enemy's authored value. Left empty alongside resistanceSource, every status effect always lands, unchanged from before resistance existed.")]
+        [SerializeField] private CharacterStatsHolder statsHolder;
+
+        private IStatusResistanceProvider resistanceProvider;
 
         private float stunExpireTime;
         private float poisonExpireTime;
@@ -29,6 +41,15 @@ namespace Project.Combat
         private int poisonDamagePerTick;
         private float poisonTickTimer;
         private bool isHidden;
+
+        /// <summary>
+        /// Raised whenever an Apply* call rolls a successful resist instead
+        /// of taking hold, naming which status was resisted. Purely a
+        /// cosmetic notification (e.g. a floating "Resist!" popup) —
+        /// nothing here depends on anyone listening to it, mirroring
+        /// <see cref="HealthComponent.Dodged"/>.
+        /// </summary>
+        public event System.Action<StatusEffectType> StatusResisted;
 
         /// <summary>Gets whether this character is currently stunned.</summary>
         public bool IsStunned => Time.time < stunExpireTime;
@@ -62,65 +83,105 @@ namespace Project.Combat
         /// (Thief). Unlike every other status here, this isn't timed: it
         /// stays true until explicitly toggled off (<see cref="SetHidden"/>)
         /// or a reveal skill clears it (<see cref="Reveal"/>), since real
-        /// Ragnarok Online's Hiding is a toggle, not a duration.
+        /// Ragnarok Online's Hiding is a toggle, not a duration. Hiding also
+        /// isn't run through <see cref="RollResisted"/> — it's a positioning
+        /// tool the caster applies to themselves, not an effect inflicted by
+        /// an opponent.
         /// </summary>
         public bool IsHidden => isHidden;
 
+        private void Awake()
+        {
+            resistanceProvider = resistanceSource as IStatusResistanceProvider;
+        }
+
         /// <summary>
-        /// Applies a stun lasting the given duration. Extends the current
-        /// stun rather than shortening it if one is already active and
-        /// would outlast this one.
+        /// Applies a stun lasting the given duration, unless resisted (see
+        /// <see cref="RollResisted"/>). Extends the current stun rather
+        /// than shortening it if one is already active and would outlast
+        /// this one.
         /// </summary>
         /// <param name="durationSeconds">How long the stun should last, in seconds.</param>
         public void ApplyStun(float durationSeconds)
         {
+            if (RollResisted(StatusEffectType.Stun))
+            {
+                return;
+            }
+
             stunExpireTime = Extend(stunExpireTime, durationSeconds);
         }
 
         /// <summary>
-        /// Applies Poison for the given duration, ticking the given flat
-        /// damage every <see cref="poisonTickIntervalSeconds"/> through the
-        /// wired <see cref="health"/>. Re-applying while already poisoned
-        /// extends the duration and keeps the stronger of the two tick
-        /// amounts; re-applying after it expired starts fresh at the new amount.
+        /// Applies Poison for the given duration, unless resisted (see
+        /// <see cref="RollResisted"/>), ticking the given flat damage every
+        /// <see cref="poisonTickIntervalSeconds"/> through the wired
+        /// <see cref="health"/>. Re-applying while already poisoned extends
+        /// the duration and keeps the stronger of the two tick amounts;
+        /// re-applying after it expired starts fresh at the new amount.
         /// </summary>
         /// <param name="durationSeconds">How long the poison should last, in seconds.</param>
         /// <param name="damagePerTick">Flat damage dealt on each tick, mitigated by the target's magical defense like any other Magical hit.</param>
         public void ApplyPoison(float durationSeconds, int damagePerTick)
         {
+            if (RollResisted(StatusEffectType.Poison))
+            {
+                return;
+            }
+
             poisonDamagePerTick = IsPoisoned ? Mathf.Max(poisonDamagePerTick, damagePerTick) : damagePerTick;
             poisonExpireTime = Extend(poisonExpireTime, durationSeconds);
         }
 
-        /// <summary>Applies Silence for the given duration, blocking skill casts only.</summary>
+        /// <summary>Applies Silence for the given duration, unless resisted (see <see cref="RollResisted"/>), blocking skill casts only.</summary>
         /// <param name="durationSeconds">How long the silence should last, in seconds.</param>
         public void ApplySilence(float durationSeconds)
         {
+            if (RollResisted(StatusEffectType.Silence))
+            {
+                return;
+            }
+
             silenceExpireTime = Extend(silenceExpireTime, durationSeconds);
         }
 
-        /// <summary>Applies Blind for the given duration. See <see cref="IsBlinded"/> for why nothing reacts to it yet.</summary>
+        /// <summary>Applies Blind for the given duration, unless resisted (see <see cref="RollResisted"/>). See <see cref="IsBlinded"/> for why nothing reacts to it yet.</summary>
         /// <param name="durationSeconds">How long the blind should last, in seconds.</param>
         public void ApplyBlind(float durationSeconds)
         {
+            if (RollResisted(StatusEffectType.Blind))
+            {
+                return;
+            }
+
             blindExpireTime = Extend(blindExpireTime, durationSeconds);
         }
 
-        /// <summary>Applies Freeze for the given duration, immobilizing the character (see <see cref="IsImmobilized"/>).</summary>
+        /// <summary>Applies Freeze for the given duration, unless resisted (see <see cref="RollResisted"/>), immobilizing the character (see <see cref="IsImmobilized"/>).</summary>
         /// <param name="durationSeconds">How long the freeze should last, in seconds.</param>
         public void ApplyFreeze(float durationSeconds)
         {
+            if (RollResisted(StatusEffectType.Freeze))
+            {
+                return;
+            }
+
             freezeExpireTime = Extend(freezeExpireTime, durationSeconds);
         }
 
-        /// <summary>Applies Petrify for the given duration, immobilizing the character (see <see cref="IsImmobilized"/>).</summary>
+        /// <summary>Applies Petrify for the given duration, unless resisted (see <see cref="RollResisted"/>), immobilizing the character (see <see cref="IsImmobilized"/>).</summary>
         /// <param name="durationSeconds">How long the petrify should last, in seconds.</param>
         public void ApplyPetrify(float durationSeconds)
         {
+            if (RollResisted(StatusEffectType.Petrify))
+            {
+                return;
+            }
+
             petrifyExpireTime = Extend(petrifyExpireTime, durationSeconds);
         }
 
-        /// <summary>Turns Hiding on or off directly — e.g. casting Hiding again to cancel it.</summary>
+        /// <summary>Turns Hiding on or off directly — e.g. casting Hiding again to cancel it. Not subject to resistance, see <see cref="IsHidden"/>.</summary>
         /// <param name="hidden">True to become hidden, false to become visible.</param>
         public void SetHidden(bool hidden)
         {
@@ -159,7 +220,10 @@ namespace Project.Combat
         /// to the matching Apply* method — e.g. lets a skill (see
         /// <see cref="Project.Skills.SkillDefinition.InflictedStatus"/>) name
         /// which status it inflicts without a caller-side switch. Does
-        /// nothing for <see cref="StatusEffectType.None"/>.
+        /// nothing for <see cref="StatusEffectType.None"/>. Resistance (see
+        /// <see cref="RollResisted"/>) is rolled inside the target Apply*
+        /// method, not here, so it applies the same way to a caller that
+        /// invokes e.g. <see cref="ApplyStun"/> directly.
         /// </summary>
         /// <param name="type">Which status to apply.</param>
         /// <param name="durationSeconds">How long it should last, in seconds.</param>
@@ -187,6 +251,40 @@ namespace Project.Combat
                     ApplyPetrify(durationSeconds);
                     break;
             }
+        }
+
+        /// <summary>
+        /// Rolls this character's chance to fully resist an incoming status
+        /// effect before it takes hold — <see cref="resistanceSource"/>'s
+        /// VIT-derived value for the player (see
+        /// <see cref="IStatusResistanceProvider"/>), or <see cref="statsHolder"/>'s
+        /// flat <see cref="CharacterStatsDefinition.StatusResistChance"/>
+        /// for an enemy with no provider wired. Both left empty means every
+        /// status always lands, unchanged from before resistance existed.
+        /// Raises <see cref="StatusResisted"/> on a successful resist.
+        /// ponytail: real Ragnarok Online splits resistance per status
+        /// (VIT for Stun/Poison/Silence/Blind, LUK for Freeze/Petrify/Sleep)
+        /// — this project already treats "one inflicted status per skill" as
+        /// an accepted simplification (see <see cref="ClearAllDebuffs"/>'s
+        /// own remarks), so one unified roll for all six covers the
+        /// gameplay need without per-status stat plumbing. Add per-status
+        /// sources if a specific status ever needs to resist differently.
+        /// </summary>
+        /// <param name="type">The status effect being rolled against, passed through to <see cref="StatusResisted"/>.</param>
+        /// <returns>True if the effect was resisted and should not be applied.</returns>
+        private bool RollResisted(StatusEffectType type)
+        {
+            var resistChance = resistanceProvider != null
+                ? resistanceProvider.GetStatusResistChance()
+                : statsHolder != null ? statsHolder.Stats.StatusResistChance : 0f;
+
+            if (Random.value >= resistChance)
+            {
+                return false;
+            }
+
+            StatusResisted?.Invoke(type);
+            return true;
         }
 
         private void Update()
