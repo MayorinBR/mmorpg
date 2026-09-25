@@ -60,6 +60,35 @@ namespace Project.Items
         }
 
         /// <summary>
+        /// Reserves carry-weight capacity for something that counts against
+        /// <see cref="MaxCarryWeight"/> without sitting in a slot — namely
+        /// an equipped item. Keeps total carried weight (inventory + gear)
+        /// constant across an equip: the item's weight leaves a slot (via
+        /// <see cref="RemoveAt"/> or <see cref="SetSlot"/>) and is
+        /// immediately re-reserved here, so equipping never frees up
+        /// capacity and unequipping — after <see cref="ReleaseExternalWeight"/>
+        /// hands that same amount back — never costs any.
+        /// </summary>
+        /// <param name="weight">The weight to reserve.</param>
+        public void ReserveExternalWeight(float weight)
+        {
+            CurrentWeight += weight;
+            InventoryChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Releases carry-weight capacity previously reserved with
+        /// <see cref="ReserveExternalWeight"/> (e.g. an item is being
+        /// unequipped or its equipped ammo consumed).
+        /// </summary>
+        /// <param name="weight">The weight to release.</param>
+        public void ReleaseExternalWeight(float weight)
+        {
+            CurrentWeight -= weight;
+            InventoryChanged?.Invoke();
+        }
+
+        /// <summary>
         /// Gets the contents of the slot at the given index.
         /// </summary>
         /// <param name="index">The slot index.</param>

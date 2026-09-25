@@ -134,6 +134,7 @@ namespace Project.Items
             var requiredSlots = ResolveTargetSlots(itemToEquip, out var alsoEvictOffHand);
 
             inventory.Items.RemoveAt(inventorySlotIndex);
+            inventory.Items.ReserveExternalWeight(itemToEquip.Weight);
 
             if (alsoEvictOffHand)
             {
@@ -164,14 +165,19 @@ namespace Project.Items
                 return false;
             }
 
+            var ammoRecord = equippedRecords.FirstOrDefault(record => record.OccupiedSlots.Contains(EquipmentSlot.Ammo));
+
             equippedAmmoCount--;
             AmmoCountChanged?.Invoke();
 
-            if (equippedAmmoCount == 0)
+            if (ammoRecord != null)
             {
-                var ammoRecord = equippedRecords.FirstOrDefault(record => record.OccupiedSlots.Contains(EquipmentSlot.Ammo));
+                // The consumed unit is gone for good (fired/used), not returned
+                // to the inventory, so its reserved capacity is released rather
+                // than handed to another slot.
+                inventory.Items.ReleaseExternalWeight(ammoRecord.Item.Weight);
 
-                if (ammoRecord != null)
+                if (equippedAmmoCount == 0)
                 {
                     equippedRecords.Remove(ammoRecord);
                     EquipmentChanged?.Invoke();
@@ -228,6 +234,7 @@ namespace Project.Items
 
                 if (equippedAmmoCount > 0)
                 {
+                    inventory.Items.ReleaseExternalWeight(record.Item.Weight * equippedAmmoCount);
                     inventory.Items.TryAddItem(record.Item, equippedAmmoCount);
                 }
 
@@ -329,6 +336,7 @@ namespace Project.Items
             {
                 equippedAmmoCount += quantity;
                 inventory.Items.RemoveAt(inventorySlotIndex);
+                inventory.Items.ReserveExternalWeight(item.Weight * quantity);
                 AmmoCountChanged?.Invoke();
                 return;
             }
@@ -336,6 +344,7 @@ namespace Project.Items
             if (existingAmmoRecord != null)
             {
                 equippedRecords.Remove(existingAmmoRecord);
+                inventory.Items.ReleaseExternalWeight(existingAmmoRecord.Item.Weight * equippedAmmoCount);
                 inventory.Items.SetSlot(inventorySlotIndex, existingAmmoRecord.Item, equippedAmmoCount);
             }
             else
@@ -343,6 +352,7 @@ namespace Project.Items
                 inventory.Items.RemoveAt(inventorySlotIndex);
             }
 
+            inventory.Items.ReserveExternalWeight(item.Weight * quantity);
             equippedRecords.Add(new EquippedRecord(item, new[] { EquipmentSlot.Ammo }));
             equippedAmmoCount = quantity;
             AmmoCountChanged?.Invoke();
@@ -393,6 +403,7 @@ namespace Project.Items
         private void EvictRecord(EquippedRecord record)
         {
             equippedRecords.Remove(record);
+            inventory.Items.ReleaseExternalWeight(record.Item.Weight);
             inventory.Items.TryAddItem(record.Item, 1);
         }
 
@@ -451,10 +462,21 @@ namespace Project.Items
                 {
                     var item = itemDatabase.FindById(data.equippedItemIds[i]);
 
-                    if (item != null)
+                    if (item == null)
                     {
-                        equippedRecords.Add(new EquippedRecord(item, FromSlotMask(data.equippedSlotMasks[i])));
+                        continue;
                     }
+
+                    var occupiedSlots = FromSlotMask(data.equippedSlotMasks[i]);
+                    equippedRecords.Add(new EquippedRecord(item, occupiedSlots));
+
+                    // Mirrors the reservation TryEquipFromInventory/EquipAmmo would
+                    // have made, so restored equipment counts toward carry weight
+                    // exactly like it did before the save.
+                    var restoredWeight = occupiedSlots.Contains(EquipmentSlot.Ammo)
+                        ? item.Weight * data.equippedAmmoCount
+                        : item.Weight;
+                    inventory.Items.ReserveExternalWeight(restoredWeight);
                 }
 
                 equippedAmmoCount = data.equippedAmmoCount;

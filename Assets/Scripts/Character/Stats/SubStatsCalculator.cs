@@ -37,10 +37,10 @@ namespace Project.Character.Stats
     /// <c>baseAspd</c> parameter — plus a flat AGI/DEX contribution,
     /// clamped to the real game's 0-190 display range) purely so the
     /// status window has a number to show, matching the original game's
-    /// own presentation (Victor asked for every sub-stat's calculation and
-    /// display to stay consistent with classic Ragnarok Online's status
-    /// window, after briefly trying a base-1.0 multiplier representation
-    /// instead — see FUTURE_IMPROVEMENTS.md for that reverted attempt).
+    /// own presentation — keeping every sub-stat's calculation and
+    /// display consistent with classic Ragnarok Online's status
+    /// window (a base-1.0 multiplier representation was tried and
+    /// reverted — see FUTURE_IMPROVEMENTS.md).
     /// This value already drives real auto-attack timing and animation
     /// speed via <see cref="Combat.AttackSpeedCalculator"/> — replace this
     /// whole calculation once the real per-weapon formula is verified.</item>

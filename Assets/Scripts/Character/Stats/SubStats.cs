@@ -47,8 +47,8 @@ namespace Project.Character.Stats
         /// <summary>
         /// Gets the attack speed rating (higher attacks faster), on
         /// Ragnarok Online's classic 0-190 display scale — matching the
-        /// original game's own status window, per Victor's request to keep
-        /// every sub-stat's calculation and presentation consistent with
+        /// original game's own status window, keeping every sub-stat's
+        /// calculation and presentation consistent with
         /// it. Computed from the real, sourced iRO Wiki Classic AGI/DEX
         /// formula — see <see cref="SubStatsCalculator"/>'s remarks. One
         /// piece is still a placeholder: the real per-weapon, per-job

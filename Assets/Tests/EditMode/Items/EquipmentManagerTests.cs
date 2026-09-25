@@ -259,6 +259,37 @@ namespace Project.Items.Tests
         }
 
         [Test]
+        public void TryEquipFromInventory_ReservesTheItemsWeight_SoTotalCarriedWeightIsUnchanged()
+        {
+            var armor = ItemTestFactory.CreateItem(itemType: ItemType.Equipment, isStackable: false, requiredSlots: new[] { EquipmentSlot.Body }, weight: 20f);
+            playerInventory.Items.TryAddItem(armor, 1);
+            var weightBeforeEquip = playerInventory.Items.CurrentWeight;
+
+            equipmentManager.TryEquipFromInventory(0);
+
+            Assert.AreEqual(weightBeforeEquip, playerInventory.Items.CurrentWeight);
+        }
+
+        [Test]
+        public void Unequip_AfterOtherItemsFilledTheCapacityEquippingHadFreed_StillReturnsTheItem()
+        {
+            // Regression test: before equipped weight was reserved, equipping
+            // this armor silently freed 20 units of carry capacity, which the
+            // filler below then consumed. Unequipping used to have nowhere to
+            // put the armor back and would drop it.
+            var armor = ItemTestFactory.CreateItem(name: "Armor", itemType: ItemType.Equipment, isStackable: false, requiredSlots: new[] { EquipmentSlot.Body }, weight: 20f);
+            var filler = ItemTestFactory.CreateItem(name: "Filler", itemType: ItemType.Material, isStackable: true, maxStackSize: 99, weight: 1f);
+            playerInventory.Items.TryAddItem(armor, 1);
+            equipmentManager.TryEquipFromInventory(0);
+            playerInventory.Items.TryAddItem(filler, 30);
+
+            equipmentManager.Unequip(EquipmentSlot.Body, 0);
+
+            Assert.AreEqual(0, equipmentManager.GetEquippedItems(EquipmentSlot.Body).Count);
+            Assert.IsTrue(InventoryContains(armor));
+        }
+
+        [Test]
         public void GetBonus_SumsStatBonusesAcrossAllEquippedItems()
         {
             var strengthItem = ItemTestFactory.CreateItem(name: "StrengthItem", itemType: ItemType.Equipment, isStackable: false, requiredSlots: new[] { EquipmentSlot.Body }, statBonuses: ItemTestFactory.CreateStatModifiers(strength: 5), weight: 0f);

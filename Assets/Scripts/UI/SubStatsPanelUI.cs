@@ -62,8 +62,8 @@ namespace Project.UI
         /// its raw rating, matching classic Ragnarok Online's own status
         /// window — Hit, Flee and Aspd briefly showed a derived percentage
         /// or a base-1.0 multiplier instead (see FUTURE_IMPROVEMENTS.md),
-        /// reverted at Victor's request to keep every sub-stat's
-        /// calculation and presentation consistent with the original game.
+        /// reverted to keep every sub-stat's calculation and
+        /// presentation consistent with the original game.
         /// Aspd uses a preliminary placeholder formula (see
         /// <see cref="SubStatsCalculator"/>'s remarks and
         /// FUTURE_IMPROVEMENTS.md) — display-only styling aside, it already

@@ -5,8 +5,8 @@ using UnityEngine.UI;
 namespace Project.Flow
 {
     /// <summary>
-    /// Placeholder login screen — no real authentication exists yet, per
-    /// Victor's explicit request ("vai ser implementada depois"). Continue
+    /// Placeholder login screen — no real authentication exists yet; that
+    /// will be implemented later. Continue
     /// currently just advances straight to Character Selection; once a real
     /// login/network flow is designed, only <see cref="HandleContinueClicked"/>'s
     /// body needs to change (e.g. to run after a successful server
