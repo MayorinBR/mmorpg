@@ -1,4 +1,5 @@
 using UnityEngine;
+using Project.CameraSystem;
 
 namespace Project.UI
 {
@@ -23,6 +24,16 @@ namespace Project.UI
 
             transform.position = target.position + offset;
 
+            if (viewCamera == null)
+            {
+                // Falls back to the persisted camera singleton instead of staying
+                // unbillboarded. Needed for prefab instances (e.g. enemies) that
+                // can't have a scene camera pre-wired at author time, and doubles
+                // as the re-wiring path for any instance whose camera reference
+                // would otherwise go stale after a map load.
+                viewCamera = IsometricCameraController.Instance?.GetComponent<Camera>();
+            }
+
             if (viewCamera != null)
             {
                 transform.forward = viewCamera.transform.forward;
@@ -30,15 +41,10 @@ namespace Project.UI
         }
 
         /// <summary>
-        /// Assigns the camera to billboard toward. Needed on any instance
-        /// that survives a scene load (e.g. parented under a persisted
-        /// player) while its target camera does not — the previous map's
-        /// camera is destroyed on <c>SceneManager.LoadScene</c>, and without
-        /// a fresh reference billboarding silently stops, leaving this
-        /// object to inherit its parent's rotation instead of facing the
-        /// camera.
+        /// Explicitly assigns the camera to billboard toward, overriding the
+        /// automatic fallback to <see cref="IsometricCameraController.Instance"/>.
         /// </summary>
-        /// <param name="newViewCamera">The active map's camera.</param>
+        /// <param name="newViewCamera">The camera to billboard toward.</param>
         public void SetViewCamera(Camera newViewCamera)
         {
             viewCamera = newViewCamera;

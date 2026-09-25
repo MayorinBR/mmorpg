@@ -7,6 +7,12 @@ namespace Project.CameraSystem
     /// while allowing horizontal orbit (yaw) and zoom. Position and rotation
     /// are smoothed independently from whatever reads player input, so the
     /// camera behaves the same whether driven by mouse, gamepad, or code.
+    /// Persists across scene loads exactly like <see cref="Project.World.PersistentPlayerAnchor"/>,
+    /// so a per-map <c>MapBootstrap</c> only needs to re-target it, never
+    /// recreate it — this is what keeps rotate/zoom input and the click/hover
+    /// raycast camera valid after a map switch. If a map scene still has its
+    /// own leftover instance, it self-destructs here as a duplicate, the same
+    /// guard <see cref="Project.World.PersistentPlayerAnchor"/> uses.
     /// </summary>
     public class IsometricCameraController : MonoBehaviour, ICameraYawProvider
     {
@@ -30,6 +36,24 @@ namespace Project.CameraSystem
 
         /// <inheritdoc />
         public float CurrentYaw => currentYaw;
+
+        /// <summary>
+        /// The single persisted camera instance. Null until the camera's
+        /// first Awake has run.
+        /// </summary>
+        public static IsometricCameraController Instance { get; private set; }
+
+        private void Awake()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
 
         private void Start()
         {

@@ -257,15 +257,26 @@ namespace Project.AI
             //     Debug.Log($"{name} overlap check: {hits.Length} hit(s), layer mask value = {playerLayer.value}");
             // }
 
+            Transform closest = null;
+            var closestSqrDistance = float.MaxValue;
+
             foreach (var hit in hits)
             {
-                if (SeesThroughHiding || !IsPlayerHidden(hit.transform))
+                if (!SeesThroughHiding && IsPlayerHidden(hit.transform))
                 {
-                    return hit.transform;
+                    continue;
+                }
+
+                var sqrDistance = (hit.transform.position - transform.position).sqrMagnitude;
+
+                if (sqrDistance < closestSqrDistance)
+                {
+                    closestSqrDistance = sqrDistance;
+                    closest = hit.transform;
                 }
             }
 
-            return null;
+            return closest;
         }
 
         /// <summary>

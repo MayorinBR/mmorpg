@@ -15,7 +15,10 @@ namespace Project.UI
             { "Inventory", "Inventory" },
             { "Stats", "Status" },
             { "Equipment", "Equipment" },
-            { "Shop", "Shop" }
+            { "Shop", "Shop" },
+            { "SkillHotbar", "Skill Hotbar" },
+            { "SkillBook", "Skills" },
+            { "WorldMap", "World Map" }
         };
 
         /// <summary>

@@ -9,10 +9,10 @@ namespace Project.World
 {
     /// <summary>
     /// Runs once when a map scene loads and re-wires the persisted player to
-    /// this map's local objects. Unity cannot serialize a reference between
-    /// two different scene files, so this replaces what would otherwise be a
-    /// direct Inspector reference from the player to the camera and respawn
-    /// point. Also publishes this scene's own <see cref="MapDefinition"/>
+    /// this map's local objects (respawn point, combat target rings) and to
+    /// the persisted <see cref="IsometricCameraController"/> singleton, which
+    /// Unity cannot serialize as a direct Inspector reference across scene
+    /// files. Also publishes this scene's own <see cref="MapDefinition"/>
     /// to <see cref="CurrentMapTracker"/>, which is how the World Map
     /// window learns the player changed map.
     /// </summary>
@@ -20,16 +20,6 @@ namespace Project.World
     {
         /// <summary>Looked up by this scene's own name to find its <see cref="MapDefinition"/>.</summary>
         [SerializeField] private MapDatabase mapDatabase;
-
-        /// <summary>This map's local camera rig, retargeted to follow the persisted player.</summary>
-        [SerializeField] private IsometricCameraController localCamera;
-
-        /// <summary>
-        /// This map's local <see cref="Camera"/> component, pushed into the
-        /// persisted player's click and hover raycasters so they stop
-        /// pointing at the previous map's now-destroyed camera.
-        /// </summary>
-        [SerializeField] private Camera localViewCamera;
 
         /// <summary>Where the persisted player respawns after dying on this map.</summary>
         [SerializeField] private Transform defaultRespawnPoint;
@@ -50,18 +40,20 @@ namespace Project.World
                 return;
             }
 
-            if (localCamera != null)
+            var activeCamera = IsometricCameraController.Instance;
+            if (activeCamera != null)
             {
-                localCamera.SetTarget(player.transform);
-                player.MovementController.SetCameraYawSource(localCamera);
-            }
+                activeCamera.SetTarget(player.transform);
+                player.MovementController.SetCameraYawSource(activeCamera);
 
-            if (localViewCamera != null)
-            {
-                player.InputRouter.SetWorldCamera(localViewCamera);
-                player.HoverDetector.SetWorldCamera(localViewCamera);
-                player.StatsCanvasFollower.SetViewCamera(localViewCamera);
-                SkillTargetingController.Instance?.SetWorldCamera(localViewCamera);
+                var viewCamera = activeCamera.GetComponent<Camera>();
+                if (viewCamera != null)
+                {
+                    player.InputRouter.SetWorldCamera(viewCamera);
+                    player.HoverDetector.SetWorldCamera(viewCamera);
+                    player.StatsCanvasFollower.SetViewCamera(viewCamera);
+                    SkillTargetingController.Instance?.SetWorldCamera(viewCamera);
+                }
             }
 
             if (defaultRespawnPoint != null)
