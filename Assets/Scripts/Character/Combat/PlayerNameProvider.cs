@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Project.Combat;
 using Project.Persistence;
 
 namespace Project.Character.Combat
@@ -16,6 +17,9 @@ namespace Project.Character.Combat
     {
         [SerializeField] private string playerName = "Player";
 
+        [Tooltip("Optional. Updated with the player's name whenever it changes, so the player's overhead tag reflects it. Left empty, no tag is updated.")]
+        [SerializeField] private EntityNameTagUI nameTag;
+
         /// <summary>Raised whenever the player's name changes.</summary>
         public event Action<string> NameChanged;
 
@@ -29,6 +33,7 @@ namespace Project.Character.Combat
         public void SetName(string newName)
         {
             playerName = newName;
+            nameTag?.SetName(newName);
             NameChanged?.Invoke(newName);
         }
 

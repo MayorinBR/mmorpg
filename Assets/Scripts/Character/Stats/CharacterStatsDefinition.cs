@@ -36,6 +36,12 @@ namespace Project.Character.Stats
         [Tooltip("Flat chance (0 to 1) to fully resist an incoming status effect (Stun, Poison, Silence, Blind, Freeze, Petrify) — read by StatusEffectController when no IStatusResistanceProvider is wired, i.e. for enemies (the player's resistance is VIT-derived instead, see IStatusResistanceProvider). Zero means every status always lands, matching the behavior before this existed.")]
         [SerializeField, Range(0f, 1f)] private float statusResistChance;
 
+        [Tooltip("Lowest level an instance of this monster species can roll, read by MonsterLevelController at spawn/respawn. Irrelevant on the player's own stats.")]
+        [SerializeField] private int minLevel = 1;
+
+        [Tooltip("Highest level an instance of this monster species can roll, read by MonsterLevelController at spawn/respawn. Equal to MinLevel means every instance is always that exact level.")]
+        [SerializeField] private int maxLevel = 1;
+
         /// <summary>Gets the maximum health points for this character type.</summary>
         public int MaxHealth => maxHealth;
 
@@ -94,5 +100,11 @@ namespace Project.Character.Stats
 
         /// <summary>Gets the flat chance (0 to 1) to fully resist an incoming status effect, for characters with no IStatusResistanceProvider wired (see Project.Combat.StatusEffectController). Zero by default.</summary>
         public float StatusResistChance => statusResistChance;
+
+        /// <summary>Gets the lowest level an instance of this monster species can roll (see Project.AI.MonsterLevelController).</summary>
+        public int MinLevel => minLevel;
+
+        /// <summary>Gets the highest level an instance of this monster species can roll (see Project.AI.MonsterLevelController).</summary>
+        public int MaxLevel => maxLevel;
     }
 }

@@ -38,6 +38,9 @@ namespace Project.AI
         [Tooltip("Stable id used to remember this enemy's state across map switches. Leave blank to use the GameObject's name — only needs to be set explicitly if two enemies share a name within the same scene.")]
         [SerializeField] private string enemyId;
 
+        [Tooltip("Optional. Re-rolled on every respawn so each life gets a fresh level, and its scaled experience reward is granted on death instead of the flat CharacterStatsDefinition value. Left empty, this enemy always grants its base experience reward.")]
+        [SerializeField] private MonsterLevelController levelController;
+
         private bool isCurrentlyAlive = true;
         private float pendingRespawnAtTime;
 
@@ -75,12 +78,14 @@ namespace Project.AI
         {
             if (playerExperience != null)
             {
-                playerExperience.AddExperience(controller.Stats.ExperienceReward);
+                var experienceReward = levelController != null ? levelController.ScaledExperienceReward : controller.Stats.ExperienceReward;
+                playerExperience.AddExperience(experienceReward);
             }
 
             if (playerJobProgress != null)
             {
-                playerJobProgress.AddExperience(controller.Stats.JobExperienceReward);
+                var jobExperienceReward = levelController != null ? levelController.ScaledJobExperienceReward : controller.Stats.JobExperienceReward;
+                playerJobProgress.AddExperience(jobExperienceReward);
             }
 
             SpawnLoot();
@@ -173,6 +178,7 @@ namespace Project.AI
             transform.position = controller.SpawnPosition;
             SetAlive(true);
             isCurrentlyAlive = true;
+            levelController?.RollNewLevel();
             health.ResetHealth();
             controller.PlayerTarget = null;
             controller.RememberedAggressor = null;

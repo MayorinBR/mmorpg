@@ -119,8 +119,8 @@ namespace Project.AI
             }
 
             var attackPower = enemy.Buffs != null
-                ? Mathf.RoundToInt(enemy.Stats.AttackPower * enemy.Buffs.AttackMultiplier)
-                : enemy.Stats.AttackPower;
+                ? Mathf.RoundToInt(enemy.EffectiveAttackPower * enemy.Buffs.AttackMultiplier)
+                : enemy.EffectiveAttackPower;
 
             damageable.TakeDamage(attackPower, attacker: enemy.transform);
         }

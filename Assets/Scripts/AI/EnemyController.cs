@@ -45,6 +45,9 @@ namespace Project.AI
         [Tooltip("Optional. Source of active status effects (see StatusEffectController) affecting this enemy — e.g. a Fatal Blow stun, or a future Freeze/Petrify skill. Left empty, this enemy is never immobilized by one.")]
         [SerializeField] private StatusEffectController statusEffects;
 
+        [Tooltip("Optional. Rolls this instance's level within its species' Min/MaxLevel range and scales its attack power, max health and experience reward accordingly (see MonsterLevelController). Left empty, this enemy always uses its base CharacterStatsDefinition values unscaled.")]
+        [SerializeField] private MonsterLevelController levelController;
+
         private CharacterStatsHolder statsHolder;
         private IEnemyState currentState;
         private float lastAttackedTime = float.NegativeInfinity;
@@ -113,6 +116,12 @@ namespace Project.AI
 
         /// <summary>Gets the enemy's base combat stats.</summary>
         public CharacterStatsDefinition Stats => StatsHolder.Stats;
+
+        /// <summary>Gets this instance's rolled level, or the species' MinLevel if no MonsterLevelController is wired.</summary>
+        public int Level => levelController != null ? levelController.CurrentLevel : Stats.MinLevel;
+
+        /// <summary>Gets this instance's attack power, scaled by <see cref="Level"/> if a MonsterLevelController is wired, otherwise the base <see cref="CharacterStatsDefinition.AttackPower"/>.</summary>
+        public int EffectiveAttackPower => levelController != null ? levelController.ScaledAttackPower : Stats.AttackPower;
 
         /// <summary>
         /// Gets whether this enemy sees through Hiding entirely, ignoring
