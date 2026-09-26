@@ -16,7 +16,9 @@ namespace Project.AI
     /// player, and pending respawn time across map switches via
     /// <see cref="EnemyWorldStateRegistry"/>, since enemies otherwise have
     /// no persistence between scene loads (unlike the player, which
-    /// survives via <c>DontDestroyOnLoad</c>).
+    /// survives via <c>DontDestroyOnLoad</c>). Also publishes the kill via
+    /// <see cref="EnemyDeathEvents"/>, for a kill-creature quest requirement
+    /// to react to without needing a reference to this specific instance.
     /// </summary>
     [RequireComponent(typeof(HealthComponent))]
     public class EnemyDeathHandler : MonoBehaviour
@@ -76,6 +78,8 @@ namespace Project.AI
 
         private void HandleDeath()
         {
+            EnemyDeathEvents.RaiseEnemyKilled(controller.Stats);
+
             if (playerExperience != null)
             {
                 var experienceReward = levelController != null ? levelController.ScaledExperienceReward : controller.Stats.ExperienceReward;

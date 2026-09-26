@@ -13,11 +13,13 @@ namespace Project.UI
     /// <summary>
     /// Shows a merchant NPC's buy list next to the player's sell tray.
     /// <see cref="Open"/> and <see cref="Close"/> are called directly by
-    /// <see cref="PlayerUIController"/> rather than this component
-    /// subscribing to <see cref="PlayerNpcInteractionController.ShopOpened"/>
-    /// itself: this window's GameObject starts inactive, and Unity never
-    /// runs Awake on an inactive GameObject, so it could never register
-    /// that subscription on its own. Closes itself automatically as soon
+    /// <see cref="PlayerUIController"/> — opening from
+    /// <see cref="DialogueWindowUI.ShopRequested"/> rather than straight
+    /// from <see cref="PlayerNpcInteractionController"/>, since walking up
+    /// to an NPC now opens its dialogue first — rather than this component
+    /// subscribing to that event itself: this window's GameObject starts
+    /// inactive, and Unity never runs Awake on an inactive GameObject, so
+    /// it could never register that subscription on its own. Closes itself automatically as soon
     /// as the player starts moving again, via
     /// <see cref="CharacterMovementController.MovementStarted"/> — that
     /// subscription lives in <see cref="Awake"/>/<see cref="OnDestroy"/>

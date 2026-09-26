@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fcfcbc670e17ba41a0e8f45647aa8d8, type: 3}
+  m_Name: HuntPoringsQuest
+  m_EditorClassIdentifier: Project.Quests::Project.Quests.QuestDefinition
+  title: Poring Extermination
+  description: Porings have been multiplying near the village. Defeat 10 of them
+    and bring back 5 Test Items they drop.
+  requirements:
+  - {fileID: 11400000, guid: 0a1ac75191b74d119ec968bcb259639c, type: 2}
+  - {fileID: 11400000, guid: f69d24a6591e4f929f05366e4f2351fc, type: 2}
+  rewardExperience: 100
+  rewardJobExperience: 30
+  rewardItem: {fileID: 0}
+  rewardItemQuantity: 1

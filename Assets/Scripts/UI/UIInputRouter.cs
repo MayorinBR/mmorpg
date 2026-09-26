@@ -70,5 +70,15 @@ namespace Project.UI
                 uiController.ToggleWindow("WorldMap");
             }
         }
+
+        /// <summary>Called by the Input System when the Toggle Quest Log shortcut is pressed.</summary>
+        /// <param name="context">Callback context for the action.</param>
+        public void OnToggleQuestLog(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+            {
+                uiController.ToggleWindow("QuestLog");
+            }
+        }
     }
 }

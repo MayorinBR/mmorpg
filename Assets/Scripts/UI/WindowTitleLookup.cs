@@ -18,7 +18,8 @@ namespace Project.UI
             { "Shop", "Shop" },
             { "SkillHotbar", "Skill Hotbar" },
             { "SkillBook", "Skills" },
-            { "WorldMap", "World Map" }
+            { "WorldMap", "World Map" },
+            { "QuestLog", "Quest Log" }
         };
 
         /// <summary>

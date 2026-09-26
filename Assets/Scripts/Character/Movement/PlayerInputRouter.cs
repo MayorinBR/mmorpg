@@ -69,7 +69,7 @@ namespace Project.Character.Movement
 
             targetSelector.ClearTarget();
 
-            if (hit.collider.TryGetComponent(out NpcShopKeeper npc))
+            if (hit.collider.TryGetComponent(out NpcDialogueController npc))
             {
                 lootController.SetTarget(null);
                 npcInteractionController.SetTarget(npc);

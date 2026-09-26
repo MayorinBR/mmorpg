@@ -135,5 +135,21 @@ namespace Project.Persistence
         /// loads on login — see <c>Project.Maps.CurrentMapSaveParticipant</c>.
         /// </summary>
         public string currentMapId = "";
+
+        /// <summary>Id (asset name) of each currently accepted, not-yet-completed quest, parallel to <see cref="activeQuestProgress"/>.</summary>
+        public List<string> activeQuestIds = new List<string>();
+
+        /// <summary>
+        /// Comma-separated progress counts, one per requirement of the
+        /// matching quest in <c>Project.Quests.QuestDefinition.Requirements</c>
+        /// order, parallel to <see cref="activeQuestIds"/>. Stored as a
+        /// single delimited string per quest, rather than a nested list,
+        /// since a quest's requirement count varies and <c>JsonUtility</c>
+        /// does not serialize jagged/nested lists.
+        /// </summary>
+        public List<string> activeQuestProgress = new List<string>();
+
+        /// <summary>Id (asset name) of each completed quest.</summary>
+        public List<string> completedQuestIds = new List<string>();
     }
 }

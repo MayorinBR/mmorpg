@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fcfcbc670e17ba41a0e8f45647aa8d8, type: 3}
+  m_Name: TalkToVillageElderQuest
+  m_EditorClassIdentifier: Project.Quests::Project.Quests.QuestDefinition
+  title: A Friendly Chat
+  description: The Village Elder wants to meet the new adventurers around town.
+    Go say hello.
+  requirements:
+  - {fileID: 11400000, guid: 298fe824f44f40a68f84fe6a0e2b6e45, type: 2}
+  rewardExperience: 20
+  rewardJobExperience: 10
+  rewardItem: {fileID: 0}
+  rewardItemQuantity: 1

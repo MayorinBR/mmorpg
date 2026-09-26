@@ -9,25 +9,21 @@ namespace Project.NPC
     /// <summary>
     /// A merchant NPC that sells a fixed assortment of items for Zeny and
     /// buys any item back from the player at that item's own configured
-    /// sell price. The first concrete NPC behavior in the project — other
-    /// NPC roles (quest giver, dialogue-only, etc.) are expected to become
-    /// separate components placed alongside this one rather than growing
-    /// this class to cover every kind of NPC.
+    /// sell price. Opened as one of the response options in this NPC's
+    /// <see cref="NpcDialogueController"/> dialogue (see that class), not
+    /// directly — this class only knows about buying and selling, not about
+    /// how the player gets to it.
     /// </summary>
     public class NpcShopKeeper : MonoBehaviour
     {
         [SerializeField] private string shopName = "Shop";
         [SerializeField] private ItemDefinition[] itemsForSale;
-        [SerializeField] private NpcAnimationController animationController;
 
         /// <summary>Gets the name shown as this shop's window title.</summary>
         public string ShopName => shopName;
 
         /// <summary>Gets the items this NPC currently has for sale.</summary>
         public IReadOnlyList<ItemDefinition> ItemsForSale => itemsForSale;
-
-        /// <summary>Gets the controller for this NPC's Idle/Interact animations, if assigned.</summary>
-        public NpcAnimationController AnimationController => animationController;
 
         /// <summary>
         /// Attempts to buy a quantity of an item this shop sells, spending
