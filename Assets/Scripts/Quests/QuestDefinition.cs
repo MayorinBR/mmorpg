@@ -21,6 +21,8 @@ namespace Project.Quests
         [SerializeField] private int rewardJobExperience;
         [SerializeField] private ItemDefinition rewardItem;
         [SerializeField] private int rewardItemQuantity = 1;
+        [SerializeField] private ItemDefinition grantItemOnAccept;
+        [SerializeField] private int grantItemOnAcceptQuantity = 1;
 
         /// <summary>Gets the quest's display title, shown in the quest log and dialogue.</summary>
         public string Title => title;
@@ -42,5 +44,17 @@ namespace Project.Quests
 
         /// <summary>Gets the quantity of <see cref="RewardItem"/> granted, when it isn't null.</summary>
         public int RewardItemQuantity => rewardItemQuantity;
+
+        /// <summary>
+        /// Gets the item handed to the player immediately on accepting this
+        /// quest (e.g. a courier's key item), or null for none. Unlike
+        /// <see cref="RewardItem"/>, this is granted the moment the quest
+        /// starts rather than on completion, and only if the player's
+        /// inventory has room for it — see <see cref="QuestManager.AcceptQuest"/>.
+        /// </summary>
+        public ItemDefinition GrantItemOnAccept => grantItemOnAccept;
+
+        /// <summary>Gets the quantity of <see cref="GrantItemOnAccept"/> granted, when it isn't null.</summary>
+        public int GrantItemOnAcceptQuantity => grantItemOnAcceptQuantity;
     }
 }

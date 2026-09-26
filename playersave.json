@@ -2,7 +2,7 @@
     "characterName": "Player_Name",
     "characterGenderIndex": 0,
     "baseLevel": 7,
-    "baseExperience": 62,
+    "baseExperience": 87,
     "strength": 12,
     "agility": 1,
     "vitality": 1,
@@ -11,7 +11,7 @@
     "luck": 1,
     "availableStatPoints": 93,
     "jobLevel": 7,
-    "jobExperience": 37,
+    "jobExperience": 47,
     "availableSkillPoints": 2,
     "characterClassIndex": 0,
     "zeny": 0,
@@ -90,15 +90,15 @@
     ],
     "equippedAmmoCount": 0,
     "windowIds": [
-        "SkillHotbar",
-        "Inventory",
-        "QuestLog",
+        "SkillBook",
         "Equipment",
+        "QuestLog",
         "Stats",
-        "SkillBook"
+        "Inventory",
+        "SkillHotbar"
     ],
     "windowIsOpen": [
-        1,
+        0,
         0,
         0,
         0,
@@ -116,29 +116,39 @@
     "windowHasCustomPosition": [
         1,
         1,
-        0,
+        1,
         1,
         1,
         1
     ],
     "windowPositionX": [
-        319.742431640625,
-        762.8125610351563,
-        0.0,
+        370.6641540527344,
         1191.33203125,
+        625.9008178710938,
         670.8531494140625,
-        370.6641540527344
+        762.8125610351563,
+        319.742431640625
     ],
     "windowPositionY": [
-        -673.9283447265625,
-        -351.1456298828125,
-        0.0,
+        -3.72772216796875,
         -357.81500244140627,
+        -360.59100341796877,
         -83.109130859375,
-        -3.72772216796875
+        -351.1456298828125,
+        -673.9283447265625
     ],
     "currentMapId": "",
-    "activeQuestIds": [],
-    "activeQuestProgress": [],
-    "completedQuestIds": []
+    "activeQuestIds": [
+        "HuntPoringsQuest",
+        "PoporingCullingQuest",
+        "TalkToVillageElderQuest"
+    ],
+    "activeQuestProgress": [
+        "0,5",
+        "0",
+        "0"
+    ],
+    "completedQuestIds": [
+        "TestItemDeliveryQuest"
+    ]
 }

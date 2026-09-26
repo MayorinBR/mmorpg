@@ -22,7 +22,10 @@ namespace Project.UI
     /// than to the interaction controller directly — walking up to an NPC
     /// now always opens its dialogue first, and the shop only opens if the
     /// player picks a "open shop" response from it. <see cref="QuestManager"/>
-    /// is wired the same way, to <see cref="DialogueWindowUI.QuestAcceptRequested"/>.
+    /// is wired the same way, to <see cref="DialogueWindowUI.QuestAcceptRequested"/>,
+    /// and <see cref="QuestBoardWindowUI"/> to <see cref="DialogueWindowUI.QuestBoardRequested"/>
+    /// — for an interactable (e.g. a bulletin board) that posts several
+    /// quests at once rather than offering one directly through dialogue.
     /// </summary>
     public class PlayerUIController : MonoBehaviour
     {
@@ -31,6 +34,7 @@ namespace Project.UI
         [SerializeField] private DialogueWindowUI dialogueWindow;
         [SerializeField] private ShopWindowUI shopWindow;
         [SerializeField] private QuestManager questManager;
+        [SerializeField] private QuestBoardWindowUI questBoardWindow;
 
         private Dictionary<string, WindowPanel> windowsById;
 
@@ -65,6 +69,12 @@ namespace Project.UI
             {
                 dialogueWindow.QuestAcceptRequested -= questManager.AcceptQuest;
                 dialogueWindow.QuestAcceptRequested += questManager.AcceptQuest;
+            }
+
+            if (dialogueWindow != null && questBoardWindow != null)
+            {
+                dialogueWindow.QuestBoardRequested -= questBoardWindow.Open;
+                dialogueWindow.QuestBoardRequested += questBoardWindow.Open;
             }
         }
 

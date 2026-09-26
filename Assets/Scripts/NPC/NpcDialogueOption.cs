@@ -9,15 +9,19 @@ namespace Project.NPC
     /// list of responses (see <see cref="NpcDialogueDefinition"/>), so an
     /// option's job is either to hand off to another system or to end the
     /// conversation. <see cref="AcceptQuest"/> hands off to whichever quest
-    /// a <c>Project.Quests.QuestGiverNpc</c> on the same NPC offers — kept
-    /// as a plain enum case rather than a field here so this assembly never
-    /// needs to depend on the quest system.
+    /// a <c>Project.Quests.QuestGiverNpc</c> on the same NPC offers, and
+    /// <see cref="OpenQuestBoard"/> to the list of quests a
+    /// <c>Project.Quests.QuestBoardNpc</c> on the same NPC posts (a bulletin
+    /// board offering several quests at once, rather than one NPC's single
+    /// accept prompt) - both kept as plain enum cases rather than fields
+    /// here so this assembly never needs to depend on the quest system.
     /// </summary>
     public enum NpcDialogueOptionAction
     {
         Close,
         OpenShop,
-        AcceptQuest
+        AcceptQuest,
+        OpenQuestBoard
     }
 
     /// <summary>

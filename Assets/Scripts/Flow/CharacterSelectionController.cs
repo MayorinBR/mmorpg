@@ -84,19 +84,19 @@ namespace Project.Flow
 
             if (string.IsNullOrEmpty(characterName))
             {
-                ShowWarning("Digite um nome para o personagem.");
+                ShowWarning("Enter a name for the character.");
                 return;
             }
 
             if (CharacterSaveLookup.Exists(characterName))
             {
-                ShowWarning("Já existe um personagem com esse nome.");
+                ShowWarning("A character with that name already exists.");
                 return;
             }
 
             if (selectedClassOption == null || selectedGenderOption == null)
             {
-                ShowWarning("Escolha uma classe e um gênero.");
+                ShowWarning("Choose a class and a gender.");
                 return;
             }
 
@@ -110,13 +110,13 @@ namespace Project.Flow
 
             if (string.IsNullOrEmpty(characterName))
             {
-                ShowWarning("Digite o nome do personagem.");
+                ShowWarning("Enter the character's name.");
                 return;
             }
 
             if (!CharacterSaveLookup.Exists(characterName))
             {
-                ShowWarning("Personagem não encontrado.");
+                ShowWarning("Character not found.");
                 return;
             }
 

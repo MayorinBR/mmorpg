@@ -177,9 +177,9 @@ namespace Project.UI
 
             var classText = item.AllowedClasses.Count > 0
                 ? string.Join(", ", item.AllowedClasses)
-                : "Qualquer classe";
+                : "Any class";
 
-            return $"Nível requerido: {item.RequiredLevel}\nClasses: {classText}";
+            return $"Required level: {item.RequiredLevel}\nClasses: {classText}";
         }
     }
 }

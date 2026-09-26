@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Project.Character.Combat;
 using Project.Character.Movement;
+using Project.Combat;
 using Project.Items;
 using Project.Persistence;
 
@@ -50,19 +51,47 @@ namespace Project.Quests
         /// <summary>
         /// Accepts a quest, starting progress tracking for each of its
         /// requirements. Does nothing if <paramref name="quest"/> is null or
-        /// already accepted or completed.
+        /// already accepted or completed. If the quest grants an item on
+        /// accept (see <see cref="QuestDefinition.GrantItemOnAccept"/>) and
+        /// the player's inventory has no room for it, the quest is refused
+        /// instead — the player can talk to the NPC again once they've made
+        /// space.
         /// </summary>
         /// <param name="quest">The quest to accept.</param>
         public void AcceptQuest(QuestDefinition quest)
         {
-            AcceptQuest(quest, null);
-        }
-
-        private void AcceptQuest(QuestDefinition quest, int[] initialProgress)
-        {
             if (quest == null || IsActive(quest) || IsCompleted(quest))
             {
                 return;
+            }
+
+            var grantItem = quest.GrantItemOnAccept;
+
+            if (grantItem != null && playerInventory.Items.GetAddableQuantity(grantItem, quest.GrantItemOnAcceptQuantity) < quest.GrantItemOnAcceptQuantity)
+            {
+                PlayerFeedbackChannel.Publish($"Not enough room to carry {grantItem.ItemName}. Make space and talk again.");
+                return;
+            }
+
+            if (AcceptQuest(quest, null))
+            {
+                PlayerFeedbackChannel.Publish($"Quest accepted: {quest.Title}");
+            }
+        }
+
+        private bool AcceptQuest(QuestDefinition quest, int[] initialProgress)
+        {
+            if (quest == null || IsActive(quest) || IsCompleted(quest))
+            {
+                return false;
+            }
+
+            // Only a fresh accept (not a save restore, which passes a
+            // non-null array) grants the item - a restored quest's item is
+            // already sitting in the inventory being restored alongside it.
+            if (initialProgress == null && quest.GrantItemOnAccept != null)
+            {
+                playerInventory?.Items.TryAddItem(quest.GrantItemOnAccept, quest.GrantItemOnAcceptQuantity);
             }
 
             var active = new ActiveQuest(quest, initialProgress);
@@ -91,6 +120,7 @@ namespace Project.Quests
             }
 
             QuestsChanged?.Invoke();
+            return true;
         }
 
         private void HandleProgress(ActiveQuest active, int requirementIndex, int progress)
@@ -101,6 +131,11 @@ namespace Project.Quests
             if (active.IsComplete)
             {
                 CompleteQuest(active);
+            }
+            else
+            {
+                var requirement = active.Definition.Requirements[requirementIndex];
+                PlayerFeedbackChannel.Publish(requirement.GetProgressText(progress));
             }
         }
 
@@ -119,6 +154,7 @@ namespace Project.Quests
                 playerInventory?.Items.TryAddItem(definition.RewardItem, definition.RewardItemQuantity);
             }
 
+            PlayerFeedbackChannel.Publish($"Quest completed: {definition.Title}");
             QuestsChanged?.Invoke();
         }
 

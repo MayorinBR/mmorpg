@@ -58,6 +58,15 @@ namespace Project.UI
         /// </summary>
         public event Action<QuestDefinition> QuestAcceptRequested;
 
+        /// <summary>
+        /// Raised when the player picks an <see cref="NpcDialogueOptionAction.OpenQuestBoard"/>
+        /// option, carrying the board to show. <see cref="PlayerUIController"/>
+        /// wires this directly to <see cref="QuestBoardWindowUI.Open"/>, the
+        /// same direct-wiring reasoning as this class's own summary. Not
+        /// raised if the NPC has no <see cref="QuestBoardNpc"/>.
+        /// </summary>
+        public event Action<QuestBoardNpc> QuestBoardRequested;
+
         private void Awake()
         {
             if (movementController != null)
@@ -143,6 +152,15 @@ namespace Project.UI
                 if (questGiver != null && questGiver.OfferedQuest != null)
                 {
                     QuestAcceptRequested?.Invoke(questGiver.OfferedQuest);
+                }
+            }
+            else if (option.Action == NpcDialogueOptionAction.OpenQuestBoard)
+            {
+                var board = currentNpc.GetComponent<QuestBoardNpc>();
+
+                if (board != null)
+                {
+                    QuestBoardRequested?.Invoke(board);
                 }
             }
         }

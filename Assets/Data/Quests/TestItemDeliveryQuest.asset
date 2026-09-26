@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fcfcbc670e17ba41a0e8f45647aa8d8, type: 3}
+  m_Name: TestItemDeliveryQuest
+  m_EditorClassIdentifier: Project.Quests::Project.Quests.QuestDefinition
+  title: Test Item Delivery
+  description: A quartermaster is stocking up on Test Items dropped by local
+    monsters. Bring 5 of them here.
+  requirements:
+  - {fileID: 11400000, guid: f69d24a6591e4f929f05366e4f2351fc, type: 2}
+  rewardExperience: 25
+  rewardJobExperience: 10
+  rewardItem: {fileID: 0}
+  rewardItemQuantity: 1
+  grantItemOnAccept: {fileID: 0}
+  grantItemOnAcceptQuantity: 1

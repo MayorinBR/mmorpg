@@ -8,6 +8,15 @@ namespace Project.Items
     {
         Consumable,
         Material,
-        Equipment
+        Equipment,
+
+        /// <summary>
+        /// A unique quest item (e.g. a letter or token an NPC hands over).
+        /// Cannot be equipped (excluded from <see cref="Equipment"/> equip
+        /// checks) or sold (see <see cref="Project.NPC.NpcShopKeeper.TrySell"/>).
+        /// Appended last so its serialized enum index never shifts the
+        /// existing values on already-authored item assets.
+        /// </summary>
+        KeyItem
     }
 }

@@ -81,6 +81,12 @@ namespace Project.NPC
                 return false;
             }
 
+            if (slot.Item.ItemType == ItemType.KeyItem)
+            {
+                PlayerFeedbackChannel.Publish($"{slot.Item.ItemName} cannot be sold.");
+                return false;
+            }
+
             var totalPrice = slot.Item.SellPrice * quantity;
 
             if (!sellerInventory.Items.TryRemoveFromSlot(sellerInventorySlotIndex, quantity))
