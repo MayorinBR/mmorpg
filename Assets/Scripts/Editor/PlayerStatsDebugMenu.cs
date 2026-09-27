@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using Project.Character.Combat;
 using Project.Items;
+using Project.Quests;
 
 namespace Project.EditorTools
 {
@@ -47,8 +48,8 @@ namespace Project.EditorTools
 
         /// <summary>
         /// Resets base level, job level, skill points, stat points,
-        /// inventory, equipment and Zeny back to a fresh character's
-        /// starting values. Job progress is reset before stats so the
+        /// inventory, equipment, Zeny and every quest back to a fresh
+        /// character's starting values. Job progress is reset before stats so the
         /// final stat refresh (see <see cref="PlayerStatsController.ResetStats"/>)
         /// no longer includes a Job Level bonus the reset job level no
         /// longer qualifies for. Equipment is cleared directly rather than
@@ -72,7 +73,9 @@ namespace Project.EditorTools
             var currency = Object.FindFirstObjectByType<PlayerCurrency>();
             var inventory = Object.FindFirstObjectByType<PlayerInventory>();
             var equipment = Object.FindFirstObjectByType<EquipmentManager>();
+            var questManager = Object.FindFirstObjectByType<QuestManager>();
 
+            questManager?.ResetQuests();
             jobProgress?.ResetProgress();
             skillBook?.ResetLearnedSkills();
             currency?.ResetToStarting();
@@ -81,7 +84,7 @@ namespace Project.EditorTools
             experience?.ResetProgress();
             statsController.ResetStats();
 
-            Debug.Log("PlayerStatsDebugMenu: player fully reset (level, job level, skill points, stat points, inventory, equipment, Zeny). Note this does not refresh already-open UI panels — close and reopen them to see the updated values.");
+            Debug.Log("PlayerStatsDebugMenu: player fully reset (level, job level, skill points, stat points, inventory, equipment, Zeny, quests). Note this does not refresh already-open UI panels — close and reopen them to see the updated values.");
         }
 
         [MenuItem(ResetPlayerMenuPath, true)]

@@ -79,6 +79,32 @@ namespace Project.Quests
             }
         }
 
+        /// <summary>
+        /// Clears every active and completed quest, disposing all
+        /// requirement trackers first. For debug/testing use via
+        /// <c>Project.EditorTools.QuestDebugMenu</c>, mirroring
+        /// <see cref="PlayerStatsController.ResetStats"/>'s role for player
+        /// stats. Does not touch the player's inventory — any item already
+        /// granted on accept (see <see cref="QuestDefinition.GrantItemOnAccept"/>)
+        /// stays where it is.
+        /// </summary>
+        /// <returns>The number of quests cleared (active plus completed).</returns>
+        public int ResetQuests()
+        {
+            var count = activeQuests.Count + completedQuests.Count;
+
+            foreach (var active in activeQuests.ToArray())
+            {
+                StopTracking(active);
+            }
+
+            activeQuests.Clear();
+            completedQuests.Clear();
+
+            QuestsChanged?.Invoke();
+            return count;
+        }
+
         private bool AcceptQuest(QuestDefinition quest, int[] initialProgress)
         {
             if (quest == null || IsActive(quest) || IsCompleted(quest))
