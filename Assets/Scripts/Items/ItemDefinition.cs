@@ -36,6 +36,9 @@ namespace Project.Items
         [SerializeField] private float effectDurationSeconds = 1f;
         [SerializeField] private float tickIntervalSeconds = 1f;
 
+        [Tooltip("If true, using this consumable clears Poison (see Project.Combat.StatusEffectController.ApplyPoison) — e.g. an Antidote. Only meaningful when ItemType is Consumable.")]
+        [SerializeField] private bool curesPoison;
+
         /// <summary>Gets the display name of the item.</summary>
         public string ItemName => itemName;
 
@@ -102,6 +105,14 @@ namespace Project.Items
         /// <summary>Gets the interval, in seconds, between each tick of an over-time effect. Only meaningful when <see cref="ConsumableEffectType"/> is OverTime.</summary>
         public float TickIntervalSeconds => tickIntervalSeconds;
 
+        /// <summary>
+        /// Gets whether using this consumable clears every active status
+        /// effect (see <see cref="Project.Combat.StatusEffectController.ClearAllDebuffs"/>)
+        /// — e.g. an Antidote. Read by
+        /// <see cref="Project.Character.Combat.PlayerConsumableUser"/>.
+        /// </summary>
+        public bool CuresPoison => curesPoison;
+
         private void OnValidate()
         {
             if (itemType == ItemType.Equipment)
@@ -131,7 +142,7 @@ namespace Project.Items
 
         private void ValidateConsumable()
         {
-            if (healthRestore <= 0 && manaRestore <= 0)
+            if (healthRestore <= 0 && manaRestore <= 0 && !curesPoison)
             {
                 Debug.LogWarning($"{name}: Consumable item restores no health or mana.", this);
             }

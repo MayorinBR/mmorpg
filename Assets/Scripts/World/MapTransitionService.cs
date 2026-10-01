@@ -1,3 +1,4 @@
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Project.World
@@ -43,6 +44,34 @@ namespace Project.World
             var spawnPointId = PendingSpawnPointId;
             PendingSpawnPointId = null;
             return spawnPointId;
+        }
+
+        /// <summary>
+        /// Leaves gameplay entirely for a menu scene (e.g. Character
+        /// Creation), destroying the persisted player and UI roots first.
+        /// Unlike <see cref="WarpTo"/> — where the persisted objects are
+        /// meant to survive into the next map — the destination here has no
+        /// player or HUD of its own, so those roots would otherwise leak
+        /// into it and fight its own EventSystem. Also clears
+        /// <see cref="PersistAcrossScenes"/>'s tracked names, so a later
+        /// return to gameplay persists a fresh set instead of finding them
+        /// already claimed.
+        /// </summary>
+        /// <param name="sceneName">Destination menu scene, must be registered in Build Settings.</param>
+        public static void ReturnToMenu(string sceneName)
+        {
+            if (PersistentPlayerAnchor.Instance != null)
+            {
+                Object.Destroy(PersistentPlayerAnchor.Instance.gameObject);
+            }
+
+            foreach (var persisted in Object.FindObjectsByType<PersistAcrossScenes>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+            {
+                Object.Destroy(persisted.gameObject);
+            }
+
+            PersistAcrossScenes.ClearTracking();
+            SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
         }
     }
 }

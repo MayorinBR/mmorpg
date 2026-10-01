@@ -18,6 +18,7 @@ namespace Project.Character.Combat
         [SerializeField] private HealthComponent health;
         [SerializeField] private ManaComponent mana;
         [SerializeField] private PlayerInventory inventory;
+        [SerializeField] private StatusEffectController statusEffects;
 
         /// <summary>
         /// Attempts to use the consumable item held at the given inventory
@@ -54,6 +55,17 @@ namespace Project.Character.Combat
         private void ApplyEffect(ItemDefinition item)
         {
             PlayerFeedbackChannel.Publish($"Used {item.ItemName}.");
+
+            if (item.CuresPoison)
+            {
+                // ClearAllDebuffs() also lifts Stun/Silence/Blind/Freeze/
+                // Petrify, not just Poison — the same accepted
+                // "one clear-everything method" simplification
+                // StatusEffectController.ClearAllDebuffs() already documents
+                // for the Cure/Detoxify skills, applied here too rather than
+                // adding a poison-only clear just for this one item.
+                statusEffects?.ClearAllDebuffs();
+            }
 
             if (item.ConsumableEffectType == ConsumableEffectType.Instant)
             {

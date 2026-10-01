@@ -22,7 +22,9 @@ namespace Project.AI
     /// power is scaled by <see cref="EnemyController.Buffs"/>'s
     /// <see cref="Combat.BuffController.AttackMultiplier"/> when a
     /// <see cref="Combat.BuffController"/> is wired — e.g. a landed Provoke
-    /// debuff.
+    /// debuff — and the attack interval itself is shortened by that same
+    /// buff's <see cref="Combat.BuffController.AspdMultiplier"/> — e.g. a
+    /// boss's own Rage skill.
     /// </summary>
     public class EnemyAttackState : IEnemyState
     {
@@ -59,7 +61,8 @@ namespace Project.AI
             if (cooldownRemaining <= 0f)
             {
                 PerformAttack(enemy);
-                cooldownRemaining = AttackSpeedCalculator.GetAttackIntervalSeconds(enemy.Stats.BaseAttackSpeed);
+                var interval = AttackSpeedCalculator.GetAttackIntervalSeconds(enemy.Stats.BaseAttackSpeed);
+                cooldownRemaining = enemy.Buffs != null ? interval / enemy.Buffs.AspdMultiplier : interval;
             }
         }
 

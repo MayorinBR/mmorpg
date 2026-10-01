@@ -59,6 +59,12 @@ namespace Project.UI
         private static readonly Color DodgeBackgroundColor = Color.white;
         private static readonly Color DodgeTextColor = Color.black;
 
+        // Placeholder colors for a skill-name popup (e.g. a boss casting
+        // Rage or Poison): purple, distinct from every damage/dodge color
+        // above, so a skill cast reads as its own kind of event at a glance.
+        private static readonly Color SkillNameBackgroundColor = new Color32(120, 60, 200, 255);
+        private static readonly Color SkillNameTextColor = Color.white;
+
         [SerializeField] private float lifetimeSeconds = 1f;
         [SerializeField] private float riseSpeed = 1.5f;
         [SerializeField, Range(0f, 1f)] private float fadeStartFraction = 0.5f;
@@ -113,6 +119,22 @@ namespace Project.UI
         public static DamagePopup CreateDodge(Vector3 worldPosition)
         {
             return CreatePopup("dodge", worldPosition, DodgeBackgroundColor, DodgeTextColor, 1f);
+        }
+
+        /// <summary>
+        /// Builds a new floating skill-name popup at the given world
+        /// position, for a character casting a named skill (e.g. a boss's
+        /// Rage or Poison) — so nearby players see what it just did. Same
+        /// rise/fade lifecycle as a damage popup, but with its own
+        /// placeholder colors (see <see cref="SkillNameBackgroundColor"/>
+        /// and <see cref="SkillNameTextColor"/>).
+        /// </summary>
+        /// <param name="skillName">The skill's display name.</param>
+        /// <param name="worldPosition">Where to spawn the popup.</param>
+        /// <returns>The spawned popup's component.</returns>
+        public static DamagePopup CreateSkillName(string skillName, Vector3 worldPosition)
+        {
+            return CreatePopup(skillName, worldPosition, SkillNameBackgroundColor, SkillNameTextColor, 1f);
         }
 
         private static DamagePopup CreatePopup(string text, Vector3 worldPosition, Color backgroundColor, Color textColor, float sizeMultiplier)

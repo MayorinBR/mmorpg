@@ -71,6 +71,16 @@ namespace Project.UI
             }
         }
 
+        /// <summary>Called by the Input System when the Toggle Pause Menu shortcut (Esc) is pressed.</summary>
+        /// <param name="context">Callback context for the action.</param>
+        public void OnTogglePauseMenu(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+            {
+                uiController.ToggleWindow("PauseMenu");
+            }
+        }
+
         /// <summary>Called by the Input System when the Toggle Quest Log shortcut is pressed.</summary>
         /// <param name="context">Callback context for the action.</param>
         public void OnToggleQuestLog(InputAction.CallbackContext context)

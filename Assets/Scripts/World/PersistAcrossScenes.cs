@@ -32,5 +32,18 @@ namespace Project.World
 
             DontDestroyOnLoad(gameObject);
         }
+
+        /// <summary>
+        /// Clears every tracked name, so the next scene to instantiate a
+        /// shared root is treated as the first instance again instead of
+        /// self-destructing as a duplicate. Called by
+        /// <see cref="MapTransitionService.ReturnToMenu"/> right before it
+        /// destroys the current persisted roots, since otherwise a later
+        /// return to gameplay would find their names already claimed.
+        /// </summary>
+        public static void ClearTracking()
+        {
+            PersistedNames.Clear();
+        }
     }
 }

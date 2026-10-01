@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -8,144 +11,143 @@ using Project.Persistence;
 namespace Project.Flow
 {
     /// <summary>
-    /// Drives the Character Selection screen: pick one of the 6 classes and
-    /// a gender, type a name, and either create a brand-new character with
-    /// that combination or continue with an existing one that already has a
-    /// save under that name. Both actions read the same
-    /// <see cref="characterNameInput"/> field but are otherwise completely
-    /// separate — Create only ever makes a new save and refuses to overwrite
-    /// one that already exists; Continue only ever loads an existing one and
-    /// never creates anything. Back returns to Login with no other side
-    /// effects, since nothing has been submitted yet at this point in the flow.
+    /// Drives the Character Selection screen: lists the signed-in account's
+    /// characters (see <see cref="AccountSessionService"/>) 6 at a time, in
+    /// creation order, with search-by-name and pagination. Selecting a slot
+    /// and pressing Start loads the gameplay scene with that character; New
+    /// Character goes to Character Creation instead.
     /// </summary>
     public class CharacterSelectionController : MonoBehaviour
     {
-        [SerializeField] private ClassSelectionButton[] classOptions;
-        [SerializeField] private GenderSelectionButton[] genderOptions;
-        [SerializeField] private TMP_InputField characterNameInput;
-        [SerializeField] private TMP_Text warningText;
-        [SerializeField] private Button createButton;
-        [SerializeField] private Button continueButton;
+        private const int CharactersPerPage = 6;
+
+        [SerializeField] private CharacterSlotView[] characterSlots;
+        [SerializeField] private TMP_InputField searchInput;
+        [SerializeField] private Button newCharacterButton;
+        [SerializeField] private Button startButton;
+        [SerializeField] private Button previousPageButton;
+        [SerializeField] private Button nextPageButton;
         [SerializeField] private Button backButton;
+        [SerializeField] private string characterCreationSceneName = "CharacterCreation";
         [SerializeField] private string gameplaySceneName = "Prototype_Map01";
         [SerializeField] private string loginSceneName = "Login";
 
-        private ClassSelectionButton selectedClassOption;
-        private GenderSelectionButton selectedGenderOption;
+        private List<string> ownedCharacterNames = new List<string>();
+        private string selectedCharacterName;
+        private int currentPage;
 
         private void Awake()
         {
-            foreach (var option in classOptions)
+            newCharacterButton.onClick.AddListener(() => SceneManager.LoadScene(characterCreationSceneName));
+            startButton.onClick.AddListener(HandleStartClicked);
+            previousPageButton.onClick.AddListener(() => ChangePage(-1));
+            nextPageButton.onClick.AddListener(() => ChangePage(1));
+            backButton.onClick.AddListener(() => SceneManager.LoadScene(loginSceneName));
+            searchInput.onValueChanged.AddListener(_ => RefreshSlots(resetPage: true));
+
+            foreach (var slot in characterSlots)
             {
-                var capturedOption = option;
-                capturedOption.Button.onClick.AddListener(() => SelectClass(capturedOption));
+                var capturedSlot = slot;
+                capturedSlot.Button.onClick.AddListener(() => SelectSlot(capturedSlot));
             }
-
-            foreach (var option in genderOptions)
-            {
-                var capturedOption = option;
-                capturedOption.Button.onClick.AddListener(() => SelectGender(capturedOption));
-            }
-
-            createButton.onClick.AddListener(HandleCreateClicked);
-            continueButton.onClick.AddListener(HandleContinueClicked);
-            backButton.onClick.AddListener(HandleBackClicked);
-
-            if (classOptions.Length > 0)
-            {
-                SelectClass(classOptions[0]);
-            }
-
-            if (genderOptions.Length > 0)
-            {
-                SelectGender(genderOptions[0]);
-            }
-
-            HideWarning();
         }
 
-        private void SelectClass(ClassSelectionButton option)
+        private void Start()
         {
-            selectedClassOption?.SetSelected(false);
-            selectedClassOption = option;
-            selectedClassOption.SetSelected(true);
-        }
+            var login = AccountSessionService.CurrentAccountLogin;
 
-        private void SelectGender(GenderSelectionButton option)
-        {
-            selectedGenderOption?.SetSelected(false);
-            selectedGenderOption = option;
-            selectedGenderOption.SetSelected(true);
-        }
-
-        private void HandleCreateClicked()
-        {
-            var characterName = characterNameInput.text?.Trim();
-
-            if (string.IsNullOrEmpty(characterName))
+            if (!string.IsNullOrEmpty(login) && AccountRepository.Exists(login))
             {
-                ShowWarning("Enter a name for the character.");
+                ownedCharacterNames = AccountRepository.Load(login).characterNames;
+            }
+
+            RefreshSlots(resetPage: true);
+        }
+
+        private void ChangePage(int delta)
+        {
+            currentPage += delta;
+            RefreshSlots(resetPage: false);
+        }
+
+        private void SelectSlot(CharacterSlotView slot)
+        {
+            if (slot.CharacterName == null)
+            {
                 return;
             }
 
-            if (CharacterSaveLookup.Exists(characterName))
+            selectedCharacterName = slot.CharacterName;
+
+            foreach (var characterSlot in characterSlots)
             {
-                ShowWarning("A character with that name already exists.");
+                characterSlot.SetSelected(characterSlot.CharacterName == selectedCharacterName);
+            }
+
+            startButton.interactable = true;
+        }
+
+        private void RefreshSlots(bool resetPage)
+        {
+            if (resetPage)
+            {
+                currentPage = 0;
+            }
+
+            var searchTerm = searchInput.text?.Trim() ?? "";
+            var filteredNames = ownedCharacterNames
+                .Where(name => name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            var pageCount = Mathf.Max(1, Mathf.CeilToInt(filteredNames.Count / (float)CharactersPerPage));
+            currentPage = Mathf.Clamp(currentPage, 0, pageCount - 1);
+
+            var pageNames = filteredNames.Skip(currentPage * CharactersPerPage).Take(CharactersPerPage).ToList();
+
+            for (var i = 0; i < characterSlots.Length; i++)
+            {
+                if (i < pageNames.Count && TryLoadSummary(pageNames[i], out var level, out var characterClass))
+                {
+                    characterSlots[i].SetCharacter(pageNames[i], level, characterClass);
+                }
+                else
+                {
+                    characterSlots[i].SetEmpty();
+                }
+
+                characterSlots[i].SetSelected(characterSlots[i].CharacterName == selectedCharacterName);
+            }
+
+            previousPageButton.interactable = currentPage > 0;
+            nextPageButton.interactable = currentPage < pageCount - 1;
+            startButton.interactable = pageNames.Contains(selectedCharacterName);
+        }
+
+        private static bool TryLoadSummary(string characterName, out int level, out CharacterClass characterClass)
+        {
+            var repository = new JsonFileSaveRepository(CharacterSaveLookup.SaveFilePath(characterName));
+
+            if (repository.TryLoad(out var data))
+            {
+                level = data.baseLevel;
+                characterClass = (CharacterClass)data.characterClassIndex;
+                return true;
+            }
+
+            level = 0;
+            characterClass = default;
+            return false;
+        }
+
+        private void HandleStartClicked()
+        {
+            if (selectedCharacterName == null)
+            {
                 return;
             }
 
-            if (selectedClassOption == null || selectedGenderOption == null)
-            {
-                ShowWarning("Choose a class and a gender.");
-                return;
-            }
-
-            GameSessionService.BeginNewCharacter(characterName, selectedClassOption.CharacterClass, selectedGenderOption.Gender);
+            GameSessionService.BeginExistingCharacter(selectedCharacterName);
             SceneManager.LoadScene(gameplaySceneName);
-        }
-
-        private void HandleContinueClicked()
-        {
-            var characterName = characterNameInput.text?.Trim();
-
-            if (string.IsNullOrEmpty(characterName))
-            {
-                ShowWarning("Enter the character's name.");
-                return;
-            }
-
-            if (!CharacterSaveLookup.Exists(characterName))
-            {
-                ShowWarning("Character not found.");
-                return;
-            }
-
-            GameSessionService.BeginExistingCharacter(characterName);
-            SceneManager.LoadScene(gameplaySceneName);
-        }
-
-        private void ShowWarning(string message)
-        {
-            if (warningText == null)
-            {
-                return;
-            }
-
-            warningText.text = message;
-            warningText.gameObject.SetActive(true);
-        }
-
-        private void HideWarning()
-        {
-            if (warningText != null)
-            {
-                warningText.gameObject.SetActive(false);
-            }
-        }
-
-        private void HandleBackClicked()
-        {
-            SceneManager.LoadScene(loginSceneName);
         }
     }
 }

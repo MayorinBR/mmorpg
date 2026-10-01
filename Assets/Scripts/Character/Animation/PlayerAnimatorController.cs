@@ -13,14 +13,18 @@ namespace Project.Character.Animation
         private static readonly int SpeedParameter = Animator.StringToHash("Speed");
         private static readonly int AttackParameter = Animator.StringToHash("Attack");
         private static readonly int AttackRangedParameter = Animator.StringToHash("AttackRanged");
+        private static readonly int IsUnarmedMeleeParameter = Animator.StringToHash("IsUnarmedMelee");
         private static readonly int CastParameter = Animator.StringToHash("Cast");
         private static readonly int IsDeadParameter = Animator.StringToHash("IsDead");
         private static readonly int AttackSpeedMultiplierParameter = Animator.StringToHash("AttackSpeedMultiplier");
 
         [SerializeField] private Animator animator;
 
-        [Tooltip("The exact clip bound to the Attack state's Motion field in the Animator Controller — read only for its authored AnimationClip.length, so SetAttackDuration can scale it to match the real Aspd interval regardless of that length.")]
+        [Tooltip("The exact clip bound to the Attack state's Motion field in the Animator Controller (the armed melee swing, e.g. Standing Melee Attack Downward) — read only for its authored AnimationClip.length, so SetAttackDuration can scale it to match the real Aspd interval regardless of that length.")]
         [SerializeField] private AnimationClip meleeAttackClip;
+
+        [Tooltip("The exact clip bound to the AttackUnarmed state's Motion field (Punching) — played instead of meleeAttackClip while bare-handed, and, until a dedicated dagger animation exists, while wielding a dagger too. Same purpose as meleeAttackClip: read only for its authored length.")]
+        [SerializeField] private AnimationClip punchingClip;
 
         [Tooltip("The exact clip bound to the AttackRanged state's Motion field, for the same reason as meleeAttackClip.")]
         [SerializeField] private AnimationClip rangedAttackClip;
@@ -61,19 +65,27 @@ namespace Project.Character.Animation
         /// the upcoming swing plays at the right speed.
         /// </summary>
         /// <param name="targetSeconds">How long the swing should actually take to play, in seconds.</param>
-        /// <param name="isRanged">True to scale <see cref="rangedAttackClip"/>; false for <see cref="meleeAttackClip"/>.</param>
-        public void SetAttackDuration(float targetSeconds, bool isRanged)
+        /// <param name="isRanged">True to scale <see cref="rangedAttackClip"/>.</param>
+        /// <param name="isUnarmedMelee">True to scale <see cref="punchingClip"/> instead of <see cref="meleeAttackClip"/>. Ignored when <paramref name="isRanged"/> is true.</param>
+        public void SetAttackDuration(float targetSeconds, bool isRanged, bool isUnarmedMelee = false)
         {
-            var clip = isRanged ? rangedAttackClip : meleeAttackClip;
+            var clip = isRanged ? rangedAttackClip : (isUnarmedMelee ? punchingClip : meleeAttackClip);
             var multiplier = clip != null && targetSeconds > 0f ? clip.length / targetSeconds : 1f;
             animator.SetFloat(AttackSpeedMultiplierParameter, multiplier);
         }
 
         /// <summary>
-        /// Plays the close-range attack animation.
+        /// Plays the close-range attack animation — the bare-handed
+        /// Punching swing (<see cref="punchingClip"/>) while
+        /// <paramref name="isUnarmedMelee"/> is true, otherwise the armed
+        /// melee swing (<see cref="meleeAttackClip"/>). The Animator
+        /// Controller branches on this via the IsUnarmedMelee parameter,
+        /// set here just before the Attack trigger fires.
         /// </summary>
-        public void TriggerAttack()
+        /// <param name="isUnarmedMelee">True while bare-handed or, until a dedicated dagger animation exists, wielding a dagger.</param>
+        public void TriggerAttack(bool isUnarmedMelee)
         {
+            animator.SetBool(IsUnarmedMeleeParameter, isUnarmedMelee);
             animator.SetTrigger(AttackParameter);
         }
 

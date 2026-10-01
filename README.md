@@ -8,7 +8,7 @@ A Unity-based MMORPG prototype inspired by Ragnarok Online.
 
 ### About
 
-Prototype of a 2.5D/3D MMORPG built in Unity, inspired by Ragnarok Online's classic PvE combat and exploration gameplay. Developed by a small team, currently focused on core gameplay systems before scaling to a full multiplayer backend.
+Prototype of a 2.5D/3D MMORPG built in Unity, inspired by Ragnarok Online's classic PvE combat and exploration gameplay. Developed solo, currently focused on core gameplay systems before scaling to a full multiplayer backend.
 
 ### Implemented so far
 
@@ -41,6 +41,8 @@ Prototype of a 2.5D/3D MMORPG built in Unity, inspired by Ragnarok Online's clas
 - Skill targeting: casting a Damage skill with no valid current target shows a ground-ring picker to choose one; a separate ring always marks the current auto-attack target
 - Aggro indicator: a brief overhead "!" flashes above an enemy on fresh detection, retaliation, or re-aggro
 - Floating damage numbers rise above the player and enemies on every hit
+- Updated 3D models for the Player and NPCs (Blacksmith), replacing the original placeholder meshes with custom Humanoid-rigged assets
+- Weapon-aware melee attack animation: unarmed (or dagger, as a temporary placeholder) plays a punching swing, while other melee weapons (sword, axe, etc.) play a dedicated weapon swing — selected automatically from the equipped weapon's subtype
 
 ---
 
@@ -81,6 +83,8 @@ Protótipo de um MMORPG 2.5D/3D feito em Unity, inspirado no gameplay clássico 
 - Seleção de alvo para skills: ao usar uma skill de Dano sem alvo válido, um anel no chão aparece para escolher um; um segundo anel marca sempre o alvo atual do auto-attack
 - Indicador de aggro: um "!" flutuante pisca sobre o inimigo ao detectar, revidar ou reengajar o player
 - Números de dano flutuantes sobem sobre o player e os inimigos a cada acerto
+- Modelos 3D atualizados para o Player e NPCs (Blacksmith), substituindo os meshes placeholder originais por assets Humanoid customizados
+- Animação de ataque corpo a corpo sensível à arma: desarmado (ou adaga, como placeholder temporário) toca uma animação de soco, enquanto outras armas corpo a corpo (espada, machado, etc.) tocam um golpe dedicado — escolhido automaticamente a partir do subtipo da arma equipada
 
 ---
 
@@ -121,3 +125,5 @@ Ragnarok Onlineのクラシックな戦闘(PvE)と探索のゲームプレイに
 - スキルのターゲット選択: 有効な対象がない状態でダメージスキルを使うと、地面のリング表示で対象を選択できる。別のリングは現在の自動攻撃対象を常に示す
 - 索敵アイコン: 敵が索敵・反撃・再索敵した際に頭上に「!」が一瞬表示される
 - ダメージ数値: プレイヤーと敵が被弾するたびに数値が上昇しながら表示される
+- 3Dモデルを更新: プレイヤーとNPC(鍛冶屋)のプレースホルダーメッシュを、カスタムのHumanoidリグ付きモデルに置き換え
+- 武器に応じた近接攻撃アニメーション: 素手(または一時的なプレースホルダーとしてダガー)はパンチの振りを再生し、それ以外の近接武器(剣・斧など)は専用の振りアニメーションを再生 — 装備中の武器サブタイプから自動選択

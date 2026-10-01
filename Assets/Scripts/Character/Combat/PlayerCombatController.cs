@@ -234,15 +234,23 @@ namespace Project.Character.Combat
 
             var isRanged = equipment.IsMainHandWeaponRanged();
 
-            // Only the swing states (Attack, AttackRanged) are bound to the
-            // AttackSpeedMultiplier parameter this sets, so it has no effect
-            // on the Mage's Cast state — the Mage's basic attack always
-            // plays at its authored speed, not scaled by Aspd, since Cast is
-            // shared with real skill casts. The swing's actual playback
-            // duration is made to equal this same interval — not just
-            // scaled proportionally to it — so the animation and the
-            // cooldown it's tied to are never out of sync.
-            animatorController?.SetAttackDuration(AttackSpeedCalculator.GetAttackIntervalSeconds(playerStats.CurrentSubStats.Aspd), isRanged);
+            // Punching plays for a bare-handed swing and, until a
+            // dedicated dagger animation is added, for a dagger too —
+            // every other melee weapon (sword, axe, etc.) plays the armed
+            // swing (Standing Melee Attack Downward) instead.
+            var weaponSubtype = equipment.GetMainHandWeaponSubtype();
+            var isUnarmedMelee = weaponSubtype == WeaponSubtype.Unarmed || weaponSubtype == WeaponSubtype.Dagger;
+
+            // Only the swing states (Attack, AttackUnarmed, AttackRanged)
+            // are bound to the AttackSpeedMultiplier parameter this sets,
+            // so it has no effect on the Mage's Cast state — the Mage's
+            // basic attack always plays at its authored speed, not scaled
+            // by Aspd, since Cast is shared with real skill casts. The
+            // swing's actual playback duration is made to equal this same
+            // interval — not just scaled proportionally to it — so the
+            // animation and the cooldown it's tied to are never out of
+            // sync.
+            animatorController?.SetAttackDuration(AttackSpeedCalculator.GetAttackIntervalSeconds(playerStats.CurrentSubStats.Aspd), isRanged, isUnarmedMelee);
 
             if (classController.CurrentClass == CharacterClass.Mage)
             {
@@ -254,7 +262,7 @@ namespace Project.Character.Combat
             }
             else
             {
-                animatorController?.TriggerAttack();
+                animatorController?.TriggerAttack(isUnarmedMelee);
             }
 
             if (classController.CurrentClass == CharacterClass.Mage)
