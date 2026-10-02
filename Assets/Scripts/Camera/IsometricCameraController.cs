@@ -55,6 +55,14 @@ namespace Project.CameraSystem
             DontDestroyOnLoad(gameObject);
         }
 
+        private void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Instance = null;
+            }
+        }
+
         private void Start()
         {
             targetDistance = distance;
@@ -77,7 +85,11 @@ namespace Project.CameraSystem
             distance = Mathf.SmoothDamp(distance, targetDistance, ref distanceVelocity, zoomSmoothTime);
 
             smoothedTargetPosition = Vector3.SmoothDamp(smoothedTargetPosition, target.position, ref positionVelocity, positionSmoothTime);
+            ApplyPose();
+        }
 
+        private void ApplyPose()
+        {
             var rotation = Quaternion.Euler(pitchAngle, currentYaw, 0f);
             transform.position = smoothedTargetPosition + (rotation * Vector3.back * distance);
             transform.rotation = rotation;
@@ -112,6 +124,23 @@ namespace Project.CameraSystem
         public void SetTarget(Transform newTarget)
         {
             target = newTarget;
+        }
+
+        /// <summary>
+        /// Places the camera on the target immediately, skipping the follow
+        /// smoothing. Used after a map change so the camera appears already
+        /// centered on the player instead of travelling to it.
+        /// </summary>
+        public void SnapToTarget()
+        {
+            if (target == null)
+            {
+                return;
+            }
+
+            smoothedTargetPosition = target.position;
+            positionVelocity = Vector3.zero;
+            ApplyPose();
         }
     }
 }

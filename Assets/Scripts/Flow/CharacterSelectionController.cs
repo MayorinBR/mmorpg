@@ -14,8 +14,10 @@ namespace Project.Flow
     /// Drives the Character Selection screen: lists the signed-in account's
     /// characters (see <see cref="AccountSessionService"/>) 6 at a time, in
     /// creation order, with search-by-name and pagination. Selecting a slot
-    /// and pressing Start loads the gameplay scene with that character; New
-    /// Character goes to Character Creation instead.
+    /// and pressing Start loads the gameplay scene with that character;
+    /// pressing Delete instead asks for confirmation and then removes it. New
+    /// Character goes to Character Creation. This is the only screen that
+    /// starts the game.
     /// </summary>
     public class CharacterSelectionController : MonoBehaviour
     {
@@ -25,11 +27,13 @@ namespace Project.Flow
         [SerializeField] private TMP_InputField searchInput;
         [SerializeField] private Button newCharacterButton;
         [SerializeField] private Button startButton;
+        [SerializeField] private Button deleteButton;
+        [SerializeField] private ConfirmationPopup confirmationPopup;
         [SerializeField] private Button previousPageButton;
         [SerializeField] private Button nextPageButton;
         [SerializeField] private Button backButton;
         [SerializeField] private string characterCreationSceneName = "CharacterCreation";
-        [SerializeField] private string gameplaySceneName = "Prototype_Map01";
+        [SerializeField] private string gameplaySceneName = "Bootstrap";
         [SerializeField] private string loginSceneName = "Login";
 
         private List<string> ownedCharacterNames = new List<string>();
@@ -40,6 +44,7 @@ namespace Project.Flow
         {
             newCharacterButton.onClick.AddListener(() => SceneManager.LoadScene(characterCreationSceneName));
             startButton.onClick.AddListener(HandleStartClicked);
+            deleteButton.onClick.AddListener(HandleDeleteClicked);
             previousPageButton.onClick.AddListener(() => ChangePage(-1));
             nextPageButton.onClick.AddListener(() => ChangePage(1));
             backButton.onClick.AddListener(() => SceneManager.LoadScene(loginSceneName));
@@ -61,7 +66,15 @@ namespace Project.Flow
                 ownedCharacterNames = AccountRepository.Load(login).characterNames;
             }
 
+            confirmationPopup.Hide();
             RefreshSlots(resetPage: true);
+
+            var queuedName = CharacterSelectionHandoff.ConsumeCharacterToSelect();
+
+            if (queuedName != null)
+            {
+                SelectCharacterByName(queuedName);
+            }
         }
 
         private void ChangePage(int delta)
@@ -85,6 +98,22 @@ namespace Project.Flow
             }
 
             startButton.interactable = true;
+            deleteButton.interactable = true;
+        }
+
+        private void SelectCharacterByName(string characterName)
+        {
+            var index = ownedCharacterNames.IndexOf(characterName);
+
+            if (index < 0)
+            {
+                return;
+            }
+
+            searchInput.SetTextWithoutNotify("");
+            selectedCharacterName = characterName;
+            currentPage = index / CharactersPerPage;
+            RefreshSlots(resetPage: false);
         }
 
         private void RefreshSlots(bool resetPage)
@@ -120,7 +149,9 @@ namespace Project.Flow
 
             previousPageButton.interactable = currentPage > 0;
             nextPageButton.interactable = currentPage < pageCount - 1;
-            startButton.interactable = pageNames.Contains(selectedCharacterName);
+            var hasSelection = pageNames.Contains(selectedCharacterName);
+            startButton.interactable = hasSelection;
+            deleteButton.interactable = hasSelection;
         }
 
         private static bool TryLoadSummary(string characterName, out int level, out CharacterClass characterClass)
@@ -131,6 +162,13 @@ namespace Project.Flow
             {
                 level = data.baseLevel;
                 characterClass = (CharacterClass)data.characterClassIndex;
+                return true;
+            }
+
+            if (AccountRepository.TryGetPendingCharacter(AccountSessionService.CurrentAccountLogin, characterName, out var pending))
+            {
+                level = 1;
+                characterClass = (CharacterClass)pending.characterClassIndex;
                 return true;
             }
 
@@ -146,8 +184,51 @@ namespace Project.Flow
                 return;
             }
 
-            GameSessionService.BeginExistingCharacter(selectedCharacterName);
+            if (CharacterSaveLookup.Exists(selectedCharacterName))
+            {
+                GameSessionService.BeginExistingCharacter(selectedCharacterName);
+            }
+            else if (AccountRepository.TryGetPendingCharacter(AccountSessionService.CurrentAccountLogin, selectedCharacterName, out var pending))
+            {
+                GameSessionService.BeginNewCharacter(
+                    selectedCharacterName,
+                    (CharacterClass)pending.characterClassIndex,
+                    (CharacterGender)pending.characterGenderIndex);
+            }
+            else
+            {
+                return;
+            }
+
             SceneManager.LoadScene(gameplaySceneName);
+        }
+
+        private void HandleDeleteClicked()
+        {
+            if (selectedCharacterName == null)
+            {
+                return;
+            }
+
+            var characterName = selectedCharacterName;
+            confirmationPopup.ShowConfirm(
+                $"Are you sure you want to delete \"{characterName}\"? This cannot be undone.",
+                () => DeleteCharacter(characterName));
+        }
+
+        private void DeleteCharacter(string characterName)
+        {
+            AccountRepository.RemoveCharacter(AccountSessionService.CurrentAccountLogin, characterName);
+            CharacterSaveLookup.Delete(characterName);
+            ownedCharacterNames.Remove(characterName);
+
+            if (selectedCharacterName == characterName)
+            {
+                selectedCharacterName = null;
+            }
+
+            RefreshSlots(resetPage: false);
+            confirmationPopup.ShowMessage($"\"{characterName}\" was deleted.");
         }
     }
 }

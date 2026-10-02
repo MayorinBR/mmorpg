@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Project.CameraSystem;
@@ -30,7 +31,33 @@ namespace Project.World
         /// <summary>This map's ring indicator for the skill target picker's hovered enemy.</summary>
         [SerializeField] private GroundRingFollower localSkillPickerRing;
 
-        private void Start()
+        private IEnumerator Start()
+        {
+            // Lets a map scene be played directly from the Editor: without the
+            // persistent objects it would have no player, so the Bootstrap
+            // scene is added on top of it.
+            if (PersistentPlayerAnchor.Instance == null && Application.CanStreamedLevelBeLoaded(BootstrapLoader.SceneName))
+            {
+                yield return SceneManager.LoadSceneAsync(BootstrapLoader.SceneName, LoadSceneMode.Additive);
+                yield return null;
+            }
+
+            Initialize();
+
+            // Waits a couple of frames so the snapped camera and the warped
+            // player have settled before the map is revealed.
+            yield return null;
+            yield return null;
+
+            LoadingScreen.Hide();
+
+            if (PersistentPlayerAnchor.Instance != null)
+            {
+                PersistentPlayerAnchor.Instance.SetInputEnabled(true);
+            }
+        }
+
+        private void Initialize()
         {
             PublishCurrentMap();
 
@@ -67,6 +94,42 @@ namespace Project.World
             }
 
             WarpToPendingSpawnPoint(player);
+            WarpToPendingPosition(player);
+            EnsureOnNavMesh(player);
+
+            if (activeCamera != null)
+            {
+                activeCamera.SnapToTarget();
+            }
+        }
+
+        /// <summary>
+        /// Places the persisted player on this map's NavMesh when nothing else
+        /// did. The player comes from the Bootstrap scene, which has no
+        /// NavMesh, so its agent starts unplaced and stays that way until warped.
+        /// </summary>
+        /// <param name="player">The persisted player.</param>
+        private void EnsureOnNavMesh(PersistentPlayerAnchor player)
+        {
+            if (player.MovementController.IsOnNavMesh)
+            {
+                return;
+            }
+
+            var position = defaultRespawnPoint != null ? defaultRespawnPoint.position : player.MovementController.transform.position;
+            player.MovementController.WarpTo(position);
+        }
+
+        private static void WarpToPendingPosition(PersistentPlayerAnchor player)
+        {
+            var position = MapTransitionService.ConsumePendingPosition();
+            if (position == null)
+            {
+                return;
+            }
+
+            player.MovementController.StopMovement();
+            player.MovementController.WarpTo(position.Value);
         }
 
         private void PublishCurrentMap()

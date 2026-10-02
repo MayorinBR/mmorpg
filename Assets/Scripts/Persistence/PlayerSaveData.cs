@@ -131,10 +131,22 @@ namespace Project.Persistence
 
         /// <summary>
         /// Id (matching a Unity scene name) of the map the player was on
-        /// when this save was captured. Not yet used to choose which scene
-        /// loads on login — see <c>Project.Maps.CurrentMapSaveParticipant</c>.
+        /// when this save was captured. Character Selection loads this scene
+        /// when the character is started.
         /// </summary>
         public string currentMapId = "";
+
+        /// <summary>Whether <see cref="positionX"/>, <see cref="positionY"/> and <see cref="positionZ"/> hold a captured position.</summary>
+        public bool hasSavedPosition;
+
+        /// <summary>World-space X of the player on <see cref="currentMapId"/> when this save was captured.</summary>
+        public float positionX;
+
+        /// <summary>World-space Y of the player on <see cref="currentMapId"/> when this save was captured.</summary>
+        public float positionY;
+
+        /// <summary>World-space Z of the player on <see cref="currentMapId"/> when this save was captured.</summary>
+        public float positionZ;
 
         /// <summary>Id (asset name) of each currently accepted, not-yet-completed quest, parallel to <see cref="activeQuestProgress"/>.</summary>
         public List<string> activeQuestIds = new List<string>();

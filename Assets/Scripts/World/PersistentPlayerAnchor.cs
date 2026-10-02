@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Project.Character;
 using Project.Character.Movement;
 using Project.UI;
@@ -47,6 +48,30 @@ namespace Project.World
 
         /// <summary>The persisted player's combat target and skill-picker ring indicators.</summary>
         public CombatTargetIndicatorsUI CombatTargetIndicators => combatTargetIndicators;
+
+        /// <summary>
+        /// Enables or disables every action of the player's <see cref="PlayerInput"/>
+        /// (movement, combat and UI shortcuts). Disabled while a map is loading
+        /// so the player cannot act, and enabled again once it is ready.
+        /// </summary>
+        /// <param name="inputEnabled">True to let the player act, false to block all input.</param>
+        public void SetInputEnabled(bool inputEnabled)
+        {
+            var playerInput = GetComponent<PlayerInput>();
+            if (playerInput == null)
+            {
+                return;
+            }
+
+            if (inputEnabled)
+            {
+                playerInput.ActivateInput();
+            }
+            else
+            {
+                playerInput.DeactivateInput();
+            }
+        }
 
         private void Awake()
         {

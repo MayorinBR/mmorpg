@@ -27,5 +27,12 @@ namespace Project.Persistence
         /// records which characters belong to this account.
         /// </summary>
         public List<string> characterNames = new List<string>();
+
+        /// <summary>
+        /// Creation choices of the characters in <see cref="characterNames"/>
+        /// that have not been played yet (and so have no save file). An entry
+        /// is only needed until the character's first save is written.
+        /// </summary>
+        public List<PendingCharacterData> pendingCharacters = new List<PendingCharacterData>();
     }
 }

@@ -47,6 +47,19 @@ namespace Project.Persistence
         }
 
         /// <summary>
+        /// Deletes a character's save file if it exists. Does nothing for a
+        /// character that has never been saved.
+        /// </summary>
+        /// <param name="characterName">The character's name, exactly as typed.</param>
+        public static void Delete(string characterName)
+        {
+            if (Exists(characterName))
+            {
+                File.Delete(SaveFilePath(characterName));
+            }
+        }
+
+        /// <summary>
         /// Replaces every character invalid in a file name (a player can
         /// type anything into the name field) with an underscore, so an odd
         /// name can never fail <see cref="Path.Combine(string, string)"/> or

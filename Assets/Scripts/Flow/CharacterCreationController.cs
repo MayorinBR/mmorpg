@@ -12,6 +12,8 @@ namespace Project.Flow
     /// combination under the signed-in account (see
     /// <see cref="AccountSessionService"/>). Cancel returns to Character
     /// Selection with no side effects, since nothing has been submitted yet.
+    /// Create adds the character to the account and returns to Character
+    /// Selection with it already selected; the game only starts from there.
     /// </summary>
     public class CharacterCreationController : MonoBehaviour
     {
@@ -21,7 +23,6 @@ namespace Project.Flow
         [SerializeField] private TMP_Text warningText;
         [SerializeField] private Button createButton;
         [SerializeField] private Button cancelButton;
-        [SerializeField] private string gameplaySceneName = "Prototype_Map01";
         [SerializeField] private string characterSelectionSceneName = "CharacterSelection";
 
         private ClassSelectionButton selectedClassOption;
@@ -81,7 +82,7 @@ namespace Project.Flow
                 return;
             }
 
-            if (CharacterSaveLookup.Exists(characterName))
+            if (AccountRepository.IsCharacterNameTaken(characterName))
             {
                 ShowWarning("A character with that name already exists.");
                 return;
@@ -93,9 +94,13 @@ namespace Project.Flow
                 return;
             }
 
-            AccountRepository.AddCharacter(AccountSessionService.CurrentAccountLogin, characterName);
-            GameSessionService.BeginNewCharacter(characterName, selectedClassOption.CharacterClass, selectedGenderOption.Gender);
-            SceneManager.LoadScene(gameplaySceneName);
+            AccountRepository.AddNewCharacter(
+                AccountSessionService.CurrentAccountLogin,
+                characterName,
+                selectedClassOption.CharacterClass,
+                selectedGenderOption.Gender);
+            CharacterSelectionHandoff.QueueCharacterToSelect(characterName);
+            SceneManager.LoadScene(characterSelectionSceneName);
         }
 
         private void HandleCancelClicked()

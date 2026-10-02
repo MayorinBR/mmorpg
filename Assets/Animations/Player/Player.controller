@@ -26,10 +26,10 @@ AnimatorStateMachine:
     m_Position: {x: 280, y: 290, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 100015}
-    m_Position: {x: 280, y: 370, z: 0}
+    m_Position: {x: 280, y: 380, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 100016}
-    m_Position: {x: 290, y: 460, z: 0}
+    m_Position: {x: 270, y: 460, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions:
   - {fileID: 100022}
@@ -204,9 +204,9 @@ AnimatorState:
   m_Motion: {fileID: -203655887218126122, guid: d2f4b6147edff1e428880517db731054, type: 3}
   m_Tag: 
   m_SpeedParameter: AttackSpeedMultiplier
-  m_MirrorParameter:
-  m_CycleOffsetParameter:
-  m_TimeParameter:
+  m_MirrorParameter: 
+  m_CycleOffsetParameter: 
+  m_TimeParameter: 
 --- !u!1102 &100016
 AnimatorState:
   serializedVersion: 6
@@ -229,11 +229,11 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: -203655887218126122, guid: 362998711c5ea72409c5dd21c824e911, type: 3}
-  m_Tag:
+  m_Tag: 
   m_SpeedParameter: AttackSpeedMultiplier
-  m_MirrorParameter:
-  m_CycleOffsetParameter:
-  m_TimeParameter:
+  m_MirrorParameter: 
+  m_CycleOffsetParameter: 
+  m_TimeParameter: 
 --- !u!1101 &100020
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -484,7 +484,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name:
+  m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
     m_ConditionEvent: Attack
@@ -512,7 +512,7 @@ AnimatorStateTransition:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name:
+  m_Name: 
   m_Conditions: []
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 100010}

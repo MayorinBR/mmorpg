@@ -100,6 +100,8 @@ namespace Project.Character.Combat
 
             var activeAnimator = currentGeometry.GetComponentInChildren<Animator>();
 
+            WarnIfAnimatorUnusable(prefab, activeAnimator);
+
             if (activeAnimator != null)
             {
                 // The instantiated model is a raw imported FBX with no
@@ -141,6 +143,30 @@ namespace Project.Character.Combat
             }
 
             GenderChanged?.Invoke(newGender);
+        }
+
+        /// <summary>
+        /// Logs why a freshly instantiated model cannot play Humanoid
+        /// animations, so a broken import (missing Animator, invalid or
+        /// non-Humanoid Avatar) is reported in the Console instead of
+        /// showing up silently as a model stuck in its bind pose.
+        /// </summary>
+        /// <param name="prefab">The model prefab that was instantiated.</param>
+        /// <param name="modelAnimator">The Animator found on the instance, or null if there is none.</param>
+        private static void WarnIfAnimatorUnusable(GameObject prefab, Animator modelAnimator)
+        {
+            if (modelAnimator == null)
+            {
+                Debug.LogError($"{prefab.name} has no Animator. Check that its Rig is set to Humanoid and imports without errors.", prefab);
+                return;
+            }
+
+            var avatar = modelAnimator.avatar;
+
+            if (avatar == null || !avatar.isValid || !avatar.isHuman)
+            {
+                Debug.LogError($"{prefab.name} has no valid Humanoid Avatar, so Humanoid animations will not play. Open its Rig tab and use Configure to check the bone mapping.", prefab);
+            }
         }
 
         /// <inheritdoc />

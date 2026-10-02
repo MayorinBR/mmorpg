@@ -32,6 +32,14 @@ namespace Project.CameraSystem
             DontDestroyOnLoad(gameObject);
         }
 
+        private void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Instance = null;
+            }
+        }
+
         private void LateUpdate()
         {
             if (player == null)

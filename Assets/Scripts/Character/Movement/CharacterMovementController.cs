@@ -47,6 +47,13 @@ namespace Project.Character.Movement
         /// </summary>
         public bool IsMoving => isMoving;
 
+        /// <summary>
+        /// Gets whether the agent is currently placed on a NavMesh. False while
+        /// the persisted player sits in a scene without one (such as the
+        /// Bootstrap scene), until a map warps it onto one.
+        /// </summary>
+        public bool IsOnNavMesh => agent.isOnNavMesh;
+
         private void Awake()
         {
             directionalProvider = new DirectionalMovementProvider();
@@ -58,6 +65,11 @@ namespace Project.Character.Movement
 
         private void Update()
         {
+            if (!agent.isOnNavMesh)
+            {
+                return;
+            }
+
             var isLocked = movementLocked || (statusEffects != null && statusEffects.IsImmobilized);
             agent.isStopped = isLocked;
 
@@ -118,7 +130,10 @@ namespace Project.Character.Movement
         /// </summary>
         public void StopMovement()
         {
-            agent.ResetPath();
+            if (agent.isOnNavMesh)
+            {
+                agent.ResetPath();
+            }
         }
 
         /// <summary>
@@ -141,7 +156,11 @@ namespace Project.Character.Movement
         public void SetMovementLocked(bool movementLocked)
         {
             this.movementLocked = movementLocked;
-            agent.isStopped = movementLocked;
+
+            if (agent.isOnNavMesh)
+            {
+                agent.isStopped = movementLocked;
+            }
 
             if (movementLocked)
             {
