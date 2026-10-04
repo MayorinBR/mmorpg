@@ -23,6 +23,7 @@ namespace Project.Flow
         [SerializeField] private TMP_Text warningText;
         [SerializeField] private Button createButton;
         [SerializeField] private Button cancelButton;
+        [SerializeField] private CharacterAppearanceSelectionController appearanceSelection;
         [SerializeField] private string characterSelectionSceneName = "CharacterSelection";
 
         private ClassSelectionButton selectedClassOption;
@@ -70,6 +71,11 @@ namespace Project.Flow
             selectedGenderOption?.SetSelected(false);
             selectedGenderOption = option;
             selectedGenderOption.SetSelected(true);
+
+            if (appearanceSelection != null)
+            {
+                appearanceSelection.SetGender(option.Gender);
+            }
         }
 
         private void HandleCreateClicked()
@@ -98,7 +104,8 @@ namespace Project.Flow
                 AccountSessionService.CurrentAccountLogin,
                 characterName,
                 selectedClassOption.CharacterClass,
-                selectedGenderOption.Gender);
+                selectedGenderOption.Gender,
+                appearanceSelection != null ? appearanceSelection.Current : null);
             CharacterSelectionHandoff.QueueCharacterToSelect(characterName);
             SceneManager.LoadScene(characterSelectionSceneName);
         }

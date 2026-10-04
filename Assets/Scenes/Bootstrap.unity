@@ -6863,12 +6863,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -7880,12 +7880,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -8935,6 +8935,7 @@ MonoBehaviour:
   nameProvider: {fileID: 1696850562}
   classController: {fileID: 1696850564}
   genderController: {fileID: 1696850566}
+  appearanceController: {fileID: 7000000000000000006}
 --- !u!114 &900000101
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13716,12 +13717,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -19925,6 +19926,7 @@ GameObject:
   - component: {fileID: 1696850567}
   - component: {fileID: 1696850568}
   - component: {fileID: 7000000000000000005}
+  - component: {fileID: 7000000000000000006}
   m_Layer: 7
   m_Name: Meta
   m_TagString: Untagged
@@ -20054,11 +20056,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Character.Combat::Project.Character.Combat.PlayerGenderController
   startingGender: 0
   geometryRoot: {fileID: 543450651632539191}
-  malePrefab: {fileID: 919132149155446097, guid: 2e52cbc18a744c4459a3ecd22beb0cfe, type: 3}
-  femalePrefab: {fileID: 919132149155446097, guid: 4a0ca60e02ee48b581918e722b7c3c1a, type: 3}
+  malePrefab: {fileID: 5665135878234285227, guid: 6776fc426f1ace94f80429ff674709d6, type: 3}
+  femalePrefab: {fileID: 6861354668323568444, guid: e507ad9d7dbd3374a9533edee67eee50, type: 3}
   sharedAnimatorController: {fileID: 9100000, guid: 4a3a42b9687649ecb7e3c2a8a3288eee, type: 2}
   animatorController: {fileID: 401280901}
   combatController: {fileID: 401280846}
+  appearanceController: {fileID: 7000000000000000006}
 --- !u!114 &1696850567
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24325,12 +24328,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -27217,6 +27220,21 @@ MonoBehaviour:
   tintStrength: 0.6
   colorPropertyName: _BaseColor
   poisonSource: {fileID: 1696850568}
+--- !u!114 &7000000000000000006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1696850558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f31e5a0f65830d4a999bea1f4260226, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Character.Appearance::Project.Character.Appearance.PlayerAppearanceController
+  headCatalog: {fileID: 11400000, guid: e59678c691fdcec4782095d90b017594, type: 2}
+  hairCatalog: {fileID: 11400000, guid: b399aa12ee54ece44b375a58eeb03fc4, type: 2}
+  faceCatalog: {fileID: 11400000, guid: 4429d21e84073574b9569415ff6aa3ce, type: 2}
 --- !u!222 &7101010101010101010
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -27504,12 +27522,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96

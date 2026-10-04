@@ -111,7 +111,8 @@ namespace Project.Persistence
         /// <param name="characterName">The new character's name.</param>
         /// <param name="characterClass">The class chosen for the character.</param>
         /// <param name="gender">The gender chosen for the character.</param>
-        public static void AddNewCharacter(string login, string characterName, CharacterClass characterClass, CharacterGender gender)
+        /// <param name="appearance">The look chosen for the character, or null to keep the model's default look.</param>
+        public static void AddNewCharacter(string login, string characterName, CharacterClass characterClass, CharacterGender gender, CharacterAppearanceData appearance = null)
         {
             var path = SaveFilePath(login);
             var account = File.Exists(path) ? LoadFromFile(path) : new AccountData { login = login };
@@ -126,7 +127,8 @@ namespace Project.Persistence
             {
                 name = characterName,
                 characterClassIndex = (int)characterClass,
-                characterGenderIndex = (int)gender
+                characterGenderIndex = (int)gender,
+                appearance = appearance ?? new CharacterAppearanceData()
             });
 
             Save(account);

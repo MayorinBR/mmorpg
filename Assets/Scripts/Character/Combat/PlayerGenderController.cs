@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using Project.Character.Stats;
 using Project.Character.Animation;
+using Project.Character.Appearance;
 using Project.Persistence;
 
 namespace Project.Character.Combat
@@ -53,6 +54,9 @@ namespace Project.Character.Combat
             "controller), no relay is added and Animation Events on that " +
             "rig simply have no receiver.")]
         [SerializeField] private PlayerCombatController combatController;
+
+        [Tooltip("Optional. Applies the player's saved look (hair, eyes, mouth) to each new model instance.")]
+        [SerializeField] private PlayerAppearanceController appearanceController;
 
         private GameObject currentGeometry;
 
@@ -140,6 +144,11 @@ namespace Project.Character.Combat
                     var relay = activeAnimator.gameObject.AddComponent<PlayerAnimationEventRelay>();
                     relay.Initialize(combatController);
                 }
+            }
+
+            if (appearanceController != null)
+            {
+                appearanceController.ApplyTo(currentGeometry, newGender);
             }
 
             GenderChanged?.Invoke(newGender);
