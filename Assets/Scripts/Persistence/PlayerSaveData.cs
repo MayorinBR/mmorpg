@@ -32,6 +32,9 @@ namespace Project.Persistence
         /// <summary>The underlying int value of the player's chosen <c>CharacterGender</c>.</summary>
         public int characterGenderIndex;
 
+        /// <summary>How the character looks. Ignored when <c>isSet</c> is false, as in saves written before this field existed.</summary>
+        public CharacterAppearanceData appearance = new CharacterAppearanceData();
+
         /// <summary>The player's current Base Level.</summary>
         public int baseLevel = 1;
 

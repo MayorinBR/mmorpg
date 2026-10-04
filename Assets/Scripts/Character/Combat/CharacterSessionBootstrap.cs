@@ -1,4 +1,5 @@
 using UnityEngine;
+using Project.Character.Appearance;
 using Project.Persistence;
 
 namespace Project.Character.Combat
@@ -42,6 +43,7 @@ namespace Project.Character.Combat
         [SerializeField] private PlayerNameProvider nameProvider;
         [SerializeField] private PlayerClassController classController;
         [SerializeField] private PlayerGenderController genderController;
+        [SerializeField] private PlayerAppearanceController appearanceController;
 
         private void Awake()
         {
@@ -62,6 +64,12 @@ namespace Project.Character.Combat
                 nameProvider.SetName(characterName);
                 classController.ChangeClass(characterClass);
                 genderController.SetGender(gender);
+
+                var appearance = GameSessionService.ConsumePendingAppearance();
+                if (appearance != null && appearanceController != null)
+                {
+                    appearanceController.SetAppearance(appearance);
+                }
             }
         }
     }

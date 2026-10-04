@@ -21,5 +21,8 @@ namespace Project.Persistence
 
         /// <summary>The chosen gender, as a <c>CharacterGender</c> index.</summary>
         public int characterGenderIndex;
+
+        /// <summary>How the character looks, chosen on the Character Creation screen.</summary>
+        public CharacterAppearanceData appearance = new CharacterAppearanceData();
     }
 }

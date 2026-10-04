@@ -28,6 +28,7 @@ namespace Project.Persistence
         private static CharacterClass pendingClass;
         private static CharacterGender pendingGender;
         private static bool hasPendingCharacter;
+        private static CharacterAppearanceData pendingAppearance;
 
         /// <summary>
         /// Records a brand-new character to create once the gameplay scene
@@ -36,8 +37,10 @@ namespace Project.Persistence
         /// <param name="characterName">The new character's name (already confirmed not to exist yet).</param>
         /// <param name="characterClass">The class chosen for the new character.</param>
         /// <param name="gender">The gender chosen for the new character.</param>
-        public static void BeginNewCharacter(string characterName, CharacterClass characterClass, CharacterGender gender)
+        /// <param name="appearance">The look chosen for the new character, or null to keep the model's default look.</param>
+        public static void BeginNewCharacter(string characterName, CharacterClass characterClass, CharacterGender gender, CharacterAppearanceData appearance)
         {
+            pendingAppearance = appearance;
             pendingCharacterName = characterName;
             pendingIsNewCharacter = true;
             pendingClass = characterClass;
@@ -55,7 +58,19 @@ namespace Project.Persistence
         {
             pendingCharacterName = characterName;
             pendingIsNewCharacter = false;
+            pendingAppearance = null;
             hasPendingCharacter = true;
+        }
+
+        /// <summary>
+        /// Consumes and clears the look chosen for the pending new character.
+        /// </summary>
+        /// <returns>The chosen look, or null if none was queued.</returns>
+        public static CharacterAppearanceData ConsumePendingAppearance()
+        {
+            var appearance = pendingAppearance;
+            pendingAppearance = null;
+            return appearance;
         }
 
         /// <summary>

@@ -193,7 +193,8 @@ namespace Project.Flow
                 GameSessionService.BeginNewCharacter(
                     selectedCharacterName,
                     (CharacterClass)pending.characterClassIndex,
-                    (CharacterGender)pending.characterGenderIndex);
+                    (CharacterGender)pending.characterGenderIndex,
+                    pending.appearance);
             }
             else
             {
