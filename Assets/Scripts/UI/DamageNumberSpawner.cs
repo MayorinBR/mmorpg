@@ -1,4 +1,5 @@
 using UnityEngine;
+using Project.Character.Combat;
 using Project.Combat;
 
 namespace Project.UI
@@ -18,11 +19,19 @@ namespace Project.UI
         [SerializeField] private Vector3 spawnOffset = new Vector3(0f, 2f, 0f);
         [SerializeField] private float horizontalJitter = 0.3f;
 
+        [Tooltip("Optional. Resolved from the owning hierarchy when empty; only the player has one, and it adds a green popup for passive skill healing.")]
+        [SerializeField] private PlayerHealthRegenController regenController;
+
         private void Awake()
         {
             if (health == null)
             {
                 health = GetComponent<HealthComponent>();
+            }
+
+            if (regenController == null)
+            {
+                regenController = transform.root.GetComponentInChildren<PlayerHealthRegenController>(true);
             }
         }
 
@@ -30,12 +39,27 @@ namespace Project.UI
         {
             health.DamageTaken += HandleDamageTaken;
             health.Dodged += HandleDodged;
+
+            if (regenController != null)
+            {
+                regenController.SkillRegenApplied += HandleSkillRegenApplied;
+            }
         }
 
         private void OnDisable()
         {
             health.DamageTaken -= HandleDamageTaken;
             health.Dodged -= HandleDodged;
+
+            if (regenController != null)
+            {
+                regenController.SkillRegenApplied -= HandleSkillRegenApplied;
+            }
+        }
+
+        private void HandleSkillRegenApplied(int amount)
+        {
+            DamagePopup.CreateHeal(amount, GetSpawnPosition());
         }
 
         private void HandleDamageTaken(int amount, bool isCritical, Element element)

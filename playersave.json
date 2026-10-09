@@ -12,23 +12,31 @@
         "headModelId": "",
         "bodyModelId": ""
     },
-    "baseLevel": 1,
-    "baseExperience": 0,
-    "strength": 1,
+    "baseLevel": 7,
+    "baseExperience": 30,
+    "strength": 15,
     "agility": 1,
-    "vitality": 1,
+    "vitality": 9,
     "intelligence": 1,
     "dexterity": 1,
     "luck": 1,
-    "availableStatPoints": 48,
-    "jobLevel": 1,
-    "jobExperience": 0,
+    "availableStatPoints": 20,
+    "jobLevel": 6,
+    "jobExperience": 116,
     "availableSkillPoints": 0,
     "characterClassIndex": 0,
     "zeny": 80,
     "mageElementIndex": 5,
-    "learnedSkillIds": [],
-    "learnedSkillLevels": [],
+    "learnedSkillIds": [
+        "IncreaseHPRecovery",
+        "HPRecoveryWhileMoving",
+        "SwordMastery"
+    ],
+    "learnedSkillLevels": [
+        2,
+        1,
+        2
+    ],
     "hotbarSkillIds": [
         "",
         "",
@@ -42,7 +50,7 @@
         ""
     ],
     "inventoryItemIds": [
-        "",
+        "TestItem",
         "",
         "",
         "",
@@ -64,7 +72,7 @@
         ""
     ],
     "inventoryQuantities": [
-        0,
+        1,
         0,
         0,
         0,
@@ -101,17 +109,17 @@
     ],
     "equippedAmmoCount": 0,
     "windowIds": [
-        "Stats",
-        "SkillBook",
-        "Equipment",
-        "SkillHotbar",
         "Inventory",
-        "QuestLog"
+        "QuestLog",
+        "Stats",
+        "SkillHotbar",
+        "Equipment",
+        "SkillBook"
     ],
     "windowIsOpen": [
         0,
         0,
-        1,
+        0,
         0,
         0,
         0
@@ -126,33 +134,33 @@
     ],
     "windowHasCustomPosition": [
         0,
-        1,
         0,
         0,
         0,
-        0
+        0,
+        1
     ],
     "windowPositionX": [
         0.0,
-        613.0000610351563,
-        16.0,
-        16.0,
-        16.0,
-        346.0
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1229.66064453125
     ],
     "windowPositionY": [
         0.0,
-        -73.0,
-        -250.0,
-        -602.0,
-        -602.0,
-        -16.0
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -67.37353515625
     ],
-    "currentMapId": "Prototype_Map02",
+    "currentMapId": "Prototype_Map01",
     "hasSavedPosition": true,
-    "positionX": -9.68722152709961,
-    "positionY": 0.08333301544189453,
-    "positionZ": 5.742687225341797,
+    "positionX": -13.776554107666016,
+    "positionY": 0.29112184047698977,
+    "positionZ": -3.5183486938476564,
     "activeQuestIds": [],
     "activeQuestProgress": [],
     "completedQuestIds": []

@@ -51,6 +51,11 @@ namespace Project.Character.Combat
         [Tooltip("Multiplier applied to the regen tick while moving with HP Recovery While Moving learned.")]
         [SerializeField] private float movementRegenPenaltyMultiplier = 0.5f;
 
+        /// <summary>
+        /// Raised after an Increase HP Recovery tick restores health, with the amount actually healed.
+        /// </summary>
+        public event System.Action<int> SkillRegenApplied;
+
         private float regenTimer;
         private float skillRegenTimer;
 
@@ -124,9 +129,18 @@ namespace Project.Character.Combat
         {
             var amount = Mathf.RoundToInt(passiveSkills.GetSkillRegenAmount(health.MaxHealth));
 
-            if (amount > 0)
+            if (amount <= 0)
             {
-                health.Heal(amount);
+                return;
+            }
+
+            var healthBefore = health.CurrentHealth;
+            health.Heal(amount);
+            var healed = health.CurrentHealth - healthBefore;
+
+            if (healed > 0)
+            {
+                SkillRegenApplied?.Invoke(healed);
             }
         }
     }

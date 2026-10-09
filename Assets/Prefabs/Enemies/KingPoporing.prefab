@@ -34,7 +34,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 20}
+  m_AnchoredPosition: {x: 0, y: 12}
   m_SizeDelta: {x: 200, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2726810376988253081
@@ -75,7 +75,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColor: {r: 0.9411765, g: 0.34901962, b: 0.34901962, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -100,7 +100,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
@@ -199,7 +199,7 @@ GameObject:
   - component: {fileID: 7000000000000000003}
   - component: {fileID: 7000000000000000004}
   m_Layer: 8
-  m_Name: King Poporing
+  m_Name: KingPoporing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -312,7 +312,6 @@ MonoBehaviour:
   healthBarRoot: {fileID: 5411425689760265616}
   playerExperience: {fileID: 0}
   playerJobProgress: {fileID: 0}
-  lootTable: {fileID: 11400000, guid: fd4089ebb95fe9a4cad34d845490ad6a, type: 2}
   itemPickupPrefab: {fileID: 5243884865457942396, guid: 4bd359e73ab1ce44894ebcea38886042, type: 3}
   dropSpreadRadius: 1.5
   respawnDelaySeconds: 5
@@ -425,10 +424,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Project.Combat::Project.Combat.StatusEffectController
   health: {fileID: 8729646936949443446}
-  buffs: {fileID: 56637467334832613}
   poisonTickIntervalSeconds: 1
   resistanceSource: {fileID: 0}
   statsHolder: {fileID: 0}
+  buffs: {fileID: 56637467334832613}
+  flinchDurationSeconds: 0.3
 --- !u!114 &6222222222222222222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -457,23 +457,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Project.Combat::Project.Combat.ManaComponent
   maxManaBonusSource: {fileID: 0}
---- !u!114 &7000000000000000004
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2301299987623212396}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4fd5b86947c74698ac873dbc2dd9b7bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Project.Combat::Project.Combat.StatusTintController
-  modelRoot: {fileID: 496431037501591645}
-  tintColor: {r: 1, g: 0, b: 0, a: 1}
-  tintStrength: 0.6
-  colorPropertyName: _Base_Color
-  poisonSource: {fileID: 0}
 --- !u!114 &7000000000000000002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -500,6 +483,7 @@ MonoBehaviour:
     cooldownSeconds: 15
     durationSeconds: 20
     damagePerTick: 10
+  skillNamePopupOffset: {x: 0, y: 2.5, z: 0}
 --- !u!114 &7000000000000000003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -516,6 +500,23 @@ MonoBehaviour:
   manaPerSecond: 30
   health: {fileID: 8729646936949443446}
   mana: {fileID: 7000000000000000001}
+--- !u!114 &7000000000000000004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2301299987623212396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fd5b86947c74698ac873dbc2dd9b7bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Combat::Project.Combat.StatusTintController
+  modelRoot: {fileID: 496431037501591645}
+  tintColor: {r: 1, g: 0, b: 0, a: 1}
+  tintStrength: 0.6
+  colorPropertyName: _Base_Color
+  poisonSource: {fileID: 0}
 --- !u!1 &2809848501221703555
 GameObject:
   m_ObjectHideFlags: 0
@@ -638,7 +639,7 @@ RectTransform:
   m_Father: {fileID: 3695954317293146170}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.049, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

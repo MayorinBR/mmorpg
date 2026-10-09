@@ -152,7 +152,7 @@ namespace Project.AI
         public EnemyBehaviorMode BehaviorMode => behaviorMode;
 
         /// <summary>Gets the world position where the enemy started, used as the default wander center and respawn point.</summary>
-        public Vector3 SpawnPosition { get; private set; }
+        public Vector3 SpawnPosition { get; set; }
 
         /// <summary>Gets or sets the current chase/attack target.</summary>
         public Transform PlayerTarget { get; set; }

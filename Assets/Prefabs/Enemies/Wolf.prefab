@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1940662483426936663
+--- !u!1 &72402712695876051
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,8 +8,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6822884422638982637}
-  - component: {fileID: 6629363431494656898}
+  - component: {fileID: 1031294030418459960}
+  - component: {fileID: 7986085218802182025}
   m_Layer: 8
   m_Name: Hitbox
   m_TagString: Untagged
@@ -17,13 +17,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6822884422638982637
+--- !u!4 &1031294030418459960
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1940662483426936663}
+  m_GameObject: {fileID: 72402712695876051}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -32,13 +32,13 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6191344707893608728}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &6629363431494656898
+--- !u!65 &7986085218802182025
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1940662483426936663}
+  m_GameObject: {fileID: 72402712695876051}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -172,7 +172,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2363408862091125617}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -2.85}
   m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -183,7 +183,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 1.5}
+  m_AnchoredPosition: {x: 425, y: 264.5}
   m_SizeDelta: {x: 160, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &2058725271509716850
@@ -306,8 +306,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 528def6e22ccf6343ad1da3acef6dc79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Project.UI.WorldSpaceHealthBarFollower
-  target: {fileID: 956249806176819962}
-  offset: {x: 0, y: 1.7, z: 0}
+  target: {fileID: 8489337951445037282}
+  offset: {x: 0, y: 2, z: 0}
   viewCamera: {fileID: 0}
 --- !u!114 &4401576482003769063
 MonoBehaviour:
@@ -480,7 +480,7 @@ GameObject:
   - component: {fileID: 7528146201324864197}
   - component: {fileID: 4253547583630163530}
   - component: {fileID: 6964384876310540749}
-  - component: {fileID: 7168019795516956797}
+  - component: {fileID: 1622804764090804273}
   m_Layer: 8
   m_Name: Wolf
   m_TagString: Untagged
@@ -503,8 +503,8 @@ Transform:
   m_Children:
   - {fileID: 8648165500238755151}
   - {fileID: 2321243056361361149}
-  - {fileID: 956249806176819962}
-  - {fileID: 6822884422638982637}
+  - {fileID: 8489337951445037282}
+  - {fileID: 1031294030418459960}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!195 &4613584862562306671
@@ -589,13 +589,12 @@ MonoBehaviour:
   health: {fileID: 4831875017803827334}
   controller: {fileID: 3451313833103779264}
   agent: {fileID: 4613584862562306671}
-  hitCollider: {fileID: 6629363431494656898}
-  visualRenderer: {fileID: 4226075715986221218}
+  hitCollider: {fileID: 7986085218802182025}
+  visualRenderer: {fileID: 4770278182553666234}
   additionalRenderers: []
   healthBarRoot: {fileID: 2363408862091125617}
   playerExperience: {fileID: 0}
   playerJobProgress: {fileID: 0}
-  lootTable: {fileID: 0}
   itemPickupPrefab: {fileID: 5243884865457942396, guid: 4bd359e73ab1ce44894ebcea38886042, type: 3}
   dropSpreadRadius: 1.5
   respawnDelaySeconds: 5
@@ -686,10 +685,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Project.Combat::Project.Combat.StatusEffectController
   health: {fileID: 4831875017803827334}
-  buffs: {fileID: 517221237455455100}
   poisonTickIntervalSeconds: 1
   resistanceSource: {fileID: 0}
   statsHolder: {fileID: 0}
+  buffs: {fileID: 517221237455455100}
+  flinchDurationSeconds: 0.3
 --- !u!114 &4253547583630163530
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -719,7 +719,7 @@ MonoBehaviour:
   label: {fileID: 8404342373337253059}
   entityName: Wolf
   showLevel: 1
---- !u!114 &7168019795516956797
+--- !u!114 &1622804764090804273
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -731,7 +731,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aacf999b63448e040a8ffffc5ae5e6e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Project.AI::Project.AI.EnemyAnimatorDriver
-  animator: {fileID: 3866724951165459758}
+  animator: {fileID: 821575969295482360}
   controller: {fileID: 3451313833103779264}
   agent: {fileID: 4613584862562306671}
   strideSpeed: 2
@@ -1198,7 +1198,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!1001 &779106640733011217
+--- !u!1001 &8240064073855850249
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -1384,21 +1384,31 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2a733447affcb81419df606c499eebb3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3866724951165459758}
+      addedObject: {fileID: 821575969295482360}
   m_SourcePrefab: {fileID: 100100000, guid: 2a733447affcb81419df606c499eebb3, type: 3}
---- !u!1 &436453946450821184 stripped
+--- !u!137 &4770278182553666234 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3488592227230979507, guid: 2a733447affcb81419df606c499eebb3, type: 3}
+  m_PrefabInstance: {fileID: 8240064073855850249}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8489337951445037282 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2a733447affcb81419df606c499eebb3, type: 3}
+  m_PrefabInstance: {fileID: 8240064073855850249}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &9123166189041740376 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 2a733447affcb81419df606c499eebb3, type: 3}
-  m_PrefabInstance: {fileID: 779106640733011217}
+  m_PrefabInstance: {fileID: 8240064073855850249}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &3866724951165459758
+--- !u!95 &821575969295482360
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 436453946450821184}
+  m_GameObject: {fileID: 9123166189041740376}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: aa6446b393a0cd249b87429decc96327, type: 2}
@@ -1413,13 +1423,3 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!4 &956249806176819962 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2a733447affcb81419df606c499eebb3, type: 3}
-  m_PrefabInstance: {fileID: 779106640733011217}
-  m_PrefabAsset: {fileID: 0}
---- !u!137 &4226075715986221218 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 3488592227230979507, guid: 2a733447affcb81419df606c499eebb3, type: 3}
-  m_PrefabInstance: {fileID: 779106640733011217}
-  m_PrefabAsset: {fileID: 0}

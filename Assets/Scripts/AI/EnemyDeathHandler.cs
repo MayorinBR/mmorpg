@@ -45,6 +45,22 @@ namespace Project.AI
         private bool isCurrentlyAlive = true;
         private float pendingRespawnAtTime;
 
+        /// <summary>Raised whenever this enemy starts waiting to respawn, including when a dead enemy is restored after a map switch.</summary>
+        public event System.Action<EnemyDeathHandler> RespawnScheduled;
+
+        /// <summary>Gets or sets how long this enemy stays dead before respawning.</summary>
+        public float RespawnDelaySeconds
+        {
+            get => respawnDelaySeconds;
+            set => respawnDelaySeconds = Mathf.Max(0f, value);
+        }
+
+        /// <summary>
+        /// Gets or sets an optional source of the respawn position, asked once the delay has elapsed.
+        /// Returning null (or leaving this unset) respawns the enemy at <see cref="EnemyController.SpawnPosition"/>.
+        /// </summary>
+        public System.Func<Vector3?> RespawnPointProvider { get; set; }
+
         private string EffectiveEnemyId => string.IsNullOrEmpty(enemyId) ? gameObject.name : enemyId;
 
         private void OnEnable()
@@ -78,6 +94,7 @@ namespace Project.AI
         private void HandleDeath()
         {
             EnemyDeathEvents.RaiseEnemyKilled(controller.Stats);
+            ResolvePlayerProgression();
 
             if (playerExperience != null)
             {
@@ -93,6 +110,24 @@ namespace Project.AI
 
             SpawnLoot();
             BeginRespawn(respawnDelaySeconds);
+        }
+
+        /// <summary>
+        /// Finds the persisted player's experience and job components when they were not assigned in the
+        /// Inspector. A prefab cannot reference a scene object, and the player now lives in the bootstrap
+        /// scene rather than in each map, so the references are resolved at kill time instead.
+        /// </summary>
+        private void ResolvePlayerProgression()
+        {
+            if (playerExperience == null)
+            {
+                playerExperience = FindFirstObjectByType<PlayerExperience>();
+            }
+
+            if (playerJobProgress == null)
+            {
+                playerJobProgress = FindFirstObjectByType<PlayerJobProgress>();
+            }
         }
 
         private void SpawnLoot()
@@ -169,6 +204,7 @@ namespace Project.AI
         {
             isCurrentlyAlive = false;
             pendingRespawnAtTime = Time.time + delaySeconds;
+            RespawnScheduled?.Invoke(this);
             StartCoroutine(RespawnRoutine(delaySeconds));
         }
 
@@ -177,6 +213,13 @@ namespace Project.AI
             SetAlive(false);
 
             yield return new WaitForSeconds(delaySeconds);
+
+            var respawnPoint = RespawnPointProvider?.Invoke();
+
+            if (respawnPoint.HasValue)
+            {
+                controller.SpawnPosition = respawnPoint.Value;
+            }
 
             transform.position = controller.SpawnPosition;
             SetAlive(true);
