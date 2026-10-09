@@ -52,7 +52,7 @@ namespace Project.UI
             titleText.text = quest.Title;
 
             var descriptionText = CreateStretchedText(rect, "Description", TitleHeight, DescriptionHeight, 12, FontStyles.Normal);
-            descriptionText.color = new Color(0.85f, 0.85f, 0.85f);
+            descriptionText.color = UiTheme.Muted;
             descriptionText.enableWordWrapping = true;
             descriptionText.text = quest.Description;
 
@@ -64,7 +64,7 @@ namespace Project.UI
             buttonRect.pivot = new Vector2(0, 1);
             buttonRect.anchoredPosition = new Vector2(0, -(TitleHeight + DescriptionHeight));
             buttonRect.sizeDelta = new Vector2(ButtonWidth, ButtonHeight);
-            buttonGo.GetComponent<Image>().color = new Color(0.25f, 0.5f, 0.25f);
+            buttonGo.GetComponent<Image>().color = UiTheme.Accent;
 
             var buttonTextRect = new GameObject("Text", typeof(RectTransform));
             var buttonTextTransform = (RectTransform)buttonTextRect.transform;
@@ -99,7 +99,7 @@ namespace Project.UI
             var text = go.AddComponent<TextMeshProUGUI>();
             text.fontSize = fontSize;
             text.fontStyle = style;
-            text.color = Color.white;
+            text.color = UiTheme.Ink;
             return text;
         }
     }

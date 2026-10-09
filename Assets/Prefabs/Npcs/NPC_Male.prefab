@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &199774444366993651
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5665135878234285227, guid: 6776fc426f1ace94f80429ff674709d6, type: 3}
+      propertyPath: m_Name
+      value: NPC_TestKnight
+      objectReference: {fileID: 0}
+    - target: {fileID: 7173404480571505355, guid: 6776fc426f1ace94f80429ff674709d6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7173404480571505355, guid: 6776fc426f1ace94f80429ff674709d6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7173404480571505355, guid: 6776fc426f1ace94f80429ff674709d6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7173404480571505355, guid: 6776fc426f1ace94f80429ff674709d6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7173404480571505355, guid: 6776fc426f1ace94f80429ff674709d6, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7173404480571505355, guid: 6776fc426f1ace94f80429ff674709d6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7173404480571505355, guid: 6776fc426f1ace94f80429ff674709d6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7173404480571505355, guid: 6776fc426f1ace94f80429ff674709d6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7173404480571505355, guid: 6776fc426f1ace94f80429ff674709d6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7173404480571505355, guid: 6776fc426f1ace94f80429ff674709d6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5665135878234285227, guid: 6776fc426f1ace94f80429ff674709d6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2944895859814103385}
+  m_SourcePrefab: {fileID: 100100000, guid: 6776fc426f1ace94f80429ff674709d6, type: 3}
+--- !u!1 &5502034098745228376 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5665135878234285227, guid: 6776fc426f1ace94f80429ff674709d6, type: 3}
+  m_PrefabInstance: {fileID: 199774444366993651}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2944895859814103385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5502034098745228376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acda79f4311938c479fd69dd813c8fbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Character.Npc::Project.Character.Npc.NpcAppearance
+  gender: 0
+  headCatalog: {fileID: 11400000, guid: e59678c691fdcec4782095d90b017594, type: 2}
+  headStyle: 4
+  outfit:
+  - {fileID: 11400000, guid: fda25377bf9da664d92cc46abdb59a91, type: 2}
+  - {fileID: 11400000, guid: f606f1d92e0cc5f4aa212941e0524b10, type: 2}
+  - {fileID: 11400000, guid: 7be95b24201b0b14cab76604154564a7, type: 2}
+  neckClipHeight: 0.3

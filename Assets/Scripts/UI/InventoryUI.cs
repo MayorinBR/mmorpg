@@ -160,7 +160,9 @@ namespace Project.UI
 
             if (weightText != null)
             {
-                weightText.text = $"{playerInventory.Items.CurrentWeight:F1} / {playerInventory.Items.MaxCarryWeight:F1}";
+                var items = playerInventory.Items;
+                weightText.text = $"{items.CurrentWeight:F1} / {items.MaxCarryWeight:F1}";
+                weightText.color = items.IsMajorOverweight ? UiTheme.Danger : items.IsMinorOverweight ? UiTheme.Warning : UiTheme.Ink;
             }
         }
     }

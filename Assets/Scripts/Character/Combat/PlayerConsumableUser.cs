@@ -20,6 +20,9 @@ namespace Project.Character.Combat
         [SerializeField] private PlayerInventory inventory;
         [SerializeField] private StatusEffectController statusEffects;
 
+        [Tooltip("Optional. Source of Increase HP Recovery's bonus to HP restored by items. Left empty, items always restore their base amount.")]
+        [SerializeField] private PlayerPassiveSkillController passiveSkills;
+
         /// <summary>
         /// Attempts to use the consumable item held at the given inventory
         /// slot. Does nothing if the slot is empty, the item isn't a
@@ -98,7 +101,8 @@ namespace Project.Character.Combat
         {
             if (healthAmount > 0)
             {
-                health?.Heal(healthAmount);
+                var multiplier = passiveSkills != null ? passiveSkills.GetHealItemMultiplier() : 1f;
+                health?.Heal(Mathf.RoundToInt(healthAmount * multiplier));
             }
 
             if (manaAmount > 0)

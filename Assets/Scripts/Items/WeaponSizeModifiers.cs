@@ -11,7 +11,7 @@ namespace Project.Items
     /// weapon types deal reduced damage to at least one monster size.
     /// Weapon types not listed here (<see cref="WeaponSubtype.Unarmed"/>,
     /// <see cref="WeaponSubtype.Rod"/>, <see cref="WeaponSubtype.Gun"/>,
-    /// <see cref="WeaponSubtype.HuumaShuriken"/>, <see cref="WeaponSubtype.Shield"/>)
+    /// <see cref="WeaponSubtype.Shield"/>)
     /// deal full damage to every size, matching the wiki's own table.
     /// </summary>
     public static class WeaponSizeModifiers
@@ -29,7 +29,8 @@ namespace Project.Items
             { WeaponSubtype.Book, new SizeModifierRow(small: 1f, medium: 1f, large: 0.5f) },
             { WeaponSubtype.Instrument, new SizeModifierRow(small: 0.75f, medium: 1f, large: 0.75f) },
             { WeaponSubtype.Whip, new SizeModifierRow(small: 0.75f, medium: 1f, large: 0.5f) },
-            { WeaponSubtype.Knuckle, new SizeModifierRow(small: 1f, medium: 0.75f, large: 0.5f) },
+            { WeaponSubtype.Knuckle, new SizeModifierRow(small: 1f, medium: 1f, large: 0.75f) },
+            { WeaponSubtype.HuumaShuriken, new SizeModifierRow(small: 0.75f, medium: 0.75f, large: 1f) },
             { WeaponSubtype.Katar, new SizeModifierRow(small: 0.75f, medium: 1f, large: 0.75f) },
         };
 

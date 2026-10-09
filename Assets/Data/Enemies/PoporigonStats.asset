@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0f4dc1c9107cfd4e9157389a9dd88a7, type: 3}
+  m_Script: {fileID: 11500000, guid: 8c2f5d1a7b3e4960a4d9e1c7b5f30a28, type: 3}
   m_Name: PoporigonStats
-  m_EditorClassIdentifier: Project.Character.Stats::Project.Character.Stats.CharacterStatsDefinition
+  m_EditorClassIdentifier: Project.AI::Project.AI.MonsterDefinition
   maxHealth: 50
   maxMana: 0
   attackPower: 10
@@ -29,3 +29,8 @@ MonoBehaviour:
   statusResistChance: 0
   minLevel: 3
   maxLevel: 7
+  drops:
+  - item: {fileID: 11400000, guid: e4c9d6a0fa7a04b4bbea3e40c9533352, type: 2}
+    dropChance: 1
+    minQuantity: 1
+    maxQuantity: 3

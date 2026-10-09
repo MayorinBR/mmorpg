@@ -32,7 +32,6 @@ namespace Project.AI
         [SerializeField] private GameObject healthBarRoot;
         [SerializeField] private PlayerExperience playerExperience;
         [SerializeField] private PlayerJobProgress playerJobProgress;
-        [SerializeField] private LootTableDefinition lootTable;
         [SerializeField] private ItemPickup itemPickupPrefab;
         [SerializeField] private float dropSpreadRadius = 1.5f;
         [SerializeField] private float respawnDelaySeconds = 5f;
@@ -98,12 +97,12 @@ namespace Project.AI
 
         private void SpawnLoot()
         {
-            if (lootTable == null || itemPickupPrefab == null)
+            if (!(controller.Stats is MonsterDefinition monster) || itemPickupPrefab == null)
             {
                 return;
             }
 
-            foreach (var (item, quantity) in lootTable.RollDrops())
+            foreach (var (item, quantity) in monster.RollDrops())
             {
                 var dropPosition = transform.position + GetRandomSpreadOffset();
                 var pickup = Instantiate(itemPickupPrefab, dropPosition, Quaternion.identity);

@@ -13,16 +13,72 @@ MonoBehaviour:
   m_Name: Bash
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
   skillName: Bash
-  description: Strikes a single target with a powerful blow, dealing physical damage with a Hit-rating bonus, both scaling with skill level.
-  icon: {fileID: 296196239, guid: ef4ed4eb516e342469b4a565db4798a7, type: 3}
+  description: Strikes a single target with a powerful blow, dealing physical damage
+    with a Hit-rating bonus, both scaling with skill level.
+  icon: {fileID: -1973940788, guid: 0f9d26d5001687d40986509de0b0e95d, type: 3}
   allowedClasses: 00000000
   effectType: 0
   targetType: 2
   maxLevel: 5
-  manaCost: 10
+  manaCost: 8
   cooldownSeconds: 5
   range: 2
+  requiredLevel: 0
+  zenyCost: 0
   damageType: 0
-  damageMultiplierPerLevel: 1
+  damageMultiplierPerLevel: 0.8
+  element: 5
   accuracyBonusPerLevel: 10
+  isAreaOfEffect: 0
+  areaRadius: 3
+  inflictedStatus: 0
+  inflictedStatusDurationSeconds: 0
+  inflictedStatusDurationPerLevel: 0
+  poisonDamagePerTickPerLevel: 0
+  successChancePerLevel: 0
+  knockbackDistance: 0
+  buffPreventsFlinch: 0
+  immuneToUndeadAndBoss: 0
+  requiredJobLevel: 0
+  passiveAttackBonusPerLevel: 0
+  passiveRequiredWeaponSubtypes: 
+  passiveDexBonusPerLevel: 0
+  passiveHitBonusPerLevel: 0
+  passiveRangeBonusPerLevel: 0
+  passiveFleeBonusPerLevel: 0
+  passiveWeightLimitBonusPerLevel: 0
+  passiveRaceDamageBonusPerLevel: 0
+  passiveRaceDefenseBonusPerLevel: 0
+  augmentsSkill: {fileID: 0}
+  stunChancePerAugmentedLevel: 0
+  stunDurationSeconds: 0
+  passiveRegenFlatPerLevel: 0
+  passiveRegenPercentOfMaxHealthPerLevel: 0
+  passiveHealItemBonusPerLevel: 0
+  passiveSpRegenMultiplierPerLevel: 0
+  passiveRemovesMovementRegenPenalty: 0
   healAmount: 10
+  buffAtkPercentPerLevel: 0
+  buffDefPercentPerLevel: 0
+  buffMdefBonusPerLevel: 0
+  buffDurationSeconds: 0
+  buffDurationPerLevel: 0
+  buffStatBonusPerLevel:
+    strength: 0
+    agility: 0
+    vitality: 0
+    intelligence: 0
+    dexterity: 0
+    luck: 0
+  buffAspdPercentPerLevel: 0
+  buffMaxHealthPerLevel: 0
+  zonePrefab: {fileID: 0}
+  zoneDurationSeconds: 15
+  zoneDurationPerLevel: 0
+  zoneTickIntervalSeconds: 1
+  blocksAttacks: 0
+  blockedWeaponType: 0
+  toggleDrainIncomingDamageReductionPercentPerLevel: 0
+  toggleDrainManaPerSecond: 0
+  craftingRecipe: {fileID: 0}
+  requiresNearWater: 0

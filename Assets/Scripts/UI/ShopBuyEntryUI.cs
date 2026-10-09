@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
 using Project.Items;
@@ -13,7 +14,7 @@ namespace Project.UI
     /// <see cref="InventorySlotUI"/> — it doesn't decide whether the
     /// purchase can succeed.
     /// </summary>
-    public class ShopBuyEntryUI : MonoBehaviour
+    public class ShopBuyEntryUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         private const int MinQuantity = 1;
 
@@ -35,6 +36,12 @@ namespace Project.UI
         /// <param name="buyCallback">Invoked with this row's item and chosen quantity when Buy is clicked.</param>
         public void Setup(ItemDefinition itemToSell, Action<ItemDefinition, int> buyCallback)
         {
+            if (itemToSell == null)
+            {
+                gameObject.SetActive(false);
+                return;
+            }
+
             item = itemToSell;
             onBuy = buyCallback;
 
@@ -63,6 +70,26 @@ namespace Project.UI
             {
                 buyButton.onClick.RemoveAllListeners();
                 buyButton.onClick.AddListener(() => onBuy?.Invoke(item, GetQuantity()));
+            }
+        }
+
+        /// <summary>Shows the shared item tooltip for this row's item.</summary>
+        /// <param name="eventData">The pointer event data.</param>
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (item != null && ItemTooltipUI.Instance != null)
+            {
+                ItemTooltipUI.Instance.Show(item, eventData.position);
+            }
+        }
+
+        /// <summary>Hides the shared item tooltip.</summary>
+        /// <param name="eventData">The pointer event data.</param>
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (ItemTooltipUI.Instance != null)
+            {
+                ItemTooltipUI.Instance.Hide();
             }
         }
 

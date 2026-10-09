@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
   skillName: Magnum Break
   description: Deals Fire property damage to every enemy around the caster.
-  icon: {fileID: 0}
+  icon: {fileID: 371646829, guid: 0f9d26d5001687d40986509de0b0e95d, type: 3}
   allowedClasses: 00000000
   effectType: 0
   targetType: 3
@@ -22,10 +22,62 @@ MonoBehaviour:
   manaCost: 15
   cooldownSeconds: 8
   range: 0
+  requiredLevel: 0
+  zenyCost: 0
   damageType: 0
   damageMultiplierPerLevel: 0.6
   element: 1
   accuracyBonusPerLevel: 0
   isAreaOfEffect: 1
   areaRadius: 4
+  inflictedStatus: 0
+  inflictedStatusDurationSeconds: 0
+  inflictedStatusDurationPerLevel: 0
+  poisonDamagePerTickPerLevel: 0
+  successChancePerLevel: 0
+  knockbackDistance: 2
+  buffPreventsFlinch: 0
+  immuneToUndeadAndBoss: 0
+  requiredJobLevel: 0
+  passiveAttackBonusPerLevel: 0
+  passiveRequiredWeaponSubtypes: 
+  passiveDexBonusPerLevel: 0
+  passiveHitBonusPerLevel: 0
+  passiveRangeBonusPerLevel: 0
+  passiveFleeBonusPerLevel: 0
+  passiveWeightLimitBonusPerLevel: 0
+  passiveRaceDamageBonusPerLevel: 0
+  passiveRaceDefenseBonusPerLevel: 0
+  augmentsSkill: {fileID: 0}
+  stunChancePerAugmentedLevel: 0
+  stunDurationSeconds: 0
+  passiveRegenFlatPerLevel: 0
+  passiveRegenPercentOfMaxHealthPerLevel: 0
+  passiveHealItemBonusPerLevel: 0
+  passiveSpRegenMultiplierPerLevel: 0
+  passiveRemovesMovementRegenPenalty: 0
   healAmount: 10
+  buffAtkPercentPerLevel: 0
+  buffDefPercentPerLevel: 0
+  buffMdefBonusPerLevel: 0
+  buffDurationSeconds: 0
+  buffDurationPerLevel: 0
+  buffStatBonusPerLevel:
+    strength: 0
+    agility: 0
+    vitality: 0
+    intelligence: 0
+    dexterity: 0
+    luck: 0
+  buffAspdPercentPerLevel: 0
+  buffMaxHealthPerLevel: 0
+  zonePrefab: {fileID: 0}
+  zoneDurationSeconds: 15
+  zoneDurationPerLevel: 0
+  zoneTickIntervalSeconds: 1
+  blocksAttacks: 0
+  blockedWeaponType: 0
+  toggleDrainIncomingDamageReductionPercentPerLevel: 0
+  toggleDrainManaPerSecond: 0
+  craftingRecipe: {fileID: 0}
+  requiresNearWater: 0

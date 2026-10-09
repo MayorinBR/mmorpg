@@ -13,9 +13,16 @@ namespace Project.Items
         [SerializeField] private ItemDefinition item;
         [SerializeField] private int quantity = 1;
         [SerializeField] private SpriteRenderer iconRenderer;
+        [SerializeField] private DroppedItemIconSet iconSet;
 
         /// <summary>Gets the item this pickup represents, read-only for external observers like tooltip triggers.</summary>
         public ItemDefinition Item => item;
+
+        /// <summary>Gets the quantity this pickup grants.</summary>
+        public int Quantity => quantity;
+
+        /// <summary>Gets whether this pickup was already collected.</summary>
+        public bool IsCollected { get; private set; }
 
         private Camera mainCamera;
 
@@ -46,11 +53,24 @@ namespace Project.Items
             UpdateIconSprite();
         }
 
+        /// <summary>
+        /// Shows or hides the icon without disabling the pickup, which stays collectable. Used to blink the icon
+        /// as the pickup is about to expire.
+        /// </summary>
+        /// <param name="visible">True to show the icon.</param>
+        public void SetIconVisible(bool visible)
+        {
+            if (iconRenderer != null)
+            {
+                iconRenderer.enabled = visible;
+            }
+        }
+
         private void UpdateIconSprite()
         {
             if (iconRenderer != null && item != null)
             {
-                iconRenderer.sprite = item.Icon;
+                iconRenderer.sprite = iconSet != null ? iconSet.GetIcon(item) : item.Icon;
             }
         }
 
@@ -72,6 +92,7 @@ namespace Project.Items
                 return false;
             }
 
+            IsCollected = true;
             Destroy(gameObject);
             return true;
         }

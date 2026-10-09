@@ -174,6 +174,22 @@ namespace Project.AI
         /// </summary>
         public event Action PlayerEngaged;
 
+        /// <summary>
+        /// Raised each time the enemy starts an attack swing, whether or not it
+        /// later connects. Purely a notification for cosmetic reactions (e.g. an
+        /// attack animation) — nothing in the state machine depends on it.
+        /// </summary>
+        public event Action AttackStarted;
+
+        /// <summary>
+        /// Raises <see cref="AttackStarted"/>. Called by <see cref="EnemyAttackState"/>
+        /// at the moment a new attack begins.
+        /// </summary>
+        internal void NotifyAttackStarted()
+        {
+            AttackStarted?.Invoke();
+        }
+
         private void Awake()
         {
             SpawnPosition = transform.position;

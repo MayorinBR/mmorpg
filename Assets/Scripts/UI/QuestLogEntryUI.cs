@@ -43,11 +43,38 @@ namespace Project.UI
             var entry = go.AddComponent<QuestLogEntryUI>();
             entry.bodyText = go.AddComponent<TextMeshProUGUI>();
             entry.bodyText.fontSize = 14;
-            entry.bodyText.color = Color.white;
+            entry.bodyText.color = UiTheme.Ink;
             entry.bodyText.enableWordWrapping = false;
 
             entry.Refresh(quest);
             return entry;
+        }
+
+        /// <summary>
+        /// Creates a single centered, non-interactive message row under
+        /// <paramref name="parent"/>, used when a list has nothing to show.
+        /// </summary>
+        /// <param name="parent">The list's content root.</param>
+        /// <param name="message">The message to display.</param>
+        /// <returns>The created message GameObject.</returns>
+        public static GameObject CreateMessage(Transform parent, string message)
+        {
+            var go = new GameObject("EmptyMessage", typeof(RectTransform));
+            var rect = (RectTransform)go.transform;
+            rect.SetParent(parent, false);
+            rect.anchorMin = new Vector2(0, 1);
+            rect.anchorMax = new Vector2(1, 1);
+            rect.pivot = new Vector2(0, 1);
+            rect.sizeDelta = new Vector2(0, 40f);
+
+            var text = go.AddComponent<TextMeshProUGUI>();
+            text.text = message;
+            text.fontSize = 14;
+            text.fontStyle = FontStyles.Italic;
+            text.color = UiTheme.Muted;
+            text.alignment = TextAlignmentOptions.Center;
+            text.raycastTarget = false;
+            return go;
         }
 
         /// <summary>Redraws the title and per-requirement progress text from the given quest's current state.</summary>

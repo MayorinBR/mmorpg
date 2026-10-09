@@ -13,7 +13,7 @@ namespace Project.Character.Combat
     /// Tracks which skills the player has learned and their current level.
     /// Learning or upgrading a skill spends one point from
     /// <see cref="PlayerJobProgress"/> and respects the skill's class
-    /// restriction and minimum level requirement.
+    /// restriction and minimum Base Level and Job Level requirements.
     /// </summary>
     public class PlayerSkillBook : MonoBehaviour, ISaveParticipant
     {
@@ -57,12 +57,18 @@ namespace Project.Character.Combat
         /// Attempts to learn (if unlearned) or upgrade (if already learned) a skill by one level.
         /// </summary>
         /// <param name="skill">The skill to learn or upgrade.</param>
-        /// <returns>True if the skill was learned/upgraded; false if the class doesn't allow it, the level requirement isn't met, it's already at max level, or no skill points are available.</returns>
+        /// <returns>True if the skill was learned/upgraded; false if the class doesn't allow it, a level requirement isn't met, it's already at max level, or no skill points are available.</returns>
         public bool TryLearnOrUpgrade(SkillDefinition skill)
         {
             if (levelProvider != null && levelProvider.BaseLevel < skill.RequiredLevel)
             {
                 PlayerFeedbackChannel.Publish($"Level {skill.RequiredLevel} required to learn {skill.SkillName}.");
+                return false;
+            }
+
+            if (skill.RequiredJobLevel > 0 && jobProgress.JobLevel < skill.RequiredJobLevel)
+            {
+                PlayerFeedbackChannel.Publish($"Job Level {skill.RequiredJobLevel} required to learn {skill.SkillName}.");
                 return false;
             }
 

@@ -359,6 +359,11 @@ namespace Project.Character.Combat
                 // Endure), so they keep always landing unchanged. Mana and
                 // cooldown are still spent on a resist, same as a missed
                 // Damage skill.
+                if (skill.ImmuneToUndeadAndBoss && IsUndeadOrBoss(targetSelector.CurrentTarget))
+                {
+                    return true;
+                }
+
                 var successChance = skill.GetSuccessChance(level);
 
                 if (successChance > 0f && Random.value >= successChance)
@@ -369,6 +374,17 @@ namespace Project.Character.Combat
 
             buffs.ApplyBuff(BuildBuffPayload(skill, level), skill.GetBuffDuration(level));
             return true;
+        }
+
+        /// <summary>
+        /// Gets whether the given target is an Undead-race monster or a Boss.
+        /// </summary>
+        /// <param name="target">The target transform to inspect.</param>
+        /// <returns>True if the target is Undead or a Boss.</returns>
+        private static bool IsUndeadOrBoss(Transform target)
+        {
+            var stats = target != null ? target.GetComponentInParent<CharacterStatsHolder>()?.Stats : null;
+            return stats != null && (stats.IsBoss || stats.Race == MonsterRace.Undead);
         }
 
         /// <summary>
@@ -449,7 +465,8 @@ namespace Project.Character.Combat
                 statBonus.Vitality,
                 statBonus.Intelligence,
                 statBonus.Dexterity,
-                statBonus.Luck);
+                statBonus.Luck,
+                preventsFlinch: skill.BuffPreventsFlinch);
         }
 
         /// <summary>
@@ -603,6 +620,11 @@ namespace Project.Character.Combat
                     var targetStatus = hitCollider.GetComponentInParent<StatusEffectController>();
                     TryProcStunAugment(skill, level, targetStatus);
                     TryProcInflictedStatus(skill, level, targetStatus);
+
+                    if (skill.KnockbackDistance > 0f)
+                    {
+                        KnockbackUtility.Apply(hitCollider.GetComponentInParent<NavMeshAgent>(), transform.position, skill.KnockbackDistance);
+                    }
                 }
                 else
                 {
@@ -772,7 +794,7 @@ namespace Project.Character.Combat
         /// <returns>True if the cast was committed (mana spent), regardless of whether the craft itself succeeded.</returns>
         private bool TryCastCraft(SkillDefinition skill)
         {
-            if (inventory == null || !mana.TryConsumeMana(skill.ManaCost))
+            if (inventory == null || inventory.Items.IsMinorOverweight || !mana.TryConsumeMana(skill.ManaCost))
             {
                 return false;
             }
@@ -897,7 +919,8 @@ namespace Project.Character.Combat
         /// </summary>
         private bool IsCastBlocked()
         {
-            return statusEffects != null && (statusEffects.IsImmobilized || statusEffects.IsSilenced);
+            return (statusEffects != null && (statusEffects.IsImmobilized || statusEffects.IsSilenced))
+                || (inventory != null && inventory.Items.IsMajorOverweight);
         }
 
         /// <summary>

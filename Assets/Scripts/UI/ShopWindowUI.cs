@@ -124,6 +124,11 @@ namespace Project.UI
 
             foreach (var item in currentShop.ItemsForSale)
             {
+                if (item == null)
+                {
+                    continue;
+                }
+
                 var view = Instantiate(buyEntryPrefab, buyListParent);
                 view.Setup(item, HandleBuyClicked);
                 buyEntryViews.Add(view);

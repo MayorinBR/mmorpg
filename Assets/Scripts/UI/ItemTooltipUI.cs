@@ -69,6 +69,7 @@ namespace Project.UI
             weightText.text = $"{item.Weight:F1}";
 
             rectTransform.position = ClampToScreen(screenPosition + offsetFromPointer);
+            rectTransform.SetAsLastSibling();
             root.SetActive(true);
         }
 

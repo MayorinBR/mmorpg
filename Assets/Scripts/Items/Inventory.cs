@@ -15,8 +15,14 @@ namespace Project.Items
     {
         private const int SlotsPerPage = 20;
 
+        /// <summary>Fraction of <see cref="MaxCarryWeight"/> at which minor overweight starts (no natural HP/SP recovery, no item creation).</summary>
+        public const float MinorOverweightRatio = 0.7f;
+
+        /// <summary>Fraction of <see cref="MaxCarryWeight"/> at which major overweight starts (no attacking, no skills).</summary>
+        public const float MajorOverweightRatio = 0.9f;
+
         private readonly List<InventorySlot> slots = new List<InventorySlot>();
-        private readonly float baseMaxCarryWeight;
+        private float baseMaxCarryWeight;
         private float weightCapacityBonus;
 
         /// <summary>Raised whenever any slot's contents change.</summary>
@@ -31,6 +37,15 @@ namespace Project.Items
 
         /// <summary>Gets the combined weight of everything currently carried.</summary>
         public float CurrentWeight { get; private set; }
+
+        /// <summary>Gets the carried weight as a fraction of <see cref="MaxCarryWeight"/>.</summary>
+        public float WeightRatio => MaxCarryWeight > 0f ? CurrentWeight / MaxCarryWeight : 1f;
+
+        /// <summary>Gets whether the carried weight reached <see cref="MinorOverweightRatio"/>.</summary>
+        public bool IsMinorOverweight => WeightRatio >= MinorOverweightRatio;
+
+        /// <summary>Gets whether the carried weight reached <see cref="MajorOverweightRatio"/>.</summary>
+        public bool IsMajorOverweight => WeightRatio >= MajorOverweightRatio;
 
         /// <summary>Gets the number of slots currently allocated (grows in pages as needed).</summary>
         public int SlotCount => slots.Count;
@@ -57,6 +72,17 @@ namespace Project.Items
         public void RefreshWeightCapacityBonus(float bonus)
         {
             weightCapacityBonus = bonus;
+        }
+
+        /// <summary>
+        /// Replaces the base maximum carry weight, e.g. when STR or class
+        /// changes, and notifies listeners so weight displays update.
+        /// </summary>
+        /// <param name="maxCarryWeight">The new base maximum, before any bonus.</param>
+        public void SetBaseMaxCarryWeight(float maxCarryWeight)
+        {
+            baseMaxCarryWeight = maxCarryWeight;
+            InventoryChanged?.Invoke();
         }
 
         /// <summary>
@@ -258,7 +284,7 @@ namespace Project.Items
         /// <returns>True if the craft succeeded.</returns>
         public bool TryCraft(CraftingRecipe recipe)
         {
-            if (recipe == null || recipe.ResultItem == null)
+            if (recipe == null || recipe.ResultItem == null || IsMinorOverweight)
             {
                 return false;
             }

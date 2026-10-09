@@ -66,6 +66,9 @@ namespace Project.Character.Combat
         /// <summary>Gets the player's current gender.</summary>
         public CharacterGender CurrentGender { get; private set; }
 
+        /// <summary>Gets the model instance currently representing the player, or null when none is instantiated.</summary>
+        public GameObject CurrentGeometry => currentGeometry;
+
         private void Awake()
         {
             SetGender(startingGender);

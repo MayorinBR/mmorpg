@@ -64,6 +64,15 @@ namespace Project.Skills
         [Tooltip("How far, in meters, this skill pushes something back via KnockbackUtility: the hit target for a Damage skill (e.g. Arrow Repel) or the caster itself for a Displacement skill (e.g. Back Slide). Zero means a Damage skill has no knockback; a Displacement skill needs this set to actually move.")]
         [SerializeField] private float knockbackDistance;
 
+        [Tooltip("If true, the Buff this skill applies stops its holder from flinching when hit (e.g. Endure).")]
+        [SerializeField] private bool buffPreventsFlinch;
+
+        [Tooltip("If true, an Enemy-targeted Buff (debuff) has no effect on Undead-race monsters or Bosses, matching Provoke's immunity in Ragnarok Online.")]
+        [SerializeField] private bool immuneToUndeadAndBoss;
+
+        [Tooltip("Minimum Job Level required to learn this skill. Zero means no Job Level gate; used by quest skills such as Berserk, Fatal Blow and HP Recovery While Moving.")]
+        [SerializeField] private int requiredJobLevel;
+
         [Header("Passive (only used if Effect Type is Passive)")]
         [Tooltip("Flat bonus to Status ATK per skill level, applied automatically while this passive skill is learned and (if PassiveRequiredWeaponSubtypes is non-empty) a matching weapon is equipped in the main hand — e.g. Sword Mastery.")]
         [SerializeField] private float passiveAttackBonusPerLevel;
@@ -101,8 +110,14 @@ namespace Project.Skills
         [Tooltip("How long the stun lasts, in seconds, when it procs. Only meaningful when AugmentsSkill is set.")]
         [SerializeField] private float stunDurationSeconds;
 
-        [Tooltip("Multiplier bonus to natural HP regen per level, e.g. 0.20 for Increase HP Recovery reaching +100% at this project's max level. Zero for passives without one.")]
-        [SerializeField] private float passiveRegenMultiplierPerLevel;
+        [Tooltip("Flat HP restored per level on each skill-regen tick (every 10 seconds while standing still), e.g. 5 for Increase HP Recovery. Zero for passives without one.")]
+        [SerializeField] private float passiveRegenFlatPerLevel;
+
+        [Tooltip("Fraction of max HP restored per level on each skill-regen tick, e.g. 0.002 for Increase HP Recovery. Zero for passives without one.")]
+        [SerializeField] private float passiveRegenPercentOfMaxHealthPerLevel;
+
+        [Tooltip("Bonus to the HP restored by healing items, per level, e.g. 0.10 for Increase HP Recovery. Zero for passives without one.")]
+        [SerializeField] private float passiveHealItemBonusPerLevel;
 
         [Tooltip("Multiplier bonus to natural SP regen per level, e.g. 0.20 for Increase SP Recovery reaching +100% at this project's max level. Zero for passives without one.")]
         [SerializeField] private float passiveSpRegenMultiplierPerLevel;
@@ -361,6 +376,15 @@ namespace Project.Skills
             return successChancePerLevel * skillLevel;
         }
 
+        /// <summary>Gets whether the Buff this skill applies stops its holder from flinching when hit.</summary>
+        public bool BuffPreventsFlinch => buffPreventsFlinch;
+
+        /// <summary>Gets whether an Enemy-targeted Buff from this skill is ignored by Undead-race monsters and Bosses.</summary>
+        public bool ImmuneToUndeadAndBoss => immuneToUndeadAndBoss;
+
+        /// <summary>Gets the minimum Job Level required to learn this skill, or zero if it has no Job Level gate.</summary>
+        public int RequiredJobLevel => requiredJobLevel;
+
         /// <summary>Gets how far, in meters, this skill pushes something back via <see cref="Combat.KnockbackUtility"/>. Zero for a Damage skill without knockback; meaningful for every Displacement skill.</summary>
         public float KnockbackDistance => knockbackDistance;
 
@@ -580,24 +604,37 @@ namespace Project.Skills
         }
 
         /// <summary>
-        /// Calculates this passive's bonus to natural HP regen at the given
-        /// level (e.g. 0.4 for Increase HP Recovery at level 2, a +40%
-        /// bonus). Summed across every learned regen passive by the
-        /// player's passive-skill controller. Only meaningful when
+        /// Calculates the HP this passive restores on each skill-regen tick
+        /// at the given level: a flat amount plus a fraction of max HP, both
+        /// scaling with level (e.g. Increase HP Recovery). Summed across
+        /// every learned regen passive by the player's passive-skill
+        /// controller. Only meaningful when <see cref="EffectType"/> is Passive.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <param name="maxHealth">The player's current max HP.</param>
+        /// <returns>The HP restored per tick. Zero for a passive without a regen component.</returns>
+        public float GetPassiveRegenAmount(int skillLevel, int maxHealth)
+        {
+            return (passiveRegenFlatPerLevel + passiveRegenPercentOfMaxHealthPerLevel * maxHealth) * skillLevel;
+        }
+
+        /// <summary>
+        /// Calculates this passive's bonus to the HP restored by healing
+        /// items at the given level (e.g. 0.3 for Increase HP Recovery at
+        /// level 3, a +30% bonus). Only meaningful when
         /// <see cref="EffectType"/> is Passive.
         /// </summary>
         /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated bonus. Zero for a passive without a regen component.</returns>
-        public float GetPassiveRegenBonus(int skillLevel)
+        /// <returns>The calculated bonus. Zero for a passive without one.</returns>
+        public float GetPassiveHealItemBonus(int skillLevel)
         {
-            return passiveRegenMultiplierPerLevel * skillLevel;
+            return passiveHealItemBonusPerLevel * skillLevel;
         }
 
         /// <summary>
         /// Calculates this passive's bonus to natural SP regen at the given
         /// level (e.g. 0.4 for Increase SP Recovery at level 2, a +40%
-        /// bonus), mirroring <see cref="GetPassiveRegenBonus"/> exactly for
-        /// mana instead of health. Only meaningful when <see cref="EffectType"/> is Passive.
+        /// bonus) applied to the natural SP regen tick. Only meaningful when <see cref="EffectType"/> is Passive.
         /// </summary>
         /// <param name="skillLevel">The skill's current level (1 or higher).</param>
         /// <returns>The calculated bonus. Zero for a passive without an SP regen component.</returns>

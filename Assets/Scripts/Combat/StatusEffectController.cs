@@ -30,7 +30,14 @@ namespace Project.Combat
         [Tooltip("Optional. Source of this character's flat status-resist chance (see CharacterStatsDefinition.StatusResistChance), used when resistanceSource isn't wired — e.g. an enemy's authored value. Left empty alongside resistanceSource, every status effect always lands, unchanged from before resistance existed.")]
         [SerializeField] private CharacterStatsHolder statsHolder;
 
+        [Tooltip("Optional. Source of buffs that stop this character from flinching when hit (e.g. Endure). Left empty, looked up on this object or a parent at Awake.")]
+        [SerializeField] private BuffController buffs;
+
+        [Tooltip("Seconds this character is briefly unable to move, attack or cast after being hit (Ragnarok Online's damage motion). Zero disables hit-reaction entirely.")]
+        [SerializeField] private float flinchDurationSeconds = 0.3f;
+
         private IStatusResistanceProvider resistanceProvider;
+        private float flinchExpireTime;
 
         private float stunExpireTime;
         private float poisonExpireTime;
@@ -75,8 +82,11 @@ namespace Project.Combat
         /// <summary>Gets whether this character is currently petrified (immobilized, see <see cref="IsImmobilized"/>).</summary>
         public bool IsPetrified => Time.time < petrifyExpireTime;
 
-        /// <summary>Gets whether Stun, Freeze or Petrify is currently blocking movement, basic attacks and skill casts.</summary>
-        public bool IsImmobilized => IsStunned || IsFrozen || IsPetrified;
+        /// <summary>Gets whether this character is briefly staggered by a recent hit, blocking movement, basic attacks and skill casts. Never true while a buff such as Endure prevents flinching.</summary>
+        public bool IsFlinching => Time.time < flinchExpireTime;
+
+        /// <summary>Gets whether Stun, Freeze, Petrify or a hit-reaction flinch is currently blocking movement, basic attacks and skill casts.</summary>
+        public bool IsImmobilized => IsStunned || IsFrozen || IsPetrified || IsFlinching;
 
         /// <summary>
         /// Gets whether this character is currently hidden — e.g. Hiding
@@ -93,6 +103,37 @@ namespace Project.Combat
         private void Awake()
         {
             resistanceProvider = resistanceSource as IStatusResistanceProvider;
+
+            if (buffs == null)
+            {
+                buffs = GetComponentInParent<BuffController>();
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (health != null)
+            {
+                health.AttackedBy += HandleAttacked;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (health != null)
+            {
+                health.AttackedBy -= HandleAttacked;
+            }
+        }
+
+        private void HandleAttacked(Transform attacker)
+        {
+            if (flinchDurationSeconds <= 0f || health.IsDead || (buffs != null && buffs.PreventsFlinch))
+            {
+                return;
+            }
+
+            flinchExpireTime = Time.time + flinchDurationSeconds;
         }
 
         /// <summary>

@@ -7,8 +7,8 @@ namespace Project.Character.Combat
 {
     /// <summary>
     /// Maps each <see cref="CharacterClass"/> to the flat stat bonus real
-    /// Ragnarok Online grants automatically at a given Job Level (e.g.
-    /// Swordman's +7 STR/+2 AGI/+4 VIT/+3 DEX/+2 LUK at Job 50) — separate
+    /// Ragnarok Online grants automatically at a given Job Level, authored as one cumulative breakpoint per Job Level where any stat rises (e.g.
+    /// Swordman reaches +7 STR/+2 AGI/+4 VIT/+3 DEX/+2 LUK at Job 50) — separate
     /// from normal spendable stat points. Read by <see cref="PlayerStatsController"/>
     /// through <see cref="JobBonusStatsView"/>.
     /// </summary>
@@ -22,18 +22,28 @@ namespace Project.Character.Combat
         /// </summary>
         /// <param name="characterClass">The class to look up.</param>
         /// <param name="jobLevel">The character's current Job Level.</param>
-        /// <returns>The class's bonus if <paramref name="jobLevel"/> meets its requirement; zero otherwise, or if the class isn't configured.</returns>
+        /// <returns>
+        /// The cumulative bonus of the highest breakpoint the class has
+        /// reached, i.e. the entry with the largest required Job Level not
+        /// above <paramref name="jobLevel"/>; zero if none is reached or the
+        /// class isn't configured. Each entry holds the total bonus from that
+        /// Job Level onward, not a delta.
+        /// </returns>
         public StatModifiers GetBonus(CharacterClass characterClass, int jobLevel)
         {
+            var best = default(StatModifiers);
+            var bestLevel = int.MinValue;
+
             foreach (var entry in bonuses)
             {
-                if (entry.CharacterClass == characterClass)
+                if (entry.CharacterClass == characterClass && jobLevel >= entry.RequiredJobLevel && entry.RequiredJobLevel > bestLevel)
                 {
-                    return jobLevel >= entry.RequiredJobLevel ? entry.Bonus : default;
+                    best = entry.Bonus;
+                    bestLevel = entry.RequiredJobLevel;
                 }
             }
 
-            return default;
+            return best;
         }
 
         [Serializable]

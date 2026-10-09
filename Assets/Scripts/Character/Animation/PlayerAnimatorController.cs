@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Project.Character.Animation
 {
@@ -12,22 +14,25 @@ namespace Project.Character.Animation
     {
         private static readonly int SpeedParameter = Animator.StringToHash("Speed");
         private static readonly int AttackParameter = Animator.StringToHash("Attack");
-        private static readonly int AttackRangedParameter = Animator.StringToHash("AttackRanged");
-        private static readonly int IsUnarmedMeleeParameter = Animator.StringToHash("IsUnarmedMelee");
         private static readonly int CastParameter = Animator.StringToHash("Cast");
         private static readonly int IsDeadParameter = Animator.StringToHash("IsDead");
         private static readonly int AttackSpeedMultiplierParameter = Animator.StringToHash("AttackSpeedMultiplier");
 
         [SerializeField] private Animator animator;
 
-        [Tooltip("The exact clip bound to the Attack state's Motion field in the Animator Controller (the armed melee swing, e.g. Standing Melee Attack Downward) — read only for its authored AnimationClip.length, so SetAttackDuration can scale it to match the real Aspd interval regardless of that length.")]
-        [SerializeField] private AnimationClip meleeAttackClip;
+        [Tooltip("The exact clip bound to the Attack state's Motion field in the Animator Controller. It is the key that SetAttackClip overrides at runtime, and the clip used for the swing duration when no weapon clip has been set.")]
+        [FormerlySerializedAs("meleeAttackClip")]
+        [SerializeField] private AnimationClip attackPlaceholderClip;
 
-        [Tooltip("The exact clip bound to the AttackUnarmed state's Motion field (Punching) — played instead of meleeAttackClip while bare-handed, and, until a dedicated dagger animation exists, while wielding a dagger too. Same purpose as meleeAttackClip: read only for its authored length.")]
-        [SerializeField] private AnimationClip punchingClip;
+        /// <summary>
+        /// Raised whenever a basic attack or a spell cast animation is triggered, so systems that only
+        /// care that the player just acted in combat (see <see cref="Combat.PlayerCombatState"/>) do not
+        /// need to know which script triggered it.
+        /// </summary>
+        public event Action CombatActionTriggered;
 
-        [Tooltip("The exact clip bound to the AttackRanged state's Motion field, for the same reason as meleeAttackClip.")]
-        [SerializeField] private AnimationClip rangedAttackClip;
+        private AnimatorOverrideController overrideController;
+        private AnimationClip activeAttackClip;
 
         /// <summary>
         /// Retargets this controller at a different <see cref="Animator"/> —
@@ -41,6 +46,50 @@ namespace Project.Character.Animation
         public void SetAnimator(Animator newAnimator)
         {
             animator = newAnimator;
+            overrideController = null;
+            ApplyAttackClip();
+        }
+
+        /// <summary>
+        /// Chooses which clip the single Attack state plays, by overriding
+        /// <see cref="attackPlaceholderClip"/> on a runtime
+        /// <see cref="AnimatorOverrideController"/> wrapped around the
+        /// Animator's controller. The choice is remembered, so it survives
+        /// <see cref="SetAnimator"/> being called again for a new model.
+        /// </summary>
+        /// <param name="clip">The attack clip for the equipped weapon; null restores the placeholder clip.</param>
+        public void SetAttackClip(AnimationClip clip)
+        {
+            activeAttackClip = clip;
+            ApplyAttackClip();
+        }
+
+        private void ApplyAttackClip()
+        {
+            if (animator == null || attackPlaceholderClip == null)
+            {
+                return;
+            }
+
+            if (overrideController == null)
+            {
+                var baseController = animator.runtimeAnimatorController;
+
+                if (baseController is AnimatorOverrideController existingOverride)
+                {
+                    baseController = existingOverride.runtimeAnimatorController;
+                }
+
+                if (baseController == null)
+                {
+                    return;
+                }
+
+                overrideController = new AnimatorOverrideController(baseController);
+                animator.runtimeAnimatorController = overrideController;
+            }
+
+            overrideController[attackPlaceholderClip] = activeAttackClip != null ? activeAttackClip : attackPlaceholderClip;
         }
 
         /// <summary>
@@ -57,44 +106,28 @@ namespace Project.Character.Animation
         /// matches <paramref name="targetSeconds"/> — the same Aspd-derived
         /// interval the next auto-attack actually waits for (see
         /// <see cref="Combat.AttackSpeedCalculator.GetAttackIntervalSeconds"/>)
-        /// — regardless of the clip's own authored length or the Attack/
-        /// AttackRanged state's base Speed in the Animator Controller (both
-        /// bound to this via the AttackSpeedMultiplier parameter, so this
-        /// has no effect on Idle, Run, Cast or Death). Call before
-        /// <see cref="TriggerAttack"/>/<see cref="TriggerRangedAttack"/> so
-        /// the upcoming swing plays at the right speed.
+        /// — regardless of the clip's own authored length or the Attack
+        /// state's base Speed in the Animator Controller (bound to this via
+        /// the AttackSpeedMultiplier parameter, so this has no effect on
+        /// Idle, Run, Cast or Death). Call before <see cref="TriggerAttack"/>
+        /// so the upcoming swing plays at the right speed.
         /// </summary>
         /// <param name="targetSeconds">How long the swing should actually take to play, in seconds.</param>
-        /// <param name="isRanged">True to scale <see cref="rangedAttackClip"/>.</param>
-        /// <param name="isUnarmedMelee">True to scale <see cref="punchingClip"/> instead of <see cref="meleeAttackClip"/>. Ignored when <paramref name="isRanged"/> is true.</param>
-        public void SetAttackDuration(float targetSeconds, bool isRanged, bool isUnarmedMelee = false)
+        public void SetAttackDuration(float targetSeconds)
         {
-            var clip = isRanged ? rangedAttackClip : (isUnarmedMelee ? punchingClip : meleeAttackClip);
+            var clip = activeAttackClip != null ? activeAttackClip : attackPlaceholderClip;
             var multiplier = clip != null && targetSeconds > 0f ? clip.length / targetSeconds : 1f;
             animator.SetFloat(AttackSpeedMultiplierParameter, multiplier);
         }
 
         /// <summary>
-        /// Plays the close-range attack animation — the bare-handed
-        /// Punching swing (<see cref="punchingClip"/>) while
-        /// <paramref name="isUnarmedMelee"/> is true, otherwise the armed
-        /// melee swing (<see cref="meleeAttackClip"/>). The Animator
-        /// Controller branches on this via the IsUnarmedMelee parameter,
-        /// set here just before the Attack trigger fires.
+        /// Plays the basic-attack animation. Which clip plays depends on the
+        /// equipped weapon — see <see cref="SetAttackClip"/>.
         /// </summary>
-        /// <param name="isUnarmedMelee">True while bare-handed or, until a dedicated dagger animation exists, wielding a dagger.</param>
-        public void TriggerAttack(bool isUnarmedMelee)
+        public void TriggerAttack()
         {
-            animator.SetBool(IsUnarmedMeleeParameter, isUnarmedMelee);
             animator.SetTrigger(AttackParameter);
-        }
-
-        /// <summary>
-        /// Plays the ranged attack animation (e.g. drawing and firing a bow).
-        /// </summary>
-        public void TriggerRangedAttack()
-        {
-            animator.SetTrigger(AttackRangedParameter);
+            CombatActionTriggered?.Invoke();
         }
 
         /// <summary>
@@ -103,6 +136,7 @@ namespace Project.Character.Animation
         public void TriggerCast()
         {
             animator.SetTrigger(CastParameter);
+            CombatActionTriggered?.Invoke();
         }
 
         /// <summary>

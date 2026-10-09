@@ -14,6 +14,7 @@ Shader "Project/Characters/ToonCharacter"
         _RimStrength ("Rim Strength", Range(0, 1)) = 0.25
         _OutlineColor ("Outline Color", Color) = (0.12, 0.08, 0.1, 1)
         _OutlineWidth ("Outline Width (pixels)", Range(0, 6)) = 1.5
+        _ClipPlane ("Clip Plane (normal, offset)", Vector) = (0, 0, 0, 0)
 
         [NoScaleOffset] _EyeArray ("Eye Layers", 2DArray) = "" {}
         [NoScaleOffset] _EyeIrisArray ("Eye Iris Mask Layers", 2DArray) = "" {}
@@ -57,6 +58,7 @@ Shader "Project/Characters/ToonCharacter"
             half _RimStrength;
             half4 _OutlineColor;
             half _OutlineWidth;
+            float4 _ClipPlane;
             float4 _EyeLayout;
             float4 _EyeOffset;
             float _EyeFrame;
@@ -65,6 +67,12 @@ Shader "Project/Characters/ToonCharacter"
             float4 _MouthOffset;
             float _MouthFrame;
         CBUFFER_END
+
+        // Discards fragments below the plane (xyz = normal, w = offset). A zero plane keeps everything.
+        void ClipBelowPlane(float3 positionWS)
+        {
+            clip(dot(_ClipPlane.xyz, positionWS) + _ClipPlane.w);
+        }
 
         // Maps the face UV (UV1) into a face layer. A layer is a whole sprite canvas; the layout
         // (scale xy, offset xy) says which part of the canvas covers the face region, so sprites
@@ -150,6 +158,7 @@ Shader "Project/Characters/ToonCharacter"
 
             half4 Frag(Varyings input) : SV_Target
             {
+                ClipBelowPlane(input.positionWS);
                 half3 normalWS = normalize(input.normalWS);
                 half3 viewDirWS = normalize(GetWorldSpaceViewDir(input.positionWS));
                 half4 albedo = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.uv) * _BaseColor;
@@ -195,11 +204,13 @@ Shader "Project/Characters/ToonCharacter"
             struct Varyings
             {
                 float4 positionCS : SV_POSITION;
+                float3 positionWS : TEXCOORD0;
             };
 
             Varyings Vert(Attributes input)
             {
                 Varyings output;
+                output.positionWS = TransformObjectToWorld(input.positionOS.xyz);
                 float4 positionCS = TransformObjectToHClip(input.positionOS.xyz);
                 float3 normalWS = TransformObjectToWorldNormal(input.normalOS);
                 float2 normalCS = mul((float3x3)UNITY_MATRIX_VP, normalWS).xy;
@@ -211,6 +222,7 @@ Shader "Project/Characters/ToonCharacter"
 
             half4 Frag(Varyings input) : SV_Target
             {
+                ClipBelowPlane(input.positionWS);
                 return _OutlineColor;
             }
             ENDHLSL

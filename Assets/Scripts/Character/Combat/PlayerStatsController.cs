@@ -90,6 +90,9 @@ namespace Project.Character.Combat
         [Tooltip("Optional. Refreshed automatically whenever a skill levels up (alongside health/mana), so a learned Enlarge Weight Limit passive's carry-weight bonus applies immediately. Left empty, or when passiveSkills isn't wired, carry weight never benefits from a passive.")]
         [SerializeField] private PlayerInventory inventory;
 
+        [Tooltip("Scales the Ragnarok Online carry weight (2000 + 30 * base STR + class modifier) down to this project's item weights, which are roughly a twentieth of Ragnarok's.")]
+        [SerializeField] private float carryWeightScale = 0.05f;
+
         [Tooltip("Optional. Source of flat Status ATK bonuses from learned passive skills (e.g. Sword Mastery), added on top of the stat-derived value in CurrentSubStats whenever the equipped weapon matches.")]
         [SerializeField] private PlayerPassiveSkillController passiveSkills;
 
@@ -152,6 +155,11 @@ namespace Project.Character.Combat
             EnsureInitialized();
         }
 
+        private void Start()
+        {
+            RefreshDependentMaxValues();
+        }
+
         private void OnDestroy()
         {
             if (equipment != null)
@@ -162,6 +170,11 @@ namespace Project.Character.Combat
             if (jobProgress != null)
             {
                 jobProgress.JobLeveledUp -= HandleJobLeveledUp;
+            }
+
+            if (classController != null)
+            {
+                classController.ClassChanged -= HandleClassChanged;
             }
 
             if (passiveSkills != null && passiveSkills.SkillBook != null)
@@ -216,6 +229,11 @@ namespace Project.Character.Combat
                 jobProgress.JobLeveledUp += HandleJobLeveledUp;
             }
 
+            if (classController != null)
+            {
+                classController.ClassChanged += HandleClassChanged;
+            }
+
             if (passiveSkills != null && passiveSkills.SkillBook != null)
             {
                 passiveSkills.SkillBook.SkillLeveledUp += HandleSkillLeveledUp;
@@ -223,6 +241,12 @@ namespace Project.Character.Combat
         }
 
         private void HandleEquipmentChanged()
+        {
+            RefreshDependentMaxValues();
+            StatsChanged?.Invoke();
+        }
+
+        private void HandleClassChanged(CharacterClass newClass)
         {
             RefreshDependentMaxValues();
             StatsChanged?.Invoke();
@@ -303,10 +327,24 @@ namespace Project.Character.Combat
             health?.RefreshMaxHealth();
             mana?.RefreshMaxMana();
 
-            if (inventory != null && inventory.Items != null && passiveSkills != null)
+            if (inventory == null || inventory.Items == null)
             {
-                inventory.Items.RefreshWeightCapacityBonus(passiveSkills.GetWeightLimitBonus());
+                return;
             }
+
+            inventory.Items.RefreshWeightCapacityBonus(passiveSkills != null ? passiveSkills.GetWeightLimitBonus() * carryWeightScale : 0f);
+            inventory.Items.SetBaseMaxCarryWeight(GetBaseCarryWeight());
+        }
+
+        /// <summary>
+        /// Calculates the base carry weight from base STR (equipment and
+        /// buffs do not count, as in Ragnarok Online) and the current
+        /// class, scaled by <see cref="carryWeightScale"/>.
+        /// </summary>
+        private float GetBaseCarryWeight()
+        {
+            var jobModifier = classController != null ? WeightCapacityCalculator.GetJobModifier(classController.CurrentClass) : 0f;
+            return WeightCapacityCalculator.Calculate(baseStats.GetValue(StatType.Strength), jobModifier) * carryWeightScale;
         }
 
         /// <summary>

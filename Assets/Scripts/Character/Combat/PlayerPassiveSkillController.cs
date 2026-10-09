@@ -191,12 +191,37 @@ namespace Project.Character.Combat
         }
 
         /// <summary>
-        /// Calculates the combined multiplier to apply to natural HP regen
-        /// (see <see cref="PlayerHealthRegenController"/>) from every
-        /// learned passive with a regen bonus — e.g. Increase HP Recovery.
+        /// Calculates the HP restored on each skill-regen tick (see
+        /// <see cref="PlayerHealthRegenController"/>) by every learned
+        /// passive with a regen component — e.g. Increase HP Recovery.
+        /// </summary>
+        /// <param name="maxHealth">The player's current max HP.</param>
+        /// <returns>The combined HP per tick. Zero if no applicable passive is learned.</returns>
+        public float GetSkillRegenAmount(int maxHealth)
+        {
+            var total = 0f;
+
+            foreach (var entry in skillBook.LearnedSkills)
+            {
+                var skill = entry.Key;
+                var level = entry.Value;
+
+                if (skill.EffectType == SkillEffectType.Passive && level > 0)
+                {
+                    total += skill.GetPassiveRegenAmount(level, maxHealth);
+                }
+            }
+
+            return total;
+        }
+
+        /// <summary>
+        /// Calculates the combined multiplier to apply to HP restored by
+        /// healing items (see <see cref="PlayerConsumableUser"/>) from every
+        /// learned passive with an item-heal bonus — e.g. Increase HP Recovery.
         /// </summary>
         /// <returns>The combined multiplier, where 1 means no bonus.</returns>
-        public float GetRegenMultiplier()
+        public float GetHealItemMultiplier()
         {
             var total = 1f;
 
@@ -207,7 +232,7 @@ namespace Project.Character.Combat
 
                 if (skill.EffectType == SkillEffectType.Passive && level > 0)
                 {
-                    total += skill.GetPassiveRegenBonus(level);
+                    total += skill.GetPassiveHealItemBonus(level);
                 }
             }
 
@@ -218,8 +243,7 @@ namespace Project.Character.Combat
         /// Calculates the combined multiplier to apply to natural SP regen
         /// (see <see cref="PlayerManaRegenController"/>) from every learned
         /// passive with an SP regen bonus — e.g. Increase SP Recovery.
-        /// Mirrors <see cref="GetRegenMultiplier"/> exactly for mana
-        /// instead of health.
+        /// Multiplies the natural SP regen tick.
         /// </summary>
         /// <returns>The combined multiplier, where 1 means no bonus.</returns>
         public float GetSpRegenMultiplier()

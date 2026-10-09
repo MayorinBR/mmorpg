@@ -15,7 +15,11 @@ namespace Project.Items
     {
         [SerializeField] private string itemName;
         [SerializeField] private string description;
+        [Tooltip("Detailed icon showing the item's real appearance. Used by the shop, tooltip, inventory and equipment UI. The small icon shown on the ground comes from the Dropped Item Icon Set, by category.")]
         [SerializeField] private Sprite icon;
+
+        [Tooltip("Ground icon category. Auto derives it from the item type, slot and weapon subtype; set it manually for cases like food.")]
+        [SerializeField] private DropIconCategory dropIconCategory = DropIconCategory.Auto;
         [SerializeField] private bool isStackable = true;
         [SerializeField] private int maxStackSize = 99;
         [SerializeField] private ItemType itemType = ItemType.Material;
@@ -39,14 +43,26 @@ namespace Project.Items
         [Tooltip("If true, using this consumable clears Poison (see Project.Combat.StatusEffectController.ApplyPoison) — e.g. an Antidote. Only meaningful when ItemType is Consumable.")]
         [SerializeField] private bool curesPoison;
 
+        [Tooltip("Model shown on the character while this item is equipped. Its root transform is the offset from the attachment bone, so author the pivot at the grip (weapons) or the head origin (headgear). Only meaningful when ItemType is Equipment.")]
+        [SerializeField] private GameObject equippedModel;
+
+        [Tooltip("Optional. Used instead of Equipped Model on a female character, for items that need a different scale or offset.")]
+        [SerializeField] private GameObject equippedModelFemale;
+
+        [Tooltip("If true, the character's hair is hidden while this item is equipped (e.g. a closed helmet).")]
+        [SerializeField] private bool hidesHair;
+
         /// <summary>Gets the display name of the item.</summary>
         public string ItemName => itemName;
 
         /// <summary>Gets the item's description text.</summary>
         public string Description => description;
 
-        /// <summary>Gets the icon shown in inventory UI.</summary>
+        /// <summary>Gets the detailed icon shown in the shop, tooltip and inventory UI.</summary>
         public Sprite Icon => icon;
+
+        /// <summary>Gets the category that selects this item's small ground icon, resolved automatically unless overridden on the asset.</summary>
+        public DropIconCategory DropCategory => dropIconCategory != DropIconCategory.Auto ? dropIconCategory : ResolveDropCategory();
 
         /// <summary>Gets a value indicating whether multiple units of this item can share a single slot.</summary>
         public bool IsStackable => isStackable;
@@ -112,6 +128,79 @@ namespace Project.Items
         /// <see cref="Project.Character.Combat.PlayerConsumableUser"/>.
         /// </summary>
         public bool CuresPoison => curesPoison;
+
+        /// <summary>Gets whether the character's hair is hidden while this item is equipped.</summary>
+        public bool HidesHair => hidesHair;
+
+        /// <summary>
+        /// Gets the model shown on a character of the given gender while this
+        /// item is equipped.
+        /// </summary>
+        /// <param name="gender">The gender of the character wearing the item.</param>
+        /// <returns>The gender-specific model when one is authored for a female character, otherwise the shared model; null when the item has no model.</returns>
+        public GameObject GetEquippedModel(CharacterGender gender)
+        {
+            return gender == CharacterGender.Female && equippedModelFemale != null ? equippedModelFemale : equippedModel;
+        }
+
+        private DropIconCategory ResolveDropCategory()
+        {
+            switch (itemType)
+            {
+                case ItemType.Consumable:
+                    return DropIconCategory.Potion;
+                case ItemType.Material:
+                    return DropIconCategory.Material;
+                case ItemType.KeyItem:
+                    return DropIconCategory.KeyItem;
+                case ItemType.Equipment:
+                    return ResolveEquipmentDropCategory();
+                default:
+                    return DropIconCategory.Generic;
+            }
+        }
+
+        private DropIconCategory ResolveEquipmentDropCategory()
+        {
+            switch (weaponSubtype)
+            {
+                case WeaponSubtype.Dagger: return DropIconCategory.Dagger;
+                case WeaponSubtype.OneHandSword: return DropIconCategory.OneHandSword;
+                case WeaponSubtype.TwoHandSword: return DropIconCategory.TwoHandSword;
+                case WeaponSubtype.OneHandAxe:
+                case WeaponSubtype.TwoHandAxe: return DropIconCategory.Axe;
+                case WeaponSubtype.Mace: return DropIconCategory.Mace;
+                case WeaponSubtype.Spear: return DropIconCategory.Spear;
+                case WeaponSubtype.Bow: return DropIconCategory.Bow;
+                case WeaponSubtype.Book: return DropIconCategory.Book;
+                case WeaponSubtype.Instrument: return DropIconCategory.Instrument;
+                case WeaponSubtype.Whip: return DropIconCategory.Whip;
+                case WeaponSubtype.Rod: return DropIconCategory.Rod;
+                case WeaponSubtype.Knuckle: return DropIconCategory.Knuckle;
+                case WeaponSubtype.Katar: return DropIconCategory.Katar;
+                case WeaponSubtype.Gun: return DropIconCategory.Gun;
+                case WeaponSubtype.HuumaShuriken: return DropIconCategory.Shuriken;
+                case WeaponSubtype.Shield: return DropIconCategory.Shield;
+            }
+
+            if (requiredSlots == null || requiredSlots.Length == 0)
+            {
+                return DropIconCategory.Generic;
+            }
+
+            switch (requiredSlots[0])
+            {
+                case EquipmentSlot.HeadTop:
+                case EquipmentSlot.HeadFace: return DropIconCategory.Headgear;
+                case EquipmentSlot.Body: return DropIconCategory.Armor;
+                case EquipmentSlot.Pants: return DropIconCategory.Legs;
+                case EquipmentSlot.Boots: return DropIconCategory.Boots;
+                case EquipmentSlot.Gloves: return DropIconCategory.Gloves;
+                case EquipmentSlot.Accessory: return DropIconCategory.Accessory;
+                case EquipmentSlot.Ammo: return DropIconCategory.Ammo;
+                default: return DropIconCategory.Generic;
+            }
+        }
 
         private void OnValidate()
         {

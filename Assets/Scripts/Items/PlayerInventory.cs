@@ -11,6 +11,7 @@ namespace Project.Items
     /// </summary>
     public class PlayerInventory : MonoBehaviour, ISaveParticipant
     {
+        [Tooltip("Initial base capacity, replaced by PlayerStatsController once it applies the STR and class based capacity.")]
         [SerializeField] private float maxCarryWeight = 50f;
         [SerializeField] private ItemDatabase itemDatabase;
 

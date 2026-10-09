@@ -16,7 +16,7 @@ namespace Project.Character.Animation
         [Tooltip("Renderer of the head mesh. When empty, the first child renderer named Face Mesh Name is used.")]
         [SerializeField] private Renderer faceRenderer;
 
-        [SerializeField] private string faceMeshName = "part_0";
+        [SerializeField] private string faceMeshName = "Body_Head";
 
         [Tooltip("Names of the eye and mouth drawings, shown as dropdowns in the inspector.")]
         [SerializeField] private FacePartCatalog catalog;

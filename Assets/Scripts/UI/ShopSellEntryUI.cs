@@ -21,7 +21,7 @@ namespace Project.UI
     /// sell time, gathers the requested amount from as many slots as it
     /// takes. This component is purely a view over one queued sale.
     /// </summary>
-    public class ShopSellEntryUI : MonoBehaviour, IDropHandler
+    public class ShopSellEntryUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler
     {
         private const int MinQuantity = 1;
         private const string EmptyPlaceholder = "Drop item here";
@@ -139,6 +139,26 @@ namespace Project.UI
             if (sellButton != null)
             {
                 sellButton.gameObject.SetActive(hasItem);
+            }
+        }
+
+        /// <summary>Shows the shared item tooltip for this row's item.</summary>
+        /// <param name="eventData">The pointer event data.</param>
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (Item != null && ItemTooltipUI.Instance != null)
+            {
+                ItemTooltipUI.Instance.Show(Item, eventData.position);
+            }
+        }
+
+        /// <summary>Hides the shared item tooltip.</summary>
+        /// <param name="eventData">The pointer event data.</param>
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (ItemTooltipUI.Instance != null)
+            {
+                ItemTooltipUI.Instance.Hide();
             }
         }
 

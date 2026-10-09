@@ -12,16 +12,16 @@ namespace Project.Character.Head
     public sealed class HeadCustomization : MonoBehaviour
     {
         [Tooltip("Name of the head renderer. The first skinned renderer with this name is used.")]
-        [SerializeField] private string headMeshName = "part_0";
+        [SerializeField] private string headMeshName = "Body_Head";
 
         [SerializeField] private HeadCatalog catalog;
 
         [Tooltip("Whether the character wears the female body. Selects the model of each head shape.")]
         [SerializeField] private bool female;
 
-        private SkinnedMeshRenderer target;
-        private Mesh originalMesh;
-        private Transform[] originalBones;
+        [SerializeField, HideInInspector] private SkinnedMeshRenderer target;
+        [SerializeField, HideInInspector] private Mesh originalMesh;
+        [SerializeField, HideInInspector] private Transform[] originalBones;
 
         /// <summary>
         /// Sets the catalog and body this component uses, for components that are added to a model
@@ -97,7 +97,10 @@ namespace Project.Character.Head
             var byName = new Dictionary<string, Transform>();
             foreach (Transform candidate in GetComponentsInChildren<Transform>(true))
             {
-                byName.TryAdd(candidate.name, candidate);
+                if (candidate.GetComponent<Renderer>() == null)
+                {
+                    byName.TryAdd(candidate.name, candidate);
+                }
             }
 
             var mapped = new Transform[sourceBones.Length];

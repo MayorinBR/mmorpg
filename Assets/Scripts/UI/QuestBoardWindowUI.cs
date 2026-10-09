@@ -26,6 +26,7 @@ namespace Project.UI
 
         private readonly List<QuestBoardEntryUI> entryViews = new List<QuestBoardEntryUI>();
         private QuestBoardNpc currentBoard;
+        private GameObject emptyMessage;
 
         private void Awake()
         {
@@ -92,6 +93,12 @@ namespace Project.UI
 
             entryViews.Clear();
 
+            if (emptyMessage != null)
+            {
+                Destroy(emptyMessage);
+                emptyMessage = null;
+            }
+
             if (currentBoard == null)
             {
                 return;
@@ -106,6 +113,11 @@ namespace Project.UI
 
                 var view = QuestBoardEntryUI.Create(entryParent, quest, HandleAcceptClicked);
                 entryViews.Add(view);
+            }
+
+            if (entryViews.Count == 0)
+            {
+                emptyMessage = QuestLogEntryUI.CreateMessage(entryParent, "No quests available.");
             }
         }
 

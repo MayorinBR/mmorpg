@@ -93,6 +93,9 @@ namespace Project.Character.Combat
         [SerializeField] private ManaComponent mana;
         [SerializeField] private PlayerAnimatorController animatorController;
 
+        [Tooltip("Optional. When assigned, basic attacks are blocked while the player is major overweight (90% carried weight or more).")]
+        [SerializeField] private PlayerInventory inventory;
+
         [Tooltip("Optional. Source of active status effects (see StatusEffectController) affecting the player — e.g. a Stun/Freeze/Petrify landed on them. Left empty, the player is never immobilized by one.")]
         [SerializeField] private StatusEffectController statusEffects;
 
@@ -207,6 +210,11 @@ namespace Project.Character.Combat
 
         private bool CanAttack()
         {
+            if (inventory != null && inventory.Items.IsMajorOverweight)
+            {
+                return false;
+            }
+
             if (statusEffects != null && statusEffects.IsImmobilized)
             {
                 return false;
@@ -234,35 +242,24 @@ namespace Project.Character.Combat
 
             var isRanged = equipment.IsMainHandWeaponRanged();
 
-            // Punching plays for a bare-handed swing and, until a
-            // dedicated dagger animation is added, for a dagger too —
-            // every other melee weapon (sword, axe, etc.) plays the armed
-            // swing (Standing Melee Attack Downward) instead.
-            var weaponSubtype = equipment.GetMainHandWeaponSubtype();
-            var isUnarmedMelee = weaponSubtype == WeaponSubtype.Unarmed || weaponSubtype == WeaponSubtype.Dagger;
-
-            // Only the swing states (Attack, AttackUnarmed, AttackRanged)
-            // are bound to the AttackSpeedMultiplier parameter this sets,
-            // so it has no effect on the Mage's Cast state — the Mage's
-            // basic attack always plays at its authored speed, not scaled
-            // by Aspd, since Cast is shared with real skill casts. The
-            // swing's actual playback duration is made to equal this same
-            // interval — not just scaled proportionally to it — so the
-            // animation and the cooldown it's tied to are never out of
-            // sync.
-            animatorController?.SetAttackDuration(AttackSpeedCalculator.GetAttackIntervalSeconds(playerStats.CurrentSubStats.Aspd), isRanged, isUnarmedMelee);
+            // Only the Attack state is bound to the AttackSpeedMultiplier
+            // parameter this sets, so it has no effect on the Mage's Cast
+            // state — the Mage's basic attack always plays at its authored
+            // speed, not scaled by Aspd, since Cast is shared with real
+            // skill casts. The swing's actual playback duration is made to
+            // equal this same interval — not just scaled proportionally to
+            // it — so the animation and the cooldown it's tied to are never
+            // out of sync. Which clip the Attack state plays comes from the
+            // equipped weapon (see PlayerWeaponAnimationBinder).
+            animatorController?.SetAttackDuration(AttackSpeedCalculator.GetAttackIntervalSeconds(playerStats.CurrentSubStats.Aspd));
 
             if (classController.CurrentClass == CharacterClass.Mage)
             {
                 animatorController?.TriggerCast();
             }
-            else if (isRanged)
-            {
-                animatorController?.TriggerRangedAttack();
-            }
             else
             {
-                animatorController?.TriggerAttack(isUnarmedMelee);
+                animatorController?.TriggerAttack();
             }
 
             if (classController.CurrentClass == CharacterClass.Mage)

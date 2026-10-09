@@ -12,6 +12,8 @@ namespace Project.UI
     /// </summary>
     public class QuestLogWindowUI : MonoBehaviour
     {
+        private const string EmptyMessage = "No quests available.";
+
         [SerializeField] private QuestManager questManager;
         [SerializeField] private Transform contentRoot;
 
@@ -36,9 +38,17 @@ namespace Project.UI
                 Destroy(contentRoot.GetChild(i).gameObject);
             }
 
+            var hasQuests = false;
+
             foreach (var active in questManager.ActiveQuests)
             {
                 QuestLogEntryUI.Create(contentRoot, active);
+                hasQuests = true;
+            }
+
+            if (!hasQuests)
+            {
+                QuestLogEntryUI.CreateMessage(contentRoot, EmptyMessage);
             }
         }
     }

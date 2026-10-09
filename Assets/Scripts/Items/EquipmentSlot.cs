@@ -14,6 +14,9 @@ namespace Project.Items
         Pants,
         Boots,
         Accessory,
-        Ammo
+        Ammo,
+
+        /// <summary>Hand armor worn over the character's hands.</summary>
+        Gloves
     }
 }

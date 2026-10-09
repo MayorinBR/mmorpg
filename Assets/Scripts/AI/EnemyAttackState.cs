@@ -60,6 +60,7 @@ namespace Project.AI
 
             if (cooldownRemaining <= 0f)
             {
+                enemy.NotifyAttackStarted();
                 PerformAttack(enemy);
                 var interval = AttackSpeedCalculator.GetAttackIntervalSeconds(enemy.Stats.BaseAttackSpeed);
                 cooldownRemaining = enemy.Buffs != null ? interval / enemy.Buffs.AspdMultiplier : interval;
