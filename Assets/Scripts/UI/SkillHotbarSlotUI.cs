@@ -86,7 +86,7 @@ namespace Project.UI
         {
             if (assignedSkill != null && SkillTooltipUI.Instance != null)
             {
-                SkillTooltipUI.Instance.Show(assignedSkill, eventData.position);
+                SkillTooltipUI.Instance.Show(assignedSkill, eventData.position, Mathf.Max(1, caster.GetSkillLevel(assignedSkill)));
             }
         }
 

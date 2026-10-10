@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using Project.Character.Stats;
+using Project.Combat;
 using Project.Persistence;
 
 namespace Project.Character.Combat
@@ -14,6 +16,9 @@ namespace Project.Character.Combat
     {
         [SerializeField] private int startingJobLevel = 1;
         [SerializeField] private int skillPointsPerJobLevel = 1;
+
+        [Tooltip("Optional. Applies the Novice Job Level cap and resets progress when the player evolves. Left empty, Job Level is uncapped.")]
+        [SerializeField] private PlayerClassController classController;
 
         private IJobExperienceCurve experienceCurve;
         private int currentExperience;
@@ -61,18 +66,51 @@ namespace Project.Character.Combat
             experienceCurve = new LinearJobExperienceCurve();
         }
 
+        private void OnEnable()
+        {
+            EnemyDeathEvents.ExperienceAwarded += HandleExperienceAwarded;
+
+            if (classController != null)
+            {
+                classController.ClassEvolved += HandleClassEvolved;
+            }
+        }
+
+        private void OnDisable()
+        {
+            EnemyDeathEvents.ExperienceAwarded -= HandleExperienceAwarded;
+
+            if (classController != null)
+            {
+                classController.ClassEvolved -= HandleClassEvolved;
+            }
+        }
+
+        private bool IsAtLevelCap => classController != null && JobLevel >= ClassProgression.GetLevelCap(classController.CurrentClass);
+
+        private void HandleClassEvolved(CharacterClass previousClass, CharacterClass newClass)
+        {
+            ResetProgress();
+        }
+
+        private void HandleExperienceAwarded(int baseExperience, int jobExperience)
+        {
+            AddExperience(jobExperience);
+        }
+
         private void Start()
         {
             JobExperienceChanged?.Invoke(currentExperience, experienceCurve.GetRequiredExperience(JobLevel));
         }
 
         /// <summary>
-        /// Adds job experience, applying as many job level ups as the amount allows.
+        /// Adds job experience, applying as many job level ups as the amount
+        /// allows. Ignored once the class's level cap is reached.
         /// </summary>
         /// <param name="amount">The job experience amount to add. Non-positive values are ignored.</param>
         public void AddExperience(int amount)
         {
-            if (amount <= 0)
+            if (amount <= 0 || IsAtLevelCap)
             {
                 return;
             }
@@ -80,13 +118,18 @@ namespace Project.Character.Combat
             currentExperience += amount;
             var requiredForNextLevel = experienceCurve.GetRequiredExperience(JobLevel);
 
-            while (currentExperience >= requiredForNextLevel)
+            while (currentExperience >= requiredForNextLevel && !IsAtLevelCap)
             {
                 currentExperience -= requiredForNextLevel;
                 JobLevel++;
                 AvailableSkillPoints += skillPointsPerJobLevel;
                 JobLeveledUp?.Invoke(JobLevel);
                 requiredForNextLevel = experienceCurve.GetRequiredExperience(JobLevel);
+            }
+
+            if (IsAtLevelCap)
+            {
+                currentExperience = 0;
             }
 
             JobExperienceChanged?.Invoke(currentExperience, requiredForNextLevel);

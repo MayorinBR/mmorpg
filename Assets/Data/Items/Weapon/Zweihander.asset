@@ -13,28 +13,30 @@ MonoBehaviour:
   m_Name: Zweihander
   m_EditorClassIdentifier: Project.Items::Project.Items.ItemDefinition
   itemName: Zweihander
-  description: Zweihander placeholder.
+  description: A long two-handed sword favored by heavy infantry.
   icon: {fileID: 1615020678, guid: 287e2daed8778f44d940a3c78a40551c, type: 3}
   isStackable: 0
   maxStackSize: 1
   itemType: 2
   requiredSlots: 0300000004000000
   statBonuses:
-    strength: 0
+    strength: 5
     agility: 0
     vitality: 0
     intelligence: 0
     dexterity: 0
     luck: 0
   requiredLevel: 1
-  allowedClasses: 
-  weight: 9
+  allowedClasses: 00000000
+  weight: 12
   canBeOffHand: 0
   weaponType: 0
   weaponSubtype: 3
+  weaponAttack: 55
   attackRange: 1.5
-  buyPrice: 0
-  sellPrice: 0
+  attackSpeedMultiplier: 0.85
+  buyPrice: 600
+  sellPrice: 240
   consumableEffectType: 0
   healthRestore: 0
   manaRestore: 0

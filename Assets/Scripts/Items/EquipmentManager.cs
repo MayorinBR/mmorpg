@@ -382,6 +382,28 @@ namespace Project.Items
             return mainHandWeapon != null ? mainHandWeapon.WeaponSubtype : WeaponSubtype.Unarmed;
         }
 
+        /// <summary>
+        /// Gets the own attack power (see <see cref="ItemDefinition.WeaponAttack"/>) of the item equipped
+        /// in the main hand, or zero if nothing is equipped there.
+        /// </summary>
+        /// <returns>The main-hand weapon's attack power.</returns>
+        public int GetMainHandWeaponAttack()
+        {
+            var mainHandWeapon = GetEquippedItems(EquipmentSlot.LeftHand).FirstOrDefault();
+            return mainHandWeapon != null ? mainHandWeapon.WeaponAttack : 0;
+        }
+
+        /// <summary>
+        /// Gets the attack speed multiplier (see <see cref="ItemDefinition.AttackSpeedMultiplier"/>) of the
+        /// item equipped in the main hand, or 1 if nothing is equipped there.
+        /// </summary>
+        /// <returns>The main-hand weapon's attack speed multiplier.</returns>
+        public float GetMainHandAttackSpeedMultiplier()
+        {
+            var mainHandWeapon = GetEquippedItems(EquipmentSlot.LeftHand).FirstOrDefault();
+            return mainHandWeapon != null ? mainHandWeapon.AttackSpeedMultiplier : 1f;
+        }
+
         private void MakeRoomFor(IReadOnlyList<EquipmentSlot> requiredSlots)
         {
             foreach (var slot in requiredSlots)

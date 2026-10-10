@@ -19,7 +19,7 @@ namespace Project.Combat
         /// Initializes a new payload. Every component defaults to zero, so
         /// a caller only needs to pass the components its buff actually has.
         /// </summary>
-        public BuffPayload(float atkPercent = 0f, float defPercent = 0f, int mdefFlat = 0, float aspdPercent = 0f, int maxHealthFlat = 0, int strength = 0, int agility = 0, int vitality = 0, int intelligence = 0, int dexterity = 0, int luck = 0, float incomingDamageReductionPercent = 0f, bool preventsFlinch = false)
+        public BuffPayload(float atkPercent = 0f, float defPercent = 0f, int mdefFlat = 0, float aspdPercent = 0f, int maxHealthFlat = 0, int strength = 0, int agility = 0, int vitality = 0, int intelligence = 0, int dexterity = 0, int luck = 0, float incomingDamageReductionPercent = 0f, bool preventsFlinch = false, float fireDamagePercent = 0f)
         {
             AtkPercent = atkPercent;
             DefPercent = defPercent;
@@ -34,6 +34,7 @@ namespace Project.Combat
             Luck = luck;
             IncomingDamageReductionPercent = incomingDamageReductionPercent;
             PreventsFlinch = preventsFlinch;
+            FireDamagePercent = fireDamagePercent;
         }
 
         /// <summary>Gets the attack power multiplier bonus, e.g. 0.32 for +32%.</summary>
@@ -75,11 +76,14 @@ namespace Project.Combat
         /// <summary>Gets whether this buff stops the holder from flinching when hit (see <see cref="StatusEffectController.IsFlinching"/>) — e.g. Endure.</summary>
         public bool PreventsFlinch { get; }
 
+        /// <summary>Gets the extra Fire-property damage added to every attack, as a fraction of the hit (e.g. 0.2 for +20%), which ignores the target's defense — e.g. Magnum Break's after-effect.</summary>
+        public float FireDamagePercent { get; }
+
         /// <summary>Gets whether every component of this payload is zero.</summary>
         public bool IsEmpty =>
             AtkPercent == 0f && DefPercent == 0f && MdefFlat == 0 && AspdPercent == 0f && MaxHealthFlat == 0 &&
             Strength == 0 && Agility == 0 && Vitality == 0 && Intelligence == 0 && Dexterity == 0 && Luck == 0 &&
-            IncomingDamageReductionPercent == 0f && !PreventsFlinch;
+            IncomingDamageReductionPercent == 0f && !PreventsFlinch && FireDamagePercent == 0f;
 
         /// <summary>
         /// Combines two payloads by summing each component.
@@ -99,7 +103,8 @@ namespace Project.Combat
                 a.Dexterity + b.Dexterity,
                 a.Luck + b.Luck,
                 a.IncomingDamageReductionPercent + b.IncomingDamageReductionPercent,
-                a.PreventsFlinch || b.PreventsFlinch);
+                a.PreventsFlinch || b.PreventsFlinch,
+                a.FireDamagePercent + b.FireDamagePercent);
         }
     }
 }

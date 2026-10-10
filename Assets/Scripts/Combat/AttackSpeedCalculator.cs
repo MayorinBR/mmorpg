@@ -36,5 +36,32 @@ namespace Project.Combat
             var delaySeconds = (AspdDelayBase - aspd) * MillisecondsPerAspdPoint / 1000f;
             return Mathf.Clamp(delaySeconds, MinIntervalSeconds, MaxIntervalSeconds);
         }
+
+        /// <summary>
+        /// Converts an Aspd rating into the auto-attack interval, then scales the speed by the
+        /// equipped weapon's own multiplier: above 1 shortens the interval, below 1 lengthens it.
+        /// The result never drops under the minimum interval.
+        /// </summary>
+        /// <param name="aspd">The Aspd sub-stat rating.</param>
+        /// <param name="weaponSpeedMultiplier">The weapon's attack speed multiplier, 1 for no change.</param>
+        /// <returns>The delay, in seconds, before the next auto-attack.</returns>
+        public static float GetAttackIntervalSeconds(int aspd, float weaponSpeedMultiplier)
+        {
+            var interval = GetAttackIntervalSeconds(aspd) / Mathf.Max(0.01f, weaponSpeedMultiplier);
+            return Mathf.Max(MinIntervalSeconds, interval);
+        }
+
+        /// <summary>
+        /// Converts an Aspd rating and a weapon speed multiplier into the Aspd rating that produces the
+        /// same auto-attack interval, so the displayed value matches the real swing speed.
+        /// </summary>
+        /// <param name="aspd">The Aspd sub-stat rating.</param>
+        /// <param name="weaponSpeedMultiplier">The weapon's attack speed multiplier, 1 for no change.</param>
+        /// <returns>The effective Aspd rating.</returns>
+        public static int GetEffectiveAspd(int aspd, float weaponSpeedMultiplier)
+        {
+            var intervalSeconds = GetAttackIntervalSeconds(aspd, weaponSpeedMultiplier);
+            return AspdDelayBase - Mathf.RoundToInt(intervalSeconds * 1000f / MillisecondsPerAspdPoint);
+        }
     }
 }

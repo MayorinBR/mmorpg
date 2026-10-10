@@ -90,7 +90,7 @@ namespace Project.Character.Stats
         /// Gets the base Aspd rating (classic Ragnarok Online's 0-190
         /// display scale) before AGI/DEX are added on top — see
         /// <see cref="SubStatsCalculator"/>. Feeds directly into
-        /// <see cref="Project.Combat.AttackSpeedCalculator.GetAttackIntervalSeconds"/>
+        /// <see cref="Project.Combat.AttackSpeedCalculator.GetAttackIntervalSeconds(int)"/>
         /// (auto-attack cooldown), which
         /// <see cref="Project.Character.Animation.PlayerAnimatorController.SetAttackDuration"/>
         /// then also uses to scale the attack swing animation's playback

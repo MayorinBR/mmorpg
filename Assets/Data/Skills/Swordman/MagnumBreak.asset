@@ -13,21 +13,25 @@ MonoBehaviour:
   m_Name: MagnumBreak
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
   skillName: Magnum Break
-  description: Deals Fire property damage to every enemy around the caster.
+  description: Deals Fire property damage to every enemy around the caster at the cost of some HP, then adds 20% Fire damage to your attacks for 10 seconds.
   icon: {fileID: 371646829, guid: 0f9d26d5001687d40986509de0b0e95d, type: 3}
   allowedClasses: 00000000
   effectType: 0
   targetType: 3
-  maxLevel: 5
-  manaCost: 15
-  cooldownSeconds: 8
+  maxLevel: 10
+  manaCost: 30
+  cooldownSeconds: 2
   range: 0
   requiredLevel: 0
   zenyCost: 0
   damageType: 0
-  damageMultiplierPerLevel: 0.6
+  damageMultiplierPerLevel: 0.2
+  damageBaseMultiplier: 1
+  healthCost: 20
+  healthCostReductionPerTwoLevels: 1
+  selfFireDamageBonusPercent: 0.2
   element: 1
-  accuracyBonusPerLevel: 0
+  accuracyBonusPerLevel: 10
   isAreaOfEffect: 1
   areaRadius: 4
   inflictedStatus: 0
@@ -60,7 +64,7 @@ MonoBehaviour:
   buffAtkPercentPerLevel: 0
   buffDefPercentPerLevel: 0
   buffMdefBonusPerLevel: 0
-  buffDurationSeconds: 0
+  buffDurationSeconds: 10
   buffDurationPerLevel: 0
   buffStatBonusPerLevel:
     strength: 0

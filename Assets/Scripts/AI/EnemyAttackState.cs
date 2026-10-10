@@ -7,7 +7,7 @@ namespace Project.AI
     /// <summary>
     /// The enemy stands still and attacks its target on a cooldown derived
     /// from its own <see cref="CharacterStatsDefinition.BaseAttackSpeed"/>
-    /// via <see cref="AttackSpeedCalculator.GetAttackIntervalSeconds"/> —
+    /// via <see cref="AttackSpeedCalculator.GetAttackIntervalSeconds(int)"/> —
     /// the same Aspd-to-delay conversion used for the player, so a
     /// faster-Aspd enemy type genuinely attacks more often instead of every
     /// mob sharing one flat cadence regardless of its stats. Falls back to

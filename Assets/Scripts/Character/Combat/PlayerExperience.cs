@@ -18,6 +18,9 @@ namespace Project.Character.Combat
         [SerializeField] private HealthComponent health;
         [SerializeField] private ManaComponent mana;
 
+        [Tooltip("Optional. Applies the Novice Base Level cap. Left empty, Base Level is uncapped.")]
+        [SerializeField] private PlayerClassController classController;
+
         private IExperienceCurve experienceCurve;
         private IStatPointsPerLevelStrategy pointsPerLevelStrategy;
         private int currentExperience;
@@ -37,10 +40,27 @@ namespace Project.Character.Combat
         /// <summary>Gets the experience required to advance from the current level.</summary>
         public int RequiredExperienceForNextLevel => experienceCurve.GetRequiredExperience(CurrentLevel);
 
+        private bool IsAtLevelCap => classController != null && CurrentLevel >= ClassProgression.GetLevelCap(classController.CurrentClass);
+
         private void Awake()
         {
             experienceCurve = new RealRagnarokExperienceCurve();
             pointsPerLevelStrategy = new RagnarokStatPointsPerLevelStrategy();
+        }
+
+        private void OnEnable()
+        {
+            EnemyDeathEvents.ExperienceAwarded += HandleExperienceAwarded;
+        }
+
+        private void OnDisable()
+        {
+            EnemyDeathEvents.ExperienceAwarded -= HandleExperienceAwarded;
+        }
+
+        private void HandleExperienceAwarded(int baseExperience, int jobExperience)
+        {
+            AddExperience(baseExperience);
         }
 
         private void Start()
@@ -50,11 +70,12 @@ namespace Project.Character.Combat
 
         /// <summary>
         /// Adds experience, applying as many level ups as the amount allows.
+        /// Ignored once the class's level cap is reached.
         /// </summary>
         /// <param name="amount">The experience amount to add. Non-positive values are ignored.</param>
         public void AddExperience(int amount)
         {
-            if (amount <= 0)
+            if (amount <= 0 || IsAtLevelCap)
             {
                 return;
             }
@@ -63,7 +84,7 @@ namespace Project.Character.Combat
             var requiredForNextLevel = experienceCurve.GetRequiredExperience(CurrentLevel);
             var didLevelUp = false;
 
-            while (currentExperience >= requiredForNextLevel)
+            while (currentExperience >= requiredForNextLevel && !IsAtLevelCap)
             {
                 currentExperience -= requiredForNextLevel;
                 var levelBeforeThisLevelUp = statsController.BaseLevel;
@@ -72,6 +93,11 @@ namespace Project.Character.Combat
                 didLevelUp = true;
                 LeveledUp?.Invoke(statsController.BaseLevel);
                 requiredForNextLevel = experienceCurve.GetRequiredExperience(CurrentLevel);
+            }
+
+            if (IsAtLevelCap)
+            {
+                currentExperience = 0;
             }
 
             if (didLevelUp)

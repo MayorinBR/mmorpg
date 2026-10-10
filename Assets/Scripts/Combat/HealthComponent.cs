@@ -165,6 +165,41 @@ namespace Project.Combat
         /// <inheritdoc />
         public void TakeDamage(int amount, Element element = Element.Neutral, DamageCategory category = DamageCategory.Physical, bool isCritical = false, Transform attacker = null)
         {
+            ApplyDamage(amount, element, category, isCritical, attacker, false);
+        }
+
+        /// <summary>
+        /// Applies damage that bypasses physical and magical defense. Elemental modifiers and incoming-damage
+        /// buffs still apply, and a hit still deals at least 1.
+        /// </summary>
+        /// <param name="amount">The amount of damage to apply. Non-positive values are ignored.</param>
+        /// <param name="element">The element this damage carries.</param>
+        /// <param name="attacker">Who dealt this damage, if known.</param>
+        public void TakePiercingDamage(int amount, Element element, Transform attacker = null)
+        {
+            ApplyDamage(amount, element, DamageCategory.Physical, false, attacker, true);
+        }
+
+        /// <summary>
+        /// Pays a health cost without dealing damage (no flinch, no damage popup). Refuses when the payment
+        /// would leave no health, so a cost can never kill its payer.
+        /// </summary>
+        /// <param name="amount">The health to spend.</param>
+        /// <returns>True if the cost was paid.</returns>
+        public bool TrySpendHealth(int amount)
+        {
+            if (IsDead || amount < 0 || currentHealth <= amount)
+            {
+                return false;
+            }
+
+            currentHealth -= amount;
+            HealthChanged?.Invoke(currentHealth, MaxHealth);
+            return true;
+        }
+
+        private void ApplyDamage(int amount, Element element, DamageCategory category, bool isCritical, Transform attacker, bool ignoreDefense)
+        {
             if (IsDead || amount <= 0)
             {
                 return;
@@ -180,8 +215,11 @@ namespace Project.Combat
                 return;
             }
 
-            var defense = category == DamageCategory.Physical ? PhysicalDefense + GetRaceDefenseBonus(attacker) : MagicalDefense;
-            amount = Mathf.Max(1, amount - defense);
+            if (!ignoreDefense)
+            {
+                var defense = category == DamageCategory.Physical ? PhysicalDefense + GetRaceDefenseBonus(attacker) : MagicalDefense;
+                amount = Mathf.Max(1, amount - defense);
+            }
 
             if (buffs != null)
             {

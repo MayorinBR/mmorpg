@@ -2036,7 +2036,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0, y: 0.0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &200805956
@@ -5080,7 +5080,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0, y: 0.0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &510601146
@@ -7284,7 +7284,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0, y: 0.0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &754905721
@@ -10412,7 +10412,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0, y: 0.0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &949269300
@@ -12309,7 +12309,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0, y: 0.0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1094253642
@@ -12420,7 +12420,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0, y: 0.0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1097514629
@@ -14218,7 +14218,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0, y: 0.0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1246025322
@@ -15734,6 +15734,7 @@ MonoBehaviour:
   health: {fileID: 1374932851}
   spawnOffset: {x: 0, y: 2, z: 0}
   horizontalJitter: 0.3
+  regenController: {fileID: 0}
 --- !u!1 &1375287689
 GameObject:
   m_ObjectHideFlags: 0
@@ -16255,7 +16256,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0, y: 0.0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &1429205265
@@ -18458,7 +18459,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0, y: 0.0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1586033116
@@ -19334,6 +19335,8 @@ MonoBehaviour:
   experience: {fileID: 1696850560}
   entryPrefab: {fileID: 4855366441664680316, guid: f3c2da1d05d3c734dbc5548d141965fa, type: 3}
   contentRoot: {fileID: 1648220005}
+  tabButtons: []
+  tabsRoot: {fileID: 0}
 --- !u!114 &1648220010
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20054,6 +20057,7 @@ MonoBehaviour:
   statsController: {fileID: 1696850561}
   health: {fileID: 1374932851}
   mana: {fileID: 1374932850}
+  classController: {fileID: 1696850564}
 --- !u!114 &1696850561
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20118,7 +20122,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e50158b06126a8428023af9dab9da15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Project.Character.Combat::Project.Character.Combat.PlayerClassController
-  startingClass: 0
+  startingClass: 6
+  jobProgress: {fileID: 1696850565}
 --- !u!114 &1696850565
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20133,6 +20138,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Character.Combat::Project.Character.Combat.PlayerJobProgress
   startingJobLevel: 1
   skillPointsPerJobLevel: 1
+  classController: {fileID: 1696850564}
 --- !u!114 &1696850566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20180,7 +20186,7 @@ MonoBehaviour:
   health: {fileID: 1374932851}
   poisonTickIntervalSeconds: 2
   resistanceSource: {fileID: 1696850561}
-  statsHolder: {fileID: 0}
+  statsHolder: {fileID: 1374932852}
   buffs: {fileID: 1696850567}
   flinchDurationSeconds: 0.3
 --- !u!1001 &1701028264
@@ -21275,7 +21281,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0, y: 0.0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1825510176
@@ -22782,7 +22788,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0, y: 0.0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2016041523
@@ -23516,7 +23522,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0, y: 0.0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2076564399
@@ -28145,6 +28151,9 @@ MonoBehaviour:
   lineText: {fileID: 9000000000000000018}
   optionButtonPrefab: {fileID: 100006, guid: a13c4f2e9b7d4a3d8e0c1f2a3b4c5d6e, type: 3}
   optionsParent: {fileID: 9000000000000000020}
+  questManager: {fileID: 0}
+  classController: {fileID: 0}
+  jobProgress: {fileID: 0}
 --- !u!1 &9000000000000000009
 GameObject:
   m_ObjectHideFlags: 0

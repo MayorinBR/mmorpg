@@ -15,13 +15,16 @@ namespace Project.NPC
     /// board offering several quests at once, rather than one NPC's single
     /// accept prompt) - both kept as plain enum cases rather than fields
     /// here so this assembly never needs to depend on the quest system.
+    /// <see cref="ClassPromotion"/> starts the Novice promotion conversation
+    /// of a <c>Project.Quests.PromotionNpc</c> on the same NPC.
     /// </summary>
     public enum NpcDialogueOptionAction
     {
         Close,
         OpenShop,
         AcceptQuest,
-        OpenQuestBoard
+        OpenQuestBoard,
+        ClassPromotion
     }
 
     /// <summary>

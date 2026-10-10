@@ -35,6 +35,18 @@ namespace Project.Skills
         [Header("Damage (used if Effect Type is Damage or Zone)")]
         [SerializeField] private SkillDamageType damageType;
         [SerializeField] private float damageMultiplierPerLevel = 1f;
+
+        [Tooltip("Flat multiplier added before the per-level part, so damage = base + perLevel * level. Magnum Break is 1.0 base + 0.2 per level (120% at level 1, 300% at level 10). Zero keeps the plain per-level scaling.")]
+        [SerializeField] private float damageBaseMultiplier;
+
+        [Tooltip("Health spent on each cast at level 1. Zero for skills that cost no health — e.g. Magnum Break.")]
+        [SerializeField, Min(0)] private int healthCost;
+
+        [Tooltip("Health cost removed for every two levels past the first — e.g. Magnum Break costs 20 at levels 1-2 and drops by 1 every two levels.")]
+        [SerializeField, Min(0)] private int healthCostReductionPerTwoLevels;
+
+        [Tooltip("Extra Fire damage, as a fraction of each hit (0.2 = +20%), that the caster's attacks add for the skill's buff duration after a cast. It ignores defense — e.g. Magnum Break's after-effect. Zero for none.")]
+        [SerializeField, Min(0f)] private float selfFireDamageBonusPercent;
         [SerializeField] private Element element = Element.Neutral;
 
         [Tooltip("Extra flat Hit rating this skill's damage roll gets on top of the caster's own Hit, scaling with level — e.g. Bash's real 5-50% Ragnarok Online accuracy bonus. Zero for skills without one.")]
@@ -210,6 +222,19 @@ namespace Project.Skills
         /// <summary>Gets the mana cost to cast this skill, regardless of its level.</summary>
         public int ManaCost => manaCost;
 
+        /// <summary>Gets the fraction of each hit that the caster's attacks add as defense-ignoring Fire damage after a cast, for <see cref="GetBuffDuration"/> seconds. Zero for skills without one.</summary>
+        public float SelfFireDamageBonusPercent => selfFireDamageBonusPercent;
+
+        /// <summary>
+        /// Gets the health this skill spends per cast at the given level.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The health cost, zero for skills without one.</returns>
+        public int GetHealthCost(int skillLevel)
+        {
+            return Mathf.Max(0, healthCost - healthCostReductionPerTwoLevels * ((skillLevel - 1) / 2));
+        }
+
         /// <summary>Gets the minimum Base Level required to learn this skill. Zero means no requirement.</summary>
         public int RequiredLevel => requiredLevel;
 
@@ -312,7 +337,7 @@ namespace Project.Skills
         public int CalculateDamage(int statusAtk, int statusMatk, int skillLevel)
         {
             var baseStat = damageType == SkillDamageType.Physical ? statusAtk : statusMatk;
-            return Mathf.RoundToInt(baseStat * damageMultiplierPerLevel * skillLevel);
+            return Mathf.RoundToInt(baseStat * (damageBaseMultiplier + damageMultiplierPerLevel * skillLevel));
         }
 
         /// <summary>

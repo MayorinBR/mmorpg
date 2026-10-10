@@ -126,6 +126,19 @@ namespace Project.Character.Combat
         /// <summary>Gets the base level a fresh character starts at, e.g. for <see cref="PlayerExperience.ResetProgress"/> to reset back to.</summary>
         public int StartingLevel => startingLevel;
 
+        /// <summary>Gets the extra Fire damage, as a fraction of each hit, that the player's active buffs currently add to every attack (0 when none).</summary>
+        public float FireDamagePercent => buffs != null ? buffs.FireDamagePercent : 0f;
+
+        /// <summary>Gets the Aspd rating after applying the equipped main-hand weapon's attack speed multiplier, matching the real auto-attack interval.</summary>
+        public int EffectiveAspd
+        {
+            get
+            {
+                var weaponMultiplier = equipment != null ? equipment.GetMainHandAttackSpeedMultiplier() : 1f;
+                return AttackSpeedCalculator.GetEffectiveAspd(CurrentSubStats.Aspd, weaponMultiplier);
+            }
+        }
+
         /// <summary>Gets the sub-stats calculated from the current effective stats, level and equipped weapon type.</summary>
         public SubStats CurrentSubStats
         {
@@ -133,7 +146,7 @@ namespace Project.Character.Combat
             {
                 EnsureInitialized();
                 var subStats = subStatsCalculator.Calculate(effectiveStats, BaseLevel, equipment != null && equipment.IsMainHandWeaponRanged(), GetBaseAttackSpeed());
-                var statusAtk = subStats.StatusAtk + GetPassiveAttackBonus();
+                var statusAtk = subStats.StatusAtk + GetPassiveAttackBonus() + GetWeaponAttack();
                 var hit = subStats.Hit + GetPassiveHitBonus();
                 var flee = subStats.Flee + GetPassiveFleeBonus();
                 var aspd = subStats.Aspd;
@@ -373,6 +386,14 @@ namespace Project.Character.Combat
             }
 
             return passiveSkills.GetAttackBonus(equipment.GetMainHandWeaponSubtype());
+        }
+
+        /// <summary>
+        /// Reads the own attack power of the equipped main-hand weapon. Zero if <see cref="equipment"/> isn't wired.
+        /// </summary>
+        private int GetWeaponAttack()
+        {
+            return equipment != null ? equipment.GetMainHandWeaponAttack() : 0;
         }
 
         /// <summary>

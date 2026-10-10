@@ -1,7 +1,9 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using Project.Character.Stats;
 using Project.Persistence;
 
 namespace Project.Flow
@@ -48,7 +50,12 @@ namespace Project.Flow
 
             if (classOptions.Length > 0)
             {
-                SelectClass(classOptions[0]);
+                var noviceOption = Array.Find(classOptions, option => option.CharacterClass == CharacterClass.Novice);
+
+                if (noviceOption != null)
+                {
+                    SelectClass(noviceOption);
+                }
             }
 
             if (genderOptions.Length > 0)
@@ -94,16 +101,16 @@ namespace Project.Flow
                 return;
             }
 
-            if (selectedClassOption == null || selectedGenderOption == null)
+            if (selectedGenderOption == null)
             {
-                ShowWarning("Choose a class and a gender.");
+                ShowWarning("Choose a gender.");
                 return;
             }
 
             AccountRepository.AddNewCharacter(
                 AccountSessionService.CurrentAccountLogin,
                 characterName,
-                selectedClassOption.CharacterClass,
+                selectedClassOption != null ? selectedClassOption.CharacterClass : CharacterClass.Novice,
                 selectedGenderOption.Gender,
                 appearanceSelection != null ? appearanceSelection.Current : null);
             CharacterSelectionHandoff.QueueCharacterToSelect(characterName);

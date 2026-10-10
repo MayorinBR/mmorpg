@@ -69,6 +69,9 @@ namespace Project.Combat
         /// <summary>Gets whether any active buff stops the holder from flinching when hit (e.g. Endure).</summary>
         public bool PreventsFlinch => Total.PreventsFlinch;
 
+        /// <summary>Gets the combined extra Fire damage fraction added to every attack (0 = none) — e.g. Magnum Break's after-effect.</summary>
+        public float FireDamagePercent => Total.FireDamagePercent;
+
         /// <summary>
         /// Applies a new timed buff, stacking with any others already
         /// active — e.g. a Provoke debuff on an enemy and a self Endure

@@ -73,6 +73,16 @@ namespace Project.Character.Combat
         private readonly Dictionary<SkillDefinition, float> cooldownEndTimes = new Dictionary<SkillDefinition, float>();
 
         /// <summary>
+        /// Gets the player's current level in the given skill.
+        /// </summary>
+        /// <param name="skill">The skill to look up.</param>
+        /// <returns>The learned level, zero if not learned.</returns>
+        public int GetSkillLevel(SkillDefinition skill)
+        {
+            return skillBook.GetLevel(skill);
+        }
+
+        /// <summary>
         /// Attempts to cast the given skill. For a Damage skill with no
         /// valid current target, this hands off to
         /// <see cref="SkillTargetingController"/> to let the player pick
@@ -539,6 +549,7 @@ namespace Project.Character.Combat
                 damage = WeaponSizeModifiers.Apply(damage, category, GetMainHandWeaponSubtype(), target.Size);
                 damage += GetRaceDamageBonus(category, target.Race);
                 target.TakeDamage(damage, skill.Element, category, attacker: transform);
+                ElementalBonusDamage.Apply(target, damage, statsController.FireDamagePercent, Element.Fire, transform);
                 var targetStatus = targetSelector.CurrentTarget.GetComponentInParent<StatusEffectController>();
                 TryProcStunAugment(skill, level, targetStatus);
                 TryProcInflictedStatus(skill, level, targetStatus);
@@ -572,13 +583,40 @@ namespace Project.Character.Combat
         /// <returns>True once the cast is committed (mana spent), regardless of how many targets were hit.</returns>
         private bool TryCastAreaDamage(SkillDefinition skill, int level)
         {
+            var healthCost = skill.GetHealthCost(level);
+
+            if (healthCost > 0 && ownHealth != null && ownHealth.CurrentHealth <= healthCost)
+            {
+                return false;
+            }
+
             if (!mana.TryConsumeMana(skill.ManaCost))
             {
                 return false;
             }
 
+            if (healthCost > 0 && ownHealth != null)
+            {
+                ownHealth.TrySpendHealth(healthCost);
+            }
+
             ApplyAreaDamage(skill, level, transform.position);
+            ApplyFireDamageBuff(skill, level);
             return true;
+        }
+
+        /// <summary>
+        /// Gives the caster the skill's after-effect of extra Fire damage on every attack (e.g. Magnum Break),
+        /// lasting <see cref="SkillDefinition.GetBuffDuration"/> seconds. No-ops for a skill without one.
+        /// </summary>
+        private void ApplyFireDamageBuff(SkillDefinition skill, int level)
+        {
+            if (skill.SelfFireDamageBonusPercent <= 0f || ownBuffs == null)
+            {
+                return;
+            }
+
+            ownBuffs.ApplyBuff(new BuffPayload(fireDamagePercent: skill.SelfFireDamageBonusPercent), skill.GetBuffDuration(level));
         }
 
         /// <summary>
@@ -617,6 +655,7 @@ namespace Project.Character.Combat
                     damage = WeaponSizeModifiers.Apply(damage, category, GetMainHandWeaponSubtype(), target.Size);
                     damage += GetRaceDamageBonus(category, target.Race);
                     target.TakeDamage(damage, skill.Element, category, attacker: transform);
+                    ElementalBonusDamage.Apply(target, damage, statsController.FireDamagePercent, Element.Fire, transform);
                     var targetStatus = hitCollider.GetComponentInParent<StatusEffectController>();
                     TryProcStunAugment(skill, level, targetStatus);
                     TryProcInflictedStatus(skill, level, targetStatus);

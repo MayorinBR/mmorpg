@@ -30,5 +30,16 @@ namespace Project.Combat
         {
             EnemyKilled?.Invoke(species);
         }
+
+        /// <summary>Raised with (base experience, job experience) whenever an enemy's death rewards the player, for the player's progression components to grant themselves.</summary>
+        public static event Action<int, int> ExperienceAwarded;
+
+        /// <summary>Raises <see cref="ExperienceAwarded"/>. Called by <c>Project.AI.EnemyDeathHandler</c> only.</summary>
+        /// <param name="baseExperience">The base experience the kill rewards.</param>
+        /// <param name="jobExperience">The job experience the kill rewards.</param>
+        public static void RaiseExperienceAwarded(int baseExperience, int jobExperience)
+        {
+            ExperienceAwarded?.Invoke(baseExperience, jobExperience);
+        }
     }
 }

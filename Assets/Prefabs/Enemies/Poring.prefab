@@ -655,7 +655,6 @@ MonoBehaviour:
   healthBarRoot: {fileID: 2363408862091125617}
   playerExperience: {fileID: 0}
   playerJobProgress: {fileID: 0}
-  lootTable: {fileID: 11400000, guid: 957a1806e79264448a2c24e60531c9a4, type: 2}
   itemPickupPrefab: {fileID: 5243884865457942396, guid: 4bd359e73ab1ce44894ebcea38886042, type: 3}
   dropSpreadRadius: 1.5
   respawnDelaySeconds: 5
@@ -728,6 +727,7 @@ MonoBehaviour:
   health: {fileID: 4831875017803827334}
   spawnOffset: {x: 0, y: 2, z: 0}
   horizontalJitter: 0.3
+  regenController: {fileID: 0}
 --- !u!114 &1319228893814348985
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -768,10 +768,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Project.Combat::Project.Combat.StatusEffectController
   health: {fileID: 4831875017803827334}
-  buffs: {fileID: 517221237455455100}
   poisonTickIntervalSeconds: 1
   resistanceSource: {fileID: 0}
   statsHolder: {fileID: 0}
+  buffs: {fileID: 517221237455455100}
+  flinchDurationSeconds: 0.3
 --- !u!114 &4253547583630163530
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -800,7 +801,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Combat::Project.Combat.EntityNameTagUI
   label: {fileID: 8404342373337253059}
   entityName: Poring
-  showLevel: 0
+  showLevel: 1
 --- !u!1 &6808703629625854916
 GameObject:
   m_ObjectHideFlags: 0

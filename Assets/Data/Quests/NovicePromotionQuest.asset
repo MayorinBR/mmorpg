@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fcfcbc670e17ba41a0e8f45647aa8d8, type: 3}
+  m_Name: NovicePromotionQuest
+  m_EditorClassIdentifier: Project.Quests::Project.Quests.QuestDefinition
+  title: Novice Trial
+  description: Prove yourself before choosing a class. Defeat 10 Wolves and bring back 5 Wolf Fangs.
+  requirements:
+  - {fileID: 11400000, guid: 5a1f0c2e7d3b4e9f8a6c1b2d3e4f5a62, type: 2}
+  - {fileID: 11400000, guid: 5a1f0c2e7d3b4e9f8a6c1b2d3e4f5a63, type: 2}
+  rewardExperience: 0
+  rewardJobExperience: 0
+  rewardItem: {fileID: 0}
+  rewardItemQuantity: 1
+  grantItemOnAccept: {fileID: 0}
+  grantItemOnAcceptQuantity: 1

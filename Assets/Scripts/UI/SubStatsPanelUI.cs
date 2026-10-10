@@ -53,7 +53,7 @@ namespace Project.UI
 
             foreach (var row in subStatRows)
             {
-                row.SetValue(FormatValue(row.SubStatType, subStats));
+                row.SetValue(FormatValue(row.SubStatType, subStats, statsController.EffectiveAspd));
             }
         }
 
@@ -68,9 +68,14 @@ namespace Project.UI
         /// <see cref="SubStatsCalculator"/>'s remarks and
         /// FUTURE_IMPROVEMENTS.md) — display-only styling aside, it already
         /// drives real auto-attack timing and animation speed, just not yet
-        /// the real Ragnarok Online-sourced formula.
+        /// the real Ragnarok Online-sourced formula. The displayed Aspd is
+        /// the effective one, with the equipped weapon's speed multiplier applied.
         /// </summary>
-        private static string FormatValue(SubStatType type, SubStats subStats)
+        /// <param name="type">The sub-stat to format.</param>
+        /// <param name="subStats">The current sub-stats.</param>
+        /// <param name="effectiveAspd">The Aspd rating after the weapon speed multiplier.</param>
+        /// <returns>The text to display.</returns>
+        private static string FormatValue(SubStatType type, SubStats subStats, int effectiveAspd)
         {
             switch (type)
             {
@@ -81,7 +86,7 @@ namespace Project.UI
                 case SubStatType.Hit: return subStats.Hit.ToString();
                 case SubStatType.Flee: return subStats.Flee.ToString();
                 case SubStatType.CriticalRate: return $"{subStats.CriticalRate:0.#}%";
-                case SubStatType.Aspd: return subStats.Aspd.ToString();
+                case SubStatType.Aspd: return effectiveAspd.ToString();
                 default: return string.Empty;
             }
         }

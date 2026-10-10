@@ -74,6 +74,9 @@ namespace Project.Persistence
         /// <summary>The underlying int value of the player's <c>CharacterClass</c>.</summary>
         public int characterClassIndex;
 
+        /// <summary>The underlying int value of every class the player has held, oldest first. Empty in saves made before class evolution existed.</summary>
+        public List<int> classPathIndices = new List<int>();
+
         /// <summary>Current Zeny amount.</summary>
         public int zeny;
 

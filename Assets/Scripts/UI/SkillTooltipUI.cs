@@ -48,7 +48,8 @@ namespace Project.UI
         /// </summary>
         /// <param name="skill">The skill to describe. If null, the tooltip hides instead.</param>
         /// <param name="screenPosition">The screen-space position to anchor the tooltip near (typically the pointer position).</param>
-        public void Show(SkillDefinition skill, Vector2 screenPosition)
+        /// <param name="skillLevel">The skill level used for level-dependent costs such as health.</param>
+        public void Show(SkillDefinition skill, Vector2 screenPosition, int skillLevel = 1)
         {
             if (skill == null)
             {
@@ -60,11 +61,17 @@ namespace Project.UI
             iconImage.sprite = skill.Icon;
             nameText.text = skill.SkillName;
             descriptionText.text = skill.Description;
-            manaCostText.text = skill.EffectType == SkillEffectType.Passive ? "Passive" : $"{skill.ManaCost} SP";
+            manaCostText.text = skill.EffectType == SkillEffectType.Passive ? "Passive" : FormatCost(skill, skillLevel);
             cooldownText.text = skill.EffectType == SkillEffectType.Passive ? string.Empty : $"{skill.CooldownSeconds:0.#}s";
 
             rectTransform.position = ClampToScreen(screenPosition + offsetFromPointer);
             root.SetActive(true);
+        }
+
+        private static string FormatCost(SkillDefinition skill, int skillLevel)
+        {
+            var healthCost = skill.GetHealthCost(skillLevel);
+            return healthCost > 0 ? $"{skill.ManaCost} SP / {healthCost} HP" : $"{skill.ManaCost} SP";
         }
 
         /// <summary>Hides the tooltip.</summary>

@@ -107,6 +107,7 @@ Wiki (Renewal; Classic difere em 3 niveis, ver nota):
 - Exemplo da wiki no nivel maximo: 250% + 20% x 250% = 300% de dano fisico, com 1/6 desse valor sendo dano de Fogo que ignora DEF.
 - Projeto hoje: `damageMultiplierPerLevel: 0.6` (300% no nivel 5, correto), `manaCost: 15`, **sem** bonus de Hit (`accuracyBonusPerLevel: 0`), **sem** custo de HP, **sem** knockback (existe `KnockbackUtility`/`knockbackDistance`, so falta configurar), **sem** buff de Fogo.
 - Proposto: `accuracyBonusPerLevel: 20` (100 no nivel 5), `knockbackDistance` para 2 celulas, `manaCost: 30`; custo de HP exige campo novo em `SkillDefinition` (`hpCost`).
+- **Implementado em 2026-10-10:** nivel maximo 10, SP 30, cooldown 2 s, dano `1.0 + 0.2 x nivel`, Hit +10 por nivel, knockback 2, custo de HP 20 (niveis 1-2) caindo 1 a cada dois niveis ate 16, e buff de Fogo de 10 s (+20% do golpe como dano de Fogo que ignora DEF). Campos novos em `SkillDefinition`: `damageBaseMultiplier`, `healthCost`, `healthCostReductionPerTwoLevels`, `selfFireDamageBonusPercent`. Ver `WEAPON_ATK_MAGNUM_BREAK_XP_EVENT_2026-10-10.md`.
 
 ### 3.3 Provoke
 

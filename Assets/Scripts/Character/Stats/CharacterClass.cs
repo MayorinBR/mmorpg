@@ -1,10 +1,10 @@
 namespace Project.Character.Stats
 {
     /// <summary>
-    /// The six Ragnarok Online base classes. A character starts as one of
-    /// these; class evolution (e.g. Swordman promoting to Knight or
-    /// Crusader) is intentionally not modeled yet — <see cref="Combat.PlayerClassController.ChangeClass"/>
-    /// is the hook where that will plug in once evolutions are designed.
+    /// The Ragnarok Online classes. Every character starts as a
+    /// <see cref="Novice"/> and evolves into one of the six first classes
+    /// through <see cref="Combat.PlayerClassController.TryEvolve"/>. Values
+    /// are only ever appended, since they are serialized as raw integers.
     /// </summary>
     public enum CharacterClass
     {
@@ -13,6 +13,7 @@ namespace Project.Character.Stats
         Merchant,
         Acolyte,
         Thief,
-        Mage
+        Mage,
+        Novice
     }
-}
+}

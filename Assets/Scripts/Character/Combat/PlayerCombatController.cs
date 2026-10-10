@@ -181,7 +181,7 @@ namespace Project.Character.Combat
                 // currently is.
                 FaceTarget(targetSelector.CurrentTarget.position);
                 PerformAttack();
-                cooldownRemaining = AttackSpeedCalculator.GetAttackIntervalSeconds(playerStats.CurrentSubStats.Aspd);
+                cooldownRemaining = GetAttackIntervalSeconds();
             }
         }
 
@@ -251,7 +251,7 @@ namespace Project.Character.Combat
             // it — so the animation and the cooldown it's tied to are never
             // out of sync. Which clip the Attack state plays comes from the
             // equipped weapon (see PlayerWeaponAnimationBinder).
-            animatorController?.SetAttackDuration(AttackSpeedCalculator.GetAttackIntervalSeconds(playerStats.CurrentSubStats.Aspd));
+            animatorController?.SetAttackDuration(GetAttackIntervalSeconds());
 
             if (classController.CurrentClass == CharacterClass.Mage)
             {
@@ -307,6 +307,13 @@ namespace Project.Character.Combat
             }
         }
 
+        private float GetAttackIntervalSeconds()
+        {
+            var weapon = GetMainHandWeapon();
+            var weaponMultiplier = weapon != null ? weapon.AttackSpeedMultiplier : 1f;
+            return AttackSpeedCalculator.GetAttackIntervalSeconds(playerStats.CurrentSubStats.Aspd, weaponMultiplier);
+        }
+
         private ItemDefinition GetMainHandWeapon()
         {
             return equipment.GetEquippedItems(EquipmentSlot.LeftHand).FirstOrDefault();
@@ -356,7 +363,11 @@ namespace Project.Character.Combat
                 damage += playerStats.GetRaceDamageBonus(target.Race);
             }
 
-            ResolveOutcome(target, projectilePrefab, () => target.TakeDamage(damage, element, category, isCriticalHit, transform));
+            ResolveOutcome(target, projectilePrefab, () =>
+            {
+                target.TakeDamage(damage, element, category, isCriticalHit, transform);
+                ElementalBonusDamage.Apply(target, damage, playerStats.FireDamagePercent, Element.Fire, transform);
+            });
         }
 
         /// <summary>

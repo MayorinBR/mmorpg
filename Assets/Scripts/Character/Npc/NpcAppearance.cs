@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Project.Character.Appearance;
 using Project.Character.Combat;
 using Project.Character.Head;
 using Project.Character.Stats;
@@ -8,8 +9,8 @@ using Project.Items;
 namespace Project.Character.Npc
 {
     /// <summary>
-    /// Look of an NPC built on a Male_Body or Female_Body prefab variant: a head shape and a list of
-    /// clothing items. Clothes are ordinary skinned equipment items, so they reuse the item prefabs
+    /// Look of an NPC built on a Male_Body or Female_Body prefab variant: a skin tone, a head shape and a
+    /// list of clothing items. Clothes are ordinary skinned equipment items, so they reuse the item prefabs
     /// and hide the body regions they cover. The look is applied when the NPC starts, and the
     /// inspector applies it in the editor as a preview. Hair is configured on its own component.
     /// </summary>
@@ -21,6 +22,9 @@ namespace Project.Character.Npc
 
         [Tooltip("Body of this NPC. Selects the head models and the gender specific item models.")]
         [SerializeField] private CharacterGender gender;
+
+        [Tooltip("Skin color painted over the skin areas of the body and head.")]
+        [SerializeField] private SkinTone skinTone;
 
         [SerializeField] private HeadCatalog headCatalog;
 
@@ -41,7 +45,7 @@ namespace Project.Character.Npc
         }
 
         /// <summary>
-        /// Applies the head shape and the outfit to the character.
+        /// Applies the skin tone, the head shape and the outfit to the character.
         /// </summary>
         public void Rebuild()
         {
@@ -59,6 +63,7 @@ namespace Project.Character.Npc
 
             var covered = ApplyOutfit(animator.transform);
             BodyVisibility.Apply(animator, covered, neckClipHeight);
+            SkinTint.Apply(animator.gameObject, SkinTonePalette.Resolve(skinTone));
         }
 
         private BodyPart ApplyOutfit(Transform root)

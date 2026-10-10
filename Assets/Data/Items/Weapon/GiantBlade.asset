@@ -13,28 +13,30 @@ MonoBehaviour:
   m_Name: GiantBlade
   m_EditorClassIdentifier: Project.Items::Project.Items.ItemDefinition
   itemName: Giant Blade
-  description: Giant Blade placeholder.
+  description: A massive two-handed blade that trades speed for raw power.
   icon: {fileID: 0}
   isStackable: 0
   maxStackSize: 1
   itemType: 2
   requiredSlots: 0300000004000000
   statBonuses:
-    strength: 0
+    strength: 6
     agility: 0
     vitality: 0
     intelligence: 0
     dexterity: 0
     luck: 0
   requiredLevel: 1
-  allowedClasses: 
-  weight: 10
+  allowedClasses: 00000000
+  weight: 14
   canBeOffHand: 0
   weaponType: 0
   weaponSubtype: 3
+  weaponAttack: 70
   attackRange: 1.5
-  buyPrice: 0
-  sellPrice: 0
+  attackSpeedMultiplier: 0.8
+  buyPrice: 800
+  sellPrice: 320
   consumableEffectType: 0
   healthRestore: 0
   manaRestore: 0

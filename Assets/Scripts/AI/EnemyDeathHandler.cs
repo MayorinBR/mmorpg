@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
-using Project.Character.Combat;
 using Project.Combat;
 using Project.Items;
 using Project.World;
@@ -9,7 +8,7 @@ using Project.World;
 namespace Project.AI
 {
     /// <summary>
-    /// Reacts to the enemy's death by granting experience, spawning loot,
+    /// Reacts to the enemy's death by publishing its experience reward, spawning loot,
     /// hiding the enemy, waiting a fixed delay, then reviving it at its
     /// spawn point. Also saves and restores this enemy's position, current
     /// health, alive/dead status, whether it was actively engaging the
@@ -30,8 +29,6 @@ namespace Project.AI
         [SerializeField] private Renderer visualRenderer;
         [SerializeField] private Renderer[] additionalRenderers;
         [SerializeField] private GameObject healthBarRoot;
-        [SerializeField] private PlayerExperience playerExperience;
-        [SerializeField] private PlayerJobProgress playerJobProgress;
         [SerializeField] private ItemPickup itemPickupPrefab;
         [SerializeField] private float dropSpreadRadius = 1.5f;
         [SerializeField] private float respawnDelaySeconds = 5f;
@@ -94,40 +91,13 @@ namespace Project.AI
         private void HandleDeath()
         {
             EnemyDeathEvents.RaiseEnemyKilled(controller.Stats);
-            ResolvePlayerProgression();
 
-            if (playerExperience != null)
-            {
-                var experienceReward = levelController != null ? levelController.ScaledExperienceReward : controller.Stats.ExperienceReward;
-                playerExperience.AddExperience(experienceReward);
-            }
-
-            if (playerJobProgress != null)
-            {
-                var jobExperienceReward = levelController != null ? levelController.ScaledJobExperienceReward : controller.Stats.JobExperienceReward;
-                playerJobProgress.AddExperience(jobExperienceReward);
-            }
+            var experienceReward = levelController != null ? levelController.ScaledExperienceReward : controller.Stats.ExperienceReward;
+            var jobExperienceReward = levelController != null ? levelController.ScaledJobExperienceReward : controller.Stats.JobExperienceReward;
+            EnemyDeathEvents.RaiseExperienceAwarded(experienceReward, jobExperienceReward);
 
             SpawnLoot();
             BeginRespawn(respawnDelaySeconds);
-        }
-
-        /// <summary>
-        /// Finds the persisted player's experience and job components when they were not assigned in the
-        /// Inspector. A prefab cannot reference a scene object, and the player now lives in the bootstrap
-        /// scene rather than in each map, so the references are resolved at kill time instead.
-        /// </summary>
-        private void ResolvePlayerProgression()
-        {
-            if (playerExperience == null)
-            {
-                playerExperience = FindFirstObjectByType<PlayerExperience>();
-            }
-
-            if (playerJobProgress == null)
-            {
-                playerJobProgress = FindFirstObjectByType<PlayerJobProgress>();
-            }
         }
 
         private void SpawnLoot()

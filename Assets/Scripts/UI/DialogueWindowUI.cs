@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Project.Character.Combat;
 using Project.Character.Movement;
+using Project.Character.Stats;
 using Project.NPC;
 using Project.Quests;
 
@@ -33,6 +36,11 @@ namespace Project.UI
         [SerializeField] private TMP_Text lineText;
         [SerializeField] private DialogueOptionButtonUI optionButtonPrefab;
         [SerializeField] private Transform optionsParent;
+
+        [Header("Class promotion")]
+        [SerializeField] private QuestManager questManager;
+        [SerializeField] private PlayerClassController classController;
+        [SerializeField] private PlayerJobProgress jobProgress;
 
         private readonly List<DialogueOptionButtonUI> optionViews = new List<DialogueOptionButtonUI>();
 
@@ -110,7 +118,8 @@ namespace Project.UI
                 portraitImage.sprite = portrait;
             }
 
-            BuildOptions(dialogue != null ? dialogue.Options : Array.Empty<NpcDialogueOption>());
+            var options = dialogue != null ? dialogue.Options : Array.Empty<NpcDialogueOption>();
+            BuildOptions(options.Select(option => (option.OptionText, (Action)(() => HandleOptionClicked(option)))));
         }
 
         /// <summary>Closes this window, if open.</summary>
@@ -120,7 +129,7 @@ namespace Project.UI
             Closed?.Invoke();
         }
 
-        private void BuildOptions(NpcDialogueOption[] options)
+        private void BuildOptions(IEnumerable<(string text, Action onClick)> options)
         {
             foreach (var view in optionViews)
             {
@@ -132,13 +141,19 @@ namespace Project.UI
             foreach (var option in options)
             {
                 var view = Instantiate(optionButtonPrefab, optionsParent);
-                view.Setup(option.OptionText, () => HandleOptionClicked(option));
+                view.Setup(option.text, option.onClick);
                 optionViews.Add(view);
             }
         }
 
         private void HandleOptionClicked(NpcDialogueOption option)
         {
+            if (option.Action == NpcDialogueOptionAction.ClassPromotion && currentNpc.GetComponent<PromotionNpc>() != null)
+            {
+                ShowPromotion(currentNpc.GetComponent<PromotionNpc>());
+                return;
+            }
+
             Close();
 
             if (option.Action == NpcDialogueOptionAction.OpenShop && currentNpc.ShopKeeper != null)
@@ -163,6 +178,69 @@ namespace Project.UI
                     QuestBoardRequested?.Invoke(board);
                 }
             }
+        }
+
+        private void ShowPromotion(PromotionNpc npc)
+        {
+            var quest = npc.PromotionQuest;
+            var leave = ("Leave.", (Action)Close);
+
+            if (classController.CurrentClass != CharacterClass.Novice)
+            {
+                ShowDynamic("You have already chosen your path. Walk it well.", leave);
+            }
+            else if (questManager.IsCompleted(quest))
+            {
+                ShowClassChoices(npc, leave);
+            }
+            else if (questManager.IsActive(quest))
+            {
+                ShowDynamic("Finish the trial first, then come back to me.\n\n" + quest.Description, leave);
+            }
+            else if (jobProgress.JobLevel < ClassProgression.EvolutionJobLevel)
+            {
+                ShowDynamic($"Come back when you reach Job Level {ClassProgression.EvolutionJobLevel}.", leave);
+            }
+            else
+            {
+                ShowDynamic(quest.Description, ("Accept the trial.", () =>
+                {
+                    questManager.AcceptQuest(quest);
+                    Close();
+                }), leave);
+            }
+        }
+
+        private void ShowClassChoices(PromotionNpc npc, (string, Action) leave)
+        {
+            if (!classController.CanEvolve)
+            {
+                ShowDynamic($"Reach Job Level {ClassProgression.EvolutionJobLevel} and spend every skill point before choosing a class.", leave);
+                return;
+            }
+
+            var choices = npc.OfferedClasses
+                .Select(target => ($"Become a {target}.", (Action)(() => ConfirmClass(target))))
+                .Append(leave)
+                .ToArray();
+
+            ShowDynamic("The trial is done. Which path will you take?", choices);
+        }
+
+        private void ConfirmClass(CharacterClass target)
+        {
+            classController.TryEvolve(target);
+            Close();
+        }
+
+        private void ShowDynamic(string line, params (string text, Action onClick)[] options)
+        {
+            if (lineText != null)
+            {
+                lineText.text = line;
+            }
+
+            BuildOptions(options);
         }
 
         private void HandleMovementStarted()

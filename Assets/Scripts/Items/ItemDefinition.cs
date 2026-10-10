@@ -32,6 +32,10 @@ namespace Project.Items
         [SerializeField] private WeaponType weaponType = WeaponType.Melee;
         [SerializeField] private WeaponSubtype weaponSubtype = WeaponSubtype.Unarmed;
         [SerializeField] private float attackRange = 1.5f;
+        [Tooltip("This weapon's own attack power, added flat to the wielder's Status ATK while it is in the main hand. Only meaningful for weapons.")]
+        [SerializeField, Min(0)] private int weaponAttack;
+        [Tooltip("Multiplier on the wielder's auto-attack speed while this weapon is in the main hand. 1 keeps the speed unchanged, above 1 attacks faster, below 1 slower.")]
+        [SerializeField, Range(0.25f, 3f)] private float attackSpeedMultiplier = 1f;
         [SerializeField] private int buyPrice;
         [SerializeField] private int sellPrice;
         [SerializeField] private ConsumableEffectType consumableEffectType = ConsumableEffectType.Instant;
@@ -99,6 +103,12 @@ namespace Project.Items
 
         /// <summary>Gets the basic-attack range this weapon grants while equipped. Only meaningful for hand-slot weapons.</summary>
         public float AttackRange => attackRange;
+
+        /// <summary>Gets the flat attack power this weapon adds to its wielder's Status ATK while equipped in the main hand.</summary>
+        public int WeaponAttack => weaponAttack;
+
+        /// <summary>Gets the multiplier this weapon applies to its wielder's auto-attack speed while equipped in the main hand. 1 means no change.</summary>
+        public float AttackSpeedMultiplier => attackSpeedMultiplier;
 
         /// <summary>Gets the Zeny cost to buy this item from a shop.</summary>
         public int BuyPrice => buyPrice;

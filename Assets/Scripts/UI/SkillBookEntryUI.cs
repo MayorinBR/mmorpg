@@ -28,6 +28,111 @@ namespace Project.UI
         private PlayerExperience experience;
         private Image dragIcon;
 
+        private static readonly Color TextColor = new Color(0.15f, 0.17f, 0.22f, 1f);
+
+        /// <summary>The width of a card created by <see cref="CreateCard"/>.</summary>
+        public const float CardWidth = 72f;
+
+        /// <summary>The height of a card created by <see cref="CreateCard"/>.</summary>
+        public const float CardHeight = 90f;
+
+        /// <summary>
+        /// Builds a compact skill card at runtime: icon, name, level and a
+        /// learn button. Mana cost, cooldown and description are left to the
+        /// shared <see cref="SkillTooltipUI"/> shown on hover. The card is
+        /// assembled while inactive so <c>Awake</c> only runs once every
+        /// reference is assigned.
+        /// </summary>
+        /// <param name="parent">The transform the card is parented to.</param>
+        /// <returns>The new, active card.</returns>
+        public static SkillBookEntryUI CreateCard(Transform parent)
+        {
+            var root = new GameObject("SkillCard", typeof(RectTransform), typeof(Image));
+            root.SetActive(false);
+            root.transform.SetParent(parent, false);
+            root.GetComponent<Image>().color = Color.clear;
+
+            var card = root.AddComponent<SkillBookEntryUI>();
+
+            var icon = CreateChild("Icon", root.transform, typeof(Image)).GetComponent<Image>();
+            icon.raycastTarget = false;
+            var iconRect = icon.rectTransform;
+            iconRect.anchorMin = iconRect.anchorMax = iconRect.pivot = new Vector2(0.5f, 1f);
+            iconRect.sizeDelta = new Vector2(44f, 44f);
+            iconRect.anchoredPosition = new Vector2(0f, -4f);
+
+            var nameLabel = CreateLabel("Name", root.transform, 10f, TextAlignmentOptions.Center);
+            var nameRect = nameLabel.rectTransform;
+            nameRect.anchorMin = new Vector2(0f, 0f);
+            nameRect.anchorMax = new Vector2(1f, 0f);
+            nameRect.pivot = new Vector2(0.5f, 0f);
+            nameRect.sizeDelta = new Vector2(-4f, 24f);
+            nameRect.anchoredPosition = new Vector2(0f, 26f);
+            nameLabel.color = TextColor;
+            nameLabel.enableAutoSizing = true;
+            nameLabel.fontSizeMin = 7f;
+            nameLabel.fontSizeMax = 10f;
+
+            var levelLabel = CreateLabel("Level", root.transform, 11f, TextAlignmentOptions.MidlineLeft);
+            var levelRect = levelLabel.rectTransform;
+            levelRect.anchorMin = levelRect.anchorMax = levelRect.pivot = Vector2.zero;
+            levelRect.sizeDelta = new Vector2(44f, 20f);
+            levelRect.anchoredPosition = new Vector2(5f, 3f);
+            levelLabel.color = TextColor;
+
+            var buttonObject = CreateChild("Learn", root.transform, typeof(Image), typeof(Button));
+            var buttonRect = (RectTransform)buttonObject.transform;
+            buttonRect.anchorMin = buttonRect.anchorMax = buttonRect.pivot = new Vector2(1f, 0f);
+            buttonRect.sizeDelta = new Vector2(20f, 20f);
+            buttonRect.anchoredPosition = new Vector2(-4f, 3f);
+            buttonObject.GetComponent<Image>().color = new Color(0.25f, 0.45f, 0.85f, 1f);
+
+            var plus = CreateLabel("Plus", buttonObject.transform, 14f, TextAlignmentOptions.Center);
+            plus.text = "+";
+            plus.fontStyle = FontStyles.Bold;
+            Stretch(plus.rectTransform);
+
+            card.iconImage = icon;
+            card.nameText = nameLabel;
+            card.levelText = levelLabel;
+            card.learnButton = buttonObject.GetComponent<Button>();
+            root.SetActive(true);
+            return card;
+        }
+
+        private static GameObject CreateChild(string childName, Transform parent, params System.Type[] components)
+        {
+            var child = new GameObject(childName, typeof(RectTransform));
+
+            foreach (var component in components)
+            {
+                child.AddComponent(component);
+            }
+
+            child.transform.SetParent(parent, false);
+            return child;
+        }
+
+        private static TMP_Text CreateLabel(string labelName, Transform parent, float size, TextAlignmentOptions alignment)
+        {
+            var label = CreateChild(labelName, parent, typeof(TextMeshProUGUI)).GetComponent<TextMeshProUGUI>();
+            label.fontSize = size;
+            label.alignment = alignment;
+            label.color = Color.white;
+            label.raycastTarget = false;
+            label.textWrappingMode = TextWrappingModes.Normal;
+            label.overflowMode = TextOverflowModes.Ellipsis;
+            return label;
+        }
+
+        private static void Stretch(RectTransform rect)
+        {
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+        }
+
         /// <summary>Gets the skill this row represents.</summary>
         public SkillDefinition Skill { get; private set; }
 
@@ -58,8 +163,17 @@ namespace Project.UI
             experience = playerExperience;
             iconImage.sprite = skill.Icon;
             nameText.text = skill.SkillName;
-            manaCostText.text = skill.EffectType == SkillEffectType.Passive ? "Passive" : $"{skill.ManaCost} SP";
-            cooldownText.text = skill.EffectType == SkillEffectType.Passive ? string.Empty : $"{skill.CooldownSeconds:0.#}s";
+
+            if (manaCostText != null)
+            {
+                manaCostText.text = skill.EffectType == SkillEffectType.Passive ? "Passive" : $"{skill.ManaCost} SP";
+            }
+
+            if (cooldownText != null)
+            {
+                cooldownText.text = skill.EffectType == SkillEffectType.Passive ? string.Empty : $"{skill.CooldownSeconds:0.#}s";
+            }
+
             Refresh();
         }
 
@@ -70,6 +184,7 @@ namespace Project.UI
             levelText.text = $"{level}/{Skill.MaxLevel}";
             var meetsLevelRequirement = experience == null || experience.CurrentLevel >= Skill.RequiredLevel;
             learnButton.interactable = level < Skill.MaxLevel && meetsLevelRequirement;
+            iconImage.color = level > 0 ? Color.white : new Color(1f, 1f, 1f, 0.5f);
         }
 
         public void OnPointerEnter(PointerEventData eventData)
