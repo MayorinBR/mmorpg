@@ -12,28 +12,47 @@
         "headModelId": "",
         "bodyModelId": ""
     },
-    "baseLevel": 4,
-    "baseExperience": 18,
+    "baseLevel": 5,
+    "baseExperience": 34,
     "strength": 17,
     "agility": 1,
     "vitality": 1,
     "intelligence": 1,
     "dexterity": 1,
     "luck": 1,
-    "availableStatPoints": 19,
-    "jobLevel": 2,
-    "jobExperience": 18,
-    "availableSkillPoints": 1,
+    "availableStatPoints": 22,
+    "jobLevel": 10,
+    "jobExperience": 0,
+    "availableSkillPoints": 0,
     "characterClassIndex": 6,
     "classPathIndices": [
         6
     ],
     "zeny": 0,
     "mageElementIndex": 5,
-    "learnedSkillIds": [],
-    "learnedSkillLevels": [],
+    "learnedSkillIds": [
+        "BasicHeal",
+        "PowerUp",
+        "PlayDead",
+        "SecondWind",
+        "QuickStep",
+        "Toughness",
+        "Insight",
+        "Fortune"
+    ],
+    "learnedSkillLevels": [
+        1,
+        2,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+    ],
     "hotbarSkillIds": [
         "BasicHeal",
+        "PowerUp",
         "PlayDead",
         "",
         "",
@@ -41,15 +60,14 @@
         "",
         "",
         "",
-        "",
-        ""
+        "SecondWind"
     ],
     "inventoryItemIds": [
         "TestItem",
-        "",
-        "",
-        "",
-        "",
+        "BlackShoes",
+        "RangerArmor",
+        "Katana",
+        "BlackShoes",
         "",
         "",
         "",
@@ -68,10 +86,10 @@
     ],
     "inventoryQuantities": [
         2,
-        0,
-        0,
-        0,
-        0,
+        1,
+        1,
+        1,
+        1,
         0,
         0,
         0,
@@ -88,22 +106,34 @@
         0,
         0
     ],
-    "equippedItemIds": [],
-    "equippedSlotMasks": [],
+    "equippedItemIds": [
+        "IronSword",
+        "PlateArmor",
+        "TestRing",
+        "RangerBoots",
+        "BasicPants"
+    ],
+    "equippedSlotMasks": [
+        8,
+        4,
+        128,
+        64,
+        32
+    ],
     "equippedAmmoCount": 0,
     "windowIds": [
-        "SkillHotbar",
         "Equipment",
         "Inventory",
         "Stats",
         "QuestLog",
+        "SkillHotbar",
         "SkillBook"
     ],
     "windowIsOpen": [
         0,
         0,
         0,
-        0,
+        1,
         0,
         0
     ],
@@ -116,35 +146,41 @@
         0
     ],
     "windowHasCustomPosition": [
+        1,
         0,
         0,
-        0,
-        0,
-        0,
+        1,
+        1,
         1
     ],
     "windowPositionX": [
+        512.25439453125,
         0.0,
         0.0,
-        0.0,
-        0.0,
-        0.0,
-        726.5244750976563
+        1002.8819580078125,
+        632.6607055664063,
+        738.9027099609375
     ],
     "windowPositionY": [
+        -206.11358642578126,
         0.0,
         0.0,
-        0.0,
-        0.0,
-        0.0,
-        -324.31024169921877
+        -334.39691162109377,
+        -590.9639892578125,
+        -83.49749755859375
     ],
-    "currentMapId": "Prototype_Map01",
+    "currentMapId": "Prototype_Map02",
     "hasSavedPosition": true,
-    "positionX": 0.0,
-    "positionY": 0.10076157003641129,
-    "positionZ": 0.0,
-    "activeQuestIds": [],
-    "activeQuestProgress": [],
+    "positionX": -20.198974609375,
+    "positionY": 0.08333301544189453,
+    "positionZ": -7.971797943115234,
+    "activeQuestIds": [
+        "HuntPoringsQuest",
+        "PoporingCullingQuest"
+    ],
+    "activeQuestProgress": [
+        "0,2",
+        "0"
+    ],
     "completedQuestIds": []
 }

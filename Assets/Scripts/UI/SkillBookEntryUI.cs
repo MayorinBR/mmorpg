@@ -73,11 +73,11 @@ namespace Project.UI
             nameLabel.fontSizeMin = 7f;
             nameLabel.fontSizeMax = 10f;
 
-            var levelLabel = CreateLabel("Level", root.transform, 11f, TextAlignmentOptions.MidlineLeft);
+            var levelLabel = CreateLabel("Level", root.transform, 11f, TextAlignmentOptions.MidlineRight);
             var levelRect = levelLabel.rectTransform;
             levelRect.anchorMin = levelRect.anchorMax = levelRect.pivot = Vector2.zero;
             levelRect.sizeDelta = new Vector2(44f, 20f);
-            levelRect.anchoredPosition = new Vector2(5f, 3f);
+            levelRect.anchoredPosition = new Vector2(1f, 3f);
             levelLabel.color = TextColor;
 
             var buttonObject = CreateChild("Learn", root.transform, typeof(Image), typeof(Button));
