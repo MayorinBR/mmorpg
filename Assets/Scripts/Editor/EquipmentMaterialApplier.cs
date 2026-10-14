@@ -6,7 +6,8 @@ namespace Project.EditorTools
 {
     /// <summary>
     /// Stage 2 of the equipment pipeline. Finds every equipment model that already has a painted
-    /// <c>&lt;Name&gt;_BaseColor.png</c> next to it, creates the toon material and links it to the model.
+    /// <c>&lt;Name&gt;_BaseColor.png</c> next to it, limits the texture import size, creates the toon material
+    /// and links it to the model.
     /// </summary>
     public static class EquipmentMaterialApplier
     {
@@ -16,6 +17,7 @@ namespace Project.EditorTools
         private const string TextureSuffix = "_BaseColor.png";
         private const string MaterialSuffix = "_Toon.mat";
         private const string BaseMapProperty = "_BaseMap";
+        private const int MaxTextureSize = 1024;
 
         /// <summary>Applies materials to every equipment model that has a painted texture.</summary>
         [MenuItem("Tools/Equipment/Apply Item Materials")]
@@ -30,6 +32,7 @@ namespace Project.EditorTools
 
             var builder = new EquipmentMaterialBuilder(template, MaterialsFolder, MaterialSuffix, BaseMapProperty);
             var linker = new EquipmentMaterialLinker();
+            var textureConfigurator = new EquipmentTextureConfigurator(MaxTextureSize);
             int applied = 0;
 
             foreach (string guid in AssetDatabase.FindAssets("t:Model", new[] { ModelsRoot }))
@@ -38,11 +41,12 @@ namespace Project.EditorTools
                 string itemName = Path.GetFileNameWithoutExtension(modelPath);
                 string texturePath = Path.Combine(Path.GetDirectoryName(modelPath), itemName + TextureSuffix).Replace('\\', '/');
 
-                var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(texturePath);
-                if (texture == null)
+                if (!textureConfigurator.Configure(texturePath))
                 {
                     continue;
                 }
+
+                var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(texturePath);
 
                 Material material = builder.CreateOrUpdate(itemName, texture);
                 if (linker.Link(modelPath, itemName, material))
@@ -53,6 +57,39 @@ namespace Project.EditorTools
 
             AssetDatabase.SaveAssets();
             Debug.Log($"Equipment materials applied: {applied}");
+        }
+    }
+
+    /// <summary>Limits the import resolution of a painted texture without changing the source file.</summary>
+    public sealed class EquipmentTextureConfigurator
+    {
+        private readonly int maxSize;
+
+        /// <summary>Creates a configurator.</summary>
+        /// <param name="maxSize">Largest allowed texture size, in pixels, on both axes.</param>
+        public EquipmentTextureConfigurator(int maxSize)
+        {
+            this.maxSize = maxSize;
+        }
+
+        /// <summary>Sets the importer max size and reimports the texture when it changed.</summary>
+        /// <param name="texturePath">Asset path of the texture.</param>
+        /// <returns>True when the texture exists and now respects the size limit.</returns>
+        public bool Configure(string texturePath)
+        {
+            var importer = AssetImporter.GetAtPath(texturePath) as TextureImporter;
+            if (importer == null)
+            {
+                return false;
+            }
+
+            if (importer.maxTextureSize != maxSize)
+            {
+                importer.maxTextureSize = maxSize;
+                importer.SaveAndReimport();
+            }
+
+            return true;
         }
     }
 
