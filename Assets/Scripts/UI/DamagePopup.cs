@@ -153,6 +153,23 @@ namespace Project.UI
             return CreatePopup(skillName, worldPosition, SkillNameBackgroundColor, SkillNameTextColor, 1f);
         }
 
+        /// <summary>
+        /// Subscribes once per Play Mode session to
+        /// <see cref="SkillAnnouncementChannel"/>, so skill casts announced
+        /// by assemblies that cannot reference this one still show a popup.
+        /// </summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void SubscribeToSkillAnnouncements()
+        {
+            SkillAnnouncementChannel.SkillAnnounced -= HandleSkillAnnounced;
+            SkillAnnouncementChannel.SkillAnnounced += HandleSkillAnnounced;
+        }
+
+        private static void HandleSkillAnnounced(string skillName, Vector3 worldPosition)
+        {
+            CreateSkillName(skillName, worldPosition);
+        }
+
         private static DamagePopup CreatePopup(string text, Vector3 worldPosition, Color backgroundColor, Color textColor, float sizeMultiplier)
         {
             var root = new GameObject("DamagePopup", typeof(RectTransform));

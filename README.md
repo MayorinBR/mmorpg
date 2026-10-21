@@ -34,15 +34,24 @@ Prototype of a 2.5D/3D MMORPG built in Unity, inspired by Ragnarok Online's clas
 - Equipment level/class requirement validation
 - Mob variety: Aggressive/Passive behavior, Poring/Poporing as Prefab Variants
 - `CharacterStatsHolder`: single shared stats reference per character
-- Basic skill system: class-restricted, mana cost/cooldown/range, Damage or Heal effects, 10-slot hotbar, 7 skills covering all 6 classes (3 still missing an icon)
+- Basic skill system: class-restricted, mana cost/cooldown/range, Damage or Heal effects, 10-slot hotbar, skills for every class (many still missing icons)
 - Skill Book and Skill Hotbar windows: drag skills onto hotbar slots; icons show ready/cooldown/unusable state; learn/upgrade by spending Job Level points
 - Class differentiation in basic attacks: range comes from the equipped weapon, except Mage, which always attacks at a fixed ranged distance with the cast animation regardless of what's equipped; Archer uses ammo (weak infinite fallback when out); Thief dual-wields for a second hit; Swordman can block; Mage attacks cost mana and carry a selectable element
 - Elemental damage and resistance: any attack carries an element, including plain physical damage (modeled as Neutral, a real resistable element, not "no element"); an optional per-character resistance/weakness table scales incoming damage of any element, wired to Poring (resists Water, weak to Fire) and Poporing (resists Ground, weak to Electric)
-- Skill targeting: casting a Damage skill with no valid current target shows a ground-ring picker to choose one; a separate ring always marks the current auto-attack target
+- Target rings: each enemy prefab carries a TargetRingMarker with its own white hover ring (cursor over the enemy, for auto-attacks and targeted skills) and red current-target ring, sized per prefab; casting a Damage skill with no valid target lets you pick one by hovering
 - Aggro indicator: a brief overhead "!" flashes above an enemy on fresh detection, retaliation, or re-aggro
 - Floating damage numbers rise above the player and enemies on every hit
 - Updated 3D models for the Player and NPCs (Blacksmith), replacing the original placeholder meshes with custom Humanoid-rigged assets
 - Weapon-aware melee attack animation: unarmed (or dagger, as a temporary placeholder) plays a punching swing, while other melee weapons (sword, axe, etc.) play a dedicated weapon swing — selected automatically from the equipped weapon's subtype
+- Classes: Novice start class (evolves at Job Level 10 through a promotion NPC and a one-time trial quest) plus 6 base classes; Skill Book with one tab per class tier; 63 skills across 7 class databases (Swordman complete, including Magnum Break and two-handed sword mastery)
+- Weapons carry their own ATK and an attack speed multiplier; two-handed swords are Swordman-only
+- Status effects and buff/debuff system (poison, stun, Fatal Blow and others), knockback, Zeny skill costs, Merchant weight limit, extra elements (Ghost, Holy, Poison)
+- Quest system with quest log and quest board, NPC dialogue, courier and kill/collect quests
+- Login, character selection and character creation flow with accounts; per-character save of map and position; multi-map warping and a rotating minimap
+- Character customization: head shape, skin tone, hair and facial expressions; equipment shown on the model through skinned equipment modules
+- Automated equipment pipeline (Blender rigging, manifest, prefab, item asset, materials) with 29 equipment pieces
+- Point-based enemy spawns with per-monster respawn delay and optional boss; King Poporing boss; rigged Wolf enemy
+- Death animation root baked into the pose; target rings stay on the ground under the enemy
 
 ---
 
@@ -76,15 +85,24 @@ Protótipo de um MMORPG 2.5D/3D feito em Unity, inspirado no gameplay clássico 
 - Validação de requisito de nível/classe pra equipar itens
 - Variedade de mob: comportamento Aggressive/Passive, Poring/Poporing como Prefab Variants
 - `CharacterStatsHolder`: referência única de status por personagem
-- Sistema básico de skills: restritas por classe, custo de mana/cooldown/alcance, efeitos de Dano ou Cura, hotbar de 10 slots, 7 skills cobrindo as 6 classes (3 ainda sem ícone)
+- Sistema básico de skills: restritas por classe, custo de mana/cooldown/alcance, efeitos de Dano ou Cura, hotbar de 10 slots, skills para todas as classes (muitas ainda sem ícone)
 - Janelas de Skill Book e Skill Hotbar: arraste skills pra hotbar; ícones mostram estado pronto/cooldown/indisponível; aprenda/upe gastando pontos de Job Level
 - Diferenciação de classes no ataque básico: alcance vem da arma equipada, exceto o Mage, que sempre ataca a uma distância fixa com a animação de conjuração, não importa o que estiver equipado; Archer usa munição (fallback fraco e infinito quando acaba); Thief dá um segundo golpe ao dual-wield; Swordman pode bloquear; ataque do Mage custa mana e tem elemento selecionável
 - Dano e resistência elemental: todo ataque carrega um elemento, incluindo o dano físico comum (modelado como Neutral, um elemento resistível de verdade, não "sem elemento"); uma tabela opcional de resistência/fraqueza por personagem escala o dano recebido de qualquer elemento, já aplicada ao Poring (resiste a Água, fraco contra Fogo) e ao Poporing (resiste a Terra, fraco contra Elétrico)
-- Seleção de alvo para skills: ao usar uma skill de Dano sem alvo válido, um anel no chão aparece para escolher um; um segundo anel marca sempre o alvo atual do auto-attack
+- Anéis de alvo: cada prefab de inimigo tem um TargetRingMarker com anel branco de hover (cursor sobre o inimigo, para auto-attack e skills com alvo) e anel vermelho de alvo atual, com tamanho ajustável por prefab; ao usar uma skill de Dano sem alvo válido, basta passar o mouse para escolher um
 - Indicador de aggro: um "!" flutuante pisca sobre o inimigo ao detectar, revidar ou reengajar o player
 - Números de dano flutuantes sobem sobre o player e os inimigos a cada acerto
 - Modelos 3D atualizados para o Player e NPCs (Blacksmith), substituindo os meshes placeholder originais por assets Humanoid customizados
 - Animação de ataque corpo a corpo sensível à arma: desarmado (ou adaga, como placeholder temporário) toca uma animação de soco, enquanto outras armas corpo a corpo (espada, machado, etc.) tocam um golpe dedicado — escolhido automaticamente a partir do subtipo da arma equipada
+- Classes: Novice como classe inicial (evolui no Job Level 10 por um NPC de promocao e uma quest unica) mais 6 classes base; Skill Book com uma aba por nivel de classe; 63 skills em 7 databases de classe (Swordman completo, incluindo Magnum Break e Two-Handed Sword Mastery)
+- Armas com ATK proprio e multiplicador de velocidade de ataque; espadas de duas maos exclusivas do Swordman
+- Sistema de status effects e buff/debuff (veneno, stun, Fatal Blow e outros), knockback, custo de Zeny em skills, limite de peso do Merchant, elementos extras (Ghost, Holy, Poison)
+- Sistema de quests com quest log e quest board, dialogo de NPC, quests de entrega e de matar/coletar
+- Fluxo de login, selecao e criacao de personagem com contas; save por personagem com mapa e posicao; warp entre mapas e minimap rotativo
+- Customizacao de personagem: formato da cabeca, cor de pele, cabelo e expressoes faciais; equipamentos mostrados no modelo por modulos skinned
+- Pipeline automatizado de equipamentos (rig no Blender, manifesto, prefab, item asset, materiais) com 29 pecas
+- Spawn de inimigos por pontos com tempo de respawn por monstro e boss opcional; boss King Poporing; inimigo Wolf com rig
+- Raiz da animacao de morte embutida na pose; anéis de alvo ficam no chão sob o inimigo
 
 ---
 
@@ -118,7 +136,7 @@ Ragnarok Onlineのクラシックな戦闘(PvE)と探索のゲームプレイに
 - 装備のレベル・職業条件バリデーション
 - モブのバリエーション: Aggressive/Passive行動、PoringとPoporingのPrefab Variant
 - `CharacterStatsHolder`: キャラクターごとに単一のステータス参照
-- 基本スキルシステム: 職業限定、マナコスト/クールダウン/射程、ダメージまたは回復効果、10スロットホットバー、6職業をカバーする7つのスキル(3つはアイコン未設定)
+- 基本スキルシステム: 職業限定、マナコスト/クールダウン/射程、ダメージまたは回復効果、10スロットホットバー、全職業のスキル(多くはアイコン未設定)
 - スキルブックとスキルホットバーのウィンドウ: スキルをホットバーへドラッグ、アイコンで使用可能/クールダウン/使用不可を表示、ジョブレベルのポイントを消費して習得・レベルアップ
 - 基本攻撃における職業ごとの差別化: 攻撃レンジは装備武器から決定(Mageのみ例外で、装備に関係なく常に固定の遠距離レンジと詠唱アニメーションで攻撃)、Archerは矢を消費(尽きると弱い無限射撃にフォールバック)、Thiefは二刀流で2撃目、Swordmanはブロック可能、Mageの攻撃はマナ消費と属性選択付き
 - 属性ダメージと耐性: あらゆる攻撃が属性を持つ(通常の物理ダメージもNeutralという実在する耐性可能な属性として扱われ、「属性なし」ではない)。キャラクターごとの耐性/弱点テーブル(任意設定)がどの属性のダメージも増減させ、Poring(水に耐性、火に弱い)とPoporing(地に耐性、電気に弱い)に設定済み
@@ -127,3 +145,12 @@ Ragnarok Onlineのクラシックな戦闘(PvE)と探索のゲームプレイに
 - ダメージ数値: プレイヤーと敵が被弾するたびに数値が上昇しながら表示される
 - 3Dモデルを更新: プレイヤーとNPC(鍛冶屋)のプレースホルダーメッシュを、カスタムのHumanoidリグ付きモデルに置き換え
 - 武器に応じた近接攻撃アニメーション: 素手(または一時的なプレースホルダーとしてダガー)はパンチの振りを再生し、それ以外の近接武器(剣・斧など)は専用の振りアニメーションを再生 — 装備中の武器サブタイプから自動選択
+- 職業: Noviceが初期職(ジョブレベル10で転職NPCと1回限りの試練クエストを経て進化)と6つの基本職。スキルブックは職業段階ごとのタブ。7つの職業データベースに63スキル(Swordmanは完成、Magnum BreakとTwo-Handed Sword Masteryを含む)
+- 武器は固有のATKと攻撃速度倍率を持つ。両手剣はSwordman専用
+- ステータス異常とバフ/デバフシステム(毒、スタン、Fatal Blowなど)、ノックバック、スキルのゼニーコスト、Merchantの重量上限、追加属性(Ghost、Holy、Poison)
+- クエストログとクエストボード付きのクエストシステム、NPC会話、配達および討伐/収集クエスト
+- アカウント付きのログイン・キャラクター選択・キャラクター作成フロー、キャラクターごとのマップと位置のセーブ、マップ間ワープ、回転ミニマップ
+- キャラクターカスタマイズ: 頭の形、肌の色、髪、表情。装備はスキン付きモジュールでモデルに表示
+- 自動化された装備パイプライン(Blenderでのリグ、マニフェスト、プレハブ、アイテムアセット、マテリアル)、29点の装備
+- ポイント指定の敵スポーン(モンスターごとのリスポーン時間、任意でボス)、ボスKing Poporing、リグ付きのWolf
+- 死亡アニメーションのルートをポーズに焼き込み、ターゲットリングを対象の足元に配置

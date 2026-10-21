@@ -25,8 +25,7 @@ namespace Project.Character.Combat
     /// <see cref="Skills.SkillDefinition"/>'s own Range value (see
     /// <see cref="PlayerSkillCaster"/>). Class still affects other
     /// behavior: Archer, while wielding a Ranged weapon, consumes
-    /// equipped ammo per shot (falling back to a weaker but infinite base
-    /// shot when out of ammo); Mage spends mana per basic attack; Thief
+    /// equipped ammo per shot and cannot attack while out of ammo; Mage spends mana per basic attack; Thief
     /// hits twice when dual-wielding two one-handed weapons. Damage is
     /// applied through <see cref="Project.Combat.IDamageable"/>, the same
     /// contract enemies use.
@@ -83,6 +82,7 @@ namespace Project.Character.Combat
     {
         private const float CriticalDamageMultiplier = 1.4f;
         private const float OffHandDamageMultiplier = 0.5f;
+        private const float AmmoWarningIntervalSeconds = 2f;
 
         [SerializeField] private PlayerStatsController playerStats;
         [SerializeField] private PlayerTargetSelector targetSelector;
@@ -109,9 +109,6 @@ namespace Project.Character.Combat
         // of standing in melee like an unarmed weapon would put it.
         [SerializeField] private float mageAttackRange = 4f;
 
-        [Header("Archer Basic Attack")]
-        [SerializeField, Range(0f, 1f)] private float archerBaseAmmoDamageMultiplier = 0.5f;
-
         [Header("Ranged Projectile (Archer arrow / Mage bolt)")]
         [Tooltip("Visual prefab spawned for the Archer's basic attack while wielding a Ranged weapon. Left empty, that attack hits instantly with no travel delay, same as every melee attack.")]
         [SerializeField] private GameObject arrowProjectilePrefab;
@@ -129,6 +126,7 @@ namespace Project.Character.Combat
         [SerializeField] private bool releaseProjectileOnAnimationEvent;
 
         private float cooldownRemaining;
+        private float nextAmmoWarningTime;
         private System.Action pendingProjectileRelease;
 
         private void Update()
@@ -225,9 +223,17 @@ namespace Project.Character.Combat
                 return mana.CurrentMana >= mageManaCostPerAttack;
             }
 
-            // Archer always attacks: real ammo while wielding a Ranged
-            // weapon, an infinite weaker base shot otherwise. Every other
-            // class is unrestricted.
+            if (classController.CurrentClass == CharacterClass.Archer && equipment.IsMainHandWeaponRanged() && equipment.EquippedAmmoCount <= 0)
+            {
+                if (Time.time >= nextAmmoWarningTime)
+                {
+                    nextAmmoWarningTime = Time.time + AmmoWarningIntervalSeconds;
+                    PlayerFeedbackChannel.Publish("No ammo equipped.");
+                }
+
+                return false;
+            }
+
             return true;
         }
 
@@ -277,10 +283,7 @@ namespace Project.Character.Combat
 
             if (classController.CurrentClass == CharacterClass.Archer && isRanged)
             {
-                if (!equipment.TryConsumeAmmo())
-                {
-                    baseDamage = Mathf.Max(1, Mathf.RoundToInt(baseDamage * archerBaseAmmoDamageMultiplier));
-                }
+                equipment.TryConsumeAmmo();
             }
 
             // Only the Mage's basic attack carries a "real" element today —
@@ -420,6 +423,25 @@ namespace Project.Character.Combat
                     applyOutcome();
                 }
             });
+        }
+
+        /// <summary>
+        /// Fires the arrow or bolt visual at a target for a skill cast, using the same prefabs, speed and
+        /// origin as the basic attack. Purely cosmetic: the skill's outcome is decided by the caster.
+        /// </summary>
+        /// <param name="magical">True for the Mage's bolt, false for the Archer's arrow.</param>
+        /// <param name="target">The transform the projectile flies to.</param>
+        public void SpawnSkillProjectile(bool magical, Transform target)
+        {
+            var prefab = magical ? boltProjectilePrefab : arrowProjectilePrefab;
+
+            if (prefab == null || target == null)
+            {
+                return;
+            }
+
+            var origin = projectileOrigin != null ? projectileOrigin.position : transform.position;
+            Projectile.Spawn(prefab, origin, target, projectileSpeed, null);
         }
 
         /// <summary>

@@ -13,23 +13,87 @@ MonoBehaviour:
   m_Name: SafetyWall
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
   skillName: Safety Wall
-  description: Creates a barrier that blocks melee physical attacks against anyone standing inside it, for a limited duration.
+  description: Creates a barrier that blocks melee physical attacks against anyone
+    standing inside it, for a limited duration.
   icon: {fileID: 0}
   allowedClasses: 05000000
   effectType: 4
   targetType: 5
   maxLevel: 1
-  manaCost: 20
+  manaCost: 30
   cooldownSeconds: 15
-  range: 4
+  range: 7
+  fixedCastSeconds: 0
+  fixedCastPerLevel: 0
+  variableCastSeconds: 4.4
+  variableCastPerLevel: -0.8
+  requiredLevel: 0
+  zenyCost: 0
+  requiredWeaponSubtypes: 
+  ammoCost: 0
+  bonusDamageRace: 0
+  bonusDamageRaceMultiplier: 1
+  buffRevealsHidden: 0
   damageType: 0
   damageMultiplierPerLevel: 0
+  damageBaseMultiplier: 0
+  healthCost: 0
+  healthCostReductionPerTwoLevels: 0
+  selfFireDamageBonusPercent: 0
   element: 0
+  accuracyBonusPerLevel: 0
+  isAreaOfEffect: 0
   areaRadius: 1.5
+  inflictedStatus: 0
+  inflictedStatusDurationSeconds: 0
+  inflictedStatusDurationPerLevel: 0
+  poisonDamagePerTickPerLevel: 0
+  successChancePerLevel: 0
+  knockbackDistance: 0
+  buffPreventsFlinch: 0
+  immuneToUndeadAndBoss: 0
+  requiredJobLevel: 0
+  passiveAttackBonusPerLevel: 0
+  passiveRequiredWeaponSubtypes: 
+  passiveDexBonusPerLevel: 0
+  passiveHitBonusPerLevel: 0
+  passiveRangeBonusPerLevel: 0
+  passiveFleeBonusPerLevel: 0
+  passiveWeightLimitBonusPerLevel: 0
+  passiveRaceDamageBonusPerLevel: 0
+  passiveRaceDefenseBonusPerLevel: 0
+  augmentsSkill: {fileID: 0}
+  stunChancePerAugmentedLevel: 0
+  stunDurationSeconds: 0
+  passiveRegenFlatPerLevel: 0
+  passiveRegenPercentOfMaxHealthPerLevel: 0
+  passiveHealItemBonusPerLevel: 0
+  passiveSpRegenMultiplierPerLevel: 0
+  passiveRemovesMovementRegenPenalty: 0
+  healAmount: 0
+  buffAtkPercentPerLevel: 0
+  buffDefPercentPerLevel: 0
+  buffMdefBonusPerLevel: 0
+  buffDurationSeconds: 0
+  buffDurationPerLevel: 0
+  buffStatBonusPerLevel:
+    strength: 0
+    agility: 0
+    vitality: 0
+    intelligence: 0
+    dexterity: 0
+    luck: 0
+  buffAspdPercentPerLevel: 0
+  buffMaxHealthPerLevel: 0
   zonePrefab: {fileID: 0}
   zoneDurationSeconds: 10
   zoneDurationPerLevel: 0
   zoneTickIntervalSeconds: 1
-  healAmount: 0
   blocksAttacks: 1
   blockedWeaponType: 0
+  toggleDrainIncomingDamageReductionPercentPerLevel: 0
+  toggleDrainManaPerSecond: 0
+  craftingRecipe: {fileID: 0}
+  requiresNearWater: 0
+  requiredItem: {fileID: 11400000, guid: 214a11428c8a4d347b86f47a9c1ae3c8, type: 2}
+  requiredItemCount: 1

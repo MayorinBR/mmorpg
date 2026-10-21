@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 namespace Project.UI
 {
@@ -18,6 +19,10 @@ namespace Project.UI
         [SerializeField] private TMP_Text nameText;
         [SerializeField] private Vector2 offsetFromPointer = new Vector2(16f, -16f);
 
+        private static readonly Color BackgroundColor = new Color(UiTheme.Ink.r, UiTheme.Ink.g, UiTheme.Ink.b, 0.95f);
+
+        private const float TextPadding = 8f;
+
         private Canvas parentCanvas;
 
         private void Awake()
@@ -33,6 +38,23 @@ namespace Project.UI
 
             Instance = this;
             parentCanvas = GetComponentInParent<Canvas>();
+
+            if (root.TryGetComponent<Image>(out var background))
+            {
+                background.color = BackgroundColor;
+            }
+
+            nameText.color = Color.white;
+            nameText.alignment = TextAlignmentOptions.Center;
+            nameText.verticalAlignment = VerticalAlignmentOptions.Middle;
+            var textRect = nameText.rectTransform;
+            if (textRect.parent == root.transform)
+            {
+                textRect.anchorMin = Vector2.zero;
+                textRect.anchorMax = Vector2.one;
+                textRect.offsetMin = new Vector2(TextPadding, 0f);
+                textRect.offsetMax = new Vector2(-TextPadding, 0f);
+            }
             Hide();
         }
 

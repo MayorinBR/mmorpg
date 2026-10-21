@@ -75,6 +75,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1493484833918569187, guid: 42832da890f68a743bb17b0830ce988d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4690526889807829553}
+    - targetCorrespondingSourceObject: {fileID: 1493484833918569187, guid: 42832da890f68a743bb17b0830ce988d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7100000000000000042}
   m_SourcePrefab: {fileID: 100100000, guid: 42832da890f68a743bb17b0830ce988d, type: 3}
 --- !u!1 &5768777102145201641 stripped
 GameObject:
@@ -161,3 +164,19 @@ MonoBehaviour:
   spawnOffset: {x: 0, y: 1.4403039, z: 0}
   horizontalJitter: 0.3
   regenController: {fileID: 0}
+--- !u!114 &7100000000000000042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5768777102145201641}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c8f1d52a7e94b60b1d2f4a6c9e07d85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.UI::Project.UI.TargetRingMarker
+  radius: 1.0
+  groundOffset: 0.05
+  hoverMaterial: {fileID: 2100000, guid: 4a9e2b7d1c6f4e3a8b5d0f9c2e1a7b64, type: 2}
+  targetMaterial: {fileID: 2100000, guid: 8d2f6c1a9b3e4d70a5c8e1f4b7d2a903, type: 2}

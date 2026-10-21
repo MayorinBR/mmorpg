@@ -13,18 +13,20 @@ MonoBehaviour:
   m_Name: ImproveConcentration
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
   skillName: Improve Concentration
-  description: Temporarily boosts the caster's own AGI and DEX.
+  description: Temporarily boosts the caster's own AGI and DEX, and reveals hidden enemies nearby.
   icon: {fileID: 0}
   allowedClasses: 01000000
   effectType: 3
   targetType: 0
   maxLevel: 5
-  manaCost: 20
+  manaCost: 45
   cooldownSeconds: 20
   range: 0
+  areaRadius: 2.5
+  buffRevealsHidden: 1
   damageType: 0
   damageMultiplierPerLevel: 1
   healAmount: 10
   buffDurationSeconds: 0
   buffDurationPerLevel: 48
-  buffStatBonusPerLevel: {strength: 0, agility: 3, vitality: 0, intelligence: 0, dexterity: 3, luck: 0}
+  buffStatBonusPerLevel: {strength: 0, agility: 2, vitality: 0, intelligence: 0, dexterity: 2, luck: 0}

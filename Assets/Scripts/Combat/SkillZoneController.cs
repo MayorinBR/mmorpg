@@ -32,6 +32,8 @@ namespace Project.Combat
         private float durationRemaining;
         private float tickRemaining;
         private AttackRangeKind? blockedRangeKind;
+        private int maxHits;
+        private int hitsDealt;
 
         /// <summary>
         /// Spawns a new zone at <paramref name="position"/>, using
@@ -73,8 +75,10 @@ namespace Project.Combat
         /// <param name="element">The element this zone's damage carries.</param>
         /// <param name="category">Whether this damage is mitigated by physical or magical defense.</param>
         /// <param name="caster">The transform that cast the skill, passed to <see cref="IDamageable.TakeDamage"/> so a hit enemy can aggro onto it, the same as any other skill hit.</param>
-        public void Initialize(LayerMask targetLayer, int accuracy, int damage, Element element, DamageCategory category, Transform caster)
+        /// <param name="maxHits">Total damaging hits, across every target, after which the zone despawns early. Zero means no limit.</param>
+        public void Initialize(LayerMask targetLayer, int accuracy, int damage, Element element, DamageCategory category, Transform caster, int maxHits = 0)
         {
+            this.maxHits = maxHits;
             this.targetLayer = targetLayer;
             this.accuracy = accuracy;
             this.damage = damage;
@@ -177,6 +181,12 @@ namespace Project.Combat
                 if (HitChanceCalculator.RollHit(accuracy, target.FleeRating))
                 {
                     target.TakeDamage(damage, element, category, attacker: caster);
+
+                    if (maxHits > 0 && ++hitsDealt >= maxHits)
+                    {
+                        Destroy(gameObject);
+                        return;
+                    }
                 }
                 else
                 {

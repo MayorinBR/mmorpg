@@ -208,6 +208,7 @@ namespace Project.Combat
             }
 
             freezeExpireTime = Extend(freezeExpireTime, durationSeconds);
+            GetComponentInParent<ElementalResistanceComponent>()?.ApplyTemporaryElement(Element.Water, durationSeconds);
         }
 
         /// <summary>Applies Petrify for the given duration, unless resisted (see <see cref="RollResisted"/>), immobilizing the character (see <see cref="IsImmobilized"/>).</summary>
@@ -220,6 +221,7 @@ namespace Project.Combat
             }
 
             petrifyExpireTime = Extend(petrifyExpireTime, durationSeconds);
+            GetComponentInParent<ElementalResistanceComponent>()?.ApplyTemporaryElement(Element.Ground, durationSeconds);
         }
 
         /// <summary>Turns Hiding on or off directly — e.g. casting Hiding again to cancel it. Not subject to resistance, see <see cref="IsHidden"/>.</summary>

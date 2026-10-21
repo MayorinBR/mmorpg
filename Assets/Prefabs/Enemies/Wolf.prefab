@@ -481,6 +481,7 @@ GameObject:
   - component: {fileID: 4253547583630163530}
   - component: {fileID: 6964384876310540749}
   - component: {fileID: 1622804764090804273}
+  - component: {fileID: 7100000000000000042}
   m_Layer: 8
   m_Name: Wolf
   m_TagString: Untagged
@@ -1424,3 +1425,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7100000000000000042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6638017485894401303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c8f1d52a7e94b60b1d2f4a6c9e07d85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.UI::Project.UI.TargetRingMarker
+  radius: 0.9
+  groundOffset: 0.05
+  hoverMaterial: {fileID: 2100000, guid: 4a9e2b7d1c6f4e3a8b5d0f9c2e1a7b64, type: 2}
+  targetMaterial: {fileID: 2100000, guid: 8d2f6c1a9b3e4d70a5c8e1f4b7d2a903, type: 2}

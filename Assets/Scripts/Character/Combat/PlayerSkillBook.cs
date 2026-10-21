@@ -77,6 +77,11 @@ namespace Project.Character.Combat
                 return false;
             }
 
+            if (!MeetsPrerequisites(skill))
+            {
+                return false;
+            }
+
             var currentLevel = GetLevel(skill);
 
             if (currentLevel >= skill.MaxLevel)
@@ -92,6 +97,26 @@ namespace Project.Character.Combat
             var newLevel = currentLevel + 1;
             skillLevels[skill] = newLevel;
             SkillLeveledUp?.Invoke(skill, newLevel);
+            return true;
+        }
+
+        /// <summary>
+        /// Checks that every <see cref="SkillDefinition.Prerequisites"/> entry has been learned
+        /// to its required level, telling the player which one is missing.
+        /// </summary>
+        /// <param name="skill">The skill about to be learned or upgraded.</param>
+        /// <returns>True when the player meets every prerequisite.</returns>
+        public bool MeetsPrerequisites(SkillDefinition skill)
+        {
+            foreach (var prerequisite in skill.Prerequisites)
+            {
+                if (prerequisite.Skill != null && GetLevel(prerequisite.Skill) < prerequisite.Level)
+                {
+                    PlayerFeedbackChannel.Publish($"{prerequisite.Skill.SkillName} level {prerequisite.Level} required to learn {skill.SkillName}.");
+                    return false;
+                }
+            }
+
             return true;
         }
 

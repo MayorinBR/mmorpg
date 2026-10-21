@@ -32,6 +32,21 @@ namespace Project.Skills
         [Tooltip("Zeny spent, on top of ManaCost, regardless of level — e.g. Mammonite. Zero for every skill without one (the vast majority).")]
         [SerializeField] private int zenyCost;
 
+        [Tooltip("Weapon categories of which one must be equipped in the main hand to cast this skill (e.g. Bow for Double Strafe). Empty means any weapon, or none.")]
+        [SerializeField] private WeaponSubtype[] requiredWeaponSubtypes;
+
+        [Tooltip("Equipped ammo units spent per cast, e.g. 1 for Double Strafe. The cast is refused while fewer are equipped. Zero for every skill that uses no ammo.")]
+        [SerializeField, Min(0)] private int ammoCost;
+
+        [Tooltip("Race this skill hits harder than usual, paired with BonusDamageRaceMultiplier (e.g. Undead for Soul Strike). Has no effect while the multiplier is 1.")]
+        [SerializeField] private MonsterRace bonusDamageRace;
+
+        [Tooltip("Damage multiplier applied when the target is of BonusDamageRace. 1 means no bonus.")]
+        [SerializeField, Min(1f)] private float bonusDamageRaceMultiplier = 1f;
+
+        [Tooltip("If true, casting this Buff skill also reveals hidden enemies within AreaRadius of the caster (e.g. Improve Concentration).")]
+        [SerializeField] private bool buffRevealsHidden;
+
         [Header("Damage (used if Effect Type is Damage or Zone)")]
         [SerializeField] private SkillDamageType damageType;
         [SerializeField] private float damageMultiplierPerLevel = 1f;
@@ -84,6 +99,9 @@ namespace Project.Skills
 
         [Tooltip("Minimum Job Level required to learn this skill. Zero means no Job Level gate; used by quest skills such as Berserk, Fatal Blow and HP Recovery While Moving.")]
         [SerializeField] private int requiredJobLevel;
+
+        [Tooltip("Skills (and levels) the player must already have learned before this one can be learned or upgraded, mirroring Ragnarok Online's skill tree. Empty means no prerequisite.")]
+        [SerializeField] private SkillPrerequisite[] prerequisites;
 
         [Header("Passive (only used if Effect Type is Passive)")]
         [Tooltip("Flat bonus to Status ATK per skill level, applied automatically while this passive skill is learned and (if PassiveRequiredWeaponSubtypes is non-empty) a matching weapon is equipped in the main hand — e.g. Sword Mastery.")]
@@ -165,6 +183,19 @@ namespace Project.Skills
         [Tooltip("Flat Max HP bonus per skill level, e.g. Angelus's flat Max HP component.")]
         [SerializeField] private int buffMaxHealthPerLevel;
 
+        [Header("Cast Time")]
+        [Tooltip("Cast time in seconds that DEX and INT cannot shorten, before any per-level component.")]
+        [SerializeField, Min(0f)] private float fixedCastSeconds;
+
+        [Tooltip("Extra fixed cast time in seconds per skill level.")]
+        [SerializeField] private float fixedCastPerLevel;
+
+        [Tooltip("Cast time in seconds that DEX and INT shorten, before any per-level component. Zero together with the fixed part means the skill is instant.")]
+        [SerializeField, Min(0f)] private float variableCastSeconds;
+
+        [Tooltip("Extra variable cast time in seconds per skill level. May be negative, as for Fire Wall and Safety Wall, whose cast shortens as they level.")]
+        [SerializeField] private float variableCastPerLevel;
+
         [Header("Zone (only used if Effect Type is Zone)")]
         [Tooltip("Optional visual spawned at the zone's position. Left empty, the zone is logic-only — still applies its effect, just invisible, useful before a real wall/fire visual is authored.")]
         [SerializeField] private GameObject zonePrefab;
@@ -177,6 +208,12 @@ namespace Project.Skills
 
         [Tooltip("Seconds between damage ticks against anything standing inside the zone, e.g. Fire Wall's repeated damage while a target stays in it. Ignored when BlocksAttacks is true.")]
         [SerializeField] private float zoneTickIntervalSeconds = 1f;
+
+        [Tooltip("Total damaging hits the zone can deal, summed over every target, before it despawns early, before any per-level component. Zero means the zone only ends when its duration runs out. Ignored when BlocksAttacks is true.")]
+        [SerializeField, Min(0)] private int zoneMaxHits;
+
+        [Tooltip("Extra total hits per skill level, added on top of ZoneMaxHits, e.g. Fire Wall's hit limit.")]
+        [SerializeField] private int zoneMaxHitsPerLevel;
 
         [Tooltip("If true, this Zone skill's spawned zone blocks attacks of BlockedWeaponType instead of damaging — e.g. Safety Wall blocking melee, Pneuma blocking ranged. False means the zone only damages, the same as every zone skill before this field existed.")]
         [SerializeField] private bool blocksAttacks;
@@ -238,8 +275,50 @@ namespace Project.Skills
         /// <summary>Gets the minimum Base Level required to learn this skill. Zero means no requirement.</summary>
         public int RequiredLevel => requiredLevel;
 
+        [Tooltip("Item consumed from the caster's inventory on every cast, e.g. a gemstone for Safety Wall. Leave empty for skills that need no catalyst.")]
+        [SerializeField] private ItemDefinition requiredItem;
+
+        [Tooltip("Units of Required Item consumed per cast. Ignored while Required Item is empty.")]
+        [SerializeField, Min(1)] private int requiredItemCount = 1;
+
         /// <summary>Gets the Zeny cost to cast this skill, on top of <see cref="ManaCost"/>, regardless of its level. Zero for every skill without one — e.g. Mammonite is the only one today.</summary>
         public int ZenyCost => zenyCost;
+
+        /// <summary>Gets the weapon categories one of which must be wielded in the main hand to cast this skill. Empty means no weapon requirement.</summary>
+        public IReadOnlyList<WeaponSubtype> RequiredWeaponSubtypes => requiredWeaponSubtypes ?? System.Array.Empty<WeaponSubtype>();
+
+        /// <summary>Gets the equipped ammo units one cast consumes. Zero for skills that use no ammo.</summary>
+        public int AmmoCost => ammoCost;
+
+        /// <summary>Gets the inventory item one cast consumes, or null when the skill needs no catalyst.</summary>
+        public ItemDefinition RequiredItem => requiredItem;
+
+        /// <summary>Gets the number of <see cref="RequiredItem"/> units one cast consumes.</summary>
+        public int RequiredItemCount => requiredItemCount;
+
+        /// <summary>Gets whether casting this Buff skill also reveals hidden enemies around the caster.</summary>
+        public bool BuffRevealsHidden => buffRevealsHidden;
+
+        /// <summary>
+        /// Gets the damage multiplier this skill applies against a target of the given race.
+        /// </summary>
+        /// <param name="race">The target's race.</param>
+        /// <returns>The authored bonus multiplier for the matching race, otherwise 1.</returns>
+        public float GetRaceDamageMultiplier(MonsterRace race)
+        {
+            return race == bonusDamageRace ? bonusDamageRaceMultiplier : 1f;
+        }
+
+        /// <summary>
+        /// Checks whether the given main-hand weapon satisfies <see cref="RequiredWeaponSubtypes"/>.
+        /// </summary>
+        /// <param name="equippedSubtype">The subtype of the weapon currently wielded in the main hand.</param>
+        /// <returns>True when the skill has no weapon requirement or the weapon matches one of the required subtypes.</returns>
+        public bool IsWeaponRequirementMet(WeaponSubtype equippedSubtype)
+        {
+            var required = RequiredWeaponSubtypes;
+            return required.Count == 0 || System.Linq.Enumerable.Contains(required, equippedSubtype);
+        }
 
         /// <summary>Gets the cooldown, in seconds, after casting this skill.</summary>
         public float CooldownSeconds => cooldownSeconds;
@@ -409,6 +488,9 @@ namespace Project.Skills
 
         /// <summary>Gets the minimum Job Level required to learn this skill, or zero if it has no Job Level gate.</summary>
         public int RequiredJobLevel => requiredJobLevel;
+
+        /// <summary>Gets the skills that must be learned first, or an empty list when there are none.</summary>
+        public IReadOnlyList<SkillPrerequisite> Prerequisites => prerequisites ?? System.Array.Empty<SkillPrerequisite>();
 
         /// <summary>Gets how far, in meters, this skill pushes something back via <see cref="Combat.KnockbackUtility"/>. Zero for a Damage skill without knockback; meaningful for every Displacement skill.</summary>
         public float KnockbackDistance => knockbackDistance;
@@ -612,6 +694,38 @@ namespace Project.Skills
         public float GetZoneDuration(int skillLevel)
         {
             return zoneDurationSeconds + zoneDurationPerLevel * skillLevel;
+        }
+
+        /// <summary>
+        /// Calculates how many damaging hits this Zone skill's zone can deal,
+        /// across all targets, before despawning early. Only meaningful when
+        /// <see cref="EffectType"/> is Zone.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The hit limit, or zero when the zone is limited by duration alone.</returns>
+        public int GetZoneMaxHits(int skillLevel)
+        {
+            return zoneMaxHits > 0 || zoneMaxHitsPerLevel > 0 ? Mathf.Max(1, zoneMaxHits + zoneMaxHitsPerLevel * skillLevel) : 0;
+        }
+
+        /// <summary>
+        /// Gets the part of the cast time that stat-based reductions never shorten.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The fixed cast time in seconds, never negative.</returns>
+        public float GetFixedCastTime(int skillLevel)
+        {
+            return Mathf.Max(0f, fixedCastSeconds + fixedCastPerLevel * skillLevel);
+        }
+
+        /// <summary>
+        /// Gets the part of the cast time that DEX and INT shorten.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The variable cast time in seconds, never negative.</returns>
+        public float GetVariableCastTime(int skillLevel)
+        {
+            return Mathf.Max(0f, variableCastSeconds + variableCastPerLevel * skillLevel);
         }
 
         /// <summary>

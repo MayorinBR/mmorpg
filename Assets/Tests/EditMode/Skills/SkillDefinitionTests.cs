@@ -70,6 +70,56 @@ namespace Project.Skills.Tests
             Assert.AreEqual(0, skill.GetHealthCost(10));
         }
 
+        /// <summary>
+        /// The zone hit limit is zero (duration only) unless a base or per-level cap is authored,
+        /// and is never lower than one once a cap exists.
+        /// </summary>
+        [TestCase(0, 0, 5, 0)]
+        [TestCase(0, 2, 3, 6)]
+        [TestCase(4, 0, 9, 4)]
+        [TestCase(0, -5, 1, 1)]
+        public void GetZoneMaxHits_FollowsAuthoredCaps(int baseHits, int perLevel, int level, int expected)
+        {
+            SetField("zoneMaxHits", baseHits);
+            SetField("zoneMaxHitsPerLevel", perLevel);
+
+            Assert.AreEqual(expected, skill.GetZoneMaxHits(level));
+        }
+
+        /// <summary>
+        /// Fixed and variable cast times scale per level and are clamped at zero.
+        /// </summary>
+        [Test]
+        public void CastTimes_ScalePerLevel_AndNeverGoNegative()
+        {
+            SetField("fixedCastSeconds", 0.5f);
+            SetField("fixedCastPerLevel", 0.1f);
+            SetField("variableCastSeconds", 1f);
+            SetField("variableCastPerLevel", -0.5f);
+
+            Assert.AreEqual(1.0f, skill.GetFixedCastTime(5), 0.0001f);
+            Assert.AreEqual(0.5f, skill.GetVariableCastTime(1), 0.0001f);
+            Assert.AreEqual(0f, skill.GetVariableCastTime(4), 0.0001f);
+        }
+
+        /// <summary>
+        /// Accuracy bonus, status duration, poison tick damage and success chance grow linearly with level.
+        /// </summary>
+        [Test]
+        public void PerLevelScaling_IsLinear()
+        {
+            SetField("accuracyBonusPerLevel", 3);
+            SetField("inflictedStatusDurationSeconds", 2f);
+            SetField("inflictedStatusDurationPerLevel", 1f);
+            SetField("poisonDamagePerTickPerLevel", 2.5f);
+            SetField("successChancePerLevel", 0.1f);
+
+            Assert.AreEqual(12, skill.GetAccuracyBonus(4));
+            Assert.AreEqual(6f, skill.GetInflictedStatusDuration(4), 0.0001f);
+            Assert.AreEqual(10, skill.GetPoisonDamagePerTick(4));
+            Assert.AreEqual(0.4f, skill.GetSuccessChance(4), 0.0001f);
+        }
+
         private void SetPhysicalDamageType()
         {
             var field = typeof(SkillDefinition).GetField("damageType", BindingFlags.NonPublic | BindingFlags.Instance);

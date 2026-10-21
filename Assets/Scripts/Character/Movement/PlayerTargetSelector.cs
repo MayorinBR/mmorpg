@@ -31,7 +31,7 @@ namespace Project.Character.Movement
         /// purely cosmetic geometry child (e.g. one that bounces via its
         /// own animation), while the damageable/AI root stays put; anything
         /// that follows <see cref="CurrentTarget"/> (such as
-        /// <see cref="Project.UI.GroundRingFollower"/>) would otherwise
+        /// <see cref="Project.UI.TargetRingMarker"/>) would otherwise
         /// drift away from the enemy's actual position as that animation
         /// plays. Falls back to the collider's own transform if it isn't
         /// parented under an <see cref="IDamageable"/> at all.

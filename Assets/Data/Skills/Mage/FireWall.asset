@@ -19,15 +19,21 @@ MonoBehaviour:
   effectType: 4
   targetType: 5
   maxLevel: 5
-  manaCost: 20
+  manaCost: 40
   cooldownSeconds: 10
-  range: 4
+  range: 7
+  fixedCastSeconds: 0
+  fixedCastPerLevel: 0
+  variableCastSeconds: 2.15
+  variableCastPerLevel: -0.3
   damageType: 1
   damageMultiplierPerLevel: 0.1
   element: 1
   areaRadius: 1.5
   zonePrefab: {fileID: 0}
-  zoneDurationSeconds: 10
-  zoneDurationPerLevel: 1
+  zoneDurationSeconds: 4
+  zoneDurationPerLevel: 2
   zoneTickIntervalSeconds: 1
+  zoneMaxHits: 2
+  zoneMaxHitsPerLevel: 2
   healAmount: 10

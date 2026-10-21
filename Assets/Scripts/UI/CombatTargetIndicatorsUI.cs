@@ -1,100 +1,87 @@
 using UnityEngine;
-using Project.Character.Combat;
 using Project.Character.Movement;
 
 namespace Project.UI
 {
     /// <summary>
-    /// Drives the two ground-ring visual indicators used for combat
-    /// targeting: a ring under whatever enemy a pending skill's target
-    /// picker is currently hovering (see <see cref="SkillTargetingController"/>),
-    /// and a separate ring under the player's current combat target (see
-    /// <see cref="PlayerTargetSelector"/>). Kept separate from either of
-    /// those so neither has to know about rendering.
+    /// Drives the ground rings of enemies: a white ring on the enemy under
+    /// the cursor (see <see cref="PlayerInputRouter.HoveredEnemyChanged"/>),
+    /// which also covers the skill target picker, and a red ring on the
+    /// player's current combat target (see <see cref="PlayerTargetSelector"/>).
+    /// The rings themselves belong to each enemy's <see cref="TargetRingMarker"/>,
+    /// so nothing here depends on the current map.
     /// </summary>
     public class CombatTargetIndicatorsUI : MonoBehaviour
     {
         [SerializeField] private PlayerTargetSelector targetSelector;
-        [SerializeField] private GroundRingFollower currentTargetRing;
-        [SerializeField] private GroundRingFollower skillPickerRing;
+
+        private PlayerInputRouter inputRouter;
+        private TargetRingMarker hoveredMarker;
+        private TargetRingMarker targetedMarker;
 
         private void OnEnable()
         {
             targetSelector.TargetChanged += HandleTargetChanged;
+
+            if (inputRouter != null)
+            {
+                inputRouter.HoveredEnemyChanged += HandleHoveredEnemyChanged;
+            }
+        }
+
+        private void Start()
+        {
+            inputRouter = FindFirstObjectByType<PlayerInputRouter>();
+
+            if (inputRouter != null)
+            {
+                inputRouter.HoveredEnemyChanged += HandleHoveredEnemyChanged;
+            }
         }
 
         private void OnDisable()
         {
             targetSelector.TargetChanged -= HandleTargetChanged;
 
-            if (SkillTargetingController.Instance != null)
+            if (inputRouter != null)
             {
-                SkillTargetingController.Instance.HoveredEnemyChanged -= HandleHoveredEnemyChanged;
+                inputRouter.HoveredEnemyChanged -= HandleHoveredEnemyChanged;
             }
-        }
-
-        private void Start()
-        {
-            // Subscribed here rather than OnEnable: SkillTargetingController.Instance
-            // is only guaranteed to be set once every object's Awake has run,
-            // which Unity guarantees has happened by the time any Start runs.
-            if (SkillTargetingController.Instance != null)
-            {
-                SkillTargetingController.Instance.HoveredEnemyChanged += HandleHoveredEnemyChanged;
-            }
-        }
-
-        /// <summary>
-        /// Retargets both ring followers to this map's local instances.
-        /// Needed on the persisted player (see <see cref="Project.World.PersistentPlayerAnchor"/>):
-        /// the ring GameObjects live in the map scene, not on the player, so
-        /// they're destroyed on every <c>SceneManager.LoadScene</c> and the
-        /// serialized references from the previous map would otherwise go
-        /// stale, exactly like <see cref="WorldSpaceHealthBarFollower.SetViewCamera"/>.
-        /// </summary>
-        /// <param name="newCurrentTargetRing">This map's ring for the player's current combat target.</param>
-        /// <param name="newSkillPickerRing">This map's ring for the skill target picker's hovered enemy.</param>
-        public void SetRings(GroundRingFollower newCurrentTargetRing, GroundRingFollower newSkillPickerRing)
-        {
-            currentTargetRing = newCurrentTargetRing;
-            skillPickerRing = newSkillPickerRing;
         }
 
         private void HandleTargetChanged(Transform newTarget)
         {
-            // currentTargetRing can be a stale reference to a ring destroyed by a
-            // scene load, in the brief window before SetRings() re-points it at
-            // the new map's ring (see SetRings' doc comment above).
-            if (currentTargetRing == null)
+            if (targetedMarker != null)
             {
-                return;
+                targetedMarker.SetTargeted(false);
             }
 
-            if (newTarget != null)
+            targetedMarker = FindMarker(newTarget);
+
+            if (targetedMarker != null)
             {
-                currentTargetRing.Show(newTarget);
-            }
-            else
-            {
-                currentTargetRing.Hide();
+                targetedMarker.SetTargeted(true);
             }
         }
 
         private void HandleHoveredEnemyChanged(Transform hoveredEnemy)
         {
-            if (skillPickerRing == null)
+            if (hoveredMarker != null)
             {
-                return;
+                hoveredMarker.SetHovered(false);
             }
 
-            if (hoveredEnemy != null)
+            hoveredMarker = FindMarker(hoveredEnemy);
+
+            if (hoveredMarker != null)
             {
-                skillPickerRing.Show(hoveredEnemy);
+                hoveredMarker.SetHovered(true);
             }
-            else
-            {
-                skillPickerRing.Hide();
-            }
+        }
+
+        private static TargetRingMarker FindMarker(Transform enemy)
+        {
+            return enemy != null ? enemy.GetComponentInChildren<TargetRingMarker>(true) : null;
         }
     }
 }

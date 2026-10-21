@@ -44,7 +44,7 @@ namespace Project.UI
             entry.bodyText = go.AddComponent<TextMeshProUGUI>();
             entry.bodyText.fontSize = 14;
             entry.bodyText.color = UiTheme.Ink;
-            entry.bodyText.enableWordWrapping = false;
+            entry.bodyText.textWrappingMode = TextWrappingModes.NoWrap;
 
             entry.Refresh(quest);
             return entry;

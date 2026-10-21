@@ -34,6 +34,10 @@ namespace Project.Items
         [SerializeField] private float attackRange = 1.5f;
         [Tooltip("This weapon's own attack power, added flat to the wielder's Status ATK while it is in the main hand. Only meaningful for weapons.")]
         [SerializeField, Min(0)] private int weaponAttack;
+        [Tooltip("This weapon's own magic attack, added flat to the wielder's Status MATK while it is in the main hand (e.g. a staff). Only meaningful for weapons.")]
+        [SerializeField, Min(0)] private int weaponMagicAttack;
+        [Tooltip("This weapon's own magic defense, added flat to the wielder's Status MDEF while it is in the main hand (e.g. a book). Only meaningful for weapons.")]
+        [SerializeField, Min(0)] private int weaponMagicDefense;
         [Tooltip("Multiplier on the wielder's auto-attack speed while this weapon is in the main hand. 1 keeps the speed unchanged, above 1 attacks faster, below 1 slower.")]
         [SerializeField, Range(0.25f, 3f)] private float attackSpeedMultiplier = 1f;
         [SerializeField] private int buyPrice;
@@ -106,6 +110,12 @@ namespace Project.Items
 
         /// <summary>Gets the flat attack power this weapon adds to its wielder's Status ATK while equipped in the main hand.</summary>
         public int WeaponAttack => weaponAttack;
+
+        /// <summary>Gets the flat magic attack this weapon adds to its wielder's Status MATK while equipped in the main hand.</summary>
+        public int WeaponMagicAttack => weaponMagicAttack;
+
+        /// <summary>Gets the flat magic defense this weapon adds to its wielder's Status MDEF while equipped in the main hand.</summary>
+        public int WeaponMagicDefense => weaponMagicDefense;
 
         /// <summary>Gets the multiplier this weapon applies to its wielder's auto-attack speed while equipped in the main hand. 1 means no change.</summary>
         public float AttackSpeedMultiplier => attackSpeedMultiplier;

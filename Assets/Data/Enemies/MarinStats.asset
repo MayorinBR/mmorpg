@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c2f5d1a7b3e4960a4d9e1c7b5f30a28, type: 3}
+  m_Name: MarinStats
+  m_EditorClassIdentifier: Project.AI::Project.AI.MonsterDefinition
+  maxHealth: 140
+  maxMana: 0
+  attackPower: 14
+  defense: 5
+  magicalDefense: 0
+  hit: 30
+  flee: 28
+  moveSpeed: 3
+  experienceReward: 55
+  jobExperienceReward: 40
+  size: 1
+  race: 3
+  isBoss: 0
+  baseAttackSpeed: 145
+  statusResistChance: 0
+  minLevel: 8
+  maxLevel: 12
+  drops:
+  - item: {fileID: 11400000, guid: 452e04800ea14e6f929563b2d0ae3631, type: 2}
+    dropChance: 0.2
+    minQuantity: 1
+    maxQuantity: 1
+  - item: {fileID: 11400000, guid: 12272af69bd24cb1a24b554f4c000406, type: 2}
+    dropChance: 0.1
+    minQuantity: 1
+    maxQuantity: 1
+  - item: {fileID: 11400000, guid: c20d99f0ef8749d38ea13af908c2d25b, type: 2}
+    dropChance: 0.15
+    minQuantity: 1
+    maxQuantity: 1
+  - item: {fileID: 11400000, guid: 7be95b24201b0b14cab76604154564a7, type: 2}
+    dropChance: 0.04
+    minQuantity: 1
+    maxQuantity: 1
+  - item: {fileID: 11400000, guid: df6abf59088be954a82e53c9bb4b8bd0, type: 2}
+    dropChance: 0.04
+    minQuantity: 1
+    maxQuantity: 1

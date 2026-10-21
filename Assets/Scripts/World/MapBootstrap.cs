@@ -4,13 +4,12 @@ using UnityEngine.SceneManagement;
 using Project.CameraSystem;
 using Project.Character.Combat;
 using Project.Maps;
-using Project.UI;
 
 namespace Project.World
 {
     /// <summary>
     /// Runs once when a map scene loads and re-wires the persisted player to
-    /// this map's local objects (respawn point, combat target rings) and to
+    /// this map's local objects (respawn point) and to
     /// the persisted <see cref="IsometricCameraController"/> singleton, which
     /// Unity cannot serialize as a direct Inspector reference across scene
     /// files. Also publishes this scene's own <see cref="MapDefinition"/>
@@ -24,12 +23,6 @@ namespace Project.World
 
         /// <summary>Where the persisted player respawns after dying on this map.</summary>
         [SerializeField] private Transform defaultRespawnPoint;
-
-        /// <summary>This map's ring indicator for the player's current combat target.</summary>
-        [SerializeField] private GroundRingFollower localCurrentTargetRing;
-
-        /// <summary>This map's ring indicator for the skill target picker's hovered enemy.</summary>
-        [SerializeField] private GroundRingFollower localSkillPickerRing;
 
         private IEnumerator Start()
         {
@@ -86,11 +79,6 @@ namespace Project.World
             if (defaultRespawnPoint != null)
             {
                 player.DeathHandler.SetRespawnPoint(defaultRespawnPoint);
-            }
-
-            if (localCurrentTargetRing != null && localSkillPickerRing != null)
-            {
-                player.CombatTargetIndicators?.SetRings(localCurrentTargetRing, localSkillPickerRing);
             }
 
             WarpToPendingSpawnPoint(player);

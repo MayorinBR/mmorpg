@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ArrowRepel
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
   skillName: Arrow Repel
-  description: Fires a heavy arrow that deals physical damage to the target and knocks it back.
+  description: Fires a heavy arrow that deals physical damage to the target and knocks it back. Requires a bow and consumes one arrow.
   icon: {fileID: 0}
   allowedClasses: 01000000
   effectType: 0
@@ -21,7 +21,9 @@ MonoBehaviour:
   maxLevel: 1
   manaCost: 15
   cooldownSeconds: 8
-  range: 5
+  range: 8
+  requiredWeaponSubtypes: 08000000
+  ammoCost: 1
   requiredJobLevel: 35
   damageType: 0
   damageMultiplierPerLevel: 1.5

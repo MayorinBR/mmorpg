@@ -37,9 +37,30 @@ namespace Project.Combat
 
         [SerializeField] private ResistanceEntry[] resistances = Array.Empty<ResistanceEntry>();
 
+        private Element temporaryElement;
+        private float temporaryElementExpireTime;
+
+        /// <summary>
+        /// Makes the character take damage as if it were of the given element until the duration runs out,
+        /// replacing its own resistance table meanwhile — e.g. a frozen target becoming Water, a petrified
+        /// one becoming Earth. Only Water and Ground have a chart; any other element leaves damage unchanged.
+        /// </summary>
+        /// <param name="element">The element the character temporarily becomes.</param>
+        /// <param name="durationSeconds">How long the change lasts, in seconds.</param>
+        public void ApplyTemporaryElement(Element element, float durationSeconds)
+        {
+            temporaryElement = element;
+            temporaryElementExpireTime = Time.time + durationSeconds;
+        }
+
         /// <inheritdoc />
         public int ModifyIncomingDamage(int amount, Element element)
         {
+            if (Time.time < temporaryElementExpireTime)
+            {
+                return Mathf.RoundToInt(amount * GetLevelOneMultiplier(temporaryElement, element));
+            }
+
             foreach (var entry in resistances)
             {
                 if (entry.element == element)
@@ -49,6 +70,33 @@ namespace Project.Combat
             }
 
             return amount;
+        }
+
+        private static float GetLevelOneMultiplier(Element defender, Element attacker)
+        {
+            switch (defender)
+            {
+                case Element.Water:
+                    return attacker switch
+                    {
+                        Element.Water => 0.25f,
+                        Element.Fire => 0.9f,
+                        Element.Electric => 1.5f,
+                        Element.Poison => 1.5f,
+                        _ => 1f
+                    };
+                case Element.Ground:
+                    return attacker switch
+                    {
+                        Element.Ground => 0.25f,
+                        Element.Fire => 1.5f,
+                        Element.Electric => 0.9f,
+                        Element.Poison => 1.5f,
+                        _ => 1f
+                    };
+                default:
+                    return 1f;
+            }
         }
     }
 }

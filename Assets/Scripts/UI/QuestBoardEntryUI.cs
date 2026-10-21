@@ -53,7 +53,7 @@ namespace Project.UI
 
             var descriptionText = CreateStretchedText(rect, "Description", TitleHeight, DescriptionHeight, 12, FontStyles.Normal);
             descriptionText.color = UiTheme.Muted;
-            descriptionText.enableWordWrapping = true;
+            descriptionText.textWrappingMode = TextWrappingModes.Normal;
             descriptionText.text = quest.Description;
 
             var buttonGo = new GameObject("AcceptButton", typeof(RectTransform), typeof(Image), typeof(Button));

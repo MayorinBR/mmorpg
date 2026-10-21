@@ -13,15 +13,18 @@ MonoBehaviour:
   m_Name: Snipe
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
   skillName: Double Strafe
-  description: Fires two arrows at the target in rapid succession, dealing physical damage that scales with skill level.
+  description: Fires two arrows at the target in rapid succession, dealing physical damage that scales with skill level. Requires a bow and consumes one arrow.
   icon: {fileID: 1710297701, guid: ef4ed4eb516e342469b4a565db4798a7, type: 3}
   allowedClasses: 01000000
   effectType: 0
   targetType: 2
   maxLevel: 5
-  manaCost: 10
-  cooldownSeconds: 2
-  range: 5
+  manaCost: 12
+  cooldownSeconds: 0.3
+  range: 8
+  requiredWeaponSubtypes: 08000000
+  ammoCost: 1
   damageType: 0
-  damageMultiplierPerLevel: 0.76
+  damageMultiplierPerLevel: 0.45
+  damageBaseMultiplier: 1.55
   healAmount: 10

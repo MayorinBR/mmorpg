@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c2f5d1a7b3e4960a4d9e1c7b5f30a28, type: 3}
+  m_Name: DireWolfStats
+  m_EditorClassIdentifier: Project.AI::Project.AI.MonsterDefinition
+  maxHealth: 260
+  maxMana: 0
+  attackPower: 24
+  defense: 8
+  magicalDefense: 0
+  hit: 40
+  flee: 32
+  moveSpeed: 3.6
+  experienceReward: 110
+  jobExperienceReward: 80
+  size: 1
+  race: 2
+  isBoss: 0
+  baseAttackSpeed: 155
+  statusResistChance: 0.05
+  minLevel: 11
+  maxLevel: 15
+  drops:
+  - item: {fileID: 11400000, guid: 5a1f0c2e7d3b4e9f8a6c1b2d3e4f5a61, type: 2}
+    dropChance: 0.3
+    minQuantity: 1
+    maxQuantity: 1
+  - item: {fileID: 11400000, guid: 452e04800ea14e6f929563b2d0ae3631, type: 2}
+    dropChance: 0.2
+    minQuantity: 1
+    maxQuantity: 1
+  - item: {fileID: 11400000, guid: 8425689a5c0690242b5d53d7807122f8, type: 2}
+    dropChance: 0.03
+    minQuantity: 1
+    maxQuantity: 1
+  - item: {fileID: 11400000, guid: 84b3d15e3eda4c18863a454575eeddca, type: 2}
+    dropChance: 0.03
+    minQuantity: 1
+    maxQuantity: 1

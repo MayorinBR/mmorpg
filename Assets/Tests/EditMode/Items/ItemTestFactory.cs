@@ -59,24 +59,11 @@ namespace Project.Items.Tests
 
         /// <summary>
         /// Builds a <see cref="StatModifiers"/> value with specific stat
-        /// bonuses. The struct's own constructor is private (its only
-        /// public construction path is the <c>+</c> operator starting from
-        /// <c>default</c>), so this invokes it through reflection.
+        /// bonuses through the struct's public constructor.
         /// </summary>
         public static StatModifiers CreateStatModifiers(int strength = 0, int agility = 0, int vitality = 0, int intelligence = 0, int dexterity = 0, int luck = 0)
         {
-            var constructor = typeof(StatModifiers).GetConstructor(
-                BindingFlags.NonPublic | BindingFlags.Instance,
-                null,
-                new[] { typeof(int), typeof(int), typeof(int), typeof(int), typeof(int), typeof(int) },
-                null);
-
-            if (constructor == null)
-            {
-                throw new InvalidOperationException("StatModifiers no longer has the expected private constructor.");
-            }
-
-            return (StatModifiers)constructor.Invoke(new object[] { strength, agility, vitality, intelligence, dexterity, luck });
+            return new StatModifiers(strength, agility, vitality, intelligence, dexterity, luck);
         }
 
         /// <summary>

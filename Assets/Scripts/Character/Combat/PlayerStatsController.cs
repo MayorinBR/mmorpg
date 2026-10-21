@@ -61,6 +61,7 @@ namespace Project.Character.Combat
         // Classic — Stats, consulted September 2026).
         private const float MaxHealthBonusPerVit = 0.01f;
         private const float MaxManaBonusPerInt = 0.01f;
+        private const float CastTimeReductionDivisor = 530f;
 
         // Real Ragnarok Online formula (source: ragnarokjobguides.blogspot.com
         // "How stats affect statuses", consulted September 2026): VIT+3 = %
@@ -147,6 +148,8 @@ namespace Project.Character.Combat
                 EnsureInitialized();
                 var subStats = subStatsCalculator.Calculate(effectiveStats, BaseLevel, equipment != null && equipment.IsMainHandWeaponRanged(), GetBaseAttackSpeed());
                 var statusAtk = subStats.StatusAtk + GetPassiveAttackBonus() + GetWeaponAttack();
+                var statusMatk = subStats.StatusMatk + GetWeaponMagicAttack();
+                var statusMDef = subStats.StatusMDef + GetWeaponMagicDefense();
                 var hit = subStats.Hit + GetPassiveHitBonus();
                 var flee = subStats.Flee + GetPassiveFleeBonus();
                 var aspd = subStats.Aspd;
@@ -157,9 +160,9 @@ namespace Project.Character.Combat
                     aspd = Mathf.RoundToInt(aspd * buffs.AspdMultiplier);
                 }
 
-                return statusAtk == subStats.StatusAtk && hit == subStats.Hit && flee == subStats.Flee && aspd == subStats.Aspd
+                return statusAtk == subStats.StatusAtk && statusMatk == subStats.StatusMatk && statusMDef == subStats.StatusMDef && hit == subStats.Hit && flee == subStats.Flee && aspd == subStats.Aspd
                     ? subStats
-                    : new SubStats(statusAtk, subStats.StatusMatk, subStats.StatusDef, subStats.StatusMDef, hit, flee, subStats.CriticalRate, aspd);
+                    : new SubStats(statusAtk, statusMatk, subStats.StatusDef, statusMDef, hit, flee, subStats.CriticalRate, aspd);
             }
         }
 
@@ -397,6 +400,22 @@ namespace Project.Character.Combat
         }
 
         /// <summary>
+        /// Reads the own magic attack of the equipped main-hand weapon. Zero if <see cref="equipment"/> isn't wired.
+        /// </summary>
+        private int GetWeaponMagicAttack()
+        {
+            return equipment != null ? equipment.GetMainHandWeaponMagicAttack() : 0;
+        }
+
+        /// <summary>
+        /// Reads the own magic defense of the equipped main-hand weapon. Zero if <see cref="equipment"/> isn't wired.
+        /// </summary>
+        private int GetWeaponMagicDefense()
+        {
+            return equipment != null ? equipment.GetMainHandWeaponMagicDefense() : 0;
+        }
+
+        /// <summary>
         /// Reads the flat DEX bonus from learned passive skills (e.g. Owl's
         /// Eye) that apply to the currently equipped main-hand weapon.
         /// Zero if either <see cref="passiveSkills"/> or <see cref="equipment"/>
@@ -491,6 +510,18 @@ namespace Project.Character.Combat
         {
             EnsureInitialized();
             return Mathf.RoundToInt(baseMaxMana * effectiveStats.GetValue(StatType.Intelligence) * MaxManaBonusPerInt);
+        }
+
+        /// <summary>
+        /// Gets the factor DEX and INT apply to a skill's variable cast time: (DEX x 2 + INT) / 530 of it is
+        /// shaved off, down to instant.
+        /// </summary>
+        /// <returns>A multiplier between 0 (instant) and 1 (no reduction).</returns>
+        public float GetCastTimeMultiplier()
+        {
+            EnsureInitialized();
+            var reduction = (effectiveStats.GetValue(StatType.Dexterity) * 2 + effectiveStats.GetValue(StatType.Intelligence)) / CastTimeReductionDivisor;
+            return Mathf.Clamp01(1f - reduction);
         }
 
         /// <inheritdoc />

@@ -394,6 +394,28 @@ namespace Project.Items
         }
 
         /// <summary>
+        /// Gets the own magic attack (see <see cref="ItemDefinition.WeaponMagicAttack"/>) of the item equipped
+        /// in the main hand, or zero if nothing is equipped there.
+        /// </summary>
+        /// <returns>The main-hand weapon's magic attack.</returns>
+        public int GetMainHandWeaponMagicAttack()
+        {
+            var mainHandWeapon = GetEquippedItems(EquipmentSlot.LeftHand).FirstOrDefault();
+            return mainHandWeapon != null ? mainHandWeapon.WeaponMagicAttack : 0;
+        }
+
+        /// <summary>
+        /// Gets the own magic defense (see <see cref="ItemDefinition.WeaponMagicDefense"/>) of the item equipped
+        /// in the main hand, or zero if nothing is equipped there.
+        /// </summary>
+        /// <returns>The main-hand weapon's magic defense.</returns>
+        public int GetMainHandWeaponMagicDefense()
+        {
+            var mainHandWeapon = GetEquippedItems(EquipmentSlot.LeftHand).FirstOrDefault();
+            return mainHandWeapon != null ? mainHandWeapon.WeaponMagicDefense : 0;
+        }
+
+        /// <summary>
         /// Gets the attack speed multiplier (see <see cref="ItemDefinition.AttackSpeedMultiplier"/>) of the
         /// item equipped in the main hand, or 1 if nothing is equipped there.
         /// </summary>

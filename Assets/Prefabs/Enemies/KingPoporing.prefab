@@ -198,6 +198,7 @@ GameObject:
   - component: {fileID: 7000000000000000002}
   - component: {fileID: 7000000000000000003}
   - component: {fileID: 7000000000000000004}
+  - component: {fileID: 7100000000000000042}
   m_Layer: 8
   m_Name: KingPoporing
   m_TagString: Untagged
@@ -1484,3 +1485,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6486279800864053301, guid: e86d857fab24cdb498e19bf20baa4b3c, type: 3}
   m_PrefabInstance: {fileID: 2324227434567439703}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7100000000000000042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2301299987623212396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c8f1d52a7e94b60b1d2f4a6c9e07d85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.UI::Project.UI.TargetRingMarker
+  radius: 1.6
+  groundOffset: 0.05
+  hoverMaterial: {fileID: 2100000, guid: 4a9e2b7d1c6f4e3a8b5d0f9c2e1a7b64, type: 2}
+  targetMaterial: {fileID: 2100000, guid: 8d2f6c1a9b3e4d70a5c8e1f4b7d2a903, type: 2}

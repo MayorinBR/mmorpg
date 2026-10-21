@@ -1,6 +1,8 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
+using Project.Combat;
 using Project.Items;
 using Project.NPC;
 
@@ -26,10 +28,49 @@ namespace Project.Character.Movement
         [SerializeField] private LayerMask npcLayer;
 
         private bool isPointerOverUI;
+        private Transform hoveredEnemy;
+
+        /// <summary>Raised when the living enemy under the cursor changes, including to null.</summary>
+        public event Action<Transform> HoveredEnemyChanged;
 
         private void Update()
         {
             isPointerOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+            UpdateHoveredEnemy();
+        }
+
+        /// <summary>
+        /// Raycasts the enemy layer under the cursor and raises
+        /// <see cref="HoveredEnemyChanged"/> with the transform owning the
+        /// enemy's <see cref="IDamageable"/>, matching how
+        /// <see cref="PlayerTargetSelector.SelectTarget"/> resolves a target.
+        /// </summary>
+        private void UpdateHoveredEnemy()
+        {
+            Transform enemy = null;
+
+            if (!isPointerOverUI && worldCamera != null && Pointer.current != null)
+            {
+                var ray = worldCamera.ScreenPointToRay(Pointer.current.position.ReadValue());
+
+                if (Physics.Raycast(ray, out var hit, float.MaxValue, enemyLayer))
+                {
+                    var damageable = hit.collider.GetComponentInParent<IDamageable>();
+
+                    if (damageable != null && !damageable.IsDead)
+                    {
+                        enemy = (damageable as Component)?.transform ?? hit.collider.transform;
+                    }
+                }
+            }
+
+            if (enemy == hoveredEnemy)
+            {
+                return;
+            }
+
+            hoveredEnemy = enemy;
+            HoveredEnemyChanged?.Invoke(hoveredEnemy);
         }
 
         /// <summary>

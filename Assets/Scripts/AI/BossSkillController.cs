@@ -1,6 +1,5 @@
 using UnityEngine;
 using Project.Combat;
-using Project.UI;
 
 namespace Project.AI
 {
@@ -76,10 +75,9 @@ namespace Project.AI
     /// immediately ready the instant a fight starts, but nothing is ever
     /// cast while wandering the map. While Rage is active, an optional
     /// <see cref="StatusTintController"/> shows a red mask over the
-    /// boss's model. Every successful cast also shows a floating
-    /// <see cref="DamagePopup"/> with the skill's name above the boss,
-    /// the same visual language as its damage numbers, so nearby players
-    /// see what it just did.
+    /// boss's model. Every successful cast is also announced through
+    /// <see cref="SkillAnnouncementChannel"/> with the skill's name above
+    /// the boss, so nearby players see what it just did.
     /// </summary>
     public class BossSkillController : MonoBehaviour
     {
@@ -126,7 +124,7 @@ namespace Project.AI
             rageCooldownRemaining = rage.CooldownSeconds;
             rageEndTime = Time.time + rage.DurationSeconds;
             enemy.Buffs?.ApplyBuff(new BuffPayload(atkPercent: rage.AtkPercent, aspdPercent: rage.AspdPercent), rage.DurationSeconds);
-            DamagePopup.CreateSkillName("Rage", transform.position + skillNamePopupOffset);
+            SkillAnnouncementChannel.Announce("Rage", transform.position + skillNamePopupOffset);
         }
 
         private void TryCastPoison()
@@ -154,7 +152,7 @@ namespace Project.AI
 
             poisonCooldownRemaining = poison.CooldownSeconds;
             targetStatus.ApplyPoison(poison.DurationSeconds, poison.DamagePerTick);
-            DamagePopup.CreateSkillName("Poison", transform.position + skillNamePopupOffset);
+            SkillAnnouncementChannel.Announce("Poison", transform.position + skillNamePopupOffset);
         }
     }
 }

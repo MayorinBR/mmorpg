@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -35,6 +36,7 @@ namespace Project.Character.Combat
     public class PlayerSkillCaster : MonoBehaviour
     {
         private const float NearWaterRadius = 3f;
+        private const float CastMoveTolerance = 0.5f;
 
         [SerializeField] private PlayerSkillBook skillBook;
         [SerializeField] private PlayerStatsController statsController;
@@ -67,10 +69,32 @@ namespace Project.Character.Combat
         [Tooltip("Optional. The caster's own inventory, crafted into by a Craft skill (e.g. Arrow Crafting, Aqua Benedicta). Left empty, a Craft skill can't be cast.")]
         [SerializeField] private PlayerInventory inventory;
 
+        [Tooltip("Optional. Source of the arrow/bolt visual a ranged skill fires. Left empty, it is looked up on this object's parents and children at first use.")]
+        [SerializeField] private PlayerCombatController combat;
+
         [Tooltip("Layer containing Water colliders, checked by a Craft skill with SkillDefinition.RequiresNearWater (e.g. Aqua Benedicta). Left at its default (nothing), such a skill can never find water — ready for the moment a map actually tags one.")]
         [SerializeField] private LayerMask waterLayer;
 
         private readonly Dictionary<SkillDefinition, float> cooldownEndTimes = new Dictionary<SkillDefinition, float>();
+        private Coroutine castRoutine;
+
+        /// <summary>Gets whether a skill with a cast time is currently being cast; no other skill can start meanwhile.</summary>
+        public bool IsCasting => castRoutine != null;
+
+        /// <summary>Raised when a timed cast begins, with its total duration in seconds.</summary>
+        public event System.Action<float> CastStarted;
+
+        /// <summary>Raised when a timed cast ends, whether it completed or was interrupted.</summary>
+        public event System.Action CastEnded;
+
+        private void OnDisable()
+        {
+            if (castRoutine != null)
+            {
+                castRoutine = null;
+                CastEnded?.Invoke();
+            }
+        }
 
         /// <summary>
         /// Gets the player's current level in the given skill.
@@ -95,7 +119,7 @@ namespace Project.Character.Combat
         /// <returns>True if the skill was successfully cast; false if any requirement wasn't met, or a target pick was started instead.</returns>
         public bool TryCastSkill(SkillDefinition skill)
         {
-            if (ownHealth.IsDead || IsCastBlocked())
+            if (ownHealth.IsDead || IsCastBlocked() || IsCasting)
             {
                 return false;
             }
@@ -115,6 +139,11 @@ namespace Project.Character.Combat
                 return false;
             }
 
+            if (!MeetsWeaponRequirement(skill) || !MeetsCatalystRequirement(skill))
+            {
+                return false;
+            }
+
             if (skill.TargetType == SkillTargetType.Ground)
             {
                 // A Ground skill has no "already selected" position the
@@ -131,6 +160,33 @@ namespace Project.Character.Combat
                 return false;
             }
 
+            var castTime = GetCastTime(skill, level);
+
+            if (castTime > 0f)
+            {
+                if (mana.CurrentMana < skill.ManaCost)
+                {
+                    return false;
+                }
+
+                animatorController?.TriggerCast();
+                BeginCast(castTime, () => MeetsWeaponRequirement(skill) && MeetsCatalystRequirement(skill) && ExecuteCast(skill, level, false));
+                return true;
+            }
+
+            return ExecuteCast(skill, level, true);
+        }
+
+        /// <summary>
+        /// Resolves a skill's effect, then spends its ammo and catalyst and starts its cooldown when it took
+        /// effect.
+        /// </summary>
+        /// <param name="skill">The skill being cast.</param>
+        /// <param name="level">The skill's current level.</param>
+        /// <param name="triggerAnimation">Whether to play the cast animation now; false when it already played at the start of a timed cast.</param>
+        /// <returns>True if the skill took effect.</returns>
+        private bool ExecuteCast(SkillDefinition skill, int level, bool triggerAnimation)
+        {
             var cast = skill.EffectType switch
             {
                 SkillEffectType.Heal => TryCastHeal(skill),
@@ -146,11 +202,121 @@ namespace Project.Character.Combat
 
             if (cast)
             {
-                animatorController?.TriggerCast();
+                SpendAmmo(skill);
+                SpendCatalyst(skill);
+
+                if (triggerAnimation)
+                {
+                    animatorController?.TriggerCast();
+                }
+
                 cooldownEndTimes[skill] = Time.time + skill.CooldownSeconds;
             }
 
             return cast;
+        }
+
+        /// <summary>
+        /// Gets how long the skill takes to cast: its fixed part plus its variable part scaled by the caster's
+        /// DEX and INT.
+        /// </summary>
+        private float GetCastTime(SkillDefinition skill, int level)
+        {
+            return skill.GetFixedCastTime(level) + skill.GetVariableCastTime(level) * statsController.GetCastTimeMultiplier();
+        }
+
+        private void BeginCast(float castTime, System.Func<bool> onComplete)
+        {
+            castRoutine = StartCoroutine(CastRoutine(castTime, onComplete));
+            CastStarted?.Invoke(castTime);
+        }
+
+        /// <summary>
+        /// Waits out a cast, abandoning it if the caster dies, gets blocked (stun, flinch, silence) or walks
+        /// away, then runs <paramref name="onComplete"/>.
+        /// </summary>
+        private IEnumerator CastRoutine(float castTime, System.Func<bool> onComplete)
+        {
+            var origin = transform.position;
+            var endTime = Time.time + castTime;
+
+            while (Time.time < endTime)
+            {
+                if (ownHealth.IsDead || IsCastBlocked() || (transform.position - origin).sqrMagnitude > CastMoveTolerance * CastMoveTolerance)
+                {
+                    castRoutine = null;
+                    CastEnded?.Invoke();
+                    PlayerFeedbackChannel.Publish("Cast interrupted.");
+                    yield break;
+                }
+
+                yield return null;
+            }
+
+            castRoutine = null;
+            CastEnded?.Invoke();
+            onComplete();
+        }
+
+        /// <summary>
+        /// Checks the weapon and ammo a skill needs before any resource is spent, telling the player why a cast
+        /// was refused (e.g. Double Strafe without a bow or without arrows).
+        /// </summary>
+        /// <param name="skill">The skill about to be cast.</param>
+        /// <returns>True when the skill needs nothing the caster lacks.</returns>
+        private bool MeetsWeaponRequirement(SkillDefinition skill)
+        {
+            if (!skill.IsWeaponRequirementMet(GetMainHandWeaponSubtype()))
+            {
+                PlayerFeedbackChannel.Publish($"{skill.SkillName} requires a {string.Join(" or ", skill.RequiredWeaponSubtypes)}.");
+                return false;
+            }
+
+            if (skill.AmmoCost > 0 && (equipment == null || equipment.EquippedAmmoCount < skill.AmmoCost))
+            {
+                PlayerFeedbackChannel.Publish($"{skill.SkillName} needs ammo equipped.");
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Checks that the inventory holds the item the skill consumes (e.g. a gemstone), telling the player
+        /// what is missing when it does not.
+        /// </summary>
+        /// <param name="skill">The skill about to be cast.</param>
+        /// <returns>True when the skill needs no catalyst or the inventory holds enough of it.</returns>
+        private bool MeetsCatalystRequirement(SkillDefinition skill)
+        {
+            if (skill.RequiredItem == null)
+            {
+                return true;
+            }
+
+            if (inventory == null || inventory.Items.GetQuantity(skill.RequiredItem) < skill.RequiredItemCount)
+            {
+                PlayerFeedbackChannel.Publish($"{skill.SkillName} requires {skill.RequiredItemCount} {skill.RequiredItem.ItemName}.");
+                return false;
+            }
+
+            return true;
+        }
+
+        private void SpendCatalyst(SkillDefinition skill)
+        {
+            if (skill.RequiredItem != null)
+            {
+                inventory.Items.TryRemoveItem(skill.RequiredItem, skill.RequiredItemCount);
+            }
+        }
+
+        private void SpendAmmo(SkillDefinition skill)
+        {
+            for (var i = 0; i < skill.AmmoCost; i++)
+            {
+                equipment.TryConsumeAmmo();
+            }
         }
 
         /// <summary>
@@ -167,19 +333,49 @@ namespace Project.Character.Combat
         /// <returns>True if the zone was spawned.</returns>
         public bool TryCastSkillAtPosition(SkillDefinition skill, Vector3 position)
         {
-            if (ownHealth.IsDead || IsCastBlocked())
+            if (ownHealth.IsDead || IsCastBlocked() || IsCasting)
             {
                 return false;
             }
 
             var level = skillBook.GetLevel(skill);
 
-            if (level <= 0 || Time.time < GetCooldownEndTime(skill) || !TryCastZone(skill, level, position))
+            if (level <= 0 || Time.time < GetCooldownEndTime(skill) || !MeetsCatalystRequirement(skill))
             {
                 return false;
             }
 
-            animatorController?.TriggerCast();
+            var castTime = GetCastTime(skill, level);
+
+            if (castTime > 0f)
+            {
+                if (mana.CurrentMana < skill.ManaCost)
+                {
+                    return false;
+                }
+
+                animatorController?.TriggerCast();
+                BeginCast(castTime, () => ExecuteZoneCast(skill, level, position, false));
+                return true;
+            }
+
+            return ExecuteZoneCast(skill, level, position, true);
+        }
+
+        private bool ExecuteZoneCast(SkillDefinition skill, int level, Vector3 position, bool triggerAnimation)
+        {
+            if (!MeetsCatalystRequirement(skill) || !TryCastZone(skill, level, position))
+            {
+                return false;
+            }
+
+            SpendCatalyst(skill);
+
+            if (triggerAnimation)
+            {
+                animatorController?.TriggerCast();
+            }
+
             cooldownEndTimes[skill] = Time.time + skill.CooldownSeconds;
             return true;
         }
@@ -269,7 +465,7 @@ namespace Project.Character.Combat
                 return false;
             }
 
-            return CombatRangeMath.HorizontalDistance(transform.position, targetSelector.CurrentTarget.position) <= skill.Range;
+            return CombatRangeMath.HorizontalDistance(transform.position, targetSelector.CurrentTarget.position) <= GetEffectiveRange(skill);
         }
 
         /// <summary>
@@ -383,7 +579,64 @@ namespace Project.Character.Combat
             }
 
             buffs.ApplyBuff(BuildBuffPayload(skill, level), skill.GetBuffDuration(level));
+
+            if (isSelfOrAlly && skill.BuffRevealsHidden)
+            {
+                RevealHiddenAround(skill.AreaRadius);
+            }
+
             return true;
+        }
+
+        /// <summary>
+        /// Reveals every hidden enemy within the given radius of the caster, without damaging it.
+        /// </summary>
+        /// <param name="radius">Radius, in meters, around the caster.</param>
+        private void RevealHiddenAround(float radius)
+        {
+            foreach (var hitCollider in Physics.OverlapSphere(transform.position, radius, enemyLayer))
+            {
+                var targetStatus = hitCollider.GetComponentInParent<StatusEffectController>();
+
+                if (targetStatus != null && targetStatus.IsHidden)
+                {
+                    targetStatus.Reveal();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets how far a target-picked skill reaches: its authored range plus the Archer's learned range
+        /// passive (Vulture's Eye) for skills that fire ammo.
+        /// </summary>
+        /// <param name="skill">The skill being cast.</param>
+        /// <returns>The effective range, in meters.</returns>
+        private float GetEffectiveRange(SkillDefinition skill)
+        {
+            return skill.Range + (skill.AmmoCost > 0 ? statsController.GetPassiveRangeBonus() : 0f);
+        }
+
+        /// <summary>
+        /// Fires the arrow (ammo skills) or bolt (magical skills) visual at the target through the basic
+        /// attack's projectile setup. The skill's outcome is already decided, so this is purely cosmetic.
+        /// </summary>
+        /// <param name="skill">The skill being cast.</param>
+        /// <param name="target">The target the projectile flies to.</param>
+        private void PlayProjectileVisual(SkillDefinition skill, Transform target)
+        {
+            var isMagical = skill.DamageType == SkillDamageType.Magical;
+
+            if (skill.AmmoCost <= 0 && !isMagical)
+            {
+                return;
+            }
+
+            if (combat == null)
+            {
+                combat = GetComponentInParent<PlayerCombatController>() ?? GetComponentInChildren<PlayerCombatController>();
+            }
+
+            combat?.SpawnSkillProjectile(isMagical, target);
         }
 
         /// <summary>
@@ -521,7 +774,7 @@ namespace Project.Character.Combat
 
             var distance = CombatRangeMath.HorizontalDistance(transform.position, targetSelector.CurrentTarget.position);
 
-            if (distance > skill.Range || !mana.TryConsumeMana(skill.ManaCost))
+            if (distance > GetEffectiveRange(skill) || !mana.TryConsumeMana(skill.ManaCost))
             {
                 return false;
             }
@@ -532,6 +785,8 @@ namespace Project.Character.Combat
                 // above and nothing else can spend Zeny mid-cast.
                 currency.TrySpend(skill.ZenyCost);
             }
+
+            PlayProjectileVisual(skill, targetSelector.CurrentTarget);
 
             if (skill.IsAreaOfEffect)
             {
@@ -545,6 +800,7 @@ namespace Project.Character.Combat
             if (HitChanceCalculator.RollHit(subStats.Hit + skill.GetAccuracyBonus(level), target.FleeRating))
             {
                 var damage = skill.CalculateDamage(subStats.StatusAtk, subStats.StatusMatk, level);
+                damage = Mathf.RoundToInt(damage * skill.GetRaceDamageMultiplier(target.Race));
                 var category = skill.DamageType == SkillDamageType.Physical ? DamageCategory.Physical : DamageCategory.Magical;
                 damage = WeaponSizeModifiers.Apply(damage, category, GetMainHandWeaponSubtype(), target.Size);
                 damage += GetRaceDamageBonus(category, target.Race);
@@ -652,6 +908,7 @@ namespace Project.Character.Combat
                 if (HitChanceCalculator.RollHit(accuracy, target.FleeRating))
                 {
                     var damage = skill.CalculateDamage(subStats.StatusAtk, subStats.StatusMatk, level);
+                    damage = Mathf.RoundToInt(damage * skill.GetRaceDamageMultiplier(target.Race));
                     damage = WeaponSizeModifiers.Apply(damage, category, GetMainHandWeaponSubtype(), target.Size);
                     damage += GetRaceDamageBonus(category, target.Race);
                     target.TakeDamage(damage, skill.Element, category, attacker: transform);
@@ -710,7 +967,7 @@ namespace Project.Character.Combat
             var accuracy = subStats.Hit + skill.GetAccuracyBonus(level);
             var damage = skill.CalculateDamage(subStats.StatusAtk, subStats.StatusMatk, level);
             var category = skill.DamageType == SkillDamageType.Physical ? DamageCategory.Physical : DamageCategory.Magical;
-            zone.Initialize(enemyLayer, accuracy, damage, skill.Element, category, transform);
+            zone.Initialize(enemyLayer, accuracy, damage, skill.Element, category, transform, skill.GetZoneMaxHits(level));
             return true;
         }
 
