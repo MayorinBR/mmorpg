@@ -7431,8 +7431,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetSelector: {fileID: 401280844}
-  currentTargetRing: {fileID: 0}
-  skillPickerRing: {fileID: 0}
 --- !u!1001 &775677243
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18113,6 +18111,10 @@ MonoBehaviour:
   entryPrefab: {fileID: 6179144918626496876, guid: 8ef7c90993e741c4d87fd591e0d8cb87, type: 3}
   contentRoot: {fileID: 1540699655}
   marker: {fileID: 1022012998}
+  screenFraction: 0.8
+  gridColumns: 10
+  gridRows: 10
+  gridUnit: 60
 --- !u!114 &1540699657
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21749,6 +21751,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1900000002}
   - component: {fileID: 900000103}
+  - component: {fileID: 1900000003}
   m_Layer: 7
   m_Name: Quests
   m_TagString: Untagged
@@ -21771,6 +21774,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 401280837}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1900000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1900000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38d5295d5911ea044a925bd9e92cdeb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Quests::Project.Quests.ClassTrialPromotion
+  catalog: {fileID: 11400000, guid: 4da61ae8c22a2624e932f76c0ada61dc, type: 2}
+  questManager: {fileID: 900000103}
+  classController: {fileID: 1696850564}
 --- !u!1 &1908883295
 GameObject:
   m_ObjectHideFlags: 0
@@ -28150,9 +28168,9 @@ MonoBehaviour:
   lineText: {fileID: 9000000000000000018}
   optionButtonPrefab: {fileID: 100006, guid: a13c4f2e9b7d4a3d8e0c1f2a3b4c5d6e, type: 3}
   optionsParent: {fileID: 9000000000000000020}
-  questManager: {fileID: 0}
-  classController: {fileID: 0}
-  jobProgress: {fileID: 0}
+  questManager: {fileID: 900000103}
+  classController: {fileID: 1696850564}
+  jobProgress: {fileID: 1696850565}
 --- !u!1 &9000000000000000009
 GameObject:
   m_ObjectHideFlags: 0

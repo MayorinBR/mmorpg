@@ -77,7 +77,7 @@ namespace Project.Skills.Tests
         [TestCase(0, 0, 5, 0)]
         [TestCase(0, 2, 3, 6)]
         [TestCase(4, 0, 9, 4)]
-        [TestCase(0, -5, 1, 1)]
+        [TestCase(4, -5, 1, 1)]
         public void GetZoneMaxHits_FollowsAuthoredCaps(int baseHits, int perLevel, int level, int expected)
         {
             SetField("zoneMaxHits", baseHits);

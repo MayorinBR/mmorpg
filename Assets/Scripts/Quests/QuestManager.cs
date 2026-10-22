@@ -34,6 +34,9 @@ namespace Project.Quests
         /// <summary>Raised whenever a quest is accepted, its progress changes, or it completes.</summary>
         public event Action QuestsChanged;
 
+        /// <summary>Raised after a quest completes and its reward is granted, carrying the completed quest.</summary>
+        public event Action<QuestDefinition> QuestCompleted;
+
         /// <summary>Gets every quest currently accepted and in progress.</summary>
         public IReadOnlyList<ActiveQuest> ActiveQuests => activeQuests;
 
@@ -103,6 +106,30 @@ namespace Project.Quests
 
             QuestsChanged?.Invoke();
             return count;
+        }
+
+        /// <summary>
+        /// Abandons an active quest and discards all of its progress, so
+        /// accepting it again starts from zero. Does nothing for a quest that is
+        /// not active. Items granted on accept stay with the player.
+        /// </summary>
+        /// <param name="quest">The quest to abandon.</param>
+        /// <returns>True if the quest was active and has been abandoned.</returns>
+        public bool AbandonQuest(QuestDefinition quest)
+        {
+            var active = activeQuests.FirstOrDefault(candidate => candidate.Definition == quest);
+
+            if (active == null)
+            {
+                return false;
+            }
+
+            StopTracking(active);
+            activeQuests.Remove(active);
+
+            PlayerFeedbackChannel.Publish($"Quest abandoned: {quest.Title}");
+            QuestsChanged?.Invoke();
+            return true;
         }
 
         private bool AcceptQuest(QuestDefinition quest, int[] initialProgress)
@@ -182,6 +209,7 @@ namespace Project.Quests
 
             PlayerFeedbackChannel.Publish($"Quest completed: {definition.Title}");
             QuestsChanged?.Invoke();
+            QuestCompleted?.Invoke(definition);
         }
 
         private void StopTracking(ActiveQuest active)

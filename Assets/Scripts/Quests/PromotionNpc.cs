@@ -1,35 +1,20 @@
 using UnityEngine;
-using Project.Character.Stats;
 
 namespace Project.Quests
 {
     /// <summary>
-    /// Marks an NPC as a class promotion master, read by
+    /// Marks an NPC as the class trial master, read by
     /// <c>Project.UI.DialogueWindowUI</c> when the player picks a
     /// <see cref="Project.NPC.NpcDialogueOptionAction.ClassPromotion"/> option.
-    /// Holds only data: the one-time trial quest a Novice must finish and the
-    /// classes this NPC can promote to. Today a single NPC offers all six
-    /// classes for testing; later each class gets its own NPC with its own
-    /// quest and a shorter <see cref="OfferedClasses"/> list.
+    /// Holds only data: the catalog of class trials the NPC offers. A Novice
+    /// picks one trial at a time, completing it promotes the player, and
+    /// afterwards the NPC only has generic dialogue.
     /// </summary>
     public class PromotionNpc : MonoBehaviour
     {
-        [SerializeField] private QuestDefinition promotionQuest;
+        [SerializeField] private ClassTrialCatalog catalog;
 
-        [SerializeField] private CharacterClass[] offeredClasses =
-        {
-            CharacterClass.Swordman,
-            CharacterClass.Archer,
-            CharacterClass.Merchant,
-            CharacterClass.Acolyte,
-            CharacterClass.Thief,
-            CharacterClass.Mage
-        };
-
-        /// <summary>Gets the trial quest a Novice must complete once before promoting.</summary>
-        public QuestDefinition PromotionQuest => promotionQuest;
-
-        /// <summary>Gets the classes this NPC can promote a Novice to.</summary>
-        public CharacterClass[] OfferedClasses => offeredClasses;
+        /// <summary>Gets the class trials this NPC offers.</summary>
+        public ClassTrialCatalog Catalog => catalog;
     }
 }
