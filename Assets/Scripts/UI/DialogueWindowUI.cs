@@ -180,53 +180,100 @@ namespace Project.UI
             }
         }
 
+        /// <summary>
+        /// Shows the trial master's conversation for the player's current trial stage.
+        /// </summary>
+        /// <param name="npc">The trial master being talked to.</param>
         private void ShowPromotion(PromotionNpc npc)
         {
-            var quest = npc.PromotionQuest;
             var leave = ("Leave.", (Action)Close);
+            var completed = npc.Catalog.FindTrial(questManager.IsCompleted);
+            var active = npc.Catalog.FindTrial(questManager.IsActive);
+            var stage = ClassTrialRules.Resolve(
+                classController.CurrentClass == CharacterClass.Novice,
+                completed != null,
+                active != null,
+                classController.CanEvolve);
 
-            if (classController.CurrentClass != CharacterClass.Novice)
+            switch (stage)
             {
-                ShowDynamic("You have already chosen your path. Walk it well.", leave);
-            }
-            else if (questManager.IsCompleted(quest))
-            {
-                ShowClassChoices(npc, leave);
-            }
-            else if (questManager.IsActive(quest))
-            {
-                ShowDynamic("Finish the trial first, then come back to me.\n\n" + quest.Description, leave);
-            }
-            else if (jobProgress.JobLevel < ClassProgression.EvolutionJobLevel)
-            {
-                ShowDynamic($"Come back when you reach Job Level {ClassProgression.EvolutionJobLevel}.", leave);
-            }
-            else
-            {
-                ShowDynamic(quest.Description, ("Accept the trial.", () =>
-                {
-                    questManager.AcceptQuest(quest);
-                    Close();
-                }), leave);
+                case ClassTrialStage.AlreadyPromoted:
+                    ShowDynamic("You have already completed the trial. Go now and seek new adventures.", leave);
+                    break;
+                case ClassTrialStage.ClaimPromotion:
+                    ShowDynamic($"You have completed the trial of the {completed.TargetClass}. Turn it in and your new path begins.",
+                        ("Turn in the trial.", () => ConfirmClass(completed.TargetClass)), leave);
+                    break;
+                case ClassTrialStage.TrialActive:
+                    ShowDynamic($"{active.Quest.Title}\n\n{active.Quest.Description}",
+                        ("Abandon the trial.", () => AbandonTrial(npc, active)), leave);
+                    break;
+                case ClassTrialStage.NotReady:
+                    ShowDynamic(GetNotReadyLine(), leave);
+                    break;
+                default:
+                    ShowTrialChoices(npc, leave);
+                    break;
             }
         }
 
-        private void ShowClassChoices(PromotionNpc npc, (string, Action) leave)
+        /// <summary>
+        /// Gets the line explaining why the Novice cannot start a trial yet.
+        /// </summary>
+        /// <returns>The line to show.</returns>
+        private string GetNotReadyLine()
         {
-            if (!classController.CanEvolve)
-            {
-                ShowDynamic($"Reach Job Level {ClassProgression.EvolutionJobLevel} and spend every skill point before choosing a class.", leave);
-                return;
-            }
+            return jobProgress.JobLevel < ClassProgression.EvolutionJobLevel
+                ? $"Come back when you reach Job Level {ClassProgression.EvolutionJobLevel}."
+                : "Spend every skill point on Novice skills before taking a trial.";
+        }
 
-            var choices = npc.OfferedClasses
-                .Select(target => ($"Become a {target}.", (Action)(() => ConfirmClass(target))))
+        /// <summary>
+        /// Lists one trial per class, plus a way to leave.
+        /// </summary>
+        /// <param name="npc">The trial master being talked to.</param>
+        /// <param name="leave">The option that closes the window.</param>
+        private void ShowTrialChoices(PromotionNpc npc, (string, Action) leave)
+        {
+            var choices = npc.Catalog.Trials
+                .Select(trial => ($"Trial of the {trial.TargetClass}.", (Action)(() => ShowTrialOffer(npc, trial))))
                 .Append(leave)
                 .ToArray();
 
-            ShowDynamic("The trial is done. Which path will you take?", choices);
+            ShowDynamic("Choose the class you wish to become. You can hold only one trial at a time.", choices);
         }
 
+        /// <summary>
+        /// Describes one trial and lets the player accept it or go back.
+        /// </summary>
+        /// <param name="npc">The trial master being talked to.</param>
+        /// <param name="trial">The trial being offered.</param>
+        private void ShowTrialOffer(PromotionNpc npc, ClassTrial trial)
+        {
+            ShowDynamic(trial.Quest.Description,
+                ("Accept the trial.", () =>
+                {
+                    questManager.AcceptQuest(trial.Quest);
+                    Close();
+                }),
+                ("Back.", () => ShowPromotion(npc)));
+        }
+
+        /// <summary>
+        /// Abandons a trial, which discards its progress, and shows the options again.
+        /// </summary>
+        /// <param name="npc">The trial master being talked to.</param>
+        /// <param name="trial">The trial to abandon.</param>
+        private void AbandonTrial(PromotionNpc npc, ClassTrial trial)
+        {
+            questManager.AbandonQuest(trial.Quest);
+            ShowPromotion(npc);
+        }
+
+        /// <summary>
+        /// Evolves the player into the chosen class and closes the window.
+        /// </summary>
+        /// <param name="target">The class to become.</param>
         private void ConfirmClass(CharacterClass target)
         {
             classController.TryEvolve(target);

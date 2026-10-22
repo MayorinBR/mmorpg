@@ -43,7 +43,7 @@ Prototype of a 2.5D/3D MMORPG built in Unity, inspired by Ragnarok Online's clas
 - Floating damage numbers rise above the player and enemies on every hit
 - Updated 3D models for the Player and NPCs (Blacksmith), replacing the original placeholder meshes with custom Humanoid-rigged assets
 - Weapon-aware melee attack animation: unarmed (or dagger, as a temporary placeholder) plays a punching swing, while other melee weapons (sword, axe, etc.) play a dedicated weapon swing — selected automatically from the equipped weapon's subtype
-- Classes: Novice start class (evolves at Job Level 10 through a promotion NPC and a one-time trial quest) plus 6 base classes; Skill Book with one tab per class tier; 63 skills across 7 class databases (Swordman complete, including Magnum Break and two-handed sword mastery)
+- Classes: Novice start class (at Job Level 10 the Trial Master NPC in the city offers one trial per class, each asking to defeat 10 Skeletons and 1 Skeleton Warrior; one trial at a time, abandoning it resets progress, and turning the completed trial in to the NPC promotes the player) plus 6 base classes; Skill Book with one tab per class tier; 63 skills across 7 class databases (Swordman complete, including Magnum Break and two-handed sword mastery)
 - Weapons carry their own ATK and an attack speed multiplier; two-handed swords are Swordman-only
 - Status effects and buff/debuff system (poison, stun, Fatal Blow and others), knockback, Zeny skill costs, Merchant weight limit, extra elements (Ghost, Holy, Poison)
 - Quest system with quest log and quest board, NPC dialogue, courier and kill/collect quests
@@ -94,7 +94,7 @@ Protótipo de um MMORPG 2.5D/3D feito em Unity, inspirado no gameplay clássico 
 - Números de dano flutuantes sobem sobre o player e os inimigos a cada acerto
 - Modelos 3D atualizados para o Player e NPCs (Blacksmith), substituindo os meshes placeholder originais por assets Humanoid customizados
 - Animação de ataque corpo a corpo sensível à arma: desarmado (ou adaga, como placeholder temporário) toca uma animação de soco, enquanto outras armas corpo a corpo (espada, machado, etc.) tocam um golpe dedicado — escolhido automaticamente a partir do subtipo da arma equipada
-- Classes: Novice como classe inicial (evolui no Job Level 10 por um NPC de promocao e uma quest unica) mais 6 classes base; Skill Book com uma aba por nivel de classe; 63 skills em 7 databases de classe (Swordman completo, incluindo Magnum Break e Two-Handed Sword Mastery)
+- Classes: Novice como classe inicial (no Job Level 10 o NPC Trial Master da cidade oferece uma prova por classe, cada uma pedindo para derrotar 10 Skeletons e 1 Skeleton Warrior; uma prova por vez, abandonar zera o progresso e entregar a prova concluida ao NPC promove o jogador) mais 6 classes base; Skill Book com uma aba por nivel de classe; 63 skills em 7 databases de classe (Swordman completo, incluindo Magnum Break e Two-Handed Sword Mastery)
 - Armas com ATK proprio e multiplicador de velocidade de ataque; espadas de duas maos exclusivas do Swordman
 - Sistema de status effects e buff/debuff (veneno, stun, Fatal Blow e outros), knockback, custo de Zeny em skills, limite de peso do Merchant, elementos extras (Ghost, Holy, Poison)
 - Sistema de quests com quest log e quest board, dialogo de NPC, quests de entrega e de matar/coletar
@@ -145,7 +145,7 @@ Ragnarok Onlineのクラシックな戦闘(PvE)と探索のゲームプレイに
 - ダメージ数値: プレイヤーと敵が被弾するたびに数値が上昇しながら表示される
 - 3Dモデルを更新: プレイヤーとNPC(鍛冶屋)のプレースホルダーメッシュを、カスタムのHumanoidリグ付きモデルに置き換え
 - 武器に応じた近接攻撃アニメーション: 素手(または一時的なプレースホルダーとしてダガー)はパンチの振りを再生し、それ以外の近接武器(剣・斧など)は専用の振りアニメーションを再生 — 装備中の武器サブタイプから自動選択
-- 職業: Noviceが初期職(ジョブレベル10で転職NPCと1回限りの試練クエストを経て進化)と6つの基本職。スキルブックは職業段階ごとのタブ。7つの職業データベースに63スキル(Swordmanは完成、Magnum BreakとTwo-Handed Sword Masteryを含む)
+- 職業: Noviceが初期職(ジョブレベル10で街のトライアルマスターNPCが職業ごとの試練を提示し、各試練はSkeleton 10体とSkeleton Warrior 1体の討伐。試練は同時に1つまで、放棄すると進行がリセットされ、達成した試練をNPCに報告すると転職)と6つの基本職。スキルブックは職業段階ごとのタブ。7つの職業データベースに63スキル(Swordmanは完成、Magnum BreakとTwo-Handed Sword Masteryを含む)
 - 武器は固有のATKと攻撃速度倍率を持つ。両手剣はSwordman専用
 - ステータス異常とバフ/デバフシステム(毒、スタン、Fatal Blowなど)、ノックバック、スキルのゼニーコスト、Merchantの重量上限、追加属性(Ghost、Holy、Poison)
 - クエストログとクエストボード付きのクエストシステム、NPC会話、配達および討伐/収集クエスト
