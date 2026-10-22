@@ -23,7 +23,7 @@ namespace Project.World
 #if UNITY_EDITOR
         [SerializeField] private SceneAsset destinationScene;
 #endif
-        [SerializeField] private string destinationSceneName = "Prototype_Map02";
+        [SerializeField] private string destinationSceneName = "Prototype_City1";
         [Tooltip("Optional. Leave empty to arrive at the spawn point named after this scene.")]
         [SerializeField] private string destinationSpawnPointId = "";
         [SerializeField] private float activationDistance = 1.5f;

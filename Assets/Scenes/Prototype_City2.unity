@@ -342,8 +342,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapDatabase: {fileID: 11400000, guid: d41f21b65a824b0e929a6a3a53774402, type: 2}
   defaultRespawnPoint: {fileID: 100000061}
-  localCurrentTargetRing: {fileID: 0}
-  localSkillPickerRing: {fileID: 0}
 --- !u!114 &100000053
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -810,6 +808,30 @@ PrefabInstance:
     - target: {fileID: 1000010, guid: 055cf84a95624247a7e1d7922912cac4, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000160, guid: 055cf84a95624247a7e1d7922912cac4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000160, guid: 055cf84a95624247a7e1d7922912cac4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.77
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000170, guid: 055cf84a95624247a7e1d7922912cac4, type: 3}
+      propertyPath: fromScene
+      value: 
+      objectReference: {fileID: 102900000, guid: fe8d21a41abb48b47bbe3652ef153512, type: 3}
+    - target: {fileID: 1000170, guid: 055cf84a95624247a7e1d7922912cac4, type: 3}
+      propertyPath: spawnPointId
+      value: Prototype_Map04
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000180, guid: 055cf84a95624247a7e1d7922912cac4, type: 3}
+      propertyPath: destinationScene
+      value: 
+      objectReference: {fileID: 102900000, guid: fe8d21a41abb48b47bbe3652ef153512, type: 3}
+    - target: {fileID: 1000180, guid: 055cf84a95624247a7e1d7922912cac4, type: 3}
+      propertyPath: destinationSceneName
+      value: Prototype_Map04
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
