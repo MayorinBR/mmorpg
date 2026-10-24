@@ -17,7 +17,7 @@ namespace Project.Character.Combat
         [SerializeField] private int startingJobLevel = 1;
         [SerializeField] private int skillPointsPerJobLevel = 1;
 
-        [Tooltip("Optional. Applies the Novice Job Level cap and resets progress when the player evolves. Left empty, Job Level is uncapped.")]
+        [Tooltip("Optional. Applies the class Job Level cap (10 for a Novice, 99 after evolving) and resets progress when the player evolves. Left empty, Job Level is uncapped.")]
         [SerializeField] private PlayerClassController classController;
 
         private IJobExperienceCurve experienceCurve;

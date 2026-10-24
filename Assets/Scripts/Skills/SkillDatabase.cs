@@ -59,5 +59,15 @@ namespace Project.Skills
 
             return null;
         }
+
+        /// <summary>
+        /// Checks whether a skill is listed in this database.
+        /// </summary>
+        /// <param name="skill">The skill to look for.</param>
+        /// <returns>True when <paramref name="skill"/> is one of <see cref="AllSkills"/>.</returns>
+        public bool Contains(SkillDefinition skill)
+        {
+            return skill != null && System.Array.IndexOf(allSkills, skill) >= 0;
+        }
     }
 }

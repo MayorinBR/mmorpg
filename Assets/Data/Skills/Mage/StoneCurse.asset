@@ -16,7 +16,7 @@ MonoBehaviour:
   description: "Attempts to petrify a single target, immobilizing them for a short
     time if it lands. Deals no direct damage \u2014 real Ragnarok Online's HP-drain-while-petrified
     and element-conversion-to-Earth aren't modeled here."
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 1c582a5a13ef35540b8d85122e03ed4c, type: 3}
   allowedClasses: 05000000
   effectType: 0
   targetType: 2
@@ -87,6 +87,8 @@ MonoBehaviour:
   fixedCastPerLevel: 0
   variableCastSeconds: 1.2
   variableCastPerLevel: 0
+  projectileVfxPrefab: {fileID: 0}
+  impactVfxPrefab: {fileID: 2433317153654023859, guid: d8d6c06e265d42d4eb2383abe154c477, type: 3}
   zonePrefab: {fileID: 0}
   zoneDurationSeconds: 15
   zoneDurationPerLevel: 0

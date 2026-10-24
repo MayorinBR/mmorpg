@@ -196,6 +196,13 @@ namespace Project.Skills
         [Tooltip("Extra variable cast time in seconds per skill level. May be negative, as for Fire Wall and Safety Wall, whose cast shortens as they level.")]
         [SerializeField] private float variableCastPerLevel;
 
+        [Header("Visual effects (optional)")]
+        [Tooltip("Effect that flies from the caster to the target when the skill is cast. Left empty, no projectile is shown (a magical skill with no effects at all falls back to the generic bolt).")]
+        [SerializeField] private GameObject projectileVfxPrefab;
+
+        [Tooltip("Effect spawned on the target when the skill lands (or on the target area for an area skill). Authored at the skill's own area size.")]
+        [SerializeField] private GameObject impactVfxPrefab;
+
         [Header("Zone (only used if Effect Type is Zone)")]
         [Tooltip("Optional visual spawned at the zone's position. Left empty, the zone is logic-only — still applies its effect, just invisible, useful before a real wall/fire visual is authored.")]
         [SerializeField] private GameObject zonePrefab;
@@ -375,6 +382,15 @@ namespace Project.Skills
 
         /// <summary>Gets the optional visual prefab spawned at a Zone skill's position. Null means the zone is logic-only. Only meaningful when <see cref="EffectType"/> is Zone.</summary>
         public GameObject ZonePrefab => zonePrefab;
+
+        /// <summary>Gets the optional effect that flies from the caster to the target.</summary>
+        public GameObject ProjectileVfxPrefab => projectileVfxPrefab;
+
+        /// <summary>Gets the optional effect spawned where the skill lands.</summary>
+        public GameObject ImpactVfxPrefab => impactVfxPrefab;
+
+        /// <summary>Gets whether this skill brings its own visual effects instead of the generic bolt.</summary>
+        public bool HasCustomVfx => projectileVfxPrefab != null || impactVfxPrefab != null;
 
         /// <summary>Gets the interval, in seconds, between a Zone skill's damage ticks against anything standing inside it. Ignored when <see cref="BlocksAttacks"/> is true. Only meaningful when <see cref="EffectType"/> is Zone.</summary>
         public float ZoneTickIntervalSeconds => zoneTickIntervalSeconds;

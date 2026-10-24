@@ -51,7 +51,10 @@ namespace Project.Character.Combat
             energyCoatSkill = skill;
             drainTimer = DrainIntervalSeconds;
             IsActive = true;
-            buffs.SetPersistentModifier(this, new BuffPayload(incomingDamageReductionPercent: skill.GetToggleDrainIncomingDamageReductionPercent(skillLevel)));
+            buffs.SetPersistentModifier(
+                this,
+                new BuffPayload(incomingDamageReductionPercent: skill.GetToggleDrainIncomingDamageReductionPercent(skillLevel)),
+                new EffectDescriptor("skill." + skill.name, skill.SkillName, skill.Description, skill.Icon, EffectCategory.Toggle));
         }
 
         private void Update()

@@ -24,7 +24,8 @@ namespace Project.AI
         {
             [SerializeField] private EnemyController prefab;
             [SerializeField, Min(0f)] private float weight = 1f;
-            [SerializeField, Min(0f)] private float respawnDelaySeconds = 30f;
+            [Tooltip("Overrides the monster's own respawn delay. A negative value uses the delay set on its MonsterDefinition.")]
+            [SerializeField] private float respawnDelaySeconds = -1f;
 
             /// <summary>Gets the enemy prefab to spawn.</summary>
             public EnemyController Prefab => prefab;
@@ -32,8 +33,22 @@ namespace Project.AI
             /// <summary>Gets the relative chance of this entry.</summary>
             public float Weight => weight;
 
-            /// <summary>Gets how long this monster stays dead before respawning.</summary>
-            public float RespawnDelaySeconds => respawnDelaySeconds;
+            /// <summary>
+            /// Gets how long this monster stays dead before respawning: the entry's override when set,
+            /// otherwise the delay on the monster's definition.
+            /// </summary>
+            public float RespawnDelaySeconds
+            {
+                get
+                {
+                    if (respawnDelaySeconds >= 0f)
+                    {
+                        return respawnDelaySeconds;
+                    }
+
+                    return prefab != null && prefab.Stats is MonsterDefinition monster ? monster.RespawnDelaySeconds : 30f;
+                }
+            }
         }
 
         private const float NavMeshSampleDistance = 2f;

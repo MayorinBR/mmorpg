@@ -126,8 +126,26 @@ namespace Project.Character.Combat
         [SerializeField] private bool releaseProjectileOnAnimationEvent;
 
         private float cooldownRemaining;
+        private PlayerSkillCaster skillCaster;
         private float nextAmmoWarningTime;
         private System.Action pendingProjectileRelease;
+
+        /// <summary>
+        /// Gets or sets whether chasing and auto attacks are paused because a
+        /// skill is walking the player into its own range. Set by
+        /// <see cref="SkillTargetingController"/> while it holds a queued skill.
+        /// </summary>
+        public bool IsSkillApproachPending { get; set; }
+
+        private bool IsSkillCasting()
+        {
+            if (skillCaster == null)
+            {
+                skillCaster = transform.root.GetComponentInChildren<PlayerSkillCaster>(true);
+            }
+
+            return skillCaster != null && skillCaster.IsCasting;
+        }
 
         private void Update()
         {
@@ -141,6 +159,17 @@ namespace Project.Character.Combat
             {
                 movementController.SetMovementLocked(false);
                 targetSelector.ClearTarget();
+                return;
+            }
+
+            if (IsSkillApproachPending)
+            {
+                movementController.SetMovementLocked(false);
+                return;
+            }
+
+            if (IsSkillCasting())
+            {
                 return;
             }
 
@@ -442,6 +471,18 @@ namespace Project.Character.Combat
 
             var origin = projectileOrigin != null ? projectileOrigin.position : transform.position;
             Projectile.Spawn(prefab, origin, target, projectileSpeed, null);
+        }
+
+        /// <summary>
+        /// Fires a skill's own projectile effect at a target and runs a callback when it arrives.
+        /// </summary>
+        /// <param name="prefab">The skill's projectile effect.</param>
+        /// <param name="target">The transform the projectile flies to.</param>
+        /// <param name="onArrival">Invoked when the projectile reaches the target.</param>
+        public void SpawnSkillProjectile(GameObject prefab, Transform target, System.Action onArrival)
+        {
+            var origin = projectileOrigin != null ? projectileOrigin.position : transform.position;
+            Projectile.Spawn(prefab, origin, target, projectileSpeed, onArrival);
         }
 
         /// <summary>

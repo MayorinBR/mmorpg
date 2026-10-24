@@ -15,6 +15,10 @@ namespace Project.Character.Animation
         private static readonly int SpeedParameter = Animator.StringToHash("Speed");
         private static readonly int AttackParameter = Animator.StringToHash("Attack");
         private static readonly int CastParameter = Animator.StringToHash("Cast");
+        private static readonly int IsChannelingParameter = Animator.StringToHash("IsChanneling");
+        private static readonly int HitParameter = Animator.StringToHash("Hit");
+        private static readonly int ChannelSpeedParameter = Animator.StringToHash("ChannelSpeed");
+        private const string ChannelStateName = "Channel";
         private static readonly int IsDeadParameter = Animator.StringToHash("IsDead");
         private static readonly int AttackSpeedMultiplierParameter = Animator.StringToHash("AttackSpeedMultiplier");
 
@@ -33,6 +37,7 @@ namespace Project.Character.Animation
 
         private AnimatorOverrideController overrideController;
         private AnimationClip activeAttackClip;
+        private float pendingChannelSeconds;
 
         /// <summary>
         /// Retargets this controller at a different <see cref="Animator"/> —
@@ -131,7 +136,54 @@ namespace Project.Character.Animation
         }
 
         /// <summary>
-        /// Plays the spell cast animation.
+        /// Enters or leaves the channeling pose held while a timed cast charges up. Set to true when the
+        /// cast starts and back to false when it completes or is interrupted.
+        /// </summary>
+        /// <param name="isChanneling">Whether the player is currently channeling a spell.</param>
+        /// <param name="durationSeconds">How long the channeling animation should take, so its playback speed is scaled to the cast time. Ignored when leaving the pose.</param>
+        public void SetChanneling(bool isChanneling, float durationSeconds = 0f)
+        {
+            animator.SetBool(IsChannelingParameter, isChanneling);
+            pendingChannelSeconds = isChanneling ? durationSeconds : 0f;
+
+            if (!isChanneling)
+            {
+                animator.SetFloat(ChannelSpeedParameter, 1f);
+            }
+        }
+
+        /// <summary>
+        /// Once the Animator has entered the Channel state, scales its playback speed so the clip lasts exactly
+        /// the requested cast time.
+        /// </summary>
+        private void Update()
+        {
+            if (pendingChannelSeconds <= 0f || animator == null || !animator.GetCurrentAnimatorStateInfo(0).IsName(ChannelStateName))
+            {
+                return;
+            }
+
+            var clips = animator.GetCurrentAnimatorClipInfo(0);
+
+            if (clips.Length == 0)
+            {
+                return;
+            }
+
+            animator.SetFloat(ChannelSpeedParameter, clips[0].clip.length / pendingChannelSeconds);
+            pendingChannelSeconds = 0f;
+        }
+
+        /// <summary>
+        /// Plays the hit reaction, used when a cast is knocked out of the player's hands.
+        /// </summary>
+        public void TriggerHit()
+        {
+            animator.SetTrigger(HitParameter);
+        }
+
+        /// <summary>
+        /// Plays the spell release animation, the moment a spell is actually cast.
         /// </summary>
         public void TriggerCast()
         {

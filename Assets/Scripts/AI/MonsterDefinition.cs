@@ -15,7 +15,13 @@ namespace Project.AI
     [CreateAssetMenu(fileName = "NewMonster", menuName = "Project/AI/Monster")]
     public class MonsterDefinition : CharacterStatsDefinition
     {
+        [Tooltip("Seconds this monster stays dead before respawning. A spawn area entry can override it.")]
+        [SerializeField, Min(0f)] private float respawnDelaySeconds = 30f;
+
         [SerializeField] private LootEntry[] drops;
+
+        /// <summary>Gets how long this monster stays dead before respawning.</summary>
+        public float RespawnDelaySeconds => respawnDelaySeconds;
 
         /// <summary>Gets the possible drops of this monster.</summary>
         public IReadOnlyList<LootEntry> Drops => drops;

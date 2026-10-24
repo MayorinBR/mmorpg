@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using Project.Maps;
 
@@ -66,10 +67,26 @@ namespace Project.UI
                 return;
             }
 
+            if (IsPointerOverOtherUi())
+            {
+                return;
+            }
+
             if (!RectTransformUtility.RectangleContainsScreenPoint(Window, mouse.position.ReadValue()))
             {
                 GetComponentInParent<WindowPanel>()?.Close();
             }
+        }
+
+        /// <summary>
+        /// Checks whether the pointer is over any UI element, such as a HUD button. Those clicks must
+        /// not close the window here, otherwise the window closes on press and the button then reopens
+        /// it on release instead of closing it.
+        /// </summary>
+        /// <returns>True when the pointer is over a UI element.</returns>
+        private static bool IsPointerOverOtherUi()
+        {
+            return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
         }
 
         private void OnDestroy()

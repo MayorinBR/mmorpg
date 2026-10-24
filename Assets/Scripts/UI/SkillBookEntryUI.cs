@@ -183,7 +183,7 @@ namespace Project.UI
             var level = skillBook.GetLevel(Skill);
             levelText.text = $"{level}/{Skill.MaxLevel}";
             var meetsLevelRequirement = experience == null || experience.CurrentLevel >= Skill.RequiredLevel;
-            learnButton.interactable = level < Skill.MaxLevel && meetsLevelRequirement;
+            learnButton.interactable = level < Skill.MaxLevel && meetsLevelRequirement && skillBook.CanSpendPointsOn(Skill);
             iconImage.color = level > 0 ? Color.white : new Color(1f, 1f, 1f, 0.5f);
         }
 

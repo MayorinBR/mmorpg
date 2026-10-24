@@ -60,6 +60,14 @@ namespace Project.Combat
             }
 
             controller.radius = radius;
+
+            var visual = instance.GetComponentInChildren<SkillAreaVisual>();
+
+            if (visual != null)
+            {
+                visual.SetRadius(radius);
+            }
+
             controller.durationRemaining = durationSeconds;
             controller.tickIntervalSeconds = tickIntervalSeconds;
             return controller;

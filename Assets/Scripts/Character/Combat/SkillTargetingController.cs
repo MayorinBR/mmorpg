@@ -40,6 +40,11 @@ namespace Project.Character.Combat
         private SkillDefinition pendingSkill;
         private Collider hoveredEnemyCollider;
         private Vector3? hoveredGroundPoint;
+        private SkillDefinition queuedSkill;
+        private float nextApproachTime;
+        private PlayerInputRouter inputRouter;
+        private CharacterMovementController movement;
+        private PlayerCombatController combat;
 
         /// <summary>
         /// The single active instance, set in <see cref="Awake"/>. Mirrors
@@ -59,6 +64,9 @@ namespace Project.Character.Combat
         /// <summary>Gets whether a skill is currently waiting for the player to pick a target.</summary>
         public bool IsPicking => pendingSkill != null;
 
+        /// <summary>Gets the skill waiting for a target or ground position, or null when not picking.</summary>
+        public SkillDefinition PendingSkill => pendingSkill;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -72,6 +80,9 @@ namespace Project.Character.Combat
 
             Instance = this;
             caster = GetComponent<PlayerSkillCaster>();
+            inputRouter = transform.root.GetComponentInChildren<PlayerInputRouter>(true);
+            movement = transform.root.GetComponentInChildren<CharacterMovementController>(true);
+            combat = transform.root.GetComponentInChildren<PlayerCombatController>(true);
         }
 
         private void OnDestroy()
@@ -86,6 +97,7 @@ namespace Project.Character.Combat
         {
             if (pendingSkill == null)
             {
+                UpdateQueuedCast();
                 return;
             }
 
@@ -99,9 +111,13 @@ namespace Project.Character.Combat
             {
                 UpdateGroundHover();
 
-                if (hoveredGroundPoint.HasValue && Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
+                if (hoveredGroundPoint.HasValue && IsConfirmPressed())
                 {
                     ConfirmGroundPicking();
+                }
+                else if (IsConfirmPressed() && !IsPointerOverUI())
+                {
+                    CancelPicking();
                 }
 
                 return;
@@ -109,9 +125,13 @@ namespace Project.Character.Combat
 
             UpdateHover();
 
-            if (hoveredEnemyCollider != null && Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
+            if (hoveredEnemyCollider != null && IsConfirmPressed())
             {
                 ConfirmPicking();
+            }
+            else if (IsConfirmPressed() && !IsPointerOverUI())
+            {
+                CancelPicking();
             }
         }
 
@@ -126,8 +146,93 @@ namespace Project.Character.Combat
         public void BeginPicking(SkillDefinition skill)
         {
             pendingSkill = skill;
+            SetQueuedSkill(null);
+            inputRouter?.SetClicksSuppressed(true);
             SetHoveredEnemy(null);
             SetHoveredGroundPoint(null);
+        }
+
+        /// <summary>
+        /// Queues a skill on the already selected enemy, so the player walks
+        /// into the skill's range and casts it there, instead of asking for
+        /// a new pick. Queuing again replaces the previous queued skill.
+        /// </summary>
+        /// <param name="skill">The skill to cast once in range.</param>
+        /// <returns>True when an alive target was selected and the skill was queued.</returns>
+        public bool TryQueueSkill(SkillDefinition skill)
+        {
+            var damageable = targetSelector.CurrentDamageable;
+
+            if (targetSelector.CurrentTarget == null || damageable == null || damageable.IsDead)
+            {
+                return false;
+            }
+
+            CancelPicking();
+            SetQueuedSkill(skill);
+            return true;
+        }
+
+        /// <summary>
+        /// Drops the queued skill, called when the player chooses another skill.
+        /// </summary>
+        public void ClearQueuedSkill()
+        {
+            SetQueuedSkill(null);
+        }
+
+        private void SetQueuedSkill(SkillDefinition skill)
+        {
+            queuedSkill = skill;
+
+            if (combat != null)
+            {
+                combat.IsSkillApproachPending = skill != null;
+            }
+        }
+
+        private static bool IsConfirmPressed()
+        {
+            return Mouse.current != null
+                && (Mouse.current.leftButton.wasPressedThisFrame || Mouse.current.rightButton.wasPressedThisFrame);
+        }
+
+        /// <summary>
+        /// Casts the skill that was queued because its target was out of
+        /// range, walking toward the target until it is close enough. The
+        /// queue is dropped when the target is lost or dies, for example
+        /// when the player clicks the ground to walk elsewhere.
+        /// </summary>
+        private void UpdateQueuedCast()
+        {
+            if (queuedSkill == null)
+            {
+                return;
+            }
+
+            var target = targetSelector.CurrentTarget;
+            var damageable = targetSelector.CurrentDamageable;
+
+            if (target == null || damageable == null || damageable.IsDead)
+            {
+                SetQueuedSkill(null);
+                return;
+            }
+
+            if (caster.HasValidDamageTarget(queuedSkill))
+            {
+                var skill = queuedSkill;
+                SetQueuedSkill(null);
+                movement?.StopMovement();
+                caster.TryCastSkill(skill);
+                return;
+            }
+
+            if (movement != null && Time.time >= nextApproachTime)
+            {
+                nextApproachTime = Time.time + 0.2f;
+                movement.SetClickDestination(target.position);
+            }
         }
 
         private void UpdateHover()
@@ -191,6 +296,10 @@ namespace Project.Character.Combat
             {
                 caster.TryCastSkill(skill);
             }
+            else if (targetSelector.CurrentTarget != null)
+            {
+                SetQueuedSkill(skill);
+            }
         }
 
         private void UpdateGroundHover()
@@ -236,6 +345,7 @@ namespace Project.Character.Combat
         private void CancelPicking()
         {
             pendingSkill = null;
+            inputRouter?.SetClicksSuppressed(false);
             SetHoveredEnemy(null);
             SetHoveredGroundPoint(null);
         }

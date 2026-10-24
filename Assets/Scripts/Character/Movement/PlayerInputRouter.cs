@@ -28,6 +28,7 @@ namespace Project.Character.Movement
         [SerializeField] private LayerMask npcLayer;
 
         private bool isPointerOverUI;
+        private bool clicksSuppressed;
         private Transform hoveredEnemy;
 
         /// <summary>Raised when the living enemy under the cursor changes, including to null.</summary>
@@ -94,7 +95,7 @@ namespace Project.Character.Movement
         /// <param name="context">Callback context for the move click action.</param>
         public void OnMoveClick(InputAction.CallbackContext context)
         {
-            if (!context.performed || isPointerOverUI)
+            if (!context.performed || isPointerOverUI || clicksSuppressed)
             {
                 return;
             }
@@ -127,6 +128,16 @@ namespace Project.Character.Movement
             lootController.SetTarget(null);
             npcInteractionController.SetTarget(null);
             movementController.SetClickDestination(hit.point);
+        }
+
+        /// <summary>
+        /// Blocks or allows the move click (left button) so a click that picks
+        /// a skill target is not also read as a walk order.
+        /// </summary>
+        /// <param name="suppressed">True to ignore move clicks.</param>
+        public void SetClicksSuppressed(bool suppressed)
+        {
+            clicksSuppressed = suppressed;
         }
 
         /// <summary>

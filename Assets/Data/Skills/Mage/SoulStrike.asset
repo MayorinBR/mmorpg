@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: SoulStrike
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
   skillName: Soul Strike
-  description: Launches ghostly projectiles at a single target, dealing Ghost-element magic damage that scales with MATK and skill level.
-  icon: {fileID: 0}
+  description: Launches ghostly projectiles at a single target, dealing Ghost-element
+    magic damage that scales with MATK and skill level.
+  icon: {fileID: 21300000, guid: 9c76b6c4555d85249af6c4311d313b3c, type: 3}
   allowedClasses: 05000000
   effectType: 0
   targetType: 2
@@ -22,13 +23,84 @@ MonoBehaviour:
   manaCost: 30
   cooldownSeconds: 1.4
   range: 7
+  requiredLevel: 0
+  zenyCost: 0
+  requiredWeaponSubtypes: 
+  ammoCost: 0
+  bonusDamageRace: 1
+  bonusDamageRaceMultiplier: 1.5
+  buffRevealsHidden: 0
+  damageType: 1
+  damageMultiplierPerLevel: 1
+  damageBaseMultiplier: 0
+  healthCost: 0
+  healthCostReductionPerTwoLevels: 0
+  selfFireDamageBonusPercent: 0
+  element: 6
+  accuracyBonusPerLevel: 0
+  isAreaOfEffect: 0
+  areaRadius: 3
+  inflictedStatus: 0
+  inflictedStatusDurationSeconds: 0
+  inflictedStatusDurationPerLevel: 0
+  poisonDamagePerTickPerLevel: 0
+  successChancePerLevel: 0
+  knockbackDistance: 0
+  buffPreventsFlinch: 0
+  immuneToUndeadAndBoss: 0
+  requiredJobLevel: 0
+  prerequisites:
+  - skill: {fileID: 11400000, guid: 0d0b0131443b486983cd85825b801da0, type: 2}
+    level: 2
+  passiveAttackBonusPerLevel: 0
+  passiveRequiredWeaponSubtypes: 
+  passiveDexBonusPerLevel: 0
+  passiveHitBonusPerLevel: 0
+  passiveRangeBonusPerLevel: 0
+  passiveFleeBonusPerLevel: 0
+  passiveWeightLimitBonusPerLevel: 0
+  passiveRaceDamageBonusPerLevel: 0
+  passiveRaceDefenseBonusPerLevel: 0
+  augmentsSkill: {fileID: 0}
+  stunChancePerAugmentedLevel: 0
+  stunDurationSeconds: 0
+  passiveRegenFlatPerLevel: 0
+  passiveRegenPercentOfMaxHealthPerLevel: 0
+  passiveHealItemBonusPerLevel: 0
+  passiveSpRegenMultiplierPerLevel: 0
+  passiveRemovesMovementRegenPenalty: 0
+  healAmount: 10
+  buffAtkPercentPerLevel: 0
+  buffDefPercentPerLevel: 0
+  buffMdefBonusPerLevel: 0
+  buffDurationSeconds: 0
+  buffDurationPerLevel: 0
+  buffStatBonusPerLevel:
+    strength: 0
+    agility: 0
+    vitality: 0
+    intelligence: 0
+    dexterity: 0
+    luck: 0
+  buffAspdPercentPerLevel: 0
+  buffMaxHealthPerLevel: 0
   fixedCastSeconds: 0
   fixedCastPerLevel: 0
   variableCastSeconds: 0.5
   variableCastPerLevel: 0
-  damageType: 1
-  damageMultiplierPerLevel: 1
-  element: 6
-  bonusDamageRace: 1
-  bonusDamageRaceMultiplier: 1.5
-  healAmount: 10
+  projectileVfxPrefab: {fileID: 2751929059163290765, guid: 939d90951752a1048ad768349a32b668, type: 3}
+  impactVfxPrefab: {fileID: 3097392334523458751, guid: 3a680a683027a534bb02beb78562d61d, type: 3}
+  zonePrefab: {fileID: 0}
+  zoneDurationSeconds: 15
+  zoneDurationPerLevel: 0
+  zoneTickIntervalSeconds: 1
+  zoneMaxHits: 0
+  zoneMaxHitsPerLevel: 0
+  blocksAttacks: 0
+  blockedWeaponType: 0
+  toggleDrainIncomingDamageReductionPercentPerLevel: 0
+  toggleDrainManaPerSecond: 0
+  craftingRecipe: {fileID: 0}
+  requiresNearWater: 0
+  requiredItem: {fileID: 0}
+  requiredItemCount: 1

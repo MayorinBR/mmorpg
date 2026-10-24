@@ -222,7 +222,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 1
+  m_overflowMode: 3
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
@@ -3976,6 +3976,10 @@ GameObject:
   - component: {fileID: 900000102}
   - component: {fileID: 270351491}
   - component: {fileID: 270351490}
+  - component: {fileID: 1753397690}
+  - component: {fileID: 1753397689}
+  - component: {fileID: 1753397688}
+  - component: {fileID: 1753397691}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -4279,6 +4283,102 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 0ebc1291-8d18-4788-8731-c2c9cfc28361
     m_ActionName: 'Character/CastSkill4[/Keyboard/4]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 401280862}
+        m_TargetAssemblyTypeName: Project.Character.Combat.SkillInputRouter, Project.Character.Combat
+        m_MethodName: OnCastSkill5
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 3a737800-4863-429c-87f8-f2a50de50f38
+    m_ActionName: 'Character/CastSkill5[/Keyboard/5]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 401280862}
+        m_TargetAssemblyTypeName: Project.Character.Combat.SkillInputRouter, Project.Character.Combat
+        m_MethodName: OnCastSkill6
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 4ab9b321-c9e9-4f06-b0a5-d8b07e8025dd
+    m_ActionName: 'Character/CastSkill6[/Keyboard/6]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 401280862}
+        m_TargetAssemblyTypeName: Project.Character.Combat.SkillInputRouter, Project.Character.Combat
+        m_MethodName: OnCastSkill7
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 29e9cfc5-4c5f-4e3e-8f32-6bc96ad2d9d0
+    m_ActionName: 'Character/CastSkill7[/Keyboard/7]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 401280862}
+        m_TargetAssemblyTypeName: Project.Character.Combat.SkillInputRouter, Project.Character.Combat
+        m_MethodName: OnCastSkill8
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: b969be2d-d4cd-46e8-bf86-5be2ed27d70e
+    m_ActionName: 'Character/CastSkill8[/Keyboard/8]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 401280862}
+        m_TargetAssemblyTypeName: Project.Character.Combat.SkillInputRouter, Project.Character.Combat
+        m_MethodName: OnCastSkill9
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: f4f2c96f-da0c-4b9e-b2c2-309a633645ed
+    m_ActionName: 'Character/CastSkill9[/Keyboard/9]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 401280862}
+        m_TargetAssemblyTypeName: Project.Character.Combat.SkillInputRouter, Project.Character.Combat
+        m_MethodName: OnCastSkill0
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: ad6211d2-29ed-4dac-99a4-a69b20cbdcbe
+    m_ActionName: 'Character/CastSkill0[/Keyboard/0]'
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 330585549}
@@ -6874,6 +6974,7 @@ RectTransform:
   - {fileID: 2270059148149912317}
   - {fileID: 1193549706}
   - {fileID: 31905863}
+  - {fileID: 2076580764}
   m_Father: {fileID: 1688011937}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -7682,6 +7783,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 782662367}
   m_CullTransparentMesh: 1
+--- !u!1 &790192823
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 790192824}
+  - component: {fileID: 790192825}
+  m_Layer: 0
+  m_Name: ActiveEffectsBar
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &790192824
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 790192823}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 838913674}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 0, y: 4}
+  m_SizeDelta: {x: 600, y: 34}
+  m_Pivot: {x: 0, y: 0}
+--- !u!114 &790192825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 790192823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53f25e2d06aab6b4eb7d53d981d0f574, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.UI::Project.UI.ActiveEffectsBarUI
+  tracker: {fileID: 0}
 --- !u!114 &798854636 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7131451582942598229, guid: 8ece3501942c28847889c59d555ad030, type: 3}
@@ -8139,6 +8289,7 @@ RectTransform:
   m_Children:
   - {fileID: 1048288485}
   - {fileID: 1097514630}
+  - {fileID: 790192824}
   m_Father: {fileID: 809109348}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -17191,6 +17342,7 @@ MonoBehaviour:
   jobProgress: {fileID: 1696850565}
   classController: {fileID: 1696850564}
   skillDatabase: {fileID: 11400000, guid: 5a7106c7c0f382445b58fce3b44a25b2, type: 2}
+  skillDatabaseLookup: {fileID: 11400000, guid: 433051164ce846628b1e97ed3d1ea7a1, type: 2}
   playerStatsSource: {fileID: 1696850561}
 --- !u!114 &1466862096
 MonoBehaviour:
@@ -20189,6 +20341,7 @@ MonoBehaviour:
   statsHolder: {fileID: 1374932852}
   buffs: {fileID: 1696850567}
   flinchDurationSeconds: 0.3
+  presentation: {fileID: 0}
 --- !u!1001 &1701028264
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20960,6 +21113,58 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Persistence::Project.Persistence.PlayerSaveController
   loadOnStart: 1
   saveFileName: playersave.json
+--- !u!114 &1753397688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 401280833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90c793c414a49f74c9e4d7388043bf30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Character.Combat::Project.Character.Combat.PlayerOverweightEffectSource
+  inventory: {fileID: 0}
+  presentation: {fileID: 0}
+--- !u!114 &1753397689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 401280833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fdbf9c2ebb423a41afa368bed46bb39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Character.Combat::Project.Character.Combat.PlayerPassiveEffectSource
+  skillBook: {fileID: 0}
+--- !u!114 &1753397690
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 401280833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b5397035d577c44c9cda37528bf3f95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Character.Combat::Project.Character.Combat.ActiveEffectsTracker
+--- !u!114 &1753397691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 401280833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af1c2b69423476b4888b47258f6482c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.UI::Project.UI.GroundSkillPreviewUI
+  areaPrefab: {fileID: 5408684023084988207, guid: 7a8acecf98400914db4b9b02b53a3f5d, type: 3}
 --- !u!1 &1787174242
 GameObject:
   m_ObjectHideFlags: 0
@@ -21788,7 +21993,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Quests::Project.Quests.ClassTrialPromotion
   catalog: {fileID: 11400000, guid: 4da61ae8c22a2624e932f76c0ada61dc, type: 2}
   questManager: {fileID: 900000103}
-  classController: {fileID: 1696850564}
 --- !u!1 &1908883295
 GameObject:
   m_ObjectHideFlags: 0
@@ -22122,6 +22326,7 @@ GameObject:
   - component: {fileID: 1928213987}
   - component: {fileID: 1928213989}
   - component: {fileID: 1928213988}
+  - component: {fileID: 1928213990}
   m_Layer: 7
   m_Name: SkillTargeting
   m_TagString: Untagged
@@ -22196,6 +22401,23 @@ MonoBehaviour:
   waterLayer:
     serializedVersion: 2
     m_Bits: 16
+--- !u!114 &1928213990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1928213986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e3b7a52c1d94f60a2b6e9d4c0f35a17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.UI::Project.UI.CastBarWorldUI
+  caster: {fileID: 0}
+  offset: {x: 0, y: -0.45, z: 0}
+  size: {x: 100, y: 8}
+  backgroundColor: {r: 0, g: 0, b: 0, a: 0.75}
+  fillColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1948768125
 GameObject:
   m_ObjectHideFlags: 0
@@ -23066,7 +23288,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 1
+  m_overflowMode: 3
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
@@ -23580,6 +23802,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2076564397}
   m_CullTransparentMesh: 1
+--- !u!1 &2076580763
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2076580764}
+  - component: {fileID: 2076580765}
+  m_Layer: 0
+  m_Name: EffectTooltip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2076580764
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076580763}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 708494040}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2076580765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076580763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32bc4a2caf076bd48844ef4eb246875c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.UI::Project.UI.EffectTooltipUI
 --- !u!1 &2082989942
 GameObject:
   m_ObjectHideFlags: 0
@@ -25228,7 +25498,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87f526560b9f42a7a122a7894c1d1356, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Project.World::Project.World.BootstrapLoader
-  defaultMapSceneName: Prototype_Map01
+  defaultMapSceneName: Map_4_3_Map01
 --- !u!114 &992000000000000001
 MonoBehaviour:
   m_ObjectHideFlags: 0

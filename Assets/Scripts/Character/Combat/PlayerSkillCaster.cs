@@ -77,6 +77,7 @@ namespace Project.Character.Combat
 
         private readonly Dictionary<SkillDefinition, float> cooldownEndTimes = new Dictionary<SkillDefinition, float>();
         private Coroutine castRoutine;
+        private CharacterMovementController movement;
 
         /// <summary>Gets whether a skill with a cast time is currently being cast; no other skill can start meanwhile.</summary>
         public bool IsCasting => castRoutine != null;
@@ -119,14 +120,26 @@ namespace Project.Character.Combat
         /// <returns>True if the skill was successfully cast; false if any requirement wasn't met, or a target pick was started instead.</returns>
         public bool TryCastSkill(SkillDefinition skill)
         {
-            if (ownHealth.IsDead || IsCastBlocked() || IsCasting)
+            if (ownHealth.IsDead || IsCasting)
             {
+                return false;
+            }
+
+            if (IsCastBlocked())
+            {
+                PlayerFeedbackChannel.Publish("You cannot cast right now (silenced, immobilized or overweight).");
                 return false;
             }
 
             var level = skillBook.GetLevel(skill);
 
-            if (level <= 0 || Time.time < GetCooldownEndTime(skill))
+            if (level <= 0)
+            {
+                PlayerFeedbackChannel.Publish($"{skill.SkillName} has not been learned.");
+                return false;
+            }
+
+            if (Time.time < GetCooldownEndTime(skill))
             {
                 return false;
             }
@@ -144,6 +157,8 @@ namespace Project.Character.Combat
                 return false;
             }
 
+            SkillTargetingController.Instance?.ClearQueuedSkill();
+
             if (skill.TargetType == SkillTargetType.Ground)
             {
                 // A Ground skill has no "already selected" position the
@@ -156,7 +171,13 @@ namespace Project.Character.Combat
 
             if (NeedsEnemyTarget(skill) && !HasValidDamageTarget(skill))
             {
-                SkillTargetingController.Instance?.BeginPicking(skill);
+                var targeting = SkillTargetingController.Instance;
+
+                if (targeting != null && !targeting.TryQueueSkill(skill))
+                {
+                    targeting.BeginPicking(skill);
+                }
+
                 return false;
             }
 
@@ -169,23 +190,21 @@ namespace Project.Character.Combat
                     return false;
                 }
 
-                animatorController?.TriggerCast();
-                BeginCast(castTime, () => MeetsWeaponRequirement(skill) && MeetsCatalystRequirement(skill) && ExecuteCast(skill, level, false));
+                BeginCast(castTime, () => MeetsWeaponRequirement(skill) && MeetsCatalystRequirement(skill) && ExecuteCast(skill, level));
                 return true;
             }
 
-            return ExecuteCast(skill, level, true);
+            return ExecuteCast(skill, level);
         }
 
         /// <summary>
         /// Resolves a skill's effect, then spends its ammo and catalyst and starts its cooldown when it took
-        /// effect.
+        /// effect, playing the release animation at that moment.
         /// </summary>
         /// <param name="skill">The skill being cast.</param>
         /// <param name="level">The skill's current level.</param>
-        /// <param name="triggerAnimation">Whether to play the cast animation now; false when it already played at the start of a timed cast.</param>
         /// <returns>True if the skill took effect.</returns>
-        private bool ExecuteCast(SkillDefinition skill, int level, bool triggerAnimation)
+        private bool ExecuteCast(SkillDefinition skill, int level)
         {
             var cast = skill.EffectType switch
             {
@@ -205,12 +224,14 @@ namespace Project.Character.Combat
                 SpendAmmo(skill);
                 SpendCatalyst(skill);
 
-                if (triggerAnimation)
+                if (skill.TargetType == SkillTargetType.Self)
                 {
-                    animatorController?.TriggerCast();
+                    SkillVfx.Spawn(skill.ImpactVfxPrefab, transform.position);
                 }
 
+                animatorController?.TriggerCast();
                 cooldownEndTimes[skill] = Time.time + skill.CooldownSeconds;
+                StopMovementForCast();
             }
 
             return cast;
@@ -225,8 +246,27 @@ namespace Project.Character.Combat
             return skill.GetFixedCastTime(level) + skill.GetVariableCastTime(level) * statsController.GetCastTimeMultiplier();
         }
 
+        /// <summary>
+        /// Halts the character where it stands, so casting never happens while walking and a timed
+        /// cast is not interrupted by leftover movement.
+        /// </summary>
+        private void StopMovementForCast()
+        {
+            if (movement == null)
+            {
+                movement = transform.root.GetComponentInChildren<CharacterMovementController>(true);
+            }
+
+            if (movement != null)
+            {
+                movement.StopMovement();
+            }
+        }
+
         private void BeginCast(float castTime, System.Func<bool> onComplete)
         {
+            StopMovementForCast();
+            animatorController?.SetChanneling(true, castTime);
             castRoutine = StartCoroutine(CastRoutine(castTime, onComplete));
             CastStarted?.Invoke(castTime);
         }
@@ -242,9 +282,18 @@ namespace Project.Character.Combat
 
             while (Time.time < endTime)
             {
-                if (ownHealth.IsDead || IsCastBlocked() || (transform.position - origin).sqrMagnitude > CastMoveTolerance * CastMoveTolerance)
+                var walkedAway = (transform.position - origin).sqrMagnitude > CastMoveTolerance * CastMoveTolerance;
+
+                if (ownHealth.IsDead || IsCastBlocked() || walkedAway)
                 {
                     castRoutine = null;
+                    animatorController?.SetChanneling(false);
+
+                    if (!ownHealth.IsDead && !walkedAway)
+                    {
+                        animatorController?.TriggerHit();
+                    }
+
                     CastEnded?.Invoke();
                     PlayerFeedbackChannel.Publish("Cast interrupted.");
                     yield break;
@@ -254,6 +303,7 @@ namespace Project.Character.Combat
             }
 
             castRoutine = null;
+            animatorController?.SetChanneling(false);
             CastEnded?.Invoke();
             onComplete();
         }
@@ -345,6 +395,8 @@ namespace Project.Character.Combat
                 return false;
             }
 
+            SkillTargetingController.Instance?.ClearQueuedSkill();
+
             var castTime = GetCastTime(skill, level);
 
             if (castTime > 0f)
@@ -354,15 +406,22 @@ namespace Project.Character.Combat
                     return false;
                 }
 
-                animatorController?.TriggerCast();
-                BeginCast(castTime, () => ExecuteZoneCast(skill, level, position, false));
+                BeginCast(castTime, () => ExecuteZoneCast(skill, level, position));
                 return true;
             }
 
-            return ExecuteZoneCast(skill, level, position, true);
+            return ExecuteZoneCast(skill, level, position);
         }
 
-        private bool ExecuteZoneCast(SkillDefinition skill, int level, Vector3 position, bool triggerAnimation)
+        /// <summary>
+        /// Spawns a ground skill's zone, then spends its catalyst and starts its cooldown, playing the release
+        /// animation at that moment.
+        /// </summary>
+        /// <param name="skill">The ground skill being cast.</param>
+        /// <param name="level">The skill's current level.</param>
+        /// <param name="position">The world position the zone spawns at.</param>
+        /// <returns>True if the zone was spawned.</returns>
+        private bool ExecuteZoneCast(SkillDefinition skill, int level, Vector3 position)
         {
             if (!MeetsCatalystRequirement(skill) || !TryCastZone(skill, level, position))
             {
@@ -371,11 +430,8 @@ namespace Project.Character.Combat
 
             SpendCatalyst(skill);
 
-            if (triggerAnimation)
-            {
-                animatorController?.TriggerCast();
-            }
-
+            animatorController?.TriggerCast();
+            StopMovementForCast();
             cooldownEndTimes[skill] = Time.time + skill.CooldownSeconds;
             return true;
         }
@@ -578,7 +634,7 @@ namespace Project.Character.Combat
                 }
             }
 
-            buffs.ApplyBuff(BuildBuffPayload(skill, level), skill.GetBuffDuration(level));
+            buffs.ApplyBuff(BuildBuffPayload(skill, level), skill.GetBuffDuration(level), BuildDescriptor(skill, isSelfOrAlly ? EffectCategory.Buff : EffectCategory.Debuff));
 
             if (isSelfOrAlly && skill.BuffRevealsHidden)
             {
@@ -624,6 +680,12 @@ namespace Project.Character.Combat
         /// <param name="target">The target the projectile flies to.</param>
         private void PlayProjectileVisual(SkillDefinition skill, Transform target)
         {
+            if (skill.HasCustomVfx)
+            {
+                PlayCustomVfx(skill, target);
+                return;
+            }
+
             var isMagical = skill.DamageType == SkillDamageType.Magical;
 
             if (skill.AmmoCost <= 0 && !isMagical)
@@ -637,6 +699,37 @@ namespace Project.Character.Combat
             }
 
             combat?.SpawnSkillProjectile(isMagical, target);
+        }
+
+        /// <summary>
+        /// Plays the skill's own effects: its projectile flies to the target and the impact effect spawns on arrival,
+        /// or at once when the skill has no projectile.
+        /// </summary>
+        /// <param name="skill">The skill being cast.</param>
+        /// <param name="target">The target the effects are played on.</param>
+        private void PlayCustomVfx(SkillDefinition skill, Transform target)
+        {
+            var position = target.position;
+            void SpawnImpact() => SkillVfx.Spawn(skill.ImpactVfxPrefab, position);
+
+            if (skill.ProjectileVfxPrefab == null)
+            {
+                SpawnImpact();
+                return;
+            }
+
+            if (combat == null)
+            {
+                combat = GetComponentInParent<PlayerCombatController>() ?? GetComponentInChildren<PlayerCombatController>();
+            }
+
+            if (combat == null)
+            {
+                SpawnImpact();
+                return;
+            }
+
+            combat.SpawnSkillProjectile(skill.ProjectileVfxPrefab, target, SpawnImpact);
         }
 
         /// <summary>
@@ -699,10 +792,22 @@ namespace Project.Character.Combat
                     continue;
                 }
 
-                targetBuffs.ApplyBuff(payload, duration);
+                targetBuffs.ApplyBuff(payload, duration, BuildDescriptor(skill, EffectCategory.Debuff));
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Builds the description the active effects bar shows for a buff or debuff applied by a skill.
+        /// </summary>
+        /// <param name="skill">The skill that applies the effect.</param>
+        /// <param name="category">Whether the effect is a buff or a debuff for whoever receives it.</param>
+        /// <param name="idSuffix">Optional suffix, for a second effect of the same skill that must not refresh the first.</param>
+        /// <returns>The effect descriptor.</returns>
+        private static EffectDescriptor BuildDescriptor(SkillDefinition skill, EffectCategory category, string idSuffix = "")
+        {
+            return new EffectDescriptor("skill." + skill.name + idSuffix, skill.SkillName, skill.Description, skill.Icon, category);
         }
 
         /// <summary>
@@ -872,7 +977,7 @@ namespace Project.Character.Combat
                 return;
             }
 
-            ownBuffs.ApplyBuff(new BuffPayload(fireDamagePercent: skill.SelfFireDamageBonusPercent), skill.GetBuffDuration(level));
+            ownBuffs.ApplyBuff(new BuffPayload(fireDamagePercent: skill.SelfFireDamageBonusPercent), skill.GetBuffDuration(level), BuildDescriptor(skill, EffectCategory.Buff, ".afterEffect"));
         }
 
         /// <summary>

@@ -127,9 +127,9 @@ namespace City2.Editor
     public static class City2TerrainMenu
     {
         private const string TerrainAssetPath = "Assets/Terrains/City2.asset";
-        private const string SceneName = "Prototype_City2";
+        private const string SceneName = "Map_4_7_City2";
         private const string TerrainObjectName = "City2";
-        private const string NavMeshFallbackPath = "Assets/Scenes/Prototype_City2/NavMesh-City2.asset";
+        private const string NavMeshFallbackPath = "Assets/Scenes/Map_4_7_City2/NavMesh-City2.asset";
         private const string PendingBakeKey = "City2.PendingNavMeshBake";
 
         /// <summary>Rebuilds the City2 terrain from the baked data.</summary>
@@ -199,14 +199,7 @@ namespace City2.Editor
         private static bool NeedsBuild()
         {
             var data = AssetDatabase.LoadAssetAtPath<TerrainData>(TerrainAssetPath);
-            if (data == null || !City2TerrainSource.Exists || AssetDatabase.LoadAssetAtPath<TerrainLayer>("Assets/Terrains/City2/Layers/City2_Grass.terrainlayer") == null)
-            {
-                return false;
-            }
-
-            var shared = City2TerrainBuilder.LoadSharedGroundLayers();
-            var current = data.terrainLayers;
-            return current.Length == 0 || (shared != null && current[0] != shared[0]);
+            return data != null && data.terrainLayers.Length == 0 && City2TerrainSource.Exists;
         }
 
         private static void BakePendingNavMesh()

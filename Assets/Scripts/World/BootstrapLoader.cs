@@ -17,7 +17,7 @@ namespace Project.World
         /// <summary>Name of the Bootstrap scene, as registered in Build Settings.</summary>
         public const string SceneName = "Bootstrap";
 
-        [SerializeField] private string defaultMapSceneName = "Prototype_Map01";
+        [SerializeField] private string defaultMapSceneName = "Map_4_3_Map01";
 
         private IEnumerator Start()
         {

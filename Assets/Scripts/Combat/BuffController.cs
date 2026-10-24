@@ -21,10 +21,24 @@ namespace Project.Combat
     /// effect like Berserk, which stays active for as long as its trigger
     /// holds true rather than for a fixed duration.
     /// </summary>
-    public class BuffController : MonoBehaviour
+    public class BuffController : MonoBehaviour, IActiveEffectSource
     {
         private readonly List<TimedBuff> activeBuffs = new List<TimedBuff>();
         private readonly Dictionary<object, BuffPayload> persistentModifiers = new Dictionary<object, BuffPayload>();
+        private readonly Dictionary<object, EffectDescriptor> persistentDescriptors = new Dictionary<object, EffectDescriptor>();
+        private System.Func<float> clock;
+
+        private float Now => clock != null ? clock() : Time.time;
+
+        /// <summary>
+        /// Replaces the time source, so tests can advance time without waiting.
+        /// Passing null restores <see cref="Time.time"/>.
+        /// </summary>
+        /// <param name="timeProvider">Returns the current time in seconds.</param>
+        public void SetClock(System.Func<float> timeProvider)
+        {
+            clock = timeProvider;
+        }
 
         /// <summary>Gets the combined payload from every active timed buff and persistent modifier.</summary>
         public BuffPayload Total
@@ -76,18 +90,43 @@ namespace Project.Combat
         /// Applies a new timed buff, stacking with any others already
         /// active — e.g. a Provoke debuff on an enemy and a self Endure
         /// buff on the player coexist fine, since they live on different
-        /// characters. Re-casting the same skill just adds another entry
-        /// rather than refreshing one in place: with a real per-skill
-        /// cooldown already preventing rapid re-casts, this is simpler than
-        /// tracking one slot per source and not worth the extra bookkeeping
-        /// today.
+        /// characters. This overload is anonymous: it always adds a new
+        /// entry and is not shown in the active effects bar. Use the overload
+        /// with an <see cref="EffectDescriptor"/> for a buff that must refresh.
         /// </summary>
         /// <param name="payload">The stat bonuses this buff grants.</param>
         /// <param name="durationSeconds">How long this buff lasts, in seconds.</param>
         public void ApplyBuff(BuffPayload payload, float durationSeconds)
         {
+            ApplyBuff(payload, durationSeconds, default);
+        }
+
+        /// <summary>
+        /// Applies a timed buff that is shown in the active effects bar. When a
+        /// buff with the same <see cref="EffectDescriptor.Id"/> is already active
+        /// it is refreshed (new payload, full duration) instead of stacked, so
+        /// re-casting a buff never doubles its bonus.
+        /// </summary>
+        /// <param name="payload">The stat bonuses this buff grants.</param>
+        /// <param name="durationSeconds">How long this buff lasts, in seconds.</param>
+        /// <param name="descriptor">How the buff is presented. An invalid descriptor makes it anonymous: it works but is not shown and never refreshes.</param>
+        public void ApplyBuff(BuffPayload payload, float durationSeconds, EffectDescriptor descriptor)
+        {
             Purge();
-            activeBuffs.Add(new TimedBuff(payload, Time.time + durationSeconds));
+            var buff = new TimedBuff(payload, Now + durationSeconds, durationSeconds, descriptor);
+
+            if (descriptor.IsValid)
+            {
+                var index = activeBuffs.FindIndex(existing => existing.Descriptor.Id == descriptor.Id);
+
+                if (index >= 0)
+                {
+                    activeBuffs[index] = buff;
+                    return;
+                }
+            }
+
+            activeBuffs.Add(buff);
         }
 
         /// <summary>
@@ -106,30 +145,70 @@ namespace Project.Combat
         /// <param name="payload">The stat bonuses this modifier grants. An empty payload clears the modifier.</param>
         public void SetPersistentModifier(object source, BuffPayload payload)
         {
+            SetPersistentModifier(source, payload, default);
+        }
+
+        /// <summary>
+        /// Sets (or clears) a persistent modifier that is shown in the active
+        /// effects bar without a timer — e.g. Energy Coat or Berserk.
+        /// </summary>
+        /// <param name="source">Identifies which caller owns this modifier.</param>
+        /// <param name="payload">The stat bonuses this modifier grants. An empty payload clears the modifier.</param>
+        /// <param name="descriptor">How the modifier is presented. An invalid descriptor keeps it out of the bar.</param>
+        public void SetPersistentModifier(object source, BuffPayload payload, EffectDescriptor descriptor)
+        {
             if (payload.IsEmpty)
             {
                 persistentModifiers.Remove(source);
+                persistentDescriptors.Remove(source);
                 return;
             }
 
             persistentModifiers[source] = payload;
+            persistentDescriptors[source] = descriptor;
+        }
+
+        /// <inheritdoc />
+        public void CollectActiveEffects(List<ActiveEffect> into)
+        {
+            Purge();
+
+            foreach (var buff in activeBuffs)
+            {
+                if (buff.Descriptor.IsValid)
+                {
+                    into.Add(new ActiveEffect(buff.Descriptor, buff.ExpireTime - Now, buff.DurationSeconds, BuffPayloadDescription.Describe(buff.Payload)));
+                }
+            }
+
+            foreach (var entry in persistentModifiers)
+            {
+                if (persistentDescriptors.TryGetValue(entry.Key, out var descriptor) && descriptor.IsValid)
+                {
+                    into.Add(new ActiveEffect(descriptor, 0f, 0f, BuffPayloadDescription.Describe(entry.Value)));
+                }
+            }
         }
 
         private void Purge()
         {
-            activeBuffs.RemoveAll(buff => buff.ExpireTime <= Time.time);
+            activeBuffs.RemoveAll(buff => buff.ExpireTime <= Now);
         }
 
         private readonly struct TimedBuff
         {
-            public TimedBuff(BuffPayload payload, float expireTime)
+            public TimedBuff(BuffPayload payload, float expireTime, float durationSeconds, EffectDescriptor descriptor)
             {
                 Payload = payload;
                 ExpireTime = expireTime;
+                DurationSeconds = durationSeconds;
+                Descriptor = descriptor;
             }
 
             public BuffPayload Payload { get; }
             public float ExpireTime { get; }
+            public float DurationSeconds { get; }
+            public EffectDescriptor Descriptor { get; }
         }
     }
 }

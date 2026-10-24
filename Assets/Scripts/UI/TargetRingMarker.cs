@@ -20,6 +20,7 @@ namespace Project.UI
         private const string TargetMaterialPath = "Assets/Materials/TargetRingTarget.mat";
 
         private static Mesh sharedRingMesh;
+        private static Material sharedSkillMaterial;
 
         [Tooltip("Outer radius of the ring, in world units.")]
         [SerializeField] private float radius = 0.75f;
@@ -32,6 +33,8 @@ namespace Project.UI
 
         private GameObject hoverRing;
         private GameObject targetRing;
+        private GameObject skillRing;
+        private bool isSkillPicked;
         private IDamageable damageable;
         private bool isHovered;
         private bool isTargeted;
@@ -53,21 +56,24 @@ namespace Project.UI
             damageable = GetComponentInParent<IDamageable>();
             hoverRing = CreateRing("HoverRing", hoverMaterial);
             targetRing = CreateRing("TargetRing", targetMaterial);
+            skillRing = CreateRing("SkillRing", GetSkillMaterial());
         }
 
         private void OnDisable()
         {
             isHovered = false;
             isTargeted = false;
+            isSkillPicked = false;
             Refresh();
         }
 
         private void LateUpdate()
         {
-            if ((isHovered || isTargeted) && damageable != null && damageable.IsDead)
+            if ((isHovered || isTargeted || isSkillPicked) && damageable != null && damageable.IsDead)
             {
                 isHovered = false;
                 isTargeted = false;
+                isSkillPicked = false;
                 Refresh();
             }
         }
@@ -103,17 +109,60 @@ namespace Project.UI
             Refresh();
         }
 
+        /// <summary>Shows or hides the yellow ring used while the player is picking a target for a skill. It wins over the other rings.</summary>
+        /// <param name="value">True while the cursor is over this enemy during a skill target pick.</param>
+        public void SetSkillPicked(bool value)
+        {
+            isSkillPicked = value;
+            Refresh();
+        }
+
         private void Refresh()
         {
+            if (skillRing != null)
+            {
+                skillRing.SetActive(isSkillPicked);
+            }
+
             if (targetRing != null)
             {
-                targetRing.SetActive(isTargeted);
+                targetRing.SetActive(isTargeted && !isSkillPicked);
             }
 
             if (hoverRing != null)
             {
-                hoverRing.SetActive(isHovered && !isTargeted);
+                hoverRing.SetActive(isHovered && !isTargeted && !isSkillPicked);
             }
+        }
+
+        private Material GetSkillMaterial()
+        {
+            if (sharedSkillMaterial != null)
+            {
+                return sharedSkillMaterial;
+            }
+
+            var source = hoverMaterial != null ? hoverMaterial : targetMaterial;
+
+            if (source == null)
+            {
+                return null;
+            }
+
+            var yellow = new Color(1f, 0.85f, 0.1f, 1f);
+            sharedSkillMaterial = new Material(source) { name = "TargetRingSkill (runtime)" };
+
+            if (sharedSkillMaterial.HasProperty("_BaseColor"))
+            {
+                sharedSkillMaterial.SetColor("_BaseColor", yellow);
+            }
+
+            if (sharedSkillMaterial.HasProperty("_Color"))
+            {
+                sharedSkillMaterial.SetColor("_Color", yellow);
+            }
+
+            return sharedSkillMaterial;
         }
 
         private GameObject CreateRing(string ringName, Material material)

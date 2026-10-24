@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: FireBolt
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
   skillName: FireBolt
-  description: Launches fire bolts at a single target, dealing Fire-element magic damage that scales with MATK and skill level.
-  icon: {fileID: 0}
+  description: Launches fire bolts at a single target, dealing Fire-element magic
+    damage that scales with MATK and skill level.
+  icon: {fileID: 21300000, guid: 6e15a94d3ad117f4a823d52afb61df2d, type: 3}
   allowedClasses: 05000000
   effectType: 0
   targetType: 2
@@ -22,11 +23,82 @@ MonoBehaviour:
   manaCost: 20
   cooldownSeconds: 1.4
   range: 7
+  requiredLevel: 0
+  zenyCost: 0
+  requiredWeaponSubtypes: 
+  ammoCost: 0
+  bonusDamageRace: 0
+  bonusDamageRaceMultiplier: 1
+  buffRevealsHidden: 0
+  damageType: 1
+  damageMultiplierPerLevel: 2
+  damageBaseMultiplier: 0
+  healthCost: 0
+  healthCostReductionPerTwoLevels: 0
+  selfFireDamageBonusPercent: 0
+  element: 1
+  accuracyBonusPerLevel: 0
+  isAreaOfEffect: 0
+  areaRadius: 3
+  inflictedStatus: 0
+  inflictedStatusDurationSeconds: 0
+  inflictedStatusDurationPerLevel: 0
+  poisonDamagePerTickPerLevel: 0
+  successChancePerLevel: 0
+  knockbackDistance: 0
+  buffPreventsFlinch: 0
+  immuneToUndeadAndBoss: 0
+  requiredJobLevel: 0
+  prerequisites: []
+  passiveAttackBonusPerLevel: 0
+  passiveRequiredWeaponSubtypes: 
+  passiveDexBonusPerLevel: 0
+  passiveHitBonusPerLevel: 0
+  passiveRangeBonusPerLevel: 0
+  passiveFleeBonusPerLevel: 0
+  passiveWeightLimitBonusPerLevel: 0
+  passiveRaceDamageBonusPerLevel: 0
+  passiveRaceDefenseBonusPerLevel: 0
+  augmentsSkill: {fileID: 0}
+  stunChancePerAugmentedLevel: 0
+  stunDurationSeconds: 0
+  passiveRegenFlatPerLevel: 0
+  passiveRegenPercentOfMaxHealthPerLevel: 0
+  passiveHealItemBonusPerLevel: 0
+  passiveSpRegenMultiplierPerLevel: 0
+  passiveRemovesMovementRegenPenalty: 0
+  healAmount: 10
+  buffAtkPercentPerLevel: 0
+  buffDefPercentPerLevel: 0
+  buffMdefBonusPerLevel: 0
+  buffDurationSeconds: 0
+  buffDurationPerLevel: 0
+  buffStatBonusPerLevel:
+    strength: 0
+    agility: 0
+    vitality: 0
+    intelligence: 0
+    dexterity: 0
+    luck: 0
+  buffAspdPercentPerLevel: 0
+  buffMaxHealthPerLevel: 0
   fixedCastSeconds: 0.2
   fixedCastPerLevel: 0.2
   variableCastSeconds: 0.2
   variableCastPerLevel: 0.6
-  damageType: 1
-  damageMultiplierPerLevel: 2
-  element: 1
-  healAmount: 10
+  projectileVfxPrefab: {fileID: 7424361530540035011, guid: b4fef350b17c54d488bc65f4f5110587, type: 3}
+  impactVfxPrefab: {fileID: 9212932827885915252, guid: a56847e5fe1dea8429a5982b81cc4c95, type: 3}
+  zonePrefab: {fileID: 0}
+  zoneDurationSeconds: 15
+  zoneDurationPerLevel: 0
+  zoneTickIntervalSeconds: 1
+  zoneMaxHits: 0
+  zoneMaxHitsPerLevel: 0
+  blocksAttacks: 0
+  blockedWeaponType: 0
+  toggleDrainIncomingDamageReductionPercentPerLevel: 0
+  toggleDrainManaPerSecond: 0
+  craftingRecipe: {fileID: 0}
+  requiresNearWater: 0
+  requiredItem: {fileID: 0}
+  requiredItemCount: 1

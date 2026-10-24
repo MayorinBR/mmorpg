@@ -27,6 +27,9 @@ namespace Project.Character.Stats
         [Tooltip("This character's race classification, read by race-conditional bonuses (Demon Bane, Divine Protection, Decrease AGI/Signum Crucis, Heal's Undead-damage interaction) and by the Boss/Insect/Demon exception on Hiding detection. Irrelevant on the player's own stats — players aren't raced in Ragnarok Online.")]
         [SerializeField] private MonsterRace race = MonsterRace.Formless;
 
+        [Tooltip("This character's element, read by elemental damage rules. Irrelevant on the player's own stats.")]
+        [SerializeField] private MonsterElement element = MonsterElement.Neutral;
+
         [Tooltip("If true, this enemy sees through Hiding entirely, matching real Ragnarok Online's Boss-monster exception (on top of the separate Insect/Demon race exception, see Race). Irrelevant on the player's own stats.")]
         [SerializeField] private bool isBoss;
 
@@ -73,6 +76,9 @@ namespace Project.Character.Stats
 
         /// <summary>Gets this character's race classification (see <see cref="MonsterRace"/>).</summary>
         public MonsterRace Race => race;
+
+        /// <summary>Gets this character's element (see <see cref="MonsterElement"/>).</summary>
+        public MonsterElement Element => element;
 
         /// <summary>Gets whether this enemy sees through Hiding entirely, matching real Ragnarok Online's Boss-monster exception.</summary>
         public bool IsBoss => isBoss;

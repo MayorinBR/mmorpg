@@ -15,7 +15,7 @@ MonoBehaviour:
   skillName: Safety Wall
   description: Creates a barrier that blocks melee physical attacks against anyone
     standing inside it, for a limited duration.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 6c49e69ce27ae504c9c3bcda6e0df098, type: 3}
   allowedClasses: 05000000
   effectType: 4
   targetType: 5
@@ -49,7 +49,11 @@ MonoBehaviour:
   buffPreventsFlinch: 0
   immuneToUndeadAndBoss: 0
   requiredJobLevel: 0
-  prerequisites: []
+  prerequisites:
+  - skill: {fileID: 11400000, guid: 0d0b0131443b486983cd85825b801da0, type: 2}
+    level: 4
+  - skill: {fileID: 11400000, guid: a3f3f9ad72b8453ab624cacb7b168092, type: 2}
+    level: 3
   passiveAttackBonusPerLevel: 0
   passiveRequiredWeaponSubtypes: 
   passiveDexBonusPerLevel: 0
@@ -86,7 +90,9 @@ MonoBehaviour:
   fixedCastPerLevel: 0
   variableCastSeconds: 4.4
   variableCastPerLevel: -0.8
-  zonePrefab: {fileID: 0}
+  projectileVfxPrefab: {fileID: 0}
+  impactVfxPrefab: {fileID: 0}
+  zonePrefab: {fileID: 6463773605202751517, guid: 04cff00ff246e514894b98215754dae5, type: 3}
   zoneDurationSeconds: 10
   zoneDurationPerLevel: 0
   zoneTickIntervalSeconds: 1

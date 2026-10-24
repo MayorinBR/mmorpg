@@ -123,7 +123,10 @@ namespace Project.AI
 
             rageCooldownRemaining = rage.CooldownSeconds;
             rageEndTime = Time.time + rage.DurationSeconds;
-            enemy.Buffs?.ApplyBuff(new BuffPayload(atkPercent: rage.AtkPercent, aspdPercent: rage.AspdPercent), rage.DurationSeconds);
+            enemy.Buffs?.ApplyBuff(
+                new BuffPayload(atkPercent: rage.AtkPercent, aspdPercent: rage.AspdPercent),
+                rage.DurationSeconds,
+                new EffectDescriptor("boss.rage", "Rage", "Enraged: attack power and attack speed are increased.", null, EffectCategory.Buff));
             SkillAnnouncementChannel.Announce("Rage", transform.position + skillNamePopupOffset);
         }
 

@@ -18,7 +18,7 @@ namespace Project.Character.Combat
         [SerializeField] private HealthComponent health;
         [SerializeField] private ManaComponent mana;
 
-        [Tooltip("Optional. Applies the Novice Base Level cap. Left empty, Base Level is uncapped.")]
+        [Tooltip("Optional. Applies the class Base Level cap (10 for a Novice, 99 after evolving) and restarts Base Level when the player evolves. Left empty, Base Level is uncapped.")]
         [SerializeField] private PlayerClassController classController;
 
         private IExperienceCurve experienceCurve;
@@ -51,11 +51,36 @@ namespace Project.Character.Combat
         private void OnEnable()
         {
             EnemyDeathEvents.ExperienceAwarded += HandleExperienceAwarded;
+
+            if (classController != null)
+            {
+                classController.ClassEvolved += HandleClassEvolved;
+            }
         }
 
         private void OnDisable()
         {
             EnemyDeathEvents.ExperienceAwarded -= HandleExperienceAwarded;
+
+            if (classController != null)
+            {
+                classController.ClassEvolved -= HandleClassEvolved;
+            }
+        }
+
+        private void HandleClassEvolved(CharacterClass previousClass, CharacterClass newClass)
+        {
+            ResetProgress();
+
+            if (health != null)
+            {
+                health.ResetHealth();
+            }
+
+            if (mana != null)
+            {
+                mana.ResetMana();
+            }
         }
 
         private void HandleExperienceAwarded(int baseExperience, int jobExperience)

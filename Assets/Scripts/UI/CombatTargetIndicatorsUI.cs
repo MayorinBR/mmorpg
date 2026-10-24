@@ -1,4 +1,5 @@
 using UnityEngine;
+using Project.Character.Combat;
 using Project.Character.Movement;
 
 namespace Project.UI
@@ -18,9 +19,12 @@ namespace Project.UI
         private PlayerInputRouter inputRouter;
         private TargetRingMarker hoveredMarker;
         private TargetRingMarker targetedMarker;
+        private SkillTargetingController skillTargeting;
+        private TargetRingMarker skillMarker;
 
         private void OnEnable()
         {
+            SubscribeSkillTargeting();
             targetSelector.TargetChanged += HandleTargetChanged;
 
             if (inputRouter != null)
@@ -31,6 +35,7 @@ namespace Project.UI
 
         private void Start()
         {
+            SubscribeSkillTargeting();
             inputRouter = FindFirstObjectByType<PlayerInputRouter>();
 
             if (inputRouter != null)
@@ -41,11 +46,53 @@ namespace Project.UI
 
         private void OnDisable()
         {
+            UnsubscribeSkillTargeting();
             targetSelector.TargetChanged -= HandleTargetChanged;
 
             if (inputRouter != null)
             {
                 inputRouter.HoveredEnemyChanged -= HandleHoveredEnemyChanged;
+            }
+        }
+
+        private void SubscribeSkillTargeting()
+        {
+            UnsubscribeSkillTargeting();
+            skillTargeting = SkillTargetingController.Instance;
+
+            if (skillTargeting != null)
+            {
+                skillTargeting.HoveredEnemyChanged += HandleSkillHoveredChanged;
+            }
+        }
+
+        private void UnsubscribeSkillTargeting()
+        {
+            if (skillTargeting != null)
+            {
+                skillTargeting.HoveredEnemyChanged -= HandleSkillHoveredChanged;
+                skillTargeting = null;
+            }
+
+            if (skillMarker != null)
+            {
+                skillMarker.SetSkillPicked(false);
+                skillMarker = null;
+            }
+        }
+
+        private void HandleSkillHoveredChanged(Transform hoveredEnemy)
+        {
+            if (skillMarker != null)
+            {
+                skillMarker.SetSkillPicked(false);
+            }
+
+            skillMarker = FindMarker(hoveredEnemy);
+
+            if (skillMarker != null)
+            {
+                skillMarker.SetSkillPicked(true);
             }
         }
 

@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: SealedLetter
   m_EditorClassIdentifier: Assembly-CSharp::Project.Items.ItemDefinition
   itemName: Sealed Letter
-  description: A wax-sealed letter addressed to someone across town. It cannot
-    be opened, sold, or equipped - only delivered to whoever it's addressed to.
-  icon: {fileID: 0}
+  description: A wax-sealed letter addressed to someone across town. It cannot be
+    opened, sold, or equipped - only delivered to whoever it's addressed to.
+  icon: {fileID: 1938591300, guid: 94d005860aec7034fb6eae4a4b450ffb, type: 3}
+  dropIconCategory: 0
   isStackable: 0
   maxStackSize: 1
   itemType: 3
-  requiredSlots:
+  requiredSlots: 
   statBonuses:
     strength: 0
     agility: 0
@@ -28,11 +29,16 @@ MonoBehaviour:
     dexterity: 0
     luck: 0
   requiredLevel: 1
-  allowedClasses:
+  allowedClasses: 
   weight: 0.1
   canBeOffHand: 0
   weaponType: 0
+  weaponSubtype: 0
   attackRange: 1.5
+  weaponAttack: 0
+  weaponMagicAttack: 0
+  weaponMagicDefense: 0
+  attackSpeedMultiplier: 1
   buyPrice: 0
   sellPrice: 0
   consumableEffectType: 0
@@ -40,3 +46,7 @@ MonoBehaviour:
   manaRestore: 0
   effectDurationSeconds: 1
   tickIntervalSeconds: 1
+  curesPoison: 0
+  equippedModel: {fileID: 0}
+  equippedModelFemale: {fileID: 0}
+  hidesHair: 0

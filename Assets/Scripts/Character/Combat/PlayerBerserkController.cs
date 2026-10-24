@@ -64,9 +64,9 @@ namespace Project.Character.Combat
             var level = skillBook.GetLevel(berserkSkill);
             var active = level > 0 && !health.IsDead && health.CurrentHealth <= health.MaxHealth * HpThresholdRatio;
 
-            buffs.SetPersistentModifier(
-                this,
-                active ? new BuffPayload(berserkSkill.GetBuffAtkPercent(level), berserkSkill.GetBuffDefPercent(level)) : default);
+            var payload = active ? new BuffPayload(berserkSkill.GetBuffAtkPercent(level), berserkSkill.GetBuffDefPercent(level)) : default;
+            var descriptor = new EffectDescriptor("skill." + berserkSkill.name, berserkSkill.SkillName, berserkSkill.Description, berserkSkill.Icon, EffectCategory.Buff);
+            buffs.SetPersistentModifier(this, payload, descriptor);
         }
     }
 }

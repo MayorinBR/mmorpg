@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: NapalmBeat
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
   skillName: Napalm Beat
-  description: Deals Ghost-element magic damage to the target and everyone near it, scaling with MATK and skill level.
-  icon: {fileID: 0}
+  description: Deals Ghost-element magic damage to the target and everyone near it,
+    scaling with MATK and skill level.
+  icon: {fileID: 21300000, guid: c020d0b88ca8693469ac195953a97b03, type: 3}
   allowedClasses: 05000000
   effectType: 0
   targetType: 4
@@ -22,14 +23,82 @@ MonoBehaviour:
   manaCost: 12
   cooldownSeconds: 0.9
   range: 7
+  requiredLevel: 0
+  zenyCost: 0
+  requiredWeaponSubtypes: 
+  ammoCost: 0
+  bonusDamageRace: 0
+  bonusDamageRaceMultiplier: 1
+  buffRevealsHidden: 0
+  damageType: 1
+  damageMultiplierPerLevel: 0.225
+  damageBaseMultiplier: 0.575
+  healthCost: 0
+  healthCostReductionPerTwoLevels: 0
+  selfFireDamageBonusPercent: 0
+  element: 6
+  accuracyBonusPerLevel: 0
+  isAreaOfEffect: 1
+  areaRadius: 3
+  inflictedStatus: 0
+  inflictedStatusDurationSeconds: 0
+  inflictedStatusDurationPerLevel: 0
+  poisonDamagePerTickPerLevel: 0
+  successChancePerLevel: 0
+  knockbackDistance: 0
+  buffPreventsFlinch: 0
+  immuneToUndeadAndBoss: 0
+  requiredJobLevel: 0
+  prerequisites: []
+  passiveAttackBonusPerLevel: 0
+  passiveRequiredWeaponSubtypes: 
+  passiveDexBonusPerLevel: 0
+  passiveHitBonusPerLevel: 0
+  passiveRangeBonusPerLevel: 0
+  passiveFleeBonusPerLevel: 0
+  passiveWeightLimitBonusPerLevel: 0
+  passiveRaceDamageBonusPerLevel: 0
+  passiveRaceDefenseBonusPerLevel: 0
+  augmentsSkill: {fileID: 0}
+  stunChancePerAugmentedLevel: 0
+  stunDurationSeconds: 0
+  passiveRegenFlatPerLevel: 0
+  passiveRegenPercentOfMaxHealthPerLevel: 0
+  passiveHealItemBonusPerLevel: 0
+  passiveSpRegenMultiplierPerLevel: 0
+  passiveRemovesMovementRegenPenalty: 0
+  healAmount: 10
+  buffAtkPercentPerLevel: 0
+  buffDefPercentPerLevel: 0
+  buffMdefBonusPerLevel: 0
+  buffDurationSeconds: 0
+  buffDurationPerLevel: 0
+  buffStatBonusPerLevel:
+    strength: 0
+    agility: 0
+    vitality: 0
+    intelligence: 0
+    dexterity: 0
+    luck: 0
+  buffAspdPercentPerLevel: 0
+  buffMaxHealthPerLevel: 0
   fixedCastSeconds: 0
   fixedCastPerLevel: 0
   variableCastSeconds: 0.6
   variableCastPerLevel: 0
-  damageType: 1
-  damageMultiplierPerLevel: 0.225
-  damageBaseMultiplier: 0.575
-  element: 6
-  isAreaOfEffect: 1
-  areaRadius: 3
-  healAmount: 10
+  projectileVfxPrefab: {fileID: 0}
+  impactVfxPrefab: {fileID: 2801450319845530028, guid: 1259331b7c6aefa42a42a8df02eac7f2, type: 3}
+  zonePrefab: {fileID: 0}
+  zoneDurationSeconds: 15
+  zoneDurationPerLevel: 0
+  zoneTickIntervalSeconds: 1
+  zoneMaxHits: 0
+  zoneMaxHitsPerLevel: 0
+  blocksAttacks: 0
+  blockedWeaponType: 0
+  toggleDrainIncomingDamageReductionPercentPerLevel: 0
+  toggleDrainManaPerSecond: 0
+  craftingRecipe: {fileID: 0}
+  requiresNearWater: 0
+  requiredItem: {fileID: 0}
+  requiredItemCount: 1

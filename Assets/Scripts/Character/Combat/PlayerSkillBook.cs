@@ -21,6 +21,9 @@ namespace Project.Character.Combat
         [SerializeField] private PlayerClassController classController;
         [SerializeField] private SkillDatabase skillDatabase;
 
+        [Tooltip("Optional. Maps each class to its own skill list, used to keep skill points exclusive to the class tier they were earned in. Left empty, any skill can be upgraded with any class's points.")]
+        [SerializeField] private ClassSkillDatabaseLookup skillDatabaseLookup;
+
         [Tooltip("Optional. Source of the player's Base Level, used to enforce SkillDefinition.RequiredLevel. Left empty, skills can be learned regardless of level.")]
         [SerializeField] private MonoBehaviour playerStatsSource;
 
@@ -54,12 +57,36 @@ namespace Project.Character.Combat
         }
 
         /// <summary>
+        /// Gets whether skill points can currently be spent on a skill. Skill points belong to the class
+        /// tier they were earned in, so the skills of an earlier tier (e.g. Novice skills after evolving)
+        /// stay learned and castable but can no longer be upgraded.
+        /// </summary>
+        /// <param name="skill">The skill to check.</param>
+        /// <returns>True when the skill belongs to the player's current class, or when no class skill lists are configured.</returns>
+        public bool CanSpendPointsOn(SkillDefinition skill)
+        {
+            if (skillDatabaseLookup == null || classController == null)
+            {
+                return true;
+            }
+
+            var tierDatabase = skillDatabaseLookup.GetDatabase(classController.CurrentClass);
+            return tierDatabase == null || tierDatabase.Contains(skill);
+        }
+
+        /// <summary>
         /// Attempts to learn (if unlearned) or upgrade (if already learned) a skill by one level.
         /// </summary>
         /// <param name="skill">The skill to learn or upgrade.</param>
         /// <returns>True if the skill was learned/upgraded; false if the class doesn't allow it, a level requirement isn't met, it's already at max level, or no skill points are available.</returns>
         public bool TryLearnOrUpgrade(SkillDefinition skill)
         {
+            if (!CanSpendPointsOn(skill))
+            {
+                PlayerFeedbackChannel.Publish($"{skill.SkillName} belongs to an earlier class and can no longer be upgraded.");
+                return false;
+            }
+
             if (levelProvider != null && levelProvider.BaseLevel < skill.RequiredLevel)
             {
                 PlayerFeedbackChannel.Publish($"Level {skill.RequiredLevel} required to learn {skill.SkillName}.");

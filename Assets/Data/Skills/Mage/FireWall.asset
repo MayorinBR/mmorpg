@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: FireWall
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
   skillName: Fire Wall
-  description: Creates a wall of fire that burns anything standing in it, dealing Fire-element magic damage on a tick that scales with MATK and skill level.
-  icon: {fileID: 0}
+  description: Creates a wall of fire that burns anything standing in it, dealing
+    Fire-element magic damage on a tick that scales with MATK and skill level.
+  icon: {fileID: 21300000, guid: 3158f314c9117244a9aa9f787a67410a, type: 3}
   allowedClasses: 05000000
   effectType: 4
   targetType: 5
@@ -22,18 +23,86 @@ MonoBehaviour:
   manaCost: 40
   cooldownSeconds: 10
   range: 7
+  requiredLevel: 0
+  zenyCost: 0
+  requiredWeaponSubtypes: 
+  ammoCost: 0
+  bonusDamageRace: 0
+  bonusDamageRaceMultiplier: 1
+  buffRevealsHidden: 0
+  damageType: 1
+  damageMultiplierPerLevel: 0.1
+  damageBaseMultiplier: 0
+  healthCost: 0
+  healthCostReductionPerTwoLevels: 0
+  selfFireDamageBonusPercent: 0
+  element: 1
+  accuracyBonusPerLevel: 0
+  isAreaOfEffect: 0
+  areaRadius: 1.5
+  inflictedStatus: 0
+  inflictedStatusDurationSeconds: 0
+  inflictedStatusDurationPerLevel: 0
+  poisonDamagePerTickPerLevel: 0
+  successChancePerLevel: 0
+  knockbackDistance: 0
+  buffPreventsFlinch: 0
+  immuneToUndeadAndBoss: 0
+  requiredJobLevel: 0
+  prerequisites:
+  - skill: {fileID: 11400000, guid: 207ee25da9754aeb9598e282fb272280, type: 2}
+    level: 3
+  - skill: {fileID: 11400000, guid: b89e0055197f48b8b428ae1b595066f1, type: 2}
+    level: 1
+  passiveAttackBonusPerLevel: 0
+  passiveRequiredWeaponSubtypes: 
+  passiveDexBonusPerLevel: 0
+  passiveHitBonusPerLevel: 0
+  passiveRangeBonusPerLevel: 0
+  passiveFleeBonusPerLevel: 0
+  passiveWeightLimitBonusPerLevel: 0
+  passiveRaceDamageBonusPerLevel: 0
+  passiveRaceDefenseBonusPerLevel: 0
+  augmentsSkill: {fileID: 0}
+  stunChancePerAugmentedLevel: 0
+  stunDurationSeconds: 0
+  passiveRegenFlatPerLevel: 0
+  passiveRegenPercentOfMaxHealthPerLevel: 0
+  passiveHealItemBonusPerLevel: 0
+  passiveSpRegenMultiplierPerLevel: 0
+  passiveRemovesMovementRegenPenalty: 0
+  healAmount: 10
+  buffAtkPercentPerLevel: 0
+  buffDefPercentPerLevel: 0
+  buffMdefBonusPerLevel: 0
+  buffDurationSeconds: 0
+  buffDurationPerLevel: 0
+  buffStatBonusPerLevel:
+    strength: 0
+    agility: 0
+    vitality: 0
+    intelligence: 0
+    dexterity: 0
+    luck: 0
+  buffAspdPercentPerLevel: 0
+  buffMaxHealthPerLevel: 0
   fixedCastSeconds: 0
   fixedCastPerLevel: 0
   variableCastSeconds: 2.15
   variableCastPerLevel: -0.3
-  damageType: 1
-  damageMultiplierPerLevel: 0.1
-  element: 1
-  areaRadius: 1.5
-  zonePrefab: {fileID: 0}
+  projectileVfxPrefab: {fileID: 0}
+  impactVfxPrefab: {fileID: 0}
+  zonePrefab: {fileID: 4064635967927030529, guid: 394e33d2112cd6b47b8a9fa140dbdff1, type: 3}
   zoneDurationSeconds: 4
   zoneDurationPerLevel: 2
   zoneTickIntervalSeconds: 1
   zoneMaxHits: 2
   zoneMaxHitsPerLevel: 2
-  healAmount: 10
+  blocksAttacks: 0
+  blockedWeaponType: 0
+  toggleDrainIncomingDamageReductionPercentPerLevel: 0
+  toggleDrainManaPerSecond: 0
+  craftingRecipe: {fileID: 0}
+  requiresNearWater: 0
+  requiredItem: {fileID: 0}
+  requiredItemCount: 1

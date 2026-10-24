@@ -16,7 +16,7 @@ namespace Project.Maps
     /// <remarks>
     /// ponytail: resuming into the saved map on login needs the Character
     /// Selection flow to load a scene by saved id instead of the fixed
-    /// "Prototype_Map01" — add that when cross-session map resume is needed.
+    /// "Map_4_3_Map01" — add that when cross-session map resume is needed.
     /// </remarks>
     public class CurrentMapSaveParticipant : MonoBehaviour, ISaveParticipant
     {

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Project.Character.Stats;
 
@@ -16,7 +17,7 @@ namespace Project.Combat
     /// and <see cref="IStatusResistanceProvider"/>), so resistance applies
     /// uniformly no matter which caller applies the status.
     /// </summary>
-    public class StatusEffectController : MonoBehaviour
+    public class StatusEffectController : MonoBehaviour, IActiveEffectSource
     {
         [Tooltip("Optional. Health this character takes Poison's damage-over-time tick from. Left empty, Poison behaves as a flag only (no damage).")]
         [SerializeField] private HealthComponent health;
@@ -36,6 +37,9 @@ namespace Project.Combat
         [Tooltip("Seconds this character is briefly unable to move, attack or cast after being hit (Ragnarok Online's damage motion). Zero disables hit-reaction entirely.")]
         [SerializeField] private float flinchDurationSeconds = 0.3f;
 
+        [Tooltip("Optional. Overrides the name, description and icon shown for each condition in the active effects bar. Left empty, built-in text is used.")]
+        [SerializeField] private StatusEffectPresentation presentation;
+
         private IStatusResistanceProvider resistanceProvider;
         private float flinchExpireTime;
 
@@ -45,6 +49,12 @@ namespace Project.Combat
         private float blindExpireTime;
         private float freezeExpireTime;
         private float petrifyExpireTime;
+        private float stunTotalSeconds;
+        private float poisonTotalSeconds;
+        private float silenceTotalSeconds;
+        private float blindTotalSeconds;
+        private float freezeTotalSeconds;
+        private float petrifyTotalSeconds;
         private int poisonDamagePerTick;
         private float poisonTickTimer;
         private bool isHidden;
@@ -150,7 +160,7 @@ namespace Project.Combat
                 return;
             }
 
-            stunExpireTime = Extend(stunExpireTime, durationSeconds);
+            Extend(ref stunExpireTime, ref stunTotalSeconds, durationSeconds);
         }
 
         /// <summary>
@@ -171,7 +181,7 @@ namespace Project.Combat
             }
 
             poisonDamagePerTick = IsPoisoned ? Mathf.Max(poisonDamagePerTick, damagePerTick) : damagePerTick;
-            poisonExpireTime = Extend(poisonExpireTime, durationSeconds);
+            Extend(ref poisonExpireTime, ref poisonTotalSeconds, durationSeconds);
         }
 
         /// <summary>Applies Silence for the given duration, unless resisted (see <see cref="RollResisted"/>), blocking skill casts only.</summary>
@@ -183,7 +193,7 @@ namespace Project.Combat
                 return;
             }
 
-            silenceExpireTime = Extend(silenceExpireTime, durationSeconds);
+            Extend(ref silenceExpireTime, ref silenceTotalSeconds, durationSeconds);
         }
 
         /// <summary>Applies Blind for the given duration, unless resisted (see <see cref="RollResisted"/>). See <see cref="IsBlinded"/> for why nothing reacts to it yet.</summary>
@@ -195,7 +205,7 @@ namespace Project.Combat
                 return;
             }
 
-            blindExpireTime = Extend(blindExpireTime, durationSeconds);
+            Extend(ref blindExpireTime, ref blindTotalSeconds, durationSeconds);
         }
 
         /// <summary>Applies Freeze for the given duration, unless resisted (see <see cref="RollResisted"/>), immobilizing the character (see <see cref="IsImmobilized"/>).</summary>
@@ -207,7 +217,7 @@ namespace Project.Combat
                 return;
             }
 
-            freezeExpireTime = Extend(freezeExpireTime, durationSeconds);
+            Extend(ref freezeExpireTime, ref freezeTotalSeconds, durationSeconds);
             GetComponentInParent<ElementalResistanceComponent>()?.ApplyTemporaryElement(Element.Water, durationSeconds);
         }
 
@@ -220,7 +230,7 @@ namespace Project.Combat
                 return;
             }
 
-            petrifyExpireTime = Extend(petrifyExpireTime, durationSeconds);
+            Extend(ref petrifyExpireTime, ref petrifyTotalSeconds, durationSeconds);
             GetComponentInParent<ElementalResistanceComponent>()?.ApplyTemporaryElement(Element.Ground, durationSeconds);
         }
 
@@ -349,9 +359,41 @@ namespace Project.Combat
             health.TakeDamage(poisonDamagePerTick, Element.Neutral, DamageCategory.Magical);
         }
 
-        private static float Extend(float currentExpireTime, float durationSeconds)
+        private static void Extend(ref float expireTime, ref float totalSeconds, float durationSeconds)
         {
-            return Mathf.Max(currentExpireTime, Time.time + durationSeconds);
+            var newExpireTime = Time.time + durationSeconds;
+
+            if (newExpireTime > expireTime)
+            {
+                expireTime = newExpireTime;
+                totalSeconds = durationSeconds;
+            }
+        }
+
+        /// <inheritdoc />
+        public void CollectActiveEffects(List<ActiveEffect> into)
+        {
+            AddTimed(into, StatusEffectIds.Stun, stunExpireTime, stunTotalSeconds, string.Empty);
+            AddTimed(into, StatusEffectIds.Poison, poisonExpireTime, poisonTotalSeconds, $"Deals {poisonDamagePerTick} damage every {poisonTickIntervalSeconds:0.#}s");
+            AddTimed(into, StatusEffectIds.Silence, silenceExpireTime, silenceTotalSeconds, string.Empty);
+            AddTimed(into, StatusEffectIds.Blind, blindExpireTime, blindTotalSeconds, string.Empty);
+            AddTimed(into, StatusEffectIds.Freeze, freezeExpireTime, freezeTotalSeconds, string.Empty);
+            AddTimed(into, StatusEffectIds.Petrify, petrifyExpireTime, petrifyTotalSeconds, string.Empty);
+
+            if (isHidden)
+            {
+                into.Add(new ActiveEffect(StatusEffectPresentation.Resolve(presentation, StatusEffectIds.Hiding), 0f, 0f));
+            }
+        }
+
+        private void AddTimed(List<ActiveEffect> into, string id, float expireTime, float totalSeconds, string detail)
+        {
+            var remaining = expireTime - Time.time;
+
+            if (remaining > 0f)
+            {
+                into.Add(new ActiveEffect(StatusEffectPresentation.Resolve(presentation, id), remaining, totalSeconds, detail));
+            }
         }
     }
 }
