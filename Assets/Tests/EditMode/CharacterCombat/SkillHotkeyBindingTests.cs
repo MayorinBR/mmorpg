@@ -13,7 +13,7 @@ namespace Project.Character.Combat.Tests
     public class SkillHotkeyBindingTests
     {
         private const string InputAssetPath = "Assets/Input/PlayerControls.inputactions";
-        private const string ScenePath = "Assets/Scenes/Bootstrap.unity";
+        private const string ScenePath = "Assets/Scenes/Flow/Bootstrap.unity";
         private const string ActionNamePrefix = "m_ActionName: 'Character/CastSkill";
         private const string ActionIdPrefix = "m_ActionId: ";
 
