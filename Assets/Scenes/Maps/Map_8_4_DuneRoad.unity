@@ -26272,9 +26272,15 @@ MonoBehaviour:
   - prefab: {fileID: 3451313833103779264, guid: 1138d708efc8cde448d163e5e858f6ea, type: 3}
     weight: 2
     respawnDelaySeconds: 60
-  bossPrefab: {fileID: 0}
-  bossRespawnDelaySeconds: 30
-  bossChance: 0
+  - prefab: {fileID: 3451313833103779264, guid: 46d3630566fe79f4883855ae6f91d3cd, type: 3}
+    weight: 2
+    respawnDelaySeconds: 60
+  - prefab: {fileID: 3451313833103779264, guid: 4eca5834b63622d4c8c5e8a977720c56, type: 3}
+    weight: 1
+    respawnDelaySeconds: 60
+  bossPrefab: {fileID: 3451313833103779264, guid: dad4ead0eeb69924b8a19f5efb2692a5, type: 3}
+  bossRespawnDelaySeconds: 300
+  bossChance: 1
   maxBosses: 1
   maxActive: 12
 --- !u!4 &832704250

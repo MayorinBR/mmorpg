@@ -22,9 +22,84 @@ MonoBehaviour:
   manaCost: 0
   cooldownSeconds: 0
   range: 0
+  requiredLevel: 0
+  zenyCost: 0
+  requiredWeaponSubtypes: 
+  ammoCost: 0
+  bonusDamageRace: 0
+  bonusDamageRaceMultiplier: 1
+  buffRevealsHidden: 0
   damageType: 0
   damageMultiplierPerLevel: 1
-  healAmount: 10
+  damageBaseMultiplier: 0
+  healthCost: 0
+  healthCostReductionPerTwoLevels: 0
+  selfFireDamageBonusPercent: 0
+  element: 5
+  accuracyBonusPerLevel: 0
+  isAreaOfEffect: 0
+  areaRadius: 3
+  inflictedStatus: 0
+  inflictedStatusDurationSeconds: 0
+  inflictedStatusDurationPerLevel: 0
+  poisonDamagePerTickPerLevel: 0
+  successChancePerLevel: 0
+  knockbackDistance: 0
+  buffPreventsFlinch: 0
+  immuneToUndeadAndBoss: 0
+  requiredJobLevel: 0
+  prerequisites:
+  - skill: {fileID: 11400000, guid: 970a2f23600046ccb67346c166f6e64d, type: 2}
+    level: 2
+  passiveAttackBonusPerLevel: 0
+  passiveRequiredWeaponSubtypes: 08000000
+  passiveDexBonusPerLevel: 0
   passiveHitBonusPerLevel: 2
   passiveRangeBonusPerLevel: 0.4
-  passiveRequiredWeaponSubtypes: 08000000
+  passiveFleeBonusPerLevel: 0
+  passiveWeightLimitBonusPerLevel: 0
+  passiveRaceDamageBonusPerLevel: 0
+  passiveRaceDefenseBonusPerLevel: 0
+  augmentsSkill: {fileID: 0}
+  stunChancePerAugmentedLevel: 0
+  stunDurationSeconds: 0
+  passiveRegenFlatPerLevel: 0
+  passiveRegenPercentOfMaxHealthPerLevel: 0
+  passiveHealItemBonusPerLevel: 0
+  passiveSpRegenMultiplierPerLevel: 0
+  passiveRemovesMovementRegenPenalty: 0
+  healAmount: 10
+  buffAtkPercentPerLevel: 0
+  buffDefPercentPerLevel: 0
+  buffMdefBonusPerLevel: 0
+  buffDurationSeconds: 0
+  buffDurationPerLevel: 0
+  buffStatBonusPerLevel:
+    strength: 0
+    agility: 0
+    vitality: 0
+    intelligence: 0
+    dexterity: 0
+    luck: 0
+  buffAspdPercentPerLevel: 0
+  buffMaxHealthPerLevel: 0
+  fixedCastSeconds: 0
+  fixedCastPerLevel: 0
+  variableCastSeconds: 0
+  variableCastPerLevel: 0
+  projectileVfxPrefab: {fileID: 0}
+  impactVfxPrefab: {fileID: 0}
+  zonePrefab: {fileID: 0}
+  zoneDurationSeconds: 15
+  zoneDurationPerLevel: 0
+  zoneTickIntervalSeconds: 1
+  zoneMaxHits: 0
+  zoneMaxHitsPerLevel: 0
+  blocksAttacks: 0
+  blockedWeaponType: 0
+  toggleDrainIncomingDamageReductionPercentPerLevel: 0
+  toggleDrainManaPerSecond: 0
+  craftingRecipe: {fileID: 0}
+  requiresNearWater: 0
+  requiredItem: {fileID: 0}
+  requiredItemCount: 1

@@ -729,6 +729,7 @@ MonoBehaviour:
   statsHolder: {fileID: 0}
   buffs: {fileID: 517221237455455100}
   flinchDurationSeconds: 0.3
+  presentation: {fileID: 0}
 --- !u!114 &4253547583630163530
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -756,7 +757,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Project.Combat::Project.Combat.EntityNameTagUI
   label: {fileID: 8404342373337253059}
-  entityName: Poring
+  entityName: Skeleton
   showLevel: 1
 --- !u!114 &4667207465286352920
 MonoBehaviour:
@@ -777,6 +778,22 @@ MonoBehaviour:
   minWalkPlayback: 0.6
   maxWalkPlayback: 2.2
   speedDampSeconds: 0.1
+--- !u!114 &7100000000000000042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6638017485894401303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c8f1d52a7e94b60b1d2f4a6c9e07d85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.UI::Project.UI.TargetRingMarker
+  radius: 0.8
+  groundOffset: 0.05
+  hoverMaterial: {fileID: 2100000, guid: 4a9e2b7d1c6f4e3a8b5d0f9c2e1a7b64, type: 2}
+  targetMaterial: {fileID: 2100000, guid: 8d2f6c1a9b3e4d70a5c8e1f4b7d2a903, type: 2}
 --- !u!1 &6780684545084016696
 GameObject:
   m_ObjectHideFlags: 0
@@ -1571,19 +1588,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 286808340400145505, guid: 905930c260de1ad40a0128f580846fa6, type: 3}
   m_PrefabInstance: {fileID: 7283598260152551580}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7100000000000000042
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6638017485894401303}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c8f1d52a7e94b60b1d2f4a6c9e07d85, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Project.UI::Project.UI.TargetRingMarker
-  radius: 0.8
-  groundOffset: 0.05
-  hoverMaterial: {fileID: 2100000, guid: 4a9e2b7d1c6f4e3a8b5d0f9c2e1a7b64, type: 2}
-  targetMaterial: {fileID: 2100000, guid: 8d2f6c1a9b3e4d70a5c8e1f4b7d2a903, type: 2}

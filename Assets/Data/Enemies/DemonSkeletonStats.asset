@@ -12,23 +12,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c2f5d1a7b3e4960a4d9e1c7b5f30a28, type: 3}
   m_Name: DemonSkeletonStats
   m_EditorClassIdentifier: Project.AI::Project.AI.MonsterDefinition
-  maxHealth: 650
+  maxHealth: 1800
   maxMana: 0
-  attackPower: 38
-  defense: 20
-  magicalDefense: 10
-  hit: 62
+  attackPower: 55
+  defense: 24
+  magicalDefense: 12
+  hit: 85
   flee: 34
-  moveSpeed: 3.1
-  experienceReward: 520
-  jobExperienceReward: 380
+  moveSpeed: 3.2
+  experienceReward: 1500
+  jobExperienceReward: 900
   size: 0
   race: 6
   element: 7
-  isBoss: 0
+  isBoss: 1
   baseAttackSpeed: 150
-  statusResistChance: 0.2
-  minLevel: 22
-  maxLevel: 26
-  respawnDelaySeconds: 30
-  drops: []
+  statusResistChance: 0.3
+  minLevel: 25
+  maxLevel: 25
+  respawnDelaySeconds: 300
+  drops:
+  - item: {fileID: 11400000, guid: 7128fa0eff79b20418e636e0a390de9b, type: 2}
+    dropChance: 1
+    minQuantity: 1
+    maxQuantity: 2
+  - item: {fileID: 11400000, guid: 75676ed25623bcd4ebcd508dc4e4de8e, type: 2}
+    dropChance: 0.3
+    minQuantity: 1
+    maxQuantity: 1
+  - item: {fileID: 11400000, guid: f2c9e4b321b4ac84ea3998c44033838e, type: 2}
+    dropChance: 0.1
+    minQuantity: 1
+    maxQuantity: 1

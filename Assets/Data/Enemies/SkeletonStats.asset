@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c2f5d1a7b3e4960a4d9e1c7b5f30a28, type: 3}
   m_Name: SkeletonStats
   m_EditorClassIdentifier: Project.AI::Project.AI.MonsterDefinition
-  maxHealth: 1
+  maxHealth: 170
   maxMana: 0
-  attackPower: 1
+  attackPower: 15
   defense: 5
   magicalDefense: 0
   hit: 30
@@ -30,4 +30,13 @@ MonoBehaviour:
   statusResistChance: 0
   minLevel: 6
   maxLevel: 10
-  drops: []
+  respawnDelaySeconds: 30
+  drops:
+  - item: {fileID: 11400000, guid: 20290b1446b21f741820e78d698461d3, type: 2}
+    dropChance: 0.5
+    minQuantity: 1
+    maxQuantity: 2
+  - item: {fileID: 11400000, guid: 452e04800ea14e6f929563b2d0ae3631, type: 2}
+    dropChance: 0.05
+    minQuantity: 1
+    maxQuantity: 1
