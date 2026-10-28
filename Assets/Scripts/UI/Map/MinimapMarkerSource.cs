@@ -25,6 +25,9 @@ namespace Project.UI
         [SerializeField] private MinimapMarkerType markerType = MinimapMarkerType.Npc;
         [SerializeField] private Color otherColor = Color.white;
 
+        /// <summary>Gets the category of this marker.</summary>
+        public MinimapMarkerType MarkerType => markerType;
+
         /// <summary>Gets the color this marker's minimap icon should use, based on <see cref="MinimapMarkerType"/>.</summary>
         public Color IconColor => markerType switch
         {
