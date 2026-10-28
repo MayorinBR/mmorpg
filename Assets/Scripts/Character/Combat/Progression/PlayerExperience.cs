@@ -40,7 +40,7 @@ namespace Project.Character.Combat
         /// <summary>Gets the experience required to advance from the current level.</summary>
         public int RequiredExperienceForNextLevel => experienceCurve.GetRequiredExperience(CurrentLevel);
 
-        private bool IsAtLevelCap => classController != null && CurrentLevel >= ClassProgression.GetLevelCap(classController.CurrentClass);
+        private bool IsAtLevelCap => classController != null && CurrentLevel >= ClassProgression.GetBaseLevelCap(classController.CurrentClass);
 
         private void Awake()
         {

@@ -136,11 +136,6 @@ namespace Project.World
             {
                 Object.Destroy(IsometricCameraController.Instance.gameObject);
             }
-
-            if (MinimapCameraFollow.Instance != null)
-            {
-                Object.Destroy(MinimapCameraFollow.Instance.gameObject);
-            }
         }
     }
 }

@@ -72,16 +72,14 @@ namespace Project.EditorTools
                 return;
             }
 
-            var png = Capture();
-
-            if (png == null)
+            if (!TryCapture(out var png, out var center, out var sideLength))
             {
                 Debug.LogWarning($"MapThumbnailCapture: nothing to capture in {sceneName}.");
                 return;
             }
 
             Directory.CreateDirectory(OutputFolder);
-            Assign(definition, sceneName, png);
+            Assign(definition, sceneName, png, center, sideLength);
             AssetDatabase.SaveAssets();
         }
 
@@ -100,22 +98,39 @@ namespace Project.EditorTools
             return null;
         }
 
-        private static byte[] Capture()
+        /// <summary>
+        /// Renders the open scene from above and reports the world area the picture covers.
+        /// </summary>
+        /// <param name="png">The encoded picture.</param>
+        /// <param name="center">World X and Z of the center of the captured area.</param>
+        /// <param name="sideLength">Side length in meters of the captured square.</param>
+        /// <returns>False when the scene has nothing to capture.</returns>
+        private static bool TryCapture(out byte[] png, out Vector2 center, out float sideLength)
         {
             var area = Object.FindFirstObjectByType<MapThumbnailArea>();
 
             if (area != null)
             {
-                return Render(area.CameraPosition, area.SideLength * 0.5f, area.CaptureDepth);
+                var position = area.CameraPosition;
+                center = new Vector2(position.x, position.z);
+                sideLength = area.SideLength;
+                png = Render(position, sideLength * 0.5f, area.CaptureDepth);
+                return true;
             }
 
             if (!TryGetSceneBounds(out var bounds))
             {
-                return null;
+                png = null;
+                center = default;
+                sideLength = 0f;
+                return false;
             }
 
-            var position = new Vector3(bounds.center.x, bounds.max.y + CameraClearance, bounds.center.z);
-            return Render(position, Mathf.Max(bounds.extents.x, bounds.extents.z), bounds.size.y + CameraClearance * 2f);
+            var halfSide = Mathf.Max(bounds.extents.x, bounds.extents.z);
+            center = new Vector2(bounds.center.x, bounds.center.z);
+            sideLength = halfSide * 2f;
+            png = Render(new Vector3(bounds.center.x, bounds.max.y + CameraClearance, bounds.center.z), halfSide, bounds.size.y + CameraClearance * 2f);
+            return true;
         }
 
         private static byte[] Render(Vector3 cameraPosition, float halfSide, float depth)
@@ -185,7 +200,7 @@ namespace Project.EditorTools
             found = true;
         }
 
-        private static void Assign(ScriptableObject definition, string mapId, byte[] png)
+        private static void Assign(ScriptableObject definition, string mapId, byte[] png, Vector2 center, float sideLength)
         {
             var path = $"{OutputFolder}/{mapId}.png";
             File.WriteAllBytes(path, png);
@@ -199,6 +214,8 @@ namespace Project.EditorTools
 
             var serialized = new SerializedObject(definition);
             serialized.FindProperty("thumbnail").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            serialized.FindProperty("thumbnailCenter").vector2Value = center;
+            serialized.FindProperty("thumbnailSideLength").floatValue = sideLength;
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(definition);
         }

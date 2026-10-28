@@ -86,7 +86,7 @@ namespace Project.Character.Combat
             }
         }
 
-        private bool IsAtLevelCap => classController != null && JobLevel >= ClassProgression.GetLevelCap(classController.CurrentClass);
+        private bool IsAtLevelCap => classController != null && JobLevel >= ClassProgression.GetJobLevelCap(classController.CurrentClass);
 
         private void HandleClassEvolved(CharacterClass previousClass, CharacterClass newClass)
         {

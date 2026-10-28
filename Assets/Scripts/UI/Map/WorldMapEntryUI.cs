@@ -7,7 +7,7 @@ namespace Project.UI
 {
     /// <summary>
     /// One map node in the World Map window: shows the map's top-down thumbnail inset from its edges so
-    /// neighbouring nodes keep a gap, and shows the map's name on hover via
+    /// neighbouring nodes keep a gap, and shows an enlarged picture of the map with its name on hover via
     /// <see cref="MapTooltipUI"/>. <see cref="WorldMapWindowUI"/> reads
     /// <see cref="RectTransform"/> to place the current-map marker on it.
     /// </summary>
@@ -47,13 +47,13 @@ namespace Project.UI
             rectTransform.anchoredPosition = position;
         }
 
-        /// <summary>Shows the map's name in the shared <see cref="MapTooltipUI"/> tooltip.</summary>
+        /// <summary>Shows the map's enlarged picture and name in the shared <see cref="MapTooltipUI"/> tooltip.</summary>
         /// <param name="eventData">Pointer event data, used for the tooltip's screen position.</param>
         public void OnPointerEnter(PointerEventData eventData)
         {
             if (Map != null && MapTooltipUI.Instance != null)
             {
-                MapTooltipUI.Instance.Show(Map.DisplayName, eventData.position);
+                MapTooltipUI.Instance.Show(Map.DisplayName, Map.Thumbnail, eventData.position);
             }
         }
 

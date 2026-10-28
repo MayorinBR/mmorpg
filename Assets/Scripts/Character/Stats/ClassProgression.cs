@@ -1,29 +1,45 @@
 namespace Project.Character.Stats
 {
     /// <summary>
-    /// Progression rules that depend on a character's class: the level cap
-    /// that forces a Novice to evolve, the Job Level required to do so and
-    /// the level cap of every evolved class.
+    /// Progression rules that depend on a character's class: the level caps
+    /// that force a Novice to evolve, the Job Level required to do so and
+    /// the Base Level and Job Level caps of every first class.
     /// </summary>
     public static class ClassProgression
     {
-        /// <summary>The Base Level and Job Level at which a Novice stops gaining experience.</summary>
-        public const int NoviceLevelCap = 10;
+        /// <summary>The Base Level at which a Novice stops gaining experience.</summary>
+        public const int NoviceBaseLevelCap = 10;
 
-        /// <summary>The highest Base Level and Job Level of an evolved class.</summary>
-        public const int EvolvedLevelCap = 99;
+        /// <summary>The Job Level at which a Novice stops gaining experience.</summary>
+        public const int NoviceJobLevelCap = 10;
+
+        /// <summary>The highest Base Level of a first class.</summary>
+        public const int FirstClassBaseLevelCap = 99;
+
+        /// <summary>The highest Job Level of a first class.</summary>
+        public const int FirstClassJobLevelCap = 50;
 
         /// <summary>The Job Level a Novice needs to evolve into a first class.</summary>
         public const int EvolutionJobLevel = 10;
 
         /// <summary>
-        /// Gets the highest Base Level and Job Level a class can reach.
+        /// Gets the highest Base Level a class can reach.
         /// </summary>
         /// <param name="characterClass">The class to look up.</param>
-        /// <returns>The level cap: 10 for a Novice, 99 for any evolved class.</returns>
-        public static int GetLevelCap(CharacterClass characterClass)
+        /// <returns>The Base Level cap: 10 for a Novice, 99 for any first class.</returns>
+        public static int GetBaseLevelCap(CharacterClass characterClass)
         {
-            return characterClass == CharacterClass.Novice ? NoviceLevelCap : EvolvedLevelCap;
+            return characterClass == CharacterClass.Novice ? NoviceBaseLevelCap : FirstClassBaseLevelCap;
+        }
+
+        /// <summary>
+        /// Gets the highest Job Level a class can reach.
+        /// </summary>
+        /// <param name="characterClass">The class to look up.</param>
+        /// <returns>The Job Level cap: 10 for a Novice, 50 for any first class.</returns>
+        public static int GetJobLevelCap(CharacterClass characterClass)
+        {
+            return characterClass == CharacterClass.Novice ? NoviceJobLevelCap : FirstClassJobLevelCap;
         }
     }
 }
