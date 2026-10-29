@@ -81,6 +81,7 @@ namespace Project.World
                 player.DeathHandler.SetRespawnPoint(defaultRespawnPoint);
             }
 
+            WarpToRespawnPointIfRequested(player);
             WarpToPendingSpawnPoint(player);
             WarpToPendingPosition(player);
             EnsureOnNavMesh(player);
@@ -106,6 +107,29 @@ namespace Project.World
 
             var position = defaultRespawnPoint != null ? defaultRespawnPoint.position : player.MovementController.transform.position;
             player.MovementController.WarpTo(position);
+        }
+
+        /// <summary>
+        /// Places the player at this map's default respawn point when the
+        /// transition asked for it through
+        /// <see cref="MapTransitionService.WarpToRespawnPoint"/>.
+        /// </summary>
+        /// <param name="player">The persisted player.</param>
+        private void WarpToRespawnPointIfRequested(PersistentPlayerAnchor player)
+        {
+            if (!MapTransitionService.ConsumePendingRespawn())
+            {
+                return;
+            }
+
+            if (defaultRespawnPoint == null)
+            {
+                Debug.LogWarning($"MapBootstrap: scene '{SceneManager.GetActiveScene().name}' has no default respawn point. Player position was left unchanged.");
+                return;
+            }
+
+            player.MovementController.StopMovement();
+            player.MovementController.WarpTo(defaultRespawnPoint.position);
         }
 
         private static void WarpToPendingPosition(PersistentPlayerAnchor player)

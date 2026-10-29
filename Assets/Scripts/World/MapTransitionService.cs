@@ -37,6 +37,39 @@ namespace Project.World
         }
 
         /// <summary>
+        /// Whether the next loaded map's <see cref="MapBootstrap"/> should
+        /// place the persisted player at that map's default respawn point.
+        /// Set by <see cref="WarpToRespawnPoint"/>.
+        /// </summary>
+        public static bool PendingRespawn { get; private set; }
+
+        /// <summary>
+        /// Loads the destination scene and requests that its
+        /// <see cref="MapBootstrap"/> place the persisted player at the
+        /// scene's default respawn point. Meant for tools that jump to a map
+        /// without going through one of its warp portals.
+        /// </summary>
+        /// <param name="sceneName">Destination scene name, must be registered in Build Settings.</param>
+        public static void WarpToRespawnPoint(string sceneName)
+        {
+            PendingRespawn = true;
+            BeginLoading();
+            SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+        }
+
+        /// <summary>
+        /// Clears <see cref="PendingRespawn"/> and returns its previous value,
+        /// so a stale request is never reapplied on a later scene load.
+        /// </summary>
+        /// <returns>True if the loaded map should place the player at its respawn point.</returns>
+        public static bool ConsumePendingRespawn()
+        {
+            var pending = PendingRespawn;
+            PendingRespawn = false;
+            return pending;
+        }
+
+        /// <summary>
         /// World-space position the next loaded map's <see cref="MapBootstrap"/>
         /// should place the persisted player at, set by <see cref="WarpToPosition"/>.
         /// </summary>
