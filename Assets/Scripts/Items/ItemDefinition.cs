@@ -75,8 +75,11 @@ namespace Project.Items
         /// <summary>Gets a value indicating whether multiple units of this item can share a single slot.</summary>
         public bool IsStackable => isStackable;
 
-        /// <summary>Gets the maximum quantity allowed in a single stack.</summary>
-        public int MaxStackSize => maxStackSize;
+        /// <summary>The hard upper limit of a single stack, applied regardless of the value authored on the asset.</summary>
+        public const int StackLimit = 999;
+
+        /// <summary>Gets the maximum quantity allowed in a single stack, never above <see cref="StackLimit"/>.</summary>
+        public int MaxStackSize => Mathf.Min(maxStackSize, StackLimit);
 
         /// <summary>Gets the broad category of this item.</summary>
         public ItemType ItemType => itemType;

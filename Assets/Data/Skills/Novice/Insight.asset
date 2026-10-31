@@ -15,7 +15,7 @@ MonoBehaviour:
   skillName: Insight
   description: Temporarily boosts INT. Applies to the caster only until party support
     exists.
-  icon: {fileID: 505740324, guid: 43fa633b25dc4b5419d0e2c000af0bca, type: 3}
+  icon: {fileID: 21300000, guid: af5b8e0b96e662d44896d60574f4ae42, type: 3}
   allowedClasses: 06000000
   effectType: 3
   targetType: 0
@@ -25,6 +25,11 @@ MonoBehaviour:
   range: 5
   requiredLevel: 0
   zenyCost: 0
+  requiredWeaponSubtypes: 
+  ammoCost: 0
+  bonusDamageRace: 0
+  bonusDamageRaceMultiplier: 1
+  buffRevealsHidden: 0
   damageType: 0
   damageMultiplierPerLevel: 1
   damageBaseMultiplier: 0
@@ -44,6 +49,7 @@ MonoBehaviour:
   buffPreventsFlinch: 0
   immuneToUndeadAndBoss: 0
   requiredJobLevel: 0
+  prerequisites: []
   passiveAttackBonusPerLevel: 0
   passiveRequiredWeaponSubtypes: 
   passiveDexBonusPerLevel: 0
@@ -76,13 +82,23 @@ MonoBehaviour:
     luck: 0
   buffAspdPercentPerLevel: 0
   buffMaxHealthPerLevel: 0
+  fixedCastSeconds: 0
+  fixedCastPerLevel: 0
+  variableCastSeconds: 0
+  variableCastPerLevel: 0
+  projectileVfxPrefab: {fileID: 0}
+  impactVfxPrefab: {fileID: 0}
   zonePrefab: {fileID: 0}
   zoneDurationSeconds: 15
   zoneDurationPerLevel: 0
   zoneTickIntervalSeconds: 1
+  zoneMaxHits: 0
+  zoneMaxHitsPerLevel: 0
   blocksAttacks: 0
   blockedWeaponType: 0
   toggleDrainIncomingDamageReductionPercentPerLevel: 0
   toggleDrainManaPerSecond: 0
   craftingRecipe: {fileID: 0}
   requiresNearWater: 0
+  requiredItem: {fileID: 0}
+  requiredItemCount: 1

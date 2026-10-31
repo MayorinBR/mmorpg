@@ -55,6 +55,9 @@ namespace Project.Items
         /// <summary>Gets how many units of ammo are currently equipped.</summary>
         public int EquippedAmmoCount => equippedAmmoCount;
 
+        /// <summary>Gets the ammo item currently equipped, or null when the ammo slot is empty.</summary>
+        public ItemDefinition EquippedAmmoItem => equippedRecords.FirstOrDefault(record => record.OccupiedSlots.Contains(EquipmentSlot.Ammo))?.Item;
+
         /// <summary>
         /// Gets the items currently occupying the given slot (more than one
         /// only possible for <see cref="EquipmentSlot.Accessory"/>).
@@ -334,9 +337,25 @@ namespace Project.Items
 
             if (existingAmmoRecord != null && existingAmmoRecord.Item == item)
             {
-                equippedAmmoCount += quantity;
-                inventory.Items.RemoveAt(inventorySlotIndex);
-                inventory.Items.ReserveExternalWeight(item.Weight * quantity);
+                var accepted = Mathf.Min(quantity, ItemDefinition.StackLimit - equippedAmmoCount);
+
+                if (accepted <= 0)
+                {
+                    return;
+                }
+
+                equippedAmmoCount += accepted;
+
+                if (accepted == quantity)
+                {
+                    inventory.Items.RemoveAt(inventorySlotIndex);
+                }
+                else
+                {
+                    inventory.Items.SetSlot(inventorySlotIndex, item, quantity - accepted);
+                }
+
+                inventory.Items.ReserveExternalWeight(item.Weight * accepted);
                 AmmoCountChanged?.Invoke();
                 return;
             }

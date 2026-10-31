@@ -152,7 +152,7 @@ namespace Project.Character.Combat
                 return false;
             }
 
-            if (!MeetsWeaponRequirement(skill) || !MeetsCatalystRequirement(skill))
+            if (!MeetsWeaponRequirement(skill) || !MeetsCatalystRequirement(skill) || !MeetsResourceRequirement(skill))
             {
                 return false;
             }
@@ -223,6 +223,7 @@ namespace Project.Character.Combat
             {
                 SpendAmmo(skill);
                 SpendCatalyst(skill);
+                SkillAnnouncementChannel.Announce(skill.SkillName, transform.position);
 
                 if (skill.TargetType == SkillTargetType.Self)
                 {
@@ -235,6 +236,54 @@ namespace Project.Character.Combat
             }
 
             return cast;
+        }
+
+        /// <summary>
+        /// Checks the mana, Zeny and crafting materials a skill needs, telling the player what is missing.
+        /// </summary>
+        /// <param name="skill">The skill about to be cast.</param>
+        /// <returns>True when every resource the skill consumes is available.</returns>
+        private bool MeetsResourceRequirement(SkillDefinition skill)
+        {
+            if (mana.CurrentMana < skill.ManaCost)
+            {
+                PlayerFeedbackChannel.Publish($"Not enough SP to cast {skill.SkillName}.");
+                return false;
+            }
+
+            if (skill.ZenyCost > 0 && (currency == null || currency.CurrentZeny < skill.ZenyCost))
+            {
+                PlayerFeedbackChannel.Publish($"{skill.SkillName} requires {skill.ZenyCost} Zeny.");
+                return false;
+            }
+
+            return skill.EffectType != SkillEffectType.Craft || MeetsCraftMaterials(skill);
+        }
+
+        /// <summary>
+        /// Checks that the inventory holds every material of a craft skill's recipe, telling the player the first one missing.
+        /// </summary>
+        /// <param name="skill">The craft skill about to be cast.</param>
+        /// <returns>True when every material is available.</returns>
+        private bool MeetsCraftMaterials(SkillDefinition skill)
+        {
+            var materials = skill.CraftingRecipe != null ? skill.CraftingRecipe.Materials : null;
+
+            if (inventory == null || materials == null)
+            {
+                return true;
+            }
+
+            foreach (var material in materials)
+            {
+                if (inventory.Items.GetQuantity(material.Item) < material.Quantity)
+                {
+                    PlayerFeedbackChannel.Publish($"{skill.SkillName} requires {material.Quantity} {material.Item.ItemName}.");
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -390,7 +439,7 @@ namespace Project.Character.Combat
 
             var level = skillBook.GetLevel(skill);
 
-            if (level <= 0 || Time.time < GetCooldownEndTime(skill) || !MeetsCatalystRequirement(skill))
+            if (level <= 0 || Time.time < GetCooldownEndTime(skill) || !MeetsCatalystRequirement(skill) || !MeetsResourceRequirement(skill))
             {
                 return false;
             }
@@ -429,6 +478,7 @@ namespace Project.Character.Combat
             }
 
             SpendCatalyst(skill);
+            SkillAnnouncementChannel.Announce(skill.SkillName, transform.position);
 
             animatorController?.TriggerCast();
             StopMovementForCast();
@@ -698,7 +748,14 @@ namespace Project.Character.Combat
                 combat = GetComponentInParent<PlayerCombatController>() ?? GetComponentInChildren<PlayerCombatController>();
             }
 
-            combat?.SpawnSkillProjectile(isMagical, target);
+            if (isMagical)
+            {
+                combat?.SpawnSkillProjectile(true, target);
+            }
+            else
+            {
+                combat?.SpawnSkillArrows(skill, target);
+            }
         }
 
         /// <summary>
@@ -1202,10 +1259,15 @@ namespace Project.Character.Combat
 
             if (skill.RequiresNearWater && !Physics.CheckSphere(transform.position, NearWaterRadius, waterLayer))
             {
+                PlayerFeedbackChannel.Publish($"{skill.SkillName} must be cast near water.");
                 return true;
             }
 
-            inventory.Items.TryCraft(skill.CraftingRecipe);
+            if (!inventory.Items.TryCraft(skill.CraftingRecipe))
+            {
+                PlayerFeedbackChannel.Publish("Not enough inventory space.");
+            }
+
             return true;
         }
 

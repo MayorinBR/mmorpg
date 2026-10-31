@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: ArrowRepel
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
   skillName: Arrow Repel
-  description: Fires a heavy arrow that deals physical damage to the target and knocks it back. Requires a bow and consumes one arrow.
-  icon: {fileID: 0}
+  description: Fires a heavy arrow that deals physical damage to the target and knocks
+    it back. Requires a bow and consumes one arrow.
+  icon: {fileID: 21300000, guid: 63ae3f498e76bd042aeb151b6a29a712, type: 3}
   allowedClasses: 01000000
   effectType: 0
   targetType: 2
@@ -22,10 +23,84 @@ MonoBehaviour:
   manaCost: 15
   cooldownSeconds: 8
   range: 8
+  requiredLevel: 0
+  zenyCost: 0
   requiredWeaponSubtypes: 08000000
+  arrowVolleyStyle: 0
+  arrowAuraPrefab: {fileID: 6579871900495731692, guid: 66d20c1407419cd478ab76bf15124d30, type: 3}
   ammoCost: 1
-  requiredJobLevel: 35
+  bonusDamageRace: 0
+  bonusDamageRaceMultiplier: 1
+  buffRevealsHidden: 0
   damageType: 0
   damageMultiplierPerLevel: 1.5
-  healAmount: 10
+  damageBaseMultiplier: 0
+  healthCost: 0
+  healthCostReductionPerTwoLevels: 0
+  selfFireDamageBonusPercent: 0
+  element: 5
+  accuracyBonusPerLevel: 0
+  isAreaOfEffect: 0
+  areaRadius: 3
+  inflictedStatus: 0
+  inflictedStatusDurationSeconds: 0
+  inflictedStatusDurationPerLevel: 0
+  poisonDamagePerTickPerLevel: 0
+  successChancePerLevel: 0
   knockbackDistance: 6
+  buffPreventsFlinch: 0
+  immuneToUndeadAndBoss: 0
+  requiredJobLevel: 35
+  prerequisites: []
+  passiveAttackBonusPerLevel: 0
+  passiveRequiredWeaponSubtypes: 
+  passiveDexBonusPerLevel: 0
+  passiveHitBonusPerLevel: 0
+  passiveRangeBonusPerLevel: 0
+  passiveFleeBonusPerLevel: 0
+  passiveWeightLimitBonusPerLevel: 0
+  passiveRaceDamageBonusPerLevel: 0
+  passiveRaceDefenseBonusPerLevel: 0
+  augmentsSkill: {fileID: 0}
+  stunChancePerAugmentedLevel: 0
+  stunDurationSeconds: 0
+  passiveRegenFlatPerLevel: 0
+  passiveRegenPercentOfMaxHealthPerLevel: 0
+  passiveHealItemBonusPerLevel: 0
+  passiveSpRegenMultiplierPerLevel: 0
+  passiveRemovesMovementRegenPenalty: 0
+  healAmount: 10
+  buffAtkPercentPerLevel: 0
+  buffDefPercentPerLevel: 0
+  buffMdefBonusPerLevel: 0
+  buffDurationSeconds: 0
+  buffDurationPerLevel: 0
+  buffStatBonusPerLevel:
+    strength: 0
+    agility: 0
+    vitality: 0
+    intelligence: 0
+    dexterity: 0
+    luck: 0
+  buffAspdPercentPerLevel: 0
+  buffMaxHealthPerLevel: 0
+  fixedCastSeconds: 0
+  fixedCastPerLevel: 0
+  variableCastSeconds: 0
+  variableCastPerLevel: 0
+  projectileVfxPrefab: {fileID: 0}
+  impactVfxPrefab: {fileID: 0}
+  zonePrefab: {fileID: 0}
+  zoneDurationSeconds: 15
+  zoneDurationPerLevel: 0
+  zoneTickIntervalSeconds: 1
+  zoneMaxHits: 0
+  zoneMaxHitsPerLevel: 0
+  blocksAttacks: 0
+  blockedWeaponType: 0
+  toggleDrainIncomingDamageReductionPercentPerLevel: 0
+  toggleDrainManaPerSecond: 0
+  craftingRecipe: {fileID: 0}
+  requiresNearWater: 0
+  requiredItem: {fileID: 0}
+  requiredItemCount: 1

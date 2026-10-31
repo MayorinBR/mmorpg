@@ -18,6 +18,12 @@ namespace Project.UI
         [SerializeField] private Image iconImage;
         [SerializeField] private TMP_Text countText;
 
+        private void Awake()
+        {
+            countText.textWrappingMode = TextWrappingModes.NoWrap;
+            countText.overflowMode = TextOverflowModes.Overflow;
+        }
+
         private void OnEnable()
         {
             equipment.AmmoCountChanged += Refresh;

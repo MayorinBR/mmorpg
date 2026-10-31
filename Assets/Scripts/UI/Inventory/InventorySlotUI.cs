@@ -42,6 +42,8 @@ namespace Project.UI
         private void Awake()
         {
             button.onClick.AddListener(() => Clicked?.Invoke(slotIndex));
+            quantityText.textWrappingMode = TextWrappingModes.NoWrap;
+            quantityText.overflowMode = TextOverflowModes.Overflow;
         }
 
         /// <summary>

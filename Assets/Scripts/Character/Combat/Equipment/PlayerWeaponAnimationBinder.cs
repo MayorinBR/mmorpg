@@ -5,15 +5,27 @@ using Project.Items;
 namespace Project.Character.Combat
 {
     /// <summary>
-    /// Keeps the player's basic-attack animation in step with the equipped main-hand weapon: on
+    /// Keeps the player's basic-attack and idle animations in step with the equipped main-hand weapon: on
     /// every equipment change it looks the weapon's category up in a <see cref="WeaponAnimationCatalog"/>
-    /// and hands the resulting clip to <see cref="PlayerAnimatorController"/>.
+    /// and hands the resulting clips to <see cref="PlayerAnimatorController"/>.
     /// </summary>
     public sealed class PlayerWeaponAnimationBinder : MonoBehaviour
     {
         [SerializeField] private EquipmentManager equipment;
         [SerializeField] private PlayerAnimatorController animatorController;
         [SerializeField] private WeaponAnimationCatalog catalog;
+
+        private WeaponHoldPoseController holdPoseController;
+
+        private void Awake()
+        {
+            holdPoseController = GetComponent<WeaponHoldPoseController>();
+
+            if (holdPoseController == null)
+            {
+                holdPoseController = gameObject.AddComponent<WeaponHoldPoseController>();
+            }
+        }
 
         private void OnEnable()
         {
@@ -32,7 +44,12 @@ namespace Project.Character.Combat
 
         private void Refresh()
         {
-            animatorController.SetAttackClip(catalog.GetAttackClip(equipment.GetMainHandWeaponSubtype()));
+            var subtype = equipment.GetMainHandWeaponSubtype();
+            animatorController.SetAttackClip(catalog.GetAttackClip(subtype));
+            animatorController.SetIdleClip(catalog.GetIdleClip(subtype));
+            animatorController.SetRunClip(catalog.GetRunClip(subtype));
+            animatorController.SetAttackImpact(catalog.GetAttackImpactNormalizedTime(subtype));
+            holdPoseController.SetPoses(catalog.GetHoldPoses(subtype));
         }
     }
 }

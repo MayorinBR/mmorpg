@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: MagnumBreak
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
   skillName: Magnum Break
-  description: Deals Fire property damage to every enemy around the caster at the cost of some HP, then adds 20% Fire damage to your attacks for 10 seconds.
-  icon: {fileID: 371646829, guid: 0f9d26d5001687d40986509de0b0e95d, type: 3}
+  description: Deals Fire property damage to every enemy around the caster at the
+    cost of some HP, then adds 20% Fire damage to your attacks for 10 seconds.
+  icon: {fileID: 21300000, guid: d8ff437777e0e0c498761437f8703448, type: 3}
   allowedClasses: 00000000
   effectType: 0
   targetType: 3
@@ -24,6 +25,11 @@ MonoBehaviour:
   range: 0
   requiredLevel: 0
   zenyCost: 0
+  requiredWeaponSubtypes: 
+  ammoCost: 0
+  bonusDamageRace: 0
+  bonusDamageRaceMultiplier: 1
+  buffRevealsHidden: 0
   damageType: 0
   damageMultiplierPerLevel: 0.2
   damageBaseMultiplier: 1
@@ -78,13 +84,23 @@ MonoBehaviour:
     luck: 0
   buffAspdPercentPerLevel: 0
   buffMaxHealthPerLevel: 0
+  fixedCastSeconds: 0
+  fixedCastPerLevel: 0
+  variableCastSeconds: 0
+  variableCastPerLevel: 0
+  projectileVfxPrefab: {fileID: 0}
+  impactVfxPrefab: {fileID: 0}
   zonePrefab: {fileID: 0}
   zoneDurationSeconds: 15
   zoneDurationPerLevel: 0
   zoneTickIntervalSeconds: 1
+  zoneMaxHits: 0
+  zoneMaxHitsPerLevel: 0
   blocksAttacks: 0
   blockedWeaponType: 0
   toggleDrainIncomingDamageReductionPercentPerLevel: 0
   toggleDrainManaPerSecond: 0
   craftingRecipe: {fileID: 0}
   requiresNearWater: 0
+  requiredItem: {fileID: 0}
+  requiredItemCount: 1

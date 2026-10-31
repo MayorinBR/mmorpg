@@ -15,17 +15,19 @@ MonoBehaviour:
   skillName: Arrow Shower
   description: Rains arrows on the target and everyone near it, dealing physical
     damage that scales with skill level. Requires a bow and consumes one arrow.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 072aa7134c243924eba7e8fce19e0e77, type: 3}
   allowedClasses: 01000000
   effectType: 0
   targetType: 4
-  maxLevel: 5
+  maxLevel: 10
   manaCost: 15
   cooldownSeconds: 1
   range: 8
   requiredLevel: 0
   zenyCost: 0
   requiredWeaponSubtypes: 08000000
+  arrowVolleyStyle: 2
+  arrowAuraPrefab: {fileID: 0}
   ammoCost: 1
   bonusDamageRace: 0
   bonusDamageRaceMultiplier: 1

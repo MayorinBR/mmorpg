@@ -35,6 +35,12 @@ namespace Project.Skills
         [Tooltip("Weapon categories of which one must be equipped in the main hand to cast this skill (e.g. Bow for Double Strafe). Empty means any weapon, or none.")]
         [SerializeField] private WeaponSubtype[] requiredWeaponSubtypes;
 
+        [Tooltip("How the arrows of an ammo skill are drawn: one arrow, two flying side by side, or a rain falling on the target. Visual only.")]
+        [SerializeField] private ArrowVolleyStyle arrowVolleyStyle;
+
+        [Tooltip("Optional effect attached to the flying arrow of an ammo skill, such as the aura of Arrow Repel. Visual only.")]
+        [SerializeField] private GameObject arrowAuraPrefab;
+
         [Tooltip("Equipped ammo units spent per cast, e.g. 1 for Double Strafe. The cast is refused while fewer are equipped. Zero for every skill that uses no ammo.")]
         [SerializeField, Min(0)] private int ammoCost;
 
@@ -386,6 +392,12 @@ namespace Project.Skills
         /// <summary>Gets the optional effect that flies from the caster to the target.</summary>
         public GameObject ProjectileVfxPrefab => projectileVfxPrefab;
 
+        /// <summary>Gets how the arrows of this ammo skill are drawn.</summary>
+        public ArrowVolleyStyle ArrowVolleyStyle => arrowVolleyStyle;
+
+        /// <summary>Gets the effect attached to the flying arrow of this ammo skill, or null for none.</summary>
+        public GameObject ArrowAuraPrefab => arrowAuraPrefab;
+
         /// <summary>Gets the optional effect spawned where the skill lands.</summary>
         public GameObject ImpactVfxPrefab => impactVfxPrefab;
 
@@ -507,6 +519,35 @@ namespace Project.Skills
 
         /// <summary>Gets the skills that must be learned first, or an empty list when there are none.</summary>
         public IReadOnlyList<SkillPrerequisite> Prerequisites => prerequisites ?? System.Array.Empty<SkillPrerequisite>();
+
+        /// <summary>
+        /// Builds a readable list of what is needed to learn this skill: Base Level, Job Level and prerequisite skills.
+        /// </summary>
+        /// <returns>One requirement per line, or an empty string when the skill has none.</returns>
+        public string GetLearningRequirementsText()
+        {
+            var lines = new List<string>();
+
+            if (requiredLevel > 0)
+            {
+                lines.Add($"Base Level {requiredLevel}");
+            }
+
+            if (requiredJobLevel > 0)
+            {
+                lines.Add($"Job Level {requiredJobLevel}");
+            }
+
+            foreach (var prerequisite in Prerequisites)
+            {
+                if (prerequisite.Skill != null)
+                {
+                    lines.Add($"{prerequisite.Skill.SkillName} Lv. {prerequisite.Level}");
+                }
+            }
+
+            return string.Join("\n", lines);
+        }
 
         /// <summary>Gets how far, in meters, this skill pushes something back via <see cref="Combat.KnockbackUtility"/>. Zero for a Damage skill without knockback; meaningful for every Displacement skill.</summary>
         public float KnockbackDistance => knockbackDistance;

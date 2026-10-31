@@ -28,6 +28,12 @@ namespace Project.Character.Animation
         [FormerlySerializedAs("meleeAttackClip")]
         [SerializeField] private AnimationClip attackPlaceholderClip;
 
+        [Tooltip("The exact clip bound to the Idle state's Motion field in the Animator Controller. It is the key that SetIdleClip overrides at runtime.")]
+        [SerializeField] private AnimationClip idlePlaceholderClip;
+
+        [Tooltip("The exact clip bound to the Run state's Motion field in the Animator Controller. It is the key that SetRunClip overrides at runtime.")]
+        [SerializeField] private AnimationClip runPlaceholderClip;
+
         /// <summary>
         /// Raised whenever a basic attack or a spell cast animation is triggered, so systems that only
         /// care that the player just acted in combat (see <see cref="Combat.PlayerCombatState"/>) do not
@@ -37,6 +43,8 @@ namespace Project.Character.Animation
 
         private AnimatorOverrideController overrideController;
         private AnimationClip activeAttackClip;
+        private AnimationClip activeIdleClip;
+        private AnimationClip activeRunClip;
         private float pendingChannelSeconds;
 
         /// <summary>
@@ -52,7 +60,7 @@ namespace Project.Character.Animation
         {
             animator = newAnimator;
             overrideController = null;
-            ApplyAttackClip();
+            ApplyClipOverrides();
         }
 
         /// <summary>
@@ -66,10 +74,45 @@ namespace Project.Character.Animation
         public void SetAttackClip(AnimationClip clip)
         {
             activeAttackClip = clip;
-            ApplyAttackClip();
+            ApplyClipOverrides();
         }
 
-        private void ApplyAttackClip()
+        /// <summary>
+        /// Chooses which clip the Idle state plays, the same way <see cref="SetAttackClip"/> does for the
+        /// Attack state. The choice is remembered, so it survives <see cref="SetAnimator"/> being called again.
+        /// </summary>
+        /// <param name="clip">The idle clip for the equipped weapon; null restores the default idle clip.</param>
+        public void SetIdleClip(AnimationClip clip)
+        {
+            activeIdleClip = clip;
+            ApplyClipOverrides();
+        }
+
+        /// <summary>
+        /// Chooses which clip the Run state plays, the same way <see cref="SetAttackClip"/> does for the Attack state.
+        /// </summary>
+        /// <param name="clip">The run clip for the equipped weapon; null restores the default run clip.</param>
+        public void SetRunClip(AnimationClip clip)
+        {
+            activeRunClip = clip;
+            ApplyClipOverrides();
+        }
+
+        /// <summary>
+        /// Sets where the attack blow lands in the swing for the equipped weapon.
+        /// </summary>
+        /// <param name="normalizedTime">The impact moment as a fraction of the attack clip; 0 for a blow that lands as the attack starts.</param>
+        public void SetAttackImpact(float normalizedTime)
+        {
+            AttackImpactNormalizedTime = normalizedTime;
+        }
+
+        /// <summary>
+        /// Where the attack blow lands in the swing of the equipped weapon, as a fraction of the attack clip.
+        /// </summary>
+        public float AttackImpactNormalizedTime { get; private set; }
+
+        private void ApplyClipOverrides()
         {
             if (animator == null || attackPlaceholderClip == null)
             {
@@ -95,6 +138,16 @@ namespace Project.Character.Animation
             }
 
             overrideController[attackPlaceholderClip] = activeAttackClip != null ? activeAttackClip : attackPlaceholderClip;
+
+            if (idlePlaceholderClip != null)
+            {
+                overrideController[idlePlaceholderClip] = activeIdleClip != null ? activeIdleClip : idlePlaceholderClip;
+            }
+
+            if (runPlaceholderClip != null)
+            {
+                overrideController[runPlaceholderClip] = activeRunClip != null ? activeRunClip : runPlaceholderClip;
+            }
         }
 
         /// <summary>

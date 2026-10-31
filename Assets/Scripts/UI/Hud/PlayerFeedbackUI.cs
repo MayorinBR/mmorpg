@@ -17,6 +17,7 @@ namespace Project.UI
         [SerializeField] private GameObject root;
         [SerializeField] private TMP_Text messageText;
         [SerializeField] private float displaySeconds = 2.5f;
+        [SerializeField] private Color messageColor = new Color(1f, 0.25f, 0.25f, 1f);
 
         private float hideAtTime;
 
@@ -46,6 +47,7 @@ namespace Project.UI
         private void ShowMessage(string message)
         {
             messageText.text = message;
+            messageText.color = messageColor;
             root.SetActive(true);
             hideAtTime = Time.time + displaySeconds;
         }

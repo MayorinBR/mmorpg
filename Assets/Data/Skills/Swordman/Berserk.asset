@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillName: Berserk
   description: Passively boosts ATK and lowers DEF while HP drops to 25% or below.
-  icon: {fileID: 103588749, guid: 0f9d26d5001687d40986509de0b0e95d, type: 3}
+  icon: {fileID: 21300000, guid: c8d92b39a9a000144b4478a0dfe030f2, type: 3}
   allowedClasses: 00000000
   effectType: 2
   targetType: 0
@@ -24,8 +24,17 @@ MonoBehaviour:
   range: 0
   requiredLevel: 0
   zenyCost: 0
+  requiredWeaponSubtypes: 
+  ammoCost: 0
+  bonusDamageRace: 0
+  bonusDamageRaceMultiplier: 1
+  buffRevealsHidden: 0
   damageType: 0
   damageMultiplierPerLevel: 1
+  damageBaseMultiplier: 0
+  healthCost: 0
+  healthCostReductionPerTwoLevels: 0
+  selfFireDamageBonusPercent: 0
   element: 0
   accuracyBonusPerLevel: 0
   isAreaOfEffect: 0
@@ -39,6 +48,7 @@ MonoBehaviour:
   buffPreventsFlinch: 0
   immuneToUndeadAndBoss: 0
   requiredJobLevel: 30
+  prerequisites: []
   passiveAttackBonusPerLevel: 0
   passiveRequiredWeaponSubtypes: 
   passiveDexBonusPerLevel: 0
@@ -71,13 +81,23 @@ MonoBehaviour:
     luck: 0
   buffAspdPercentPerLevel: 0
   buffMaxHealthPerLevel: 0
+  fixedCastSeconds: 0
+  fixedCastPerLevel: 0
+  variableCastSeconds: 0
+  variableCastPerLevel: 0
+  projectileVfxPrefab: {fileID: 0}
+  impactVfxPrefab: {fileID: 0}
   zonePrefab: {fileID: 0}
   zoneDurationSeconds: 15
   zoneDurationPerLevel: 0
   zoneTickIntervalSeconds: 1
+  zoneMaxHits: 0
+  zoneMaxHitsPerLevel: 0
   blocksAttacks: 0
   blockedWeaponType: 0
   toggleDrainIncomingDamageReductionPercentPerLevel: 0
   toggleDrainManaPerSecond: 0
   craftingRecipe: {fileID: 0}
   requiresNearWater: 0
+  requiredItem: {fileID: 0}
+  requiredItemCount: 1

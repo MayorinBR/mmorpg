@@ -19,6 +19,7 @@ namespace Project.Combat
 
         private Transform target;
         private Vector3 lastKnownPosition;
+        private Vector3 targetOffset;
         private float speed;
         private Action onArrival;
 
@@ -33,7 +34,9 @@ namespace Project.Combat
         /// <param name="target">Transform the projectile travels toward.</param>
         /// <param name="speed">Travel speed, in meters per second.</param>
         /// <param name="onArrival">Invoked once the projectile reaches its target, then the projectile destroys itself.</param>
-        public static void Spawn(GameObject prefab, Vector3 origin, Transform target, float speed, Action onArrival)
+        /// <param name="targetOffset">Shifts the aim point away from the target's position, so several projectiles can fly side by side.</param>
+        /// <returns>The spawned projectile object.</returns>
+        public static GameObject Spawn(GameObject prefab, Vector3 origin, Transform target, float speed, Action onArrival, Vector3 targetOffset = default)
         {
             var instance = prefab != null ? Instantiate(prefab, origin, Quaternion.identity) : new GameObject("Projectile");
             instance.transform.position = origin;
@@ -45,14 +48,31 @@ namespace Project.Combat
             }
 
             projectile.target = target;
-            projectile.lastKnownPosition = target != null ? target.position : origin;
+            projectile.targetOffset = targetOffset;
+            projectile.lastKnownPosition = target != null ? target.position + targetOffset : origin;
             projectile.speed = speed;
             projectile.onArrival = onArrival;
+            return instance;
+        }
+
+        /// <summary>
+        /// Spawns a projectile that flies to a fixed world position instead of following a transform.
+        /// </summary>
+        /// <param name="prefab">Optional visual prefab, or null for a logic-only projectile.</param>
+        /// <param name="origin">World position to spawn the projectile at.</param>
+        /// <param name="point">World position the projectile travels to.</param>
+        /// <param name="speed">Travel speed, in meters per second.</param>
+        /// <returns>The spawned projectile object.</returns>
+        public static GameObject SpawnToPoint(GameObject prefab, Vector3 origin, Vector3 point, float speed)
+        {
+            var instance = Spawn(prefab, origin, null, speed, null);
+            instance.GetComponent<Projectile>().lastKnownPosition = point;
+            return instance;
         }
 
         private void Update()
         {
-            var destination = target != null ? target.position : lastKnownPosition;
+            var destination = target != null ? target.position + targetOffset : lastKnownPosition;
             lastKnownPosition = destination;
 
             var toDestination = destination - transform.position;

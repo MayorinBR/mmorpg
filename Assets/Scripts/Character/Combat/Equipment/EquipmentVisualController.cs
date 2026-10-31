@@ -20,7 +20,6 @@ namespace Project.Character.Combat
             EquipmentSlot.RightHand,
             EquipmentSlot.HeadTop,
             EquipmentSlot.HeadFace,
-            EquipmentSlot.Ammo,
             EquipmentSlot.Body,
             EquipmentSlot.Pants,
             EquipmentSlot.Boots,
@@ -41,6 +40,16 @@ namespace Project.Character.Combat
         private HairCustomization observedHair;
         private bool hairHidden;
         private BodyPart coveredParts;
+
+        /// <summary>
+        /// The model of the equipped main-hand weapon, or null while the hand is empty or the models are being rebuilt.
+        /// </summary>
+        public Transform MainHandWeapon { get; private set; }
+
+        /// <summary>
+        /// The Animator of the character model the equipment is attached to, or null when there is no model.
+        /// </summary>
+        public Animator CurrentAnimator { get; private set; }
 
         private void OnEnable()
         {
@@ -99,6 +108,8 @@ namespace Project.Character.Combat
             DestroySpawned();
             hairHidden = false;
             coveredParts = BodyPart.None;
+            MainHandWeapon = null;
+            CurrentAnimator = null;
 
             var geometry = genderController.CurrentGeometry;
 
@@ -109,6 +120,7 @@ namespace Project.Character.Combat
             }
 
             var animator = geometry.GetComponentInChildren<Animator>();
+            CurrentAnimator = animator;
 
             if (animator != null)
             {
@@ -162,6 +174,11 @@ namespace Project.Character.Combat
                 if (item.WeaponSubtype != WeaponSubtype.Unarmed)
                 {
                     weapons.Add(instance);
+
+                    if (slot == EquipmentSlot.LeftHand)
+                    {
+                        MainHandWeapon = instance.transform;
+                    }
                 }
 
                 if (item.HidesHair)

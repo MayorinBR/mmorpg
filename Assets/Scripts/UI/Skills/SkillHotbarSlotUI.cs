@@ -71,12 +71,10 @@ namespace Project.UI
                 return;
             }
 
-            // NoValidTarget is let through too (not just Ready): TryCastSkill
-            // itself now starts the skill's target-picking ring instead of
-            // failing when a Damage skill has no valid target yet.
-            var availability = caster.GetAvailability(assignedSkill);
-
-            if (availability == SkillAvailability.Ready || availability == SkillAvailability.NoValidTarget)
+            // Every state except a running cooldown is let through: TryCastSkill
+            // starts the target-picking ring when a Damage skill has no target
+            // yet, and tells the player which requirement is missing otherwise.
+            if (caster.GetAvailability(assignedSkill) != SkillAvailability.OnCooldown)
             {
                 caster.TryCastSkill(assignedSkill);
             }

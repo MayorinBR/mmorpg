@@ -20,6 +20,8 @@ namespace Project.UI
         private const float BackgroundWidth = 80f;
         private const float BackgroundHeight = 40f;
         private const float BaseFontSize = 24f;
+        private const float SkillNameFontSize = 20f;
+        private const float SkillNamePadding = 24f;
 
         // A critical hit's feedback is the same popup, just bigger: both
         // the background and the text scale up by this factor so the
@@ -150,7 +152,7 @@ namespace Project.UI
         /// <returns>The spawned popup's component.</returns>
         public static DamagePopup CreateSkillName(string skillName, Vector3 worldPosition)
         {
-            return CreatePopup(skillName, worldPosition, SkillNameBackgroundColor, SkillNameTextColor, 1f);
+            return CreatePopup(skillName, worldPosition, SkillNameBackgroundColor, SkillNameTextColor, 1f, SkillNameFontSize, true);
         }
 
         /// <summary>
@@ -170,7 +172,7 @@ namespace Project.UI
             CreateSkillName(skillName, worldPosition);
         }
 
-        private static DamagePopup CreatePopup(string text, Vector3 worldPosition, Color backgroundColor, Color textColor, float sizeMultiplier)
+        private static DamagePopup CreatePopup(string text, Vector3 worldPosition, Color backgroundColor, Color textColor, float sizeMultiplier, float fontSize = BaseFontSize, bool fitWidthToText = false)
         {
             var root = new GameObject("DamagePopup", typeof(RectTransform));
             var rootRect = (RectTransform)root.transform;
@@ -200,8 +202,17 @@ namespace Project.UI
             textComponent.text = text;
             textComponent.color = textColor;
             textComponent.fontStyle = FontStyles.Bold;
-            textComponent.fontSize = BaseFontSize * sizeMultiplier;
+            textComponent.fontSize = fontSize * sizeMultiplier;
             textComponent.alignment = TextAlignmentOptions.Center;
+
+            if (fitWidthToText)
+            {
+                textComponent.textWrappingMode = TextWrappingModes.NoWrap;
+                textComponent.overflowMode = TextOverflowModes.Overflow;
+                var fittedWidth = textComponent.GetPreferredValues(text).x + SkillNamePadding;
+                rootRect.sizeDelta = new Vector2(Mathf.Max(rootRect.sizeDelta.x, fittedWidth), rootRect.sizeDelta.y);
+            }
+
             var textRect = (RectTransform)textObject.transform;
             textRect.anchorMin = Vector2.zero;
             textRect.anchorMax = Vector2.one;

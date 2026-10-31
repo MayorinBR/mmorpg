@@ -119,6 +119,7 @@ namespace Project.UI
         public void Close()
         {
             gameObject.SetActive(false);
+            TooltipHub.HideAll();
 
             if (!hasCustomPosition && layoutManager != null)
             {

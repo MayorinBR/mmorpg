@@ -60,7 +60,10 @@ namespace Project.UI
             iconImage.enabled = skill.Icon != null;
             iconImage.sprite = skill.Icon;
             nameText.text = skill.SkillName;
-            descriptionText.text = skill.Description;
+            var requirements = skill.GetLearningRequirementsText();
+            descriptionText.text = requirements.Length == 0
+                ? skill.Description
+                : $"{skill.Description}\n\n<b>Requirements to learn</b>\n{requirements}";
             manaCostText.text = skill.EffectType == SkillEffectType.Passive ? "Passive" : FormatCost(skill, skillLevel);
             cooldownText.text = skill.EffectType == SkillEffectType.Passive ? string.Empty : $"{skill.CooldownSeconds:0.#}s";
 

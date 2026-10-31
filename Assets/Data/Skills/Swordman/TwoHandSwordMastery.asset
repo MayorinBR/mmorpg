@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
   skillName: Two-Handed Sword Mastery
   description: Passively increases ATK while wielding a two-handed sword.
-  icon: {fileID: 365811959, guid: 0f9d26d5001687d40986509de0b0e95d, type: 3}
+  icon: {fileID: 21300000, guid: da5a5285438001f4d8751bdc046a5e7b, type: 3}
   allowedClasses: 00000000
   effectType: 2
   targetType: 0
@@ -24,8 +24,17 @@ MonoBehaviour:
   range: 0
   requiredLevel: 0
   zenyCost: 0
+  requiredWeaponSubtypes: 
+  ammoCost: 0
+  bonusDamageRace: 0
+  bonusDamageRaceMultiplier: 1
+  buffRevealsHidden: 0
   damageType: 0
   damageMultiplierPerLevel: 1
+  damageBaseMultiplier: 0
+  healthCost: 0
+  healthCostReductionPerTwoLevels: 0
+  selfFireDamageBonusPercent: 0
   element: 0
   accuracyBonusPerLevel: 0
   isAreaOfEffect: 0
@@ -74,13 +83,23 @@ MonoBehaviour:
     luck: 0
   buffAspdPercentPerLevel: 0
   buffMaxHealthPerLevel: 0
+  fixedCastSeconds: 0
+  fixedCastPerLevel: 0
+  variableCastSeconds: 0
+  variableCastPerLevel: 0
+  projectileVfxPrefab: {fileID: 0}
+  impactVfxPrefab: {fileID: 0}
   zonePrefab: {fileID: 0}
   zoneDurationSeconds: 15
   zoneDurationPerLevel: 0
   zoneTickIntervalSeconds: 1
+  zoneMaxHits: 0
+  zoneMaxHitsPerLevel: 0
   blocksAttacks: 0
   blockedWeaponType: 0
   toggleDrainIncomingDamageReductionPercentPerLevel: 0
   toggleDrainManaPerSecond: 0
   craftingRecipe: {fileID: 0}
   requiresNearWater: 0
+  requiredItem: {fileID: 0}
+  requiredItemCount: 1
