@@ -975,7 +975,7 @@ namespace Project.Character.Combat
                 if (skill.KnockbackDistance > 0f)
                 {
                     var targetAgent = targetSelector.CurrentTarget.GetComponentInParent<NavMeshAgent>();
-                    KnockbackUtility.Apply(targetAgent, transform.position, skill.KnockbackDistance);
+                    KnockbackUtility.Slide(targetAgent, transform.position, skill.KnockbackDistance);
                 }
             }
             else
@@ -1081,7 +1081,7 @@ namespace Project.Character.Combat
 
                     if (skill.KnockbackDistance > 0f)
                     {
-                        KnockbackUtility.Apply(hitCollider.GetComponentInParent<NavMeshAgent>(), transform.position, skill.KnockbackDistance);
+                        KnockbackUtility.Slide(hitCollider.GetComponentInParent<NavMeshAgent>(), transform.position, skill.KnockbackDistance);
                     }
                 }
                 else

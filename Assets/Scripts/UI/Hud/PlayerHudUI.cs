@@ -255,6 +255,11 @@ namespace Project.UI
 
         private void UpdateBaseExperience(int current, int required)
         {
+            if (experience != null)
+            {
+                UpdateBaseLevel(experience.CurrentLevel);
+            }
+
             if (baseExpSlider != null)
             {
                 baseExpSlider.value = required > 0 ? (float)current / required : 0f;
@@ -271,6 +276,11 @@ namespace Project.UI
 
         private void UpdateJobExperience(int current, int required)
         {
+            if (jobProgress != null)
+            {
+                UpdateJobLevel(jobProgress.JobLevel);
+            }
+
             if (jobExpSlider != null)
             {
                 jobExpSlider.value = required > 0 ? (float)current / required : 0f;

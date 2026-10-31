@@ -15,13 +15,15 @@ namespace Project.UI
     /// <see cref="WindowDragHandler"/>), the custom position is remembered
     /// for the rest of the session and used on every subsequent open.
     /// Clicking the window (or starting to drag it) brings it to front.
+    /// A window with content can be dragged from any of its background, not only
+    /// its title bar: a drag that no child handles bubbles up to this panel.
     /// Whether this window's open/minimized/position state survives to the
     /// next session is opt-out via the <c>persistBetweenSessions</c>
     /// Inspector field — most windows want that persistence, but a window
     /// like the shop should always start closed instead of reopening just
     /// because it happened to be open when the previous session ended.
     /// </summary>
-    public class WindowPanel : MonoBehaviour, IPointerDownHandler, ISaveParticipant
+    public class WindowPanel : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, ISaveParticipant
     {
         [SerializeField] private RectTransform contentRoot;
         [SerializeField] private Button closeButton;
@@ -74,6 +76,8 @@ namespace Project.UI
 
         private void Awake()
         {
+            EnsureDragSurface();
+
             if (titleText != null)
             {
                 titleText.text = WindowTitleLookup.GetDisplayName(id);
@@ -196,6 +200,51 @@ namespace Project.UI
         public void OnPointerDown(PointerEventData eventData)
         {
             BringToFront();
+        }
+
+        /// <inheritdoc />
+        public void OnBeginDrag(PointerEventData eventData)
+        {
+            if (contentRoot != null)
+            {
+                BringToFront();
+            }
+        }
+
+        /// <inheritdoc />
+        public void OnDrag(PointerEventData eventData)
+        {
+            if (contentRoot != null)
+            {
+                Drag(eventData.delta);
+            }
+        }
+
+        /// <summary>
+        /// Moves the window by a screen-space delta and remembers the result as its custom position.
+        /// </summary>
+        /// <param name="screenDelta">The pointer movement in screen pixels.</param>
+        public void Drag(Vector2 screenDelta)
+        {
+            var canvas = CachedRectTransform.GetComponentInParent<Canvas>();
+            var scaleFactor = canvas != null ? canvas.scaleFactor : 1f;
+            CachedRectTransform.anchoredPosition += screenDelta / scaleFactor;
+            SetCustomPosition(CachedRectTransform.anchoredPosition);
+        }
+
+        /// <summary>
+        /// Gives a window that has no graphic of its own an invisible one covering its whole rect, so a pointer over
+        /// any gap between its children still reaches this panel's drag handlers.
+        /// </summary>
+        private void EnsureDragSurface()
+        {
+            if (contentRoot == null || GetComponent<Graphic>() != null)
+            {
+                return;
+            }
+
+            var surface = gameObject.AddComponent<Image>();
+            surface.color = Color.clear;
         }
 
         /// <inheritdoc />

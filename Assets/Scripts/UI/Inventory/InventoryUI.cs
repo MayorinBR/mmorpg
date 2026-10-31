@@ -71,6 +71,7 @@ namespace Project.UI
             {
                 var slotView = Instantiate(slotPrefab, slotsParent);
                 slotView.Clicked += HandleSlotClicked;
+                slotView.SlotDropped += HandleSlotDropped;
                 slotViews[i] = slotView;
             }
         }
@@ -98,6 +99,11 @@ namespace Project.UI
         {
             currentPage--;
             RefreshAll();
+        }
+
+        private void HandleSlotDropped(int sourceIndex, int targetIndex)
+        {
+            playerInventory.Items.TryMergeSlots(sourceIndex, targetIndex);
         }
 
         private void HandleSlotClicked(int inventoryIndex)

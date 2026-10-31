@@ -111,6 +111,17 @@ namespace Project.Combat
         }
 
         /// <summary>
+        /// Directly sets the current mana to a previously-known value, clamped to [0, MaxMana].
+        /// Intended for restoring captured state rather than as a gameplay action.
+        /// </summary>
+        /// <param name="value">The mana value to restore.</param>
+        public void SetCurrentMana(int value)
+        {
+            currentMana = Mathf.Clamp(value, 0, MaxMana);
+            ManaChanged?.Invoke(currentMana, MaxMana);
+        }
+
+        /// <summary>
         /// Restores mana to its maximum value, typically called on level up or respawn.
         /// </summary>
         public void ResetMana()

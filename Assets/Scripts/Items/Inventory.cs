@@ -432,6 +432,40 @@ namespace Project.Items
         }
 
         /// <summary>
+        /// Moves units from one slot onto another slot holding the same stackable item, up to the item's
+        /// <see cref="ItemDefinition.MaxStackSize"/>. Whatever does not fit stays in the source slot.
+        /// </summary>
+        /// <param name="sourceIndex">The slot the units are taken from.</param>
+        /// <param name="targetIndex">The slot that receives them.</param>
+        /// <returns>True when at least one unit moved.</returns>
+        public bool TryMergeSlots(int sourceIndex, int targetIndex)
+        {
+            if (sourceIndex == targetIndex || sourceIndex < 0 || targetIndex < 0 || sourceIndex >= slots.Count || targetIndex >= slots.Count)
+            {
+                return false;
+            }
+
+            var source = slots[sourceIndex];
+            var target = slots[targetIndex];
+
+            if (source.IsEmpty || target.IsEmpty || source.Item != target.Item || !source.Item.IsStackable)
+            {
+                return false;
+            }
+
+            var moved = Math.Min(source.Quantity, source.Item.MaxStackSize - target.Quantity);
+
+            if (moved <= 0)
+            {
+                return false;
+            }
+
+            SetSlot(targetIndex, target.Item, target.Quantity + moved);
+            TryRemoveFromSlot(sourceIndex, moved);
+            return true;
+        }
+
+        /// <summary>
         /// Directly replaces the contents of a slot, bypassing stacking and
         /// weight-capacity logic. Intended for swaps where the caller already
         /// knows exactly which slot should hold the item (e.g. exchanging

@@ -68,6 +68,12 @@ namespace Project.Persistence
         /// <summary>Accumulated Job Experience toward the next Job Level.</summary>
         public int jobExperience;
 
+        /// <summary>The player's current health, or -1 in saves made before it was stored (restored as full).</summary>
+        public int currentHealth = -1;
+
+        /// <summary>The player's current mana, or -1 in saves made before it was stored (restored as full).</summary>
+        public int currentMana = -1;
+
         /// <summary>Unspent skill points available to learn or upgrade skills.</summary>
         public int availableSkillPoints;
 

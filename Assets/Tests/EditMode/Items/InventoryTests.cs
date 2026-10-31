@@ -228,6 +228,34 @@ namespace Project.Items.Tests
         }
 
         [Test]
+        public void TryMergeSlots_ExceedsMaxStackSize_LeavesRemainderInSource()
+        {
+            var inventory = new Inventory(maxCarryWeight: 5000f);
+            var item = ItemTestFactory.CreateItem(isStackable: true, maxStackSize: 999, weight: 1f);
+            inventory.SetSlot(0, item, 990);
+            inventory.SetSlot(1, item, 20);
+
+            var merged = inventory.TryMergeSlots(1, 0);
+
+            Assert.IsTrue(merged);
+            Assert.AreEqual(999, inventory.GetSlot(0).Quantity);
+            Assert.AreEqual(11, inventory.GetSlot(1).Quantity);
+            Assert.AreEqual(1010f, inventory.CurrentWeight);
+        }
+
+        [Test]
+        public void TryMergeSlots_DifferentItems_DoesNothing()
+        {
+            var inventory = new Inventory(maxCarryWeight: 5000f);
+            var first = ItemTestFactory.CreateItem(name: "A", isStackable: true, weight: 0f);
+            var second = ItemTestFactory.CreateItem(name: "B", isStackable: true, weight: 0f);
+            inventory.SetSlot(0, first, 5);
+            inventory.SetSlot(1, second, 5);
+
+            Assert.IsFalse(inventory.TryMergeSlots(1, 0));
+        }
+
+        [Test]
         public void InventoryChanged_DoesNotFireWhenNothingCouldBeAdded()
         {
             var inventory = new Inventory(maxCarryWeight: 0f);

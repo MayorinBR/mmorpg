@@ -16,7 +16,7 @@ namespace Project.UI
     /// dragging should do.
     /// </summary>
     [RequireComponent(typeof(Button))]
-    public class InventorySlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
+    public class InventorySlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
     {
         [SerializeField] private Image iconImage;
         [SerializeField] private TMP_Text quantityText;
@@ -29,6 +29,9 @@ namespace Project.UI
 
         /// <summary>Raised when this slot is clicked, carrying its inventory index.</summary>
         public event Action<int> Clicked;
+
+        /// <summary>Raised when another inventory slot is dropped on this one, carrying the dragged slot's index and this slot's index.</summary>
+        public event Action<int, int> SlotDropped;
 
         /// <summary>Gets the inventory index this slot currently represents.</summary>
         public int SlotIndex => slotIndex;
@@ -106,6 +109,14 @@ namespace Project.UI
             if (dragIcon != null)
             {
                 dragIcon.position = eventData.position;
+            }
+        }
+
+        public void OnDrop(PointerEventData eventData)
+        {
+            if (eventData.pointerDrag != null && eventData.pointerDrag.TryGetComponent(out InventorySlotUI source) && source != this)
+            {
+                SlotDropped?.Invoke(source.slotIndex, slotIndex);
             }
         }
 

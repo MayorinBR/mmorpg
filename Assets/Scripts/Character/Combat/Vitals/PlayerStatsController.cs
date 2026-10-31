@@ -585,6 +585,8 @@ namespace Project.Character.Combat
             data.dexterity = baseStats.GetValue(StatType.Dexterity);
             data.luck = baseStats.GetValue(StatType.Luck);
             data.availableStatPoints = baseStats.AvailablePoints;
+            data.currentHealth = health != null ? health.CurrentHealth : -1;
+            data.currentMana = mana != null ? mana.CurrentMana : -1;
         }
 
         /// <inheritdoc />
@@ -615,6 +617,29 @@ namespace Project.Character.Combat
             mana?.ResetMana();
             RefreshDependentMaxValues();
             StatsChanged?.Invoke();
+            StartCoroutine(RestoreVitalsAfterLoad(data.currentHealth, data.currentMana));
+        }
+
+        /// <summary>
+        /// Applies the saved current health and mana once every save participant has restored, so the maximums
+        /// they feed (equipment, passives) are final before the values are clamped against them.
+        /// </summary>
+        /// <param name="savedHealth">The saved health, or a value below one to start at full health.</param>
+        /// <param name="savedMana">The saved mana, or a negative value to start at full mana.</param>
+        /// <returns>The coroutine enumerator.</returns>
+        private System.Collections.IEnumerator RestoreVitalsAfterLoad(int savedHealth, int savedMana)
+        {
+            yield return null;
+
+            if (health != null && savedHealth > 0)
+            {
+                health.SetCurrentHealth(savedHealth);
+            }
+
+            if (mana != null && savedMana >= 0)
+            {
+                mana.SetCurrentMana(savedMana);
+            }
         }
     }
 }

@@ -19,15 +19,7 @@ namespace Project.UI
 
         public void OnDrag(PointerEventData eventData)
         {
-            var scaleFactor = GetCanvasScaleFactor();
-            windowPanel.RectTransform.anchoredPosition += eventData.delta / scaleFactor;
-            windowPanel.SetCustomPosition(windowPanel.RectTransform.anchoredPosition);
-        }
-
-        private float GetCanvasScaleFactor()
-        {
-            var canvas = windowPanel.RectTransform.GetComponentInParent<Canvas>();
-            return canvas != null ? canvas.scaleFactor : 1f;
+            windowPanel.Drag(eventData.delta);
         }
     }
 }
