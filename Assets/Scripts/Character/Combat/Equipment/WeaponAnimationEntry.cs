@@ -19,6 +19,8 @@ namespace Project.Character.Combat
         [SerializeField] private AnimationClip runClip;
         [Tooltip("Where in the attack clip the blow lands, from 0 (first frame) to 1 (last frame). The hit is applied at that moment; 0 applies it as the attack starts.")]
         [SerializeField, Range(0f, 1f)] private float attackImpactNormalizedTime;
+        [Tooltip("Optional. A single clip that replaces both the channeling and the release animation of spells cast with this weapon category. Its playback speed is scaled to the cast time; empty keeps the default channel and cast animations.")]
+        [SerializeField] private AnimationClip castClip;
         [SerializeField] private WeaponHoldPoseSet holdPoses = new WeaponHoldPoseSet();
 
         /// <summary>
@@ -40,6 +42,11 @@ namespace Project.Character.Combat
         /// The run clip for the weapon category, or null to keep the default run.
         /// </summary>
         public AnimationClip RunClip => runClip;
+
+        /// <summary>
+        /// The clip that covers channeling and release of a spell for the weapon category, or null to keep the default animations.
+        /// </summary>
+        public AnimationClip CastClip => castClip;
 
         /// <summary>
         /// The moment the attack blow lands, as a fraction of the attack clip.

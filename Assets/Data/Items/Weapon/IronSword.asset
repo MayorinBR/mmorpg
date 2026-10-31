@@ -15,6 +15,7 @@ MonoBehaviour:
   itemName: Iron Sword
   description: A plain but reliable one-handed iron sword.
   icon: {fileID: -2088284292, guid: 287e2daed8778f44d940a3c78a40551c, type: 3}
+  dropIconCategory: 0
   isStackable: 0
   maxStackSize: 1
   itemType: 2
@@ -32,8 +33,11 @@ MonoBehaviour:
   canBeOffHand: 0
   weaponType: 0
   weaponSubtype: 2
-  weaponAttack: 25
   attackRange: 1.5
+  weaponAttack: 25
+  weaponMagicAttack: 0
+  weaponMagicDefense: 0
+  attackSpeedMultiplier: 1
   buyPrice: 100
   sellPrice: 40
   consumableEffectType: 0

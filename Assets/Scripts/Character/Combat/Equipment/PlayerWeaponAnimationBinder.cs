@@ -48,6 +48,7 @@ namespace Project.Character.Combat
             animatorController.SetAttackClip(catalog.GetAttackClip(subtype));
             animatorController.SetIdleClip(catalog.GetIdleClip(subtype));
             animatorController.SetRunClip(catalog.GetRunClip(subtype));
+            animatorController.SetCastClip(catalog.GetCastClip(subtype));
             animatorController.SetAttackImpact(catalog.GetAttackImpactNormalizedTime(subtype));
             holdPoseController.SetPoses(catalog.GetHoldPoses(subtype));
         }

@@ -36,6 +36,16 @@ namespace Project.Character.Combat
         }
 
         /// <summary>
+        /// Finds the single cast clip for a weapon category.
+        /// </summary>
+        /// <param name="subtype">The category of the wielded weapon, or <see cref="WeaponSubtype.Unarmed"/>.</param>
+        /// <returns>The cast clip of the matching entry, or null when the category keeps the default channel and cast animations.</returns>
+        public AnimationClip GetCastClip(WeaponSubtype subtype)
+        {
+            return Find(subtype)?.CastClip;
+        }
+
+        /// <summary>
         /// Finds the run clip for a weapon category.
         /// </summary>
         /// <param name="subtype">The category of the wielded weapon, or <see cref="WeaponSubtype.Unarmed"/>.</param>

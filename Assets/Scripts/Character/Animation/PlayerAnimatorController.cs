@@ -34,6 +34,12 @@ namespace Project.Character.Animation
         [Tooltip("The exact clip bound to the Run state's Motion field in the Animator Controller. It is the key that SetRunClip overrides at runtime.")]
         [SerializeField] private AnimationClip runPlaceholderClip;
 
+        [Tooltip("The exact clip bound to the Channel state's Motion field in the Animator Controller. It is the key that SetCastClip overrides at runtime.")]
+        [SerializeField] private AnimationClip channelPlaceholderClip;
+
+        [Tooltip("The exact clip bound to the Cast state's Motion field in the Animator Controller. It is the key that SetCastClip overrides at runtime.")]
+        [SerializeField] private AnimationClip castPlaceholderClip;
+
         /// <summary>
         /// Raised whenever a basic attack or a spell cast animation is triggered, so systems that only
         /// care that the player just acted in combat (see <see cref="Combat.PlayerCombatState"/>) do not
@@ -45,6 +51,7 @@ namespace Project.Character.Animation
         private AnimationClip activeAttackClip;
         private AnimationClip activeIdleClip;
         private AnimationClip activeRunClip;
+        private AnimationClip activeCastClip;
         private float pendingChannelSeconds;
 
         /// <summary>
@@ -99,6 +106,18 @@ namespace Project.Character.Animation
         }
 
         /// <summary>
+        /// Makes one clip serve as both the channeling and the release animation of spells, the same way
+        /// <see cref="SetAttackClip"/> does for the Attack state. While set, a timed cast plays the clip once,
+        /// stretched to the cast time, and no separate release animation follows it.
+        /// </summary>
+        /// <param name="clip">The single cast clip for the equipped weapon; null restores the default channel and cast clips.</param>
+        public void SetCastClip(AnimationClip clip)
+        {
+            activeCastClip = clip;
+            ApplyClipOverrides();
+        }
+
+        /// <summary>
         /// Sets where the attack blow lands in the swing for the equipped weapon.
         /// </summary>
         /// <param name="normalizedTime">The impact moment as a fraction of the attack clip; 0 for a blow that lands as the attack starts.</param>
@@ -147,6 +166,16 @@ namespace Project.Character.Animation
             if (runPlaceholderClip != null)
             {
                 overrideController[runPlaceholderClip] = activeRunClip != null ? activeRunClip : runPlaceholderClip;
+            }
+
+            if (channelPlaceholderClip != null)
+            {
+                overrideController[channelPlaceholderClip] = activeCastClip != null ? activeCastClip : channelPlaceholderClip;
+            }
+
+            if (castPlaceholderClip != null)
+            {
+                overrideController[castPlaceholderClip] = activeCastClip != null ? activeCastClip : castPlaceholderClip;
             }
         }
 
@@ -236,11 +265,18 @@ namespace Project.Character.Animation
         }
 
         /// <summary>
-        /// Plays the spell release animation, the moment a spell is actually cast.
+        /// Plays the spell release animation, the moment a spell is actually cast. When a timed cast has just
+        /// finished playing its cast clip in the Channel state, the release is skipped so the clip is not repeated.
         /// </summary>
         public void TriggerCast()
         {
-            animator.SetTrigger(CastParameter);
+            var channelClipAlreadyPlayed = animator.GetCurrentAnimatorStateInfo(0).IsName(ChannelStateName);
+
+            if (!channelClipAlreadyPlayed)
+            {
+                animator.SetTrigger(CastParameter);
+            }
+
             CombatActionTriggered?.Invoke();
         }
 

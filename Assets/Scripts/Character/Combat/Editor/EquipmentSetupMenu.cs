@@ -1,19 +1,13 @@
 using System.Linq;
-using Project.Character.Animation;
-using Project.Character.Movement;
-using Project.Combat;
 using Project.Items;
 using UnityEditor;
-using UnityEditor.Animations;
 using UnityEngine;
 
 namespace Project.Character.Combat.EditorTools
 {
     /// <summary>
-    /// Editor menu that automates the one-time setup of the equipment visuals
-    /// and weapon animation systems: item prefabs, item assets, the weapon
-    /// animation catalog and the Player scene wiring. Every step is
-    /// idempotent, so running a menu twice never duplicates assets.
+    /// Editor menu that builds the weapon item prefabs and item assets. The
+    /// step is idempotent, so running the menu twice never duplicates assets.
     /// </summary>
     public static class EquipmentSetupMenu
     {
@@ -21,15 +15,12 @@ namespace Project.Character.Combat.EditorTools
         private const string ItemPrefabsFolder = "Assets/Prefabs/Items/Weapons";
         private const string ItemAssetsFolder = "Assets/Data/Items/Weapon";
         private const string ItemDatabasePath = "Assets/Data/ItemDatabase.asset";
-        private const string CatalogPath = "Assets/Data/WeaponAnimationCatalog.asset";
-        private const string AnimationsFolder = "Assets/Models/Player/Animations";
-        private const string PlayerControllerPath = "Assets/Animations/Player/Player.controller";
         private const float ReferenceExtent = 2f;
         private const string ToonShaderName = "Project/Items/ToonItem";
         private const string SizeReferenceItem = "IronSword";
         private const float OneHandLengthFactor = 1f;
         private const float TwoHandLengthFactor = 1.3f;
-        private const string TwoHandAttackClipFile = "Two Hand Sword Attack";
+        private const float RodLengthFactor = 1.21f;
 
         private static readonly EquipmentSlot[] MainHand = { EquipmentSlot.LeftHand };
         private static readonly EquipmentSlot[] BothHands = { EquipmentSlot.LeftHand, EquipmentSlot.RightHand };
@@ -47,16 +38,7 @@ namespace Project.Character.Combat.EditorTools
             new ItemSpec("Axe", "NordicAxe", new[] { "NordicAxe" }, "Nordic Axe", WeaponSubtype.OneHandAxe, WeaponType.Melee, new[] { EquipmentSlot.LeftHand }, 5f, 1.5f),
             new ItemSpec("Book", "AprenticeBook", new[] { "AprenticeBook" }, "Apprentice Book", WeaponSubtype.Book, WeaponType.Melee, new[] { EquipmentSlot.LeftHand }, 2f, 1.5f),
             new ItemSpec("Staff", "ArcaneStaff", new[] { "ArcaneStaff" }, "Arcane Staff", WeaponSubtype.Rod, WeaponType.Melee, new[] { EquipmentSlot.LeftHand }, 3f, 1.5f),
-        };
-
-        private static readonly (WeaponSubtype subtype, string clipFile)[] CatalogEntries =
-        {
-            (WeaponSubtype.Unarmed, "Punching"),
-            (WeaponSubtype.Dagger, "Punching"),
-            (WeaponSubtype.Bow, "Shooting Arrow"),
-            (WeaponSubtype.Rod, "Spell Cast"),
-            (WeaponSubtype.Book, "Spell Cast"),
-            (WeaponSubtype.TwoHandSword, TwoHandAttackClipFile),
+            new ItemSpec("Staff", "ApprenticeRod", new[] { "ApprenticeRod" }, "Apprentice Rod", WeaponSubtype.Rod, WeaponType.Melee, MainHand, 2f, 1.5f, RodLengthFactor),
         };
 
         /// <summary>
@@ -97,125 +79,6 @@ namespace Project.Character.Combat.EditorTools
 
             AssetDatabase.SaveAssets();
             Debug.Log("Equipment: item models built.");
-        }
-
-        /// <summary>
-        /// Creates the weapon animation catalog from the player animation
-        /// clips already in the project. A category whose clip file does not
-        /// exist yet (such as the two-handed sword) keeps an empty entry and
-        /// plays the fallback clip until the file is added and this menu is
-        /// run again.
-        /// </summary>
-        [MenuItem("Tools/Equipment/Build Weapon Animation Catalog")]
-        public static void BuildWeaponAnimationCatalog()
-        {
-            var catalog = AssetDatabase.LoadAssetAtPath<WeaponAnimationCatalog>(CatalogPath);
-            if (catalog == null)
-            {
-                catalog = ScriptableObject.CreateInstance<WeaponAnimationCatalog>();
-                AssetDatabase.CreateAsset(catalog, CatalogPath);
-            }
-
-            var serialized = new SerializedObject(catalog);
-            serialized.FindProperty("fallbackAttackClip").objectReferenceValue = LoadClip("Standing Melee Attack Downward");
-
-            var entries = serialized.FindProperty("entries");
-            entries.arraySize = CatalogEntries.Length;
-            for (var i = 0; i < CatalogEntries.Length; i++)
-            {
-                var entry = entries.GetArrayElementAtIndex(i);
-                entry.FindPropertyRelative("subtype").intValue = (int)CatalogEntries[i].subtype;
-                entry.FindPropertyRelative("attackClip").objectReferenceValue = LoadClip(CatalogEntries[i].clipFile);
-            }
-
-            serialized.ApplyModifiedPropertiesWithoutUndo();
-            EditorUtility.SetDirty(catalog);
-            AssetDatabase.SaveAssets();
-            Debug.Log("Equipment: weapon animation catalog built.", catalog);
-        }
-
-        /// <summary>
-        /// Adds and wires the weapon animation binder and the equipment visual
-        /// controller on an EquipmentVisuals child of the player in the open scene, and fills the attack
-        /// placeholder clip from the Attack state of the player controller.
-        /// </summary>
-        [MenuItem("Tools/Equipment/Wire Player In Open Scene")]
-        public static void WirePlayer()
-        {
-            var combat = Object.FindFirstObjectByType<PlayerCombatController>();
-            if (combat == null)
-            {
-                Debug.LogWarning("Equipment: no PlayerCombatController in the open scene.");
-                return;
-            }
-
-            var catalog = AssetDatabase.LoadAssetAtPath<WeaponAnimationCatalog>(CatalogPath);
-            if (catalog == null)
-            {
-                Debug.LogWarning("Equipment: run 'Build Weapon Animation Catalog' first.");
-                return;
-            }
-
-            var existingVisuals = Object.FindFirstObjectByType<EquipmentVisualController>();
-            var player = existingVisuals != null
-                ? existingVisuals.gameObject
-                : GetOrCreateChild(combat.transform.root.gameObject, "EquipmentVisuals");
-            var equipment = Object.FindFirstObjectByType<EquipmentManager>();
-            var animatorController = Object.FindFirstObjectByType<PlayerAnimatorController>();
-            var genderController = Object.FindFirstObjectByType<PlayerGenderController>();
-
-            var binder = GetOrAdd<PlayerWeaponAnimationBinder>(player);
-            Assign(binder, ("equipment", equipment), ("animatorController", animatorController), ("catalog", catalog));
-
-            var combatState = GetOrAdd<PlayerCombatState>(player);
-            Assign(combatState,
-                ("targetSelector", combat.GetComponent<PlayerTargetSelector>()),
-                ("animatorController", animatorController),
-                ("health", combat.transform.root.GetComponentInChildren<HealthComponent>()));
-
-            var visuals = GetOrAdd<EquipmentVisualController>(player);
-            Assign(visuals, ("equipment", equipment), ("genderController", genderController), ("combatState", combatState));
-
-            if (animatorController != null)
-            {
-                var placeholder = new SerializedObject(animatorController).FindProperty("attackPlaceholderClip");
-                if (placeholder.objectReferenceValue == null)
-                {
-                    placeholder.objectReferenceValue = FindAttackStateClip();
-                    placeholder.serializedObject.ApplyModifiedProperties();
-                }
-            }
-
-            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(player.scene);
-            Debug.Log("Equipment: player wired. Save the scene.", player);
-        }
-
-        /// <summary>
-        /// Rescales the item prefabs that already exist so their largest
-        /// dimension is on the scale of a normal weapon, correcting models
-        /// exported with a 100x (or 0.01x) armature scale. Pivot adjustments
-        /// are kept: only the model's scale is changed.
-        /// </summary>
-        [MenuItem("Tools/Equipment/Fix Item Model Scale")]
-        public static void FixItemModelScale()
-        {
-            foreach (var guid in AssetDatabase.FindAssets("t:Prefab", new[] { ItemPrefabsFolder }))
-            {
-                var path = AssetDatabase.GUIDToAssetPath(guid);
-                var contents = PrefabUtility.LoadPrefabContents(path);
-                try
-                {
-                    if (contents.transform.childCount > 0 && NormalizeScale(contents.transform.GetChild(0)))
-                    {
-                        PrefabUtility.SaveAsPrefabAsset(contents, path);
-                        Debug.Log($"Equipment: rescaled {path}");
-                    }
-                }
-                finally
-                {
-                    PrefabUtility.UnloadPrefabContents(contents);
-                }
-            }
         }
 
         private static float MeasureExtent(Transform model)
@@ -452,65 +315,6 @@ namespace Project.Character.Combat.EditorTools
             all.GetArrayElementAtIndex(all.arraySize - 1).objectReferenceValue = item;
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(database);
-        }
-
-        private static AnimationClip LoadClip(string fileName)
-        {
-            return AssetDatabase.LoadAllAssetsAtPath($"{AnimationsFolder}/{fileName}.fbx")
-                .OfType<AnimationClip>()
-                .FirstOrDefault(clip => !clip.name.StartsWith("__preview__"));
-        }
-
-        private static AnimationClip FindAttackStateClip()
-        {
-            var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(PlayerControllerPath);
-            if (controller == null)
-            {
-                return null;
-            }
-
-            return controller.layers
-                .SelectMany(layer => layer.stateMachine.states)
-                .Where(state => state.state.name == "Attack")
-                .Select(state => state.state.motion as AnimationClip)
-                .FirstOrDefault();
-        }
-
-        private static GameObject GetOrCreateChild(GameObject parent, string childName)
-        {
-            var existing = parent.transform.Find(childName);
-            if (existing != null)
-            {
-                return existing.gameObject;
-            }
-
-            var child = new GameObject(childName) { layer = parent.layer };
-            Undo.RegisterCreatedObjectUndo(child, "Create " + childName);
-            child.transform.SetParent(parent.transform, false);
-            return child;
-        }
-
-        private static T GetOrAdd<T>(GameObject target) where T : Component
-        {
-            var component = target.GetComponent<T>();
-            return component != null ? component : Undo.AddComponent<T>(target);
-        }
-
-        private static void Assign(Object target, params (string field, Object value)[] values)
-        {
-            var serialized = new SerializedObject(target);
-            foreach (var (field, value) in values)
-            {
-                if (value == null)
-                {
-                    Debug.LogWarning($"Equipment: no object found for {target.GetType().Name}.{field}.");
-                    continue;
-                }
-
-                serialized.FindProperty(field).objectReferenceValue = value;
-            }
-
-            serialized.ApplyModifiedProperties();
         }
 
         private static void EnsureFolder(string path)

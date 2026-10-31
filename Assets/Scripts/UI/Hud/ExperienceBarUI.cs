@@ -38,6 +38,7 @@ namespace Project.UI
         private void UpdateExperience(int current, int required)
         {
             xpSlider.value = required > 0 ? (float)current / required : 0f;
+            UpdateLevel(experience.CurrentLevel);
         }
 
         private void UpdateLevel(int newLevel)

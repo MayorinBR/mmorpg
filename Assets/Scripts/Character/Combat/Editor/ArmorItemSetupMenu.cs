@@ -1,4 +1,3 @@
-using System.IO;
 using Project.Items;
 using UnityEditor;
 using UnityEngine;
@@ -14,7 +13,6 @@ namespace Project.Character.Combat.EditorTools
     public static class ArmorItemSetupMenu
     {
         private const string ModelsFolder = "Assets/Models/Items/Equipaments";
-        private const string SourcesFolder = ModelsFolder + "/_Sources";
         private const string PrefabsFolder = "Assets/Prefabs/Items";
         private const string DataFolder = "Assets/Data/Items";
         private const string ItemDatabasePath = "Assets/Data/ItemDatabase.asset";
@@ -58,40 +56,6 @@ namespace Project.Character.Combat.EditorTools
 
             AssetDatabase.SaveAssets();
             Debug.Log("Equipment: armor items built.");
-        }
-
-        /// <summary>
-        /// Moves the raw models left in the equipment root into a sources folder once their
-        /// processed version exists, so the root only holds models still waiting to be processed.
-        /// </summary>
-        [MenuItem("Tools/Equipment/Archive Processed Sources")]
-        public static void ArchiveSources()
-        {
-            EnsureFolder(SourcesFolder);
-
-            foreach (var entry in ArmorManifestStore.Load())
-            {
-                foreach (var model in entry.models)
-                {
-                    var fileName = Path.GetFileName(model);
-                    var rawPath = $"{ModelsFolder}/{fileName}.fbx";
-                    var processedPath = $"{ModelsFolder}/{model}.fbx";
-
-                    if (rawPath == processedPath || !File.Exists(rawPath) || !File.Exists(processedPath))
-                    {
-                        continue;
-                    }
-
-                    var error = AssetDatabase.MoveAsset(rawPath, $"{SourcesFolder}/{fileName}.fbx");
-
-                    if (!string.IsNullOrEmpty(error))
-                    {
-                        Debug.LogWarning($"Equipment: could not archive {rawPath}: {error}");
-                    }
-                }
-            }
-
-            Debug.Log("Equipment: processed sources archived.");
         }
 
         private static GameObject BuildPrefab(ArmorManifestEntry spec)

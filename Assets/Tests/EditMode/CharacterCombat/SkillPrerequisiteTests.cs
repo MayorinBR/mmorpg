@@ -114,10 +114,10 @@ namespace Project.Character.Combat.Tests
         /// <summary>
         /// The authored Archer tree matches the Ragnarok Online skill tree (levels compressed to a maximum of 5).
         /// </summary>
-        [TestCase("ArrowShower", "Snipe:3")]
+        [TestCase("ArrowShower", "DoubleStrafe:3")]
         [TestCase("VulturesEye", "OwlsEye:2")]
         [TestCase("ImproveConcentration", "VulturesEye:1")]
-        [TestCase("Snipe", "")]
+        [TestCase("DoubleStrafe", "")]
         [TestCase("OwlsEye", "")]
         public void ArcherAssets_MatchExpectedTree(string skillName, string expected)
         {
