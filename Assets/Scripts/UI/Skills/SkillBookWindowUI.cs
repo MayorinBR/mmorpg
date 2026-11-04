@@ -23,6 +23,7 @@ namespace Project.UI
         private const float HeaderHeight = 32f;
         private const float TabHeight = 28f;
         private const float Padding = 8f;
+        private const float PointsLabelHeight = 22f;
         private const int Columns = 5;
 
         private static readonly string[] TierNames = { "Novice", "1st Class", "2nd Class" };
@@ -43,6 +44,8 @@ namespace Project.UI
         [SerializeField] private RectTransform tabsRoot;
 
         private RectTransform gridRoot;
+        private TextMeshProUGUI pointsLabel;
+        private int displayedPoints = -1;
         private int selectedTab;
 
         private void Start()
@@ -100,7 +103,7 @@ namespace Project.UI
             gridRoot.SetParent(panel, false);
             gridRoot.anchorMin = Vector2.zero;
             gridRoot.anchorMax = Vector2.one;
-            gridRoot.offsetMin = new Vector2(Padding, Padding);
+            gridRoot.offsetMin = new Vector2(Padding, Padding + PointsLabelHeight);
             gridRoot.offsetMax = new Vector2(-Padding, -(TabHeight + Padding * 2f));
 
             var grid = gridRoot.GetComponent<GridLayoutGroup>();
@@ -111,6 +114,61 @@ namespace Project.UI
             grid.childAlignment = TextAnchor.UpperCenter;
             grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             grid.constraintCount = Columns;
+
+            pointsLabel = CreatePointsLabel(panel);
+        }
+
+        private void Update()
+        {
+            RefreshSkillPoints();
+        }
+
+        /// <summary>
+        /// Updates the "Skill Points" label when the available amount has
+        /// changed. Polled instead of event-driven so it also covers points
+        /// gained on job level-up, resets and save restores.
+        /// </summary>
+        private void RefreshSkillPoints()
+        {
+            if (pointsLabel == null || skillBook == null || skillBook.AvailableSkillPoints == displayedPoints)
+            {
+                return;
+            }
+
+            displayedPoints = skillBook.AvailableSkillPoints;
+            pointsLabel.text = "Skill Points: " + displayedPoints;
+        }
+
+        private static TextMeshProUGUI CreatePointsLabel(RectTransform panel)
+        {
+            var bar = new GameObject("SkillPoints", typeof(RectTransform), typeof(Image));
+            var barRect = bar.GetComponent<RectTransform>();
+            barRect.SetParent(panel, false);
+            barRect.anchorMin = Vector2.zero;
+            barRect.anchorMax = new Vector2(1f, 0f);
+            barRect.pivot = new Vector2(0.5f, 0f);
+            barRect.offsetMin = Vector2.zero;
+            barRect.offsetMax = new Vector2(0f, PointsLabelHeight);
+
+            var barImage = bar.GetComponent<Image>();
+            barImage.color = ReachedTabColor;
+            barImage.raycastTarget = false;
+
+            var labelObject = new GameObject("SkillPointsLabel", typeof(RectTransform), typeof(TextMeshProUGUI));
+            var rect = labelObject.GetComponent<RectTransform>();
+            rect.SetParent(barRect, false);
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = new Vector2(Padding, 0f);
+            rect.offsetMax = new Vector2(-Padding, 0f);
+
+            var label = labelObject.GetComponent<TextMeshProUGUI>();
+            label.alignment = TextAlignmentOptions.MidlineLeft;
+            label.fontSize = 11f;
+            label.fontStyle = FontStyles.Bold;
+            label.color = Color.white;
+            label.raycastTarget = false;
+            return label;
         }
 
         private static RectTransform CreateTabsStrip(RectTransform panel)

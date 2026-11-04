@@ -19,25 +19,27 @@ MonoBehaviour:
   allowedClasses: 00000000
   effectType: 0
   targetType: 2
-  maxLevel: 5
+  maxLevel: 10
   manaCost: 8
   cooldownSeconds: 5
   range: 2
   requiredLevel: 0
   zenyCost: 0
   requiredWeaponSubtypes: 
+  arrowVolleyStyle: 0
+  arrowAuraPrefab: {fileID: 0}
   ammoCost: 0
   bonusDamageRace: 0
   bonusDamageRaceMultiplier: 1
   buffRevealsHidden: 0
   damageType: 0
-  damageMultiplierPerLevel: 0.8
-  damageBaseMultiplier: 0
+  damageMultiplierPerLevel: 0.3
+  damageBaseMultiplier: 1
   healthCost: 0
   healthCostReductionPerTwoLevels: 0
   selfFireDamageBonusPercent: 0
   element: 5
-  accuracyBonusPerLevel: 10
+  accuracyBonusPerLevel: 5
   isAreaOfEffect: 0
   areaRadius: 3
   inflictedStatus: 0
@@ -88,6 +90,9 @@ MonoBehaviour:
   variableCastPerLevel: 0
   projectileVfxPrefab: {fileID: 0}
   impactVfxPrefab: {fileID: 0}
+  weaponGlowVfxPrefab: {fileID: 2569016691361972632, guid: 24fddc95d1d435a42b3728a61d44dff9, type: 3}
+  usesAttackAnimation: 1
+  impactDelaySeconds: 0.3
   zonePrefab: {fileID: 0}
   zoneDurationSeconds: 15
   zoneDurationPerLevel: 0

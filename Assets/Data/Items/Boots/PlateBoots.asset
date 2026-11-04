@@ -12,24 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ac8772ba691df44989e71fd8e110b57, type: 3}
   m_Name: PlateBoots
   m_EditorClassIdentifier: Project.Items::Project.Items.ItemDefinition
-  itemName: 
-  description: 
+  itemName: Plate Boots
+  description: Heavy plate greaves with steel sabatons.
   icon: {fileID: 0}
   dropIconCategory: 0
-  isStackable: 1
-  maxStackSize: 99
-  itemType: 1
-  requiredSlots: 
+  isStackable: 0
+  maxStackSize: 1
+  itemType: 2
+  requiredSlots: 06000000
   statBonuses:
     strength: 0
     agility: 0
-    vitality: 0
+    vitality: 1
     intelligence: 0
     dexterity: 0
     luck: 0
   requiredLevel: 1
   allowedClasses: 
-  weight: 1
+  weight: 6
   canBeOffHand: 0
   weaponType: 0
   weaponSubtype: 0
@@ -38,8 +38,8 @@ MonoBehaviour:
   weaponMagicAttack: 0
   weaponMagicDefense: 0
   attackSpeedMultiplier: 1
-  buyPrice: 0
-  sellPrice: 0
+  buyPrice: 250
+  sellPrice: 100
   consumableEffectType: 0
   healthRestore: 0
   manaRestore: 0

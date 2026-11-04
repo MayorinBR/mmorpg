@@ -353,6 +353,16 @@ namespace Project.Character.Combat
             }
         }
 
+        /// <summary>
+        /// Plays the basic-attack swing of the equipped weapon without dealing a hit, at the same speed as a normal
+        /// attack. Used by skills that strike with the weapon, such as Bash and Magnum Break.
+        /// </summary>
+        public void PlaySkillSwing()
+        {
+            animatorController?.SetAttackDuration(GetAttackIntervalSeconds());
+            animatorController?.TriggerAttack();
+        }
+
         private float GetAttackIntervalSeconds()
         {
             var weapon = GetMainHandWeapon();

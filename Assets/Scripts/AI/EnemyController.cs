@@ -201,6 +201,7 @@ namespace Project.AI
             if (health != null)
             {
                 health.AttackedBy += HandleAttacked;
+                health.Provoked += HandleProvoked;
             }
         }
 
@@ -209,6 +210,7 @@ namespace Project.AI
             if (health != null)
             {
                 health.AttackedBy -= HandleAttacked;
+                health.Provoked -= HandleProvoked;
             }
         }
 
@@ -349,6 +351,27 @@ namespace Project.AI
             }
 
             EngagePlayer(attacker);
+        }
+
+        /// <summary>
+        /// Forces this enemy to target whoever provoked it (e.g. a landed
+        /// Provoke skill), regardless of distance or behavior mode.
+        /// Refreshes <see cref="LastAttackedTime"/> so the chase does not
+        /// immediately give up, and restarts the chase even if the
+        /// provoker was already the target, so an enemy mid-wander or
+        /// attacking someone else switches over.
+        /// </summary>
+        /// <param name="provoker">The transform that provoked this enemy.</param>
+        private void HandleProvoked(Transform provoker)
+        {
+            lastAttackedTime = Time.time;
+
+            if (PlayerTarget == provoker && currentState is EnemyChaseState or EnemyAttackState)
+            {
+                return;
+            }
+
+            EngagePlayer(provoker);
         }
 
         private void OnDrawGizmosSelected()

@@ -120,6 +120,64 @@ namespace Project.Skills.Tests
             Assert.AreEqual(0.4f, skill.GetSuccessChance(4), 0.0001f);
         }
 
+        /// <summary>Success chance adds the flat base to the per-level growth (Provoke: 50% + 3% per level).</summary>
+        [Test]
+        public void GetSuccessChance_AddsBase()
+        {
+            SetField("successChanceBase", 0.5f);
+            SetField("successChancePerLevel", 0.03f);
+
+            Assert.AreEqual(0.53f, skill.GetSuccessChance(1), 0.0001f);
+            Assert.AreEqual(0.8f, skill.GetSuccessChance(10), 0.0001f);
+        }
+
+        /// <summary>Stun chance is zero below the minimum augmented level and starts counting from it (Fatal Blow: level 6).</summary>
+        [TestCase(5, 0f)]
+        [TestCase(6, 0.05f)]
+        [TestCase(8, 0.15f)]
+        [TestCase(10, 0.25f)]
+        public void GetStunChance_RespectsMinimumAugmentedLevel(int augmentedLevel, float expected)
+        {
+            SetField("stunChancePerAugmentedLevel", 0.05f);
+            SetField("stunMinimumAugmentedLevel", 6);
+
+            Assert.AreEqual(expected, skill.GetStunChance(augmentedLevel), 0.0001f);
+        }
+
+        /// <summary>Without a minimum level the stun chance grows from level 1.</summary>
+        [Test]
+        public void GetStunChance_WithoutMinimum_StartsAtLevelOne()
+        {
+            SetField("stunChancePerAugmentedLevel", 0.05f);
+
+            Assert.AreEqual(0.05f, skill.GetStunChance(1), 0.0001f);
+            Assert.AreEqual(0f, skill.GetStunChance(0), 0.0001f);
+        }
+
+        /// <summary>Buff percentages add the flat base to the per-level growth (Provoke values).</summary>
+        [Test]
+        public void BuffPercents_AddBase()
+        {
+            SetField("buffAtkPercentBase", 0.02f);
+            SetField("buffAtkPercentPerLevel", 0.03f);
+            SetField("buffDefPercentBase", -0.05f);
+            SetField("buffDefPercentPerLevel", -0.05f);
+
+            Assert.AreEqual(0.32f, skill.GetBuffAtkPercent(10), 0.0001f);
+            Assert.AreEqual(-0.55f, skill.GetBuffDefPercent(10), 0.0001f);
+        }
+
+        /// <summary>The flinch hit limit and impact delay are exposed as authored.</summary>
+        [Test]
+        public void FlinchLimitAndImpactDelay_ExposeAuthoredValues()
+        {
+            SetField("buffFlinchHitLimit", 7);
+            SetField("impactDelaySeconds", 0.3f);
+
+            Assert.AreEqual(7, skill.BuffFlinchHitLimit);
+            Assert.AreEqual(0.3f, skill.ImpactDelaySeconds, 0.0001f);
+        }
+
         private void SetPhysicalDamageType()
         {
             var field = typeof(SkillDefinition).GetField("damageType", BindingFlags.NonPublic | BindingFlags.Instance);

@@ -166,6 +166,33 @@ namespace Project.Character.Combat
             }
         }
 
+        /// <summary>
+        /// Gets the Def shown to the player: the status Def with active buff multipliers
+        /// (e.g. Provoke) applied, matching what incoming physical hits are mitigated by.
+        /// </summary>
+        public int EffectiveDef
+        {
+            get
+            {
+                var statusDef = CurrentSubStats.StatusDef;
+                return buffs != null ? Mathf.RoundToInt(statusDef * buffs.DefenseMultiplier) : statusDef;
+            }
+        }
+
+        /// <summary>
+        /// Gets the MDef shown to the player: the status MDef plus the flat bonus of active buffs
+        /// (e.g. Endure), matching what incoming magical hits are mitigated by.
+        /// <see cref="CurrentSubStats"/> deliberately excludes it, because the health component adds the buff bonus itself.
+        /// </summary>
+        public int EffectiveMDef
+        {
+            get
+            {
+                var statusMDef = CurrentSubStats.StatusMDef;
+                return buffs != null ? statusMDef + buffs.MagicalDefenseBonus : statusMDef;
+            }
+        }
+
         private void Awake()
         {
             EnsureInitialized();

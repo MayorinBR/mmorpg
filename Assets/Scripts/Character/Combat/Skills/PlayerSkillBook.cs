@@ -28,6 +28,10 @@ namespace Project.Character.Combat
         [SerializeField] private MonoBehaviour playerStatsSource;
 
         private IPlayerLevelProvider levelProvider;
+
+        /// <summary>Gets the skill points the player can still spend, or zero if no job progress is wired.</summary>
+        public int AvailableSkillPoints => jobProgress != null ? jobProgress.AvailableSkillPoints : 0;
+
         private readonly Dictionary<SkillDefinition, int> skillLevels = new Dictionary<SkillDefinition, int>();
 
         private void Awake()

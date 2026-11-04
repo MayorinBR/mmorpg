@@ -86,6 +86,26 @@ namespace Project.Combat
         public event Action<Transform> AttackedBy;
 
         /// <summary>
+        /// Raised by <see cref="Provoke"/>. Unlike <see cref="AttackedBy"/>,
+        /// no damage is dealt, so listeners such as flinch handling do not
+        /// react; AI uses it to switch its target to the provoker.
+        /// </summary>
+        public event Action<Transform> Provoked;
+
+        /// <summary>
+        /// Forces anything listening to <see cref="Provoked"/> to focus the
+        /// given transform, without dealing damage.
+        /// </summary>
+        /// <param name="provoker">The transform that provoked this character.</param>
+        public void Provoke(Transform provoker)
+        {
+            if (provoker != null)
+            {
+                Provoked?.Invoke(provoker);
+            }
+        }
+
+        /// <summary>
         /// Gets the maximum health defined by the character's stats, plus
         /// any bonus from <see cref="maxHealthBonusSource"/> (e.g. the
         /// player's VIT-derived bonus).

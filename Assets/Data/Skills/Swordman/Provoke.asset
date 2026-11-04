@@ -18,13 +18,15 @@ MonoBehaviour:
   allowedClasses: 00000000
   effectType: 3
   targetType: 2
-  maxLevel: 5
+  maxLevel: 10
   manaCost: 10
   cooldownSeconds: 15
   range: 5
   requiredLevel: 0
   zenyCost: 0
   requiredWeaponSubtypes: 
+  arrowVolleyStyle: 0
+  arrowAuraPrefab: {fileID: 0}
   ammoCost: 0
   bonusDamageRace: 0
   bonusDamageRaceMultiplier: 1
@@ -43,7 +45,8 @@ MonoBehaviour:
   inflictedStatusDurationSeconds: 0
   inflictedStatusDurationPerLevel: 0
   poisonDamagePerTickPerLevel: 0
-  successChancePerLevel: 0.16
+  successChancePerLevel: 0.03
+  successChanceBase: 0.5
   knockbackDistance: 0
   buffPreventsFlinch: 0
   immuneToUndeadAndBoss: 1
@@ -67,8 +70,10 @@ MonoBehaviour:
   passiveSpRegenMultiplierPerLevel: 0
   passiveRemovesMovementRegenPenalty: 0
   healAmount: 10
-  buffAtkPercentPerLevel: 0.064
-  buffDefPercentPerLevel: -0.11
+  buffAtkPercentPerLevel: 0.03
+  buffAtkPercentBase: 0.02
+  buffDefPercentPerLevel: -0.05
+  buffDefPercentBase: -0.05
   buffMdefBonusPerLevel: 0
   buffDurationSeconds: 30
   buffDurationPerLevel: 0
@@ -86,7 +91,10 @@ MonoBehaviour:
   variableCastSeconds: 0
   variableCastPerLevel: 0
   projectileVfxPrefab: {fileID: 0}
-  impactVfxPrefab: {fileID: 0}
+  impactVfxPrefab: {fileID: 8778285957250417129, guid: e49c25d436970564d8a62e63f64dcde8, type: 3}
+  weaponGlowVfxPrefab: {fileID: 0}
+  usesAttackAnimation: 0
+  impactVfxAuthoredHeight: 2.1
   zonePrefab: {fileID: 0}
   zoneDurationSeconds: 15
   zoneDurationPerLevel: 0

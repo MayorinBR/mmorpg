@@ -22,6 +22,11 @@ namespace Project.UI
         [Tooltip("Optional. Resolved from the owning hierarchy when empty; only the player has one, and it adds a green popup for passive skill healing.")]
         [SerializeField] private PlayerHealthRegenController regenController;
 
+        [Tooltip("Optional. Resolved from the owning hierarchy when empty; shows Flinch, status and Resist popups.")]
+        [SerializeField] private StatusEffectController statusEffects;
+
+        [SerializeField] private float statusPopupHeight = 0.6f;
+
         private void Awake()
         {
             if (health == null)
@@ -32,6 +37,11 @@ namespace Project.UI
             if (regenController == null)
             {
                 regenController = transform.root.GetComponentInChildren<PlayerHealthRegenController>(true);
+            }
+
+            if (statusEffects == null)
+            {
+                statusEffects = transform.root.GetComponentInChildren<StatusEffectController>(true);
             }
         }
 
@@ -44,6 +54,13 @@ namespace Project.UI
             {
                 regenController.SkillRegenApplied += HandleSkillRegenApplied;
             }
+
+            if (statusEffects != null)
+            {
+                statusEffects.Flinched += HandleFlinched;
+                statusEffects.StatusApplied += HandleStatusApplied;
+                statusEffects.StatusResisted += HandleStatusResisted;
+            }
         }
 
         private void OnDisable()
@@ -54,6 +71,13 @@ namespace Project.UI
             if (regenController != null)
             {
                 regenController.SkillRegenApplied -= HandleSkillRegenApplied;
+            }
+
+            if (statusEffects != null)
+            {
+                statusEffects.Flinched -= HandleFlinched;
+                statusEffects.StatusApplied -= HandleStatusApplied;
+                statusEffects.StatusResisted -= HandleStatusResisted;
             }
         }
 
@@ -67,9 +91,29 @@ namespace Project.UI
             DamagePopup.Create(amount, GetSpawnPosition(), element, isCritical);
         }
 
+        private void HandleFlinched()
+        {
+            DamagePopup.CreateStatus("Flinch", GetStatusSpawnPosition());
+        }
+
+        private void HandleStatusApplied(StatusEffectType type)
+        {
+            DamagePopup.CreateStatus(type.ToString(), GetStatusSpawnPosition());
+        }
+
+        private void HandleStatusResisted(StatusEffectType type)
+        {
+            DamagePopup.CreateStatus("Resist", GetStatusSpawnPosition());
+        }
+
         private void HandleDodged()
         {
             DamagePopup.CreateDodge(GetSpawnPosition());
+        }
+
+        private Vector3 GetStatusSpawnPosition()
+        {
+            return GetSpawnPosition() + Vector3.up * statusPopupHeight;
         }
 
         private Vector3 GetSpawnPosition()

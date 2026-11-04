@@ -83,6 +83,49 @@ namespace Project.Combat
         /// <summary>Gets whether any active buff stops the holder from flinching when hit (e.g. Endure).</summary>
         public bool PreventsFlinch => Total.PreventsFlinch;
 
+        /// <summary>
+        /// Absorbs one flinch-causing hit with the first active flinch-protecting
+        /// buff. A buff with a hit limit (see
+        /// <see cref="ApplyBuff(BuffPayload, float, EffectDescriptor, int)"/>) loses one
+        /// charge per absorbed hit and ends when its charges run out, e.g. Endure's
+        /// 7 hits; a buff without a limit absorbs every hit until it expires.
+        /// </summary>
+        /// <returns>True if a hit was absorbed and the holder should not flinch.</returns>
+        public bool TryConsumeFlinchProtection()
+        {
+            Purge();
+
+            foreach (var buff in activeBuffs)
+            {
+                if (!buff.Payload.PreventsFlinch)
+                {
+                    continue;
+                }
+
+                if (buff.RemainingFlinchHits > 0)
+                {
+                    buff.RemainingFlinchHits--;
+
+                    if (buff.RemainingFlinchHits == 0)
+                    {
+                        activeBuffs.Remove(buff);
+                    }
+                }
+
+                return true;
+            }
+
+            foreach (var modifier in persistentModifiers.Values)
+            {
+                if (modifier.PreventsFlinch)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>Gets the combined extra Fire damage fraction added to every attack (0 = none) — e.g. Magnum Break's after-effect.</summary>
         public float FireDamagePercent => Total.FireDamagePercent;
 
@@ -110,10 +153,11 @@ namespace Project.Combat
         /// <param name="payload">The stat bonuses this buff grants.</param>
         /// <param name="durationSeconds">How long this buff lasts, in seconds.</param>
         /// <param name="descriptor">How the buff is presented. An invalid descriptor makes it anonymous: it works but is not shown and never refreshes.</param>
-        public void ApplyBuff(BuffPayload payload, float durationSeconds, EffectDescriptor descriptor)
+        /// <param name="flinchHitLimit">How many flinch-causing hits the buff absorbs before ending (see <see cref="TryConsumeFlinchProtection"/>); zero means no limit.</param>
+        public void ApplyBuff(BuffPayload payload, float durationSeconds, EffectDescriptor descriptor, int flinchHitLimit = 0)
         {
             Purge();
-            var buff = new TimedBuff(payload, Now + durationSeconds, durationSeconds, descriptor);
+            var buff = new TimedBuff(payload, Now + durationSeconds, durationSeconds, descriptor, flinchHitLimit);
 
             if (descriptor.IsValid)
             {
@@ -195,20 +239,22 @@ namespace Project.Combat
             activeBuffs.RemoveAll(buff => buff.ExpireTime <= Now);
         }
 
-        private readonly struct TimedBuff
+        private sealed class TimedBuff
         {
-            public TimedBuff(BuffPayload payload, float expireTime, float durationSeconds, EffectDescriptor descriptor)
+            public TimedBuff(BuffPayload payload, float expireTime, float durationSeconds, EffectDescriptor descriptor, int flinchHitLimit)
             {
                 Payload = payload;
                 ExpireTime = expireTime;
                 DurationSeconds = durationSeconds;
                 Descriptor = descriptor;
+                RemainingFlinchHits = flinchHitLimit;
             }
 
             public BuffPayload Payload { get; }
             public float ExpireTime { get; }
             public float DurationSeconds { get; }
             public EffectDescriptor Descriptor { get; }
+            public int RemainingFlinchHits { get; set; }
         }
     }
 }

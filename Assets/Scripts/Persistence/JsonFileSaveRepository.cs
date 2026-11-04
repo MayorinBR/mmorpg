@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using UnityEngine;
 
@@ -33,38 +32,14 @@ namespace Project.Persistence
         /// <inheritdoc />
         public bool TryLoad(out PlayerSaveData data)
         {
-            if (!File.Exists(filePath))
-            {
-                data = null;
-                return false;
-            }
-
-            try
-            {
-                var json = File.ReadAllText(filePath);
-                data = JsonUtility.FromJson<PlayerSaveData>(json);
-                return data != null;
-            }
-            catch (Exception exception)
-            {
-                Debug.LogWarning($"Failed to load save data from '{filePath}': {exception.Message}");
-                data = null;
-                return false;
-            }
+            return SafeFile.TryRead(filePath, JsonUtility.FromJson<PlayerSaveData>, out data);
         }
 
         /// <inheritdoc />
         public void Save(PlayerSaveData data)
         {
-            var directory = Path.GetDirectoryName(filePath);
-
-            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-
-            var json = JsonUtility.ToJson(data, true);
-            File.WriteAllText(filePath, json);
+            data.saveVersion = PlayerSaveData.CurrentSaveVersion;
+            SafeFile.WriteAllText(filePath, JsonUtility.ToJson(data, true));
         }
     }
 }

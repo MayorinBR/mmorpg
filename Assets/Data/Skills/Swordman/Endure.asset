@@ -18,13 +18,15 @@ MonoBehaviour:
   allowedClasses: 00000000
   effectType: 3
   targetType: 0
-  maxLevel: 5
+  maxLevel: 10
   manaCost: 10
   cooldownSeconds: 10
   range: 0
   requiredLevel: 0
   zenyCost: 0
   requiredWeaponSubtypes: 
+  arrowVolleyStyle: 0
+  arrowAuraPrefab: {fileID: 0}
   ammoCost: 0
   bonusDamageRace: 0
   bonusDamageRaceMultiplier: 1
@@ -46,6 +48,7 @@ MonoBehaviour:
   successChancePerLevel: 0
   knockbackDistance: 0
   buffPreventsFlinch: 1
+  buffFlinchHitLimit: 7
   immuneToUndeadAndBoss: 0
   requiredJobLevel: 0
   prerequisites:
@@ -71,9 +74,9 @@ MonoBehaviour:
   healAmount: 10
   buffAtkPercentPerLevel: 0
   buffDefPercentPerLevel: 0
-  buffMdefBonusPerLevel: 2
-  buffDurationSeconds: 0
-  buffDurationPerLevel: 7.4
+  buffMdefBonusPerLevel: 1
+  buffDurationSeconds: 7
+  buffDurationPerLevel: 3
   buffStatBonusPerLevel:
     strength: 0
     agility: 0
@@ -88,7 +91,9 @@ MonoBehaviour:
   variableCastSeconds: 0
   variableCastPerLevel: 0
   projectileVfxPrefab: {fileID: 0}
-  impactVfxPrefab: {fileID: 0}
+  impactVfxPrefab: {fileID: 9222862341418275586, guid: a1f375e380b9c1c449a80caa8c3eb5cc, type: 3}
+  weaponGlowVfxPrefab: {fileID: 0}
+  usesAttackAnimation: 0
   zonePrefab: {fileID: 0}
   zoneDurationSeconds: 15
   zoneDurationPerLevel: 0

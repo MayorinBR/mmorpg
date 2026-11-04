@@ -17,6 +17,12 @@ namespace Project.Persistence
     [Serializable]
     public class PlayerSaveData
     {
+        /// <summary>The save schema version written by this build. Raise it when a change needs a migration.</summary>
+        public const int CurrentSaveVersion = 1;
+
+        /// <summary>The schema version this file was saved with. Zero for saves written before versioning existed.</summary>
+        public int saveVersion;
+
         /// <summary>
         /// The character's name, as typed on the Character Selection screen.
         /// Also the key used to find this save on disk (see

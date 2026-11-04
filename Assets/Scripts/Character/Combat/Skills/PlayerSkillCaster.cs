@@ -76,8 +76,11 @@ namespace Project.Character.Combat
         [SerializeField] private LayerMask waterLayer;
 
         private readonly Dictionary<SkillDefinition, float> cooldownEndTimes = new Dictionary<SkillDefinition, float>();
+        private const float HeadMarkerMarginMeters = 0.3f;
+
         private Coroutine castRoutine;
         private CharacterMovementController movement;
+        private SkillWeaponVfxPlayer weaponVfx;
 
         /// <summary>Gets whether a skill with a cast time is currently being cast; no other skill can start meanwhile.</summary>
         public bool IsCasting => castRoutine != null;
@@ -224,18 +227,67 @@ namespace Project.Character.Combat
                 SpendAmmo(skill);
                 SpendCatalyst(skill);
                 SkillAnnouncementChannel.Announce(skill.SkillName, transform.position);
+                PlayWeaponVfx(skill);
 
                 if (skill.TargetType == SkillTargetType.Self)
                 {
                     SkillVfx.Spawn(skill.ImpactVfxPrefab, transform.position);
                 }
 
-                animatorController?.TriggerCast();
+                PlayCastAnimation(skill);
                 cooldownEndTimes[skill] = Time.time + skill.CooldownSeconds;
                 StopMovementForCast();
             }
 
             return cast;
+        }
+
+        /// <summary>
+        /// Plays the animation of a cast skill: the equipped weapon's basic-attack swing for a skill that strikes
+        /// with the weapon, the cast animation for every other skill.
+        /// </summary>
+        /// <param name="skill">The skill that was just cast.</param>
+        private void PlayCastAnimation(SkillDefinition skill)
+        {
+            ResolveCombat();
+
+            if (skill.UsesAttackAnimation && combat != null)
+            {
+                combat.PlaySkillSwing();
+                return;
+            }
+
+            animatorController?.TriggerCast();
+        }
+
+        /// <summary>
+        /// Looks up the combat controller on this object's parents and children when it was not assigned.
+        /// </summary>
+        private void ResolveCombat()
+        {
+            if (combat == null)
+            {
+                combat = GetComponentInParent<PlayerCombatController>() ?? GetComponentInChildren<PlayerCombatController>();
+            }
+        }
+
+        /// <summary>
+        /// Plays the skill's weapon glow and burst visuals, adding the <see cref="SkillWeaponVfxPlayer"/> on first use.
+        /// </summary>
+        /// <param name="skill">The skill that was just cast.</param>
+        private void PlayWeaponVfx(SkillDefinition skill)
+        {
+            if (skill.WeaponGlowVfxPrefab == null)
+            {
+                return;
+            }
+
+            if (weaponVfx == null && !TryGetComponent(out weaponVfx))
+            {
+                weaponVfx = gameObject.AddComponent<SkillWeaponVfxPlayer>();
+            }
+
+            weaponVfx.Play(skill);
         }
 
         /// <summary>
@@ -663,6 +715,11 @@ namespace Project.Character.Combat
                 return false;
             }
 
+            if (!isSelfOrAlly && skill.HasCustomVfx)
+            {
+                PlayCustomVfx(skill, targetSelector.CurrentTarget);
+            }
+
             if (!isSelfOrAlly)
             {
                 // An enemy-targeted Buff is really a debuff (e.g. Decrease
@@ -684,7 +741,12 @@ namespace Project.Character.Combat
                 }
             }
 
-            buffs.ApplyBuff(BuildBuffPayload(skill, level), skill.GetBuffDuration(level), BuildDescriptor(skill, isSelfOrAlly ? EffectCategory.Buff : EffectCategory.Debuff));
+            buffs.ApplyBuff(BuildBuffPayload(skill, level), skill.GetBuffDuration(level), BuildDescriptor(skill, isSelfOrAlly ? EffectCategory.Buff : EffectCategory.Debuff), skill.BuffFlinchHitLimit);
+
+            if (!isSelfOrAlly)
+            {
+                targetSelector.CurrentTarget.GetComponentInParent<HealthComponent>()?.Provoke(transform);
+            }
 
             if (isSelfOrAlly && skill.BuffRevealsHidden)
             {
@@ -743,10 +805,7 @@ namespace Project.Character.Combat
                 return;
             }
 
-            if (combat == null)
-            {
-                combat = GetComponentInParent<PlayerCombatController>() ?? GetComponentInChildren<PlayerCombatController>();
-            }
+            ResolveCombat();
 
             if (isMagical)
             {
@@ -767,7 +826,11 @@ namespace Project.Character.Combat
         private void PlayCustomVfx(SkillDefinition skill, Transform target)
         {
             var position = target.position;
-            void SpawnImpact() => SkillVfx.Spawn(skill.ImpactVfxPrefab, position);
+            void SpawnImpact()
+            {
+                var instance = SkillVfx.Spawn(skill.ImpactVfxPrefab, position);
+                AlignToTargetHead(skill, instance, target);
+            }
 
             if (skill.ProjectileVfxPrefab == null)
             {
@@ -775,10 +838,7 @@ namespace Project.Character.Combat
                 return;
             }
 
-            if (combat == null)
-            {
-                combat = GetComponentInParent<PlayerCombatController>() ?? GetComponentInChildren<PlayerCombatController>();
-            }
+            ResolveCombat();
 
             if (combat == null)
             {
@@ -787,6 +847,46 @@ namespace Project.Character.Combat
             }
 
             combat.SpawnSkillProjectile(skill.ProjectileVfxPrefab, target, SpawnImpact);
+        }
+
+        /// <summary>
+        /// Shifts a spawned impact effect so the point it was authored at
+        /// (see <see cref="SkillDefinition.ImpactVfxAuthoredHeight"/>) sits just above
+        /// the top of the target's model, so a floating mark such as Provoke's
+        /// follows the target's height. Does nothing for a skill without an
+        /// authored height or a target without a mesh.
+        /// </summary>
+        /// <param name="skill">The skill whose effect was spawned.</param>
+        /// <param name="instance">The spawned effect, or null.</param>
+        /// <param name="target">The target the effect belongs to.</param>
+        private static void AlignToTargetHead(SkillDefinition skill, GameObject instance, Transform target)
+        {
+            if (instance == null || target == null || skill.ImpactVfxAuthoredHeight <= 0f)
+            {
+                return;
+            }
+
+            var hasMesh = false;
+            var top = float.NegativeInfinity;
+
+            foreach (var meshRenderer in target.GetComponentsInChildren<Renderer>())
+            {
+                if (meshRenderer is ParticleSystemRenderer || meshRenderer is TrailRenderer || meshRenderer is LineRenderer)
+                {
+                    continue;
+                }
+
+                hasMesh = true;
+                top = Mathf.Max(top, meshRenderer.bounds.max.y);
+            }
+
+            if (!hasMesh)
+            {
+                return;
+            }
+
+            var shift = top + HeadMarkerMarginMeters - (instance.transform.position.y + skill.ImpactVfxAuthoredHeight);
+            instance.transform.position += Vector3.up * shift;
         }
 
         /// <summary>
@@ -952,11 +1052,57 @@ namespace Project.Character.Combat
 
             if (skill.IsAreaOfEffect)
             {
-                ApplyAreaDamage(skill, level, targetSelector.CurrentTarget.position);
+                var areaCenter = targetSelector.CurrentTarget.position;
+                ResolveAfterImpactDelay(skill, () => ApplyAreaDamage(skill, level, areaCenter));
                 return true;
             }
 
             var target = targetSelector.CurrentDamageable;
+            var targetTransform = targetSelector.CurrentTarget;
+            ResolveAfterImpactDelay(skill, () => ResolveSingleTargetHit(skill, level, target, targetTransform));
+            return true;
+        }
+
+        /// <summary>
+        /// Runs <paramref name="resolve"/> right away, or after
+        /// <see cref="SkillDefinition.ImpactDelaySeconds"/> so a melee skill's
+        /// damage lands when its weapon swing connects.
+        /// </summary>
+        /// <param name="skill">The skill being resolved.</param>
+        /// <param name="resolve">The damage application to run.</param>
+        private void ResolveAfterImpactDelay(SkillDefinition skill, System.Action resolve)
+        {
+            if (skill.ImpactDelaySeconds <= 0f)
+            {
+                resolve();
+                return;
+            }
+
+            StartCoroutine(RunAfterDelay(skill.ImpactDelaySeconds, resolve));
+        }
+
+        private static IEnumerator RunAfterDelay(float seconds, System.Action action)
+        {
+            yield return new WaitForSeconds(seconds);
+            action();
+        }
+
+        /// <summary>
+        /// Rolls the hit against a single target and applies the skill's
+        /// damage, knockback and status procs. Skipped if the target was
+        /// destroyed or died while the impact delay was running.
+        /// </summary>
+        /// <param name="skill">The skill that was cast.</param>
+        /// <param name="level">The skill's current level.</param>
+        /// <param name="target">The damageable target selected at cast time.</param>
+        /// <param name="targetTransform">The transform of that target.</param>
+        private void ResolveSingleTargetHit(SkillDefinition skill, int level, IDamageable target, Transform targetTransform)
+        {
+            if (targetTransform == null || target == null || target.IsDead)
+            {
+                return;
+            }
+
             var subStats = statsController.CurrentSubStats;
 
             if (HitChanceCalculator.RollHit(subStats.Hit + skill.GetAccuracyBonus(level), target.FleeRating))
@@ -968,13 +1114,13 @@ namespace Project.Character.Combat
                 damage += GetRaceDamageBonus(category, target.Race);
                 target.TakeDamage(damage, skill.Element, category, attacker: transform);
                 ElementalBonusDamage.Apply(target, damage, statsController.FireDamagePercent, Element.Fire, transform);
-                var targetStatus = targetSelector.CurrentTarget.GetComponentInParent<StatusEffectController>();
+                var targetStatus = targetTransform.GetComponentInParent<StatusEffectController>();
                 TryProcStunAugment(skill, level, targetStatus);
                 TryProcInflictedStatus(skill, level, targetStatus);
 
                 if (skill.KnockbackDistance > 0f)
                 {
-                    var targetAgent = targetSelector.CurrentTarget.GetComponentInParent<NavMeshAgent>();
+                    var targetAgent = targetTransform.GetComponentInParent<NavMeshAgent>();
                     KnockbackUtility.Slide(targetAgent, transform.position, skill.KnockbackDistance);
                 }
             }
@@ -982,8 +1128,6 @@ namespace Project.Character.Combat
             {
                 target.NotifyDodged();
             }
-
-            return true;
         }
 
         /// <summary>
@@ -1018,8 +1162,12 @@ namespace Project.Character.Combat
                 ownHealth.TrySpendHealth(healthCost);
             }
 
-            ApplyAreaDamage(skill, level, transform.position);
-            ApplyFireDamageBuff(skill, level);
+            ResolveAfterImpactDelay(skill, () =>
+            {
+                ApplyAreaDamage(skill, level, transform.position);
+                ApplyFireDamageBuff(skill, level);
+            });
+
             return true;
         }
 

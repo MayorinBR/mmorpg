@@ -68,6 +68,12 @@ namespace Project.Combat
         /// </summary>
         public event System.Action<StatusEffectType> StatusResisted;
 
+        /// <summary>Raised when a hit starts a new flinch. Not raised for hits absorbed by Endure or landing during an ongoing flinch.</summary>
+        public event System.Action Flinched;
+
+        /// <summary>Raised when a status effect takes hold (not when it is resisted), naming which one.</summary>
+        public event System.Action<StatusEffectType> StatusApplied;
+
         /// <summary>Gets whether this character is currently stunned.</summary>
         public bool IsStunned => Time.time < stunExpireTime;
 
@@ -138,12 +144,18 @@ namespace Project.Combat
 
         private void HandleAttacked(Transform attacker)
         {
-            if (flinchDurationSeconds <= 0f || health.IsDead || (buffs != null && buffs.PreventsFlinch))
+            if (flinchDurationSeconds <= 0f || health.IsDead || (buffs != null && buffs.TryConsumeFlinchProtection()))
             {
                 return;
             }
 
+            var wasFlinching = IsFlinching;
             flinchExpireTime = Time.time + flinchDurationSeconds;
+
+            if (!wasFlinching)
+            {
+                Flinched?.Invoke();
+            }
         }
 
         /// <summary>
@@ -161,6 +173,7 @@ namespace Project.Combat
             }
 
             Extend(ref stunExpireTime, ref stunTotalSeconds, durationSeconds);
+            StatusApplied?.Invoke(StatusEffectType.Stun);
         }
 
         /// <summary>
@@ -182,6 +195,7 @@ namespace Project.Combat
 
             poisonDamagePerTick = IsPoisoned ? Mathf.Max(poisonDamagePerTick, damagePerTick) : damagePerTick;
             Extend(ref poisonExpireTime, ref poisonTotalSeconds, durationSeconds);
+            StatusApplied?.Invoke(StatusEffectType.Poison);
         }
 
         /// <summary>Applies Silence for the given duration, unless resisted (see <see cref="RollResisted"/>), blocking skill casts only.</summary>
@@ -194,6 +208,7 @@ namespace Project.Combat
             }
 
             Extend(ref silenceExpireTime, ref silenceTotalSeconds, durationSeconds);
+            StatusApplied?.Invoke(StatusEffectType.Silence);
         }
 
         /// <summary>Applies Blind for the given duration, unless resisted (see <see cref="RollResisted"/>). See <see cref="IsBlinded"/> for why nothing reacts to it yet.</summary>
@@ -206,6 +221,7 @@ namespace Project.Combat
             }
 
             Extend(ref blindExpireTime, ref blindTotalSeconds, durationSeconds);
+            StatusApplied?.Invoke(StatusEffectType.Blind);
         }
 
         /// <summary>Applies Freeze for the given duration, unless resisted (see <see cref="RollResisted"/>), immobilizing the character (see <see cref="IsImmobilized"/>).</summary>
@@ -218,6 +234,7 @@ namespace Project.Combat
             }
 
             Extend(ref freezeExpireTime, ref freezeTotalSeconds, durationSeconds);
+            StatusApplied?.Invoke(StatusEffectType.Freeze);
             GetComponentInParent<ElementalResistanceComponent>()?.ApplyTemporaryElement(Element.Water, durationSeconds);
         }
 
@@ -231,6 +248,7 @@ namespace Project.Combat
             }
 
             Extend(ref petrifyExpireTime, ref petrifyTotalSeconds, durationSeconds);
+            StatusApplied?.Invoke(StatusEffectType.Petrify);
             GetComponentInParent<ElementalResistanceComponent>()?.ApplyTemporaryElement(Element.Ground, durationSeconds);
         }
 

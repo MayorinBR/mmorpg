@@ -20,6 +20,8 @@ namespace Project.UI
         [SerializeField] private PlayerExperience experience;
         [SerializeField] private SubStatRowUI[] subStatRows;
 
+        private string[] shownValues;
+
         private void OnEnable()
         {
             statsController.StatsChanged += RefreshAll;
@@ -47,13 +49,37 @@ namespace Project.UI
             RefreshAll();
         }
 
+        private void Update()
+        {
+            RefreshAll();
+        }
+
+        /// <summary>
+        /// Rewrites the rows whose text changed. Runs every frame because timed buffs
+        /// start and expire without raising <see cref="PlayerStatsController.StatsChanged"/>.
+        /// </summary>
         private void RefreshAll()
         {
             var subStats = statsController.CurrentSubStats;
+            var def = statsController.EffectiveDef;
+            var mdef = statsController.EffectiveMDef;
 
-            foreach (var row in subStatRows)
+            if (shownValues == null || shownValues.Length != subStatRows.Length)
             {
-                row.SetValue(FormatValue(row.SubStatType, subStats, statsController.EffectiveAspd));
+                shownValues = new string[subStatRows.Length];
+            }
+
+            for (var i = 0; i < subStatRows.Length; i++)
+            {
+                var text = FormatValue(subStatRows[i].SubStatType, subStats, def, mdef, statsController.EffectiveAspd);
+
+                if (text == shownValues[i])
+                {
+                    continue;
+                }
+
+                shownValues[i] = text;
+                subStatRows[i].SetValue(text);
             }
         }
 
@@ -73,16 +99,18 @@ namespace Project.UI
         /// </summary>
         /// <param name="type">The sub-stat to format.</param>
         /// <param name="subStats">The current sub-stats.</param>
+        /// <param name="def">The Def after buff multipliers.</param>
+        /// <param name="mdef">The MDef including buff bonuses.</param>
         /// <param name="effectiveAspd">The Aspd rating after the weapon speed multiplier.</param>
         /// <returns>The text to display.</returns>
-        private static string FormatValue(SubStatType type, SubStats subStats, int effectiveAspd)
+        private static string FormatValue(SubStatType type, SubStats subStats, int def, int mdef, int effectiveAspd)
         {
             switch (type)
             {
                 case SubStatType.Atk: return subStats.StatusAtk.ToString();
                 case SubStatType.Matk: return subStats.StatusMatk.ToString();
-                case SubStatType.Def: return subStats.StatusDef.ToString();
-                case SubStatType.MDef: return subStats.StatusMDef.ToString();
+                case SubStatType.Def: return def.ToString();
+                case SubStatType.MDef: return mdef.ToString();
                 case SubStatType.Hit: return subStats.Hit.ToString();
                 case SubStatType.Flee: return subStats.Flee.ToString();
                 case SubStatType.CriticalRate: return $"{subStats.CriticalRate:0.#}%";

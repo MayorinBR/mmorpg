@@ -94,6 +94,9 @@ namespace Project.Skills
         [Tooltip("Chance per skill level, from 0 to 1, used by two different mechanics depending on EffectType: for a Damage skill, the chance InflictedStatus actually procs on a hit (e.g. Envenom's poison chance); for an Enemy-targeted Buff (i.e. a debuff, e.g. Decrease AGI), the chance the debuff lands at all instead of being resisted. Left at zero, a Damage skill's InflictedStatus never procs and a debuff always lands — matching every skill authored before this field existed.")]
         [SerializeField] private float successChancePerLevel;
 
+        [Tooltip("Flat chance, from 0 to 1, added to SuccessChancePerLevel * level — e.g. Provoke's 50% base plus 3% per level gives 53% to 80%. Left at zero, the chance scales purely from the per-level value.")]
+        [SerializeField] private float successChanceBase;
+
         [Tooltip("How far, in meters, this skill pushes something back via KnockbackUtility: the hit target for a Damage skill (e.g. Arrow Repel) or the caster itself for a Displacement skill (e.g. Back Slide). Zero means a Damage skill has no knockback; a Displacement skill needs this set to actually move.")]
         [SerializeField] private float knockbackDistance;
 
@@ -143,6 +146,9 @@ namespace Project.Skills
         [Tooltip("Stun chance per level of the AUGMENTED skill (not this passive's own level) — e.g. Fatal Blow's 5% per Bash level. Only meaningful when AugmentsSkill is set.")]
         [SerializeField] private float stunChancePerAugmentedLevel;
 
+        [Tooltip("Lowest level of the AUGMENTED skill at which the stun can proc, e.g. 6 for Fatal Blow on Bash. The chance is StunChancePerAugmentedLevel times (level - this + 1), so it starts at one step on that level. Zero or one means it procs from level 1 at StunChancePerAugmentedLevel times the level.")]
+        [SerializeField] private int stunMinimumAugmentedLevel;
+
         [Tooltip("How long the stun lasts, in seconds, when it procs. Only meaningful when AugmentsSkill is set.")]
         [SerializeField] private float stunDurationSeconds;
 
@@ -167,6 +173,15 @@ namespace Project.Skills
         [Header("Buff/Debuff (only used if Effect Type is Buff)")]
         [Tooltip("Attack power multiplier bonus per skill level, e.g. Provoke's +32% at this project's max level.")]
         [SerializeField] private float buffAtkPercentPerLevel;
+
+        [Tooltip("Flat attack power multiplier bonus added to the per-level amount, e.g. Provoke's +2% so that level 1 gives +5% and level 10 gives +32%.")]
+        [SerializeField] private float buffAtkPercentBase;
+
+        [Tooltip("Flat physical defense multiplier bonus added to the per-level amount. Negative for a debuff, e.g. Provoke's -5% so that level 1 gives -10% and level 10 gives -55%.")]
+        [SerializeField] private float buffDefPercentBase;
+
+        [Tooltip("How many hits the buff's flinch protection absorbs before the buff ends, e.g. 7 for Endure. Zero means no hit limit. Only meaningful when Buff Prevents Flinch is set.")]
+        [SerializeField] private int buffFlinchHitLimit;
 
         [Tooltip("Physical defense multiplier bonus per skill level. Negative for a debuff, e.g. Provoke's -55% DEF at this project's max level.")]
         [SerializeField] private float buffDefPercentPerLevel;
@@ -208,6 +223,19 @@ namespace Project.Skills
 
         [Tooltip("Effect spawned on the target when the skill lands (or on the target area for an area skill). Authored at the skill's own area size.")]
         [SerializeField] private GameObject impactVfxPrefab;
+
+        [Tooltip("Glow spawned on the caster's main-hand weapon when the skill is cast, following the weapon while it plays. On an area-around-caster skill with an Impact Vfx Prefab, the impact bursts from the caster once the glow has built up.")]
+        [SerializeField] private GameObject weaponGlowVfxPrefab;
+
+        [Tooltip("Height, in meters above the Impact Vfx Prefab's spawn point, at which the effect is authored (e.g. Provoke's mark floats 2.1 m up). When above zero, the impact is shifted so that point sits just above the top of the target's model instead, so the effect follows the target's height. Zero spawns the effect unshifted.")]
+        [SerializeField] private float impactVfxAuthoredHeight;
+
+        [Header("Animation")]
+        [Tooltip("Plays the equipped weapon's basic-attack swing (one-handed or two-handed) instead of the cast animation when the skill is cast. For melee skills that strike with the weapon, such as Bash and Magnum Break.")]
+        [SerializeField] private bool usesAttackAnimation;
+
+        [Tooltip("Seconds after the cast before the damage and its after-effects are applied, so they land when the weapon swing connects instead of at the start of the animation. Zero applies them instantly.")]
+        [SerializeField] private float impactDelaySeconds;
 
         [Header("Zone (only used if Effect Type is Zone)")]
         [Tooltip("Optional visual spawned at the zone's position. Left empty, the zone is logic-only — still applies its effect, just invisible, useful before a real wall/fire visual is authored.")]
@@ -401,6 +429,21 @@ namespace Project.Skills
         /// <summary>Gets the optional effect spawned where the skill lands.</summary>
         public GameObject ImpactVfxPrefab => impactVfxPrefab;
 
+        /// <summary>Gets the optional glow spawned on the caster's main-hand weapon when the skill is cast.</summary>
+        public GameObject WeaponGlowVfxPrefab => weaponGlowVfxPrefab;
+
+        /// <summary>Gets whether casting this skill plays the weapon's basic-attack swing instead of the cast animation.</summary>
+        public bool UsesAttackAnimation => usesAttackAnimation;
+
+        /// <summary>Gets the delay, in seconds, between the cast and the moment the skill's damage is applied.</summary>
+        public float ImpactDelaySeconds => impactDelaySeconds;
+
+        /// <summary>Gets the height above the impact effect's spawn point at which it is authored, or zero if it should not follow the target's height.</summary>
+        public float ImpactVfxAuthoredHeight => impactVfxAuthoredHeight;
+
+        /// <summary>Gets how many hits this buff's flinch protection absorbs before ending, or zero for no limit.</summary>
+        public int BuffFlinchHitLimit => buffFlinchHitLimit;
+
         /// <summary>Gets whether this skill brings its own visual effects instead of the generic bolt.</summary>
         public bool HasCustomVfx => projectileVfxPrefab != null || impactVfxPrefab != null;
 
@@ -505,7 +548,7 @@ namespace Project.Skills
         /// <returns>The calculated chance, from 0 to 1.</returns>
         public float GetSuccessChance(int skillLevel)
         {
-            return successChancePerLevel * skillLevel;
+            return successChanceBase + successChancePerLevel * skillLevel;
         }
 
         /// <summary>Gets whether the Buff this skill applies stops its holder from flinching when hit.</summary>
@@ -665,7 +708,7 @@ namespace Project.Skills
         /// <returns>The calculated bonus. Zero for a buff without an ATK component.</returns>
         public float GetBuffAtkPercent(int skillLevel)
         {
-            return buffAtkPercentPerLevel * skillLevel;
+            return buffAtkPercentBase + buffAtkPercentPerLevel * skillLevel;
         }
 
         /// <summary>
@@ -677,7 +720,7 @@ namespace Project.Skills
         /// <returns>The calculated bonus. Zero for a buff without a DEF component.</returns>
         public float GetBuffDefPercent(int skillLevel)
         {
-            return buffDefPercentPerLevel * skillLevel;
+            return buffDefPercentBase + buffDefPercentPerLevel * skillLevel;
         }
 
         /// <summary>
@@ -796,7 +839,14 @@ namespace Project.Skills
         /// <returns>The calculated stun chance, from 0 to 1.</returns>
         public float GetStunChance(int augmentedSkillLevel)
         {
-            return stunChancePerAugmentedLevel * augmentedSkillLevel;
+            var firstLevel = Mathf.Max(1, stunMinimumAugmentedLevel);
+
+            if (augmentedSkillLevel < firstLevel)
+            {
+                return 0f;
+            }
+
+            return stunChancePerAugmentedLevel * (augmentedSkillLevel - firstLevel + 1);
         }
 
         /// <summary>

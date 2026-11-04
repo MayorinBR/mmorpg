@@ -5,7 +5,7 @@ namespace Project.EditorTools.Maps
     /// <summary>Creates the flat water surfaces of the maps.</summary>
     public static class MapWater
     {
-        private const string WaterMaterialPath = "Assets/Materials/Greybox/Plains_Water.mat";
+        private const string WaterMaterialPath = "Assets/Materials/Environment/Plains_Water.mat";
 
         /// <summary>Creates a water plane with the shared water material and no collider.</summary>
         /// <param name="parent">Parent transform.</param>

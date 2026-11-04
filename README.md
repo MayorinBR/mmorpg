@@ -49,7 +49,7 @@ Prototype of a 2.5D/3D MMORPG built in Unity, inspired by Ragnarok Online's clas
 - Quest system with quest log and quest board, NPC dialogue, courier and kill/collect quests
 - Login, character selection and character creation flow with accounts; per-character save of map and position; multi-map warping and a rotating minimap
 - Character customization: head shape, skin tone, hair and facial expressions; equipment shown on the model through skinned equipment modules
-- Automated equipment pipeline (Blender rigging, manifest, prefab, item asset, materials) with 29 equipment pieces
+- Automated equipment pipeline (Blender rigging, manifest, prefab, item asset, materials) with 30 armor pieces (plus 15 weapons)
 - Point-based enemy spawns with per-monster respawn delay and optional boss; King Poporing boss; rigged Wolf enemy
 - Death animation root baked into the pose; target rings stay on the ground under the enemy
 - Ragnarok-style skill cast (walk to range, cast ring and bar, ground skills with a preview disc), skill hotkeys, skill points exclusive per class tier, and VFX prefabs for the Mage skills
@@ -104,7 +104,7 @@ Protótipo de um MMORPG 2.5D/3D feito em Unity, inspirado no gameplay clássico 
 - Sistema de quests com quest log e quest board, dialogo de NPC, quests de entrega e de matar/coletar
 - Fluxo de login, selecao e criacao de personagem com contas; save por personagem com mapa e posicao; warp entre mapas e minimap rotativo
 - Customizacao de personagem: formato da cabeca, cor de pele, cabelo e expressoes faciais; equipamentos mostrados no modelo por modulos skinned
-- Pipeline automatizado de equipamentos (rig no Blender, manifesto, prefab, item asset, materiais) com 29 pecas
+- Pipeline automatizado de equipamentos (rig no Blender, manifesto, prefab, item asset, materiais) com 30 pecas de armadura (mais 15 armas)
 - Spawn de inimigos por pontos com tempo de respawn por monstro e boss opcional; boss King Poporing; inimigo Wolf com rig
 - Raiz da animacao de morte embutida na pose; anéis de alvo ficam no chão sob o inimigo
 - Conjuracao de skill estilo Ragnarok (anda ate o alcance, anel e barra de cast, skills de chao com preview), atalhos de skill, pontos de skill exclusivos por nivel de classe e VFX dos skills do Mage
@@ -159,7 +159,7 @@ Ragnarok Onlineのクラシックな戦闘(PvE)と探索のゲームプレイに
 - クエストログとクエストボード付きのクエストシステム、NPC会話、配達および討伐/収集クエスト
 - アカウント付きのログイン・キャラクター選択・キャラクター作成フロー、キャラクターごとのマップと位置のセーブ、マップ間ワープ、回転ミニマップ
 - キャラクターカスタマイズ: 頭の形、肌の色、髪、表情。装備はスキン付きモジュールでモデルに表示
-- 自動化された装備パイプライン(Blenderでのリグ、マニフェスト、プレハブ、アイテムアセット、マテリアル)、29点の装備
+- 自動化された装備パイプライン(Blenderでのリグ、マニフェスト、プレハブ、アイテムアセット、マテリアル)、30点の防具(武器15点を別途)
 - ポイント指定の敵スポーン(モンスターごとのリスポーン時間、任意でボス)、ボスKing Poporing、リグ付きのWolf
 - 死亡アニメーションのルートをポーズに焼き込み、ターゲットリングを対象の足元に配置
 - Ragnarok風のスキル詠唱(射程まで移動、詠唱リングとバー、地面スキルのプレビュー)、スキルホットキー、職業段階ごとの排他的スキルポイント、MageスキルのVFX

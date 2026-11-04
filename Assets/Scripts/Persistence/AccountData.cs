@@ -13,6 +13,12 @@ namespace Project.Persistence
     [Serializable]
     public class AccountData
     {
+        /// <summary>The account schema version written by this build. Raise it when a change needs a migration.</summary>
+        public const int CurrentSaveVersion = 1;
+
+        /// <summary>The schema version this file was saved with. Zero for accounts written before versioning existed.</summary>
+        public int saveVersion;
+
         /// <summary>The login name, exactly as typed on the Login screen.</summary>
         public string login = "";
 

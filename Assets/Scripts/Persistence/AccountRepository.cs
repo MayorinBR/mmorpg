@@ -218,8 +218,11 @@ namespace Project.Persistence
 
         private static AccountData LoadFromFile(string path)
         {
-            var json = File.ReadAllText(path);
-            var account = JsonUtility.FromJson<AccountData>(json);
+            if (!SafeFile.TryRead(path, JsonUtility.FromJson<AccountData>, out var account))
+            {
+                throw new IOException($"Account file '{path}' and its backup are missing or corrupt.");
+            }
+
             account.characterNames ??= new List<string>();
             account.pendingCharacters ??= new List<PendingCharacterData>();
             return account;
@@ -228,14 +231,8 @@ namespace Project.Persistence
         private static void Save(AccountData account)
         {
             var path = SaveFilePath(account.login);
-            var directory = Path.GetDirectoryName(path);
-
-            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-
-            File.WriteAllText(path, JsonUtility.ToJson(account, true));
+            account.saveVersion = AccountData.CurrentSaveVersion;
+            SafeFile.WriteAllText(path, JsonUtility.ToJson(account, true));
         }
 
         private static string Hash(string password)

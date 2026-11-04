@@ -71,6 +71,18 @@ namespace Project.UI
         private static readonly Color HealBackgroundColor = new Color32(40, 160, 70, 255);
         private static readonly Color HealTextColor = Color.white;
 
+        // Placeholder colors for status and condition popups (Flinch, Stun, Poison...).
+        private static readonly Dictionary<string, Color> StatusBackgroundColors = new Dictionary<string, Color>
+        {
+            { "Flinch", new Color32(110, 110, 110, 255) },
+            { "Stun", new Color32(200, 150, 0, 255) },
+            { "Poison", new Color32(90, 130, 30, 255) },
+            { "Silence", new Color32(90, 100, 140, 255) },
+            { "Blind", new Color32(50, 50, 50, 255) },
+            { "Freeze", new Color32(80, 170, 220, 255) },
+            { "Petrify", new Color32(130, 120, 110, 255) },
+        };
+
         [SerializeField] private float lifetimeSeconds = 1f;
         [SerializeField] private float riseSpeed = 1.5f;
         [SerializeField, Range(0f, 1f)] private float fadeStartFraction = 0.5f;
@@ -153,6 +165,23 @@ namespace Project.UI
         public static DamagePopup CreateSkillName(string skillName, Vector3 worldPosition)
         {
             return CreatePopup(skillName, worldPosition, SkillNameBackgroundColor, SkillNameTextColor, 1f, SkillNameFontSize, true);
+        }
+
+        /// <summary>
+        /// Builds a floating text popup for a status, action or condition (e.g. "Flinch", "Stun", "Resist").
+        /// Known labels get their own background color; anything else uses the neutral white of a dodge.
+        /// </summary>
+        /// <param name="label">The text to show.</param>
+        /// <param name="worldPosition">Where to spawn the popup.</param>
+        /// <returns>The spawned popup's component.</returns>
+        public static DamagePopup CreateStatus(string label, Vector3 worldPosition)
+        {
+            if (StatusBackgroundColors.TryGetValue(label, out var background))
+            {
+                return CreatePopup(label, worldPosition, background, Color.white, 1f, SkillNameFontSize, true);
+            }
+
+            return CreatePopup(label, worldPosition, DodgeBackgroundColor, DodgeTextColor, 1f, SkillNameFontSize, true);
         }
 
         /// <summary>
