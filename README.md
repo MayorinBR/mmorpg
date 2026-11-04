@@ -52,6 +52,10 @@ Prototype of a 2.5D/3D MMORPG built in Unity, inspired by Ragnarok Online's clas
 - Automated equipment pipeline (Blender rigging, manifest, prefab, item asset, materials) with 29 equipment pieces
 - Point-based enemy spawns with per-monster respawn delay and optional boss; King Poporing boss; rigged Wolf enemy
 - Death animation root baked into the pose; target rings stay on the ground under the enemy
+- Ragnarok-style skill cast (walk to range, cast ring and bar, ground skills with a preview disc), skill hotkeys, skill points exclusive per class tier, and VFX prefabs for the Mage skills
+- Active effects bar, Class Trial NPC with six class trials, and promotion that resets levels (evolved cap 99/99)
+- Region and desert maps connected by a 10x10 world map with a static minimap; enemy roster grown to 17 definitions (Spider, Beetle, Tarantula, Davidis, Skeleton Warrior, Alpha Wolf, Giant Spider, Demon Skeleton)
+- Weapon prefab rules (rods, bows, one-hand, two-hand) normalized to the socket scale; Rod, Bow and Book weapon sets and four arrow types
 
 ---
 
@@ -103,6 +107,10 @@ Protótipo de um MMORPG 2.5D/3D feito em Unity, inspirado no gameplay clássico 
 - Pipeline automatizado de equipamentos (rig no Blender, manifesto, prefab, item asset, materiais) com 29 pecas
 - Spawn de inimigos por pontos com tempo de respawn por monstro e boss opcional; boss King Poporing; inimigo Wolf com rig
 - Raiz da animacao de morte embutida na pose; anéis de alvo ficam no chão sob o inimigo
+- Conjuracao de skill estilo Ragnarok (anda ate o alcance, anel e barra de cast, skills de chao com preview), atalhos de skill, pontos de skill exclusivos por nivel de classe e VFX dos skills do Mage
+- Barra de efeitos ativos, NPC de Trial de classe com seis provas e promocao que reseta niveis (limite 99/99)
+- Mapas de regiao e deserto ligados por um mapa-mundi 10x10 com minimapa estatico; 17 definicoes de inimigos (Spider, Beetle, Tarantula, Davidis, Skeleton Warrior, Alpha Wolf, Giant Spider, Demon Skeleton)
+- Regras de prefab de armas (rod, arco, uma mao, duas maos) normalizadas na escala do socket; armas Rod, Bow e Book e quatro tipos de flecha
 
 ---
 
@@ -154,3 +162,7 @@ Ragnarok Onlineのクラシックな戦闘(PvE)と探索のゲームプレイに
 - 自動化された装備パイプライン(Blenderでのリグ、マニフェスト、プレハブ、アイテムアセット、マテリアル)、29点の装備
 - ポイント指定の敵スポーン(モンスターごとのリスポーン時間、任意でボス)、ボスKing Poporing、リグ付きのWolf
 - 死亡アニメーションのルートをポーズに焼き込み、ターゲットリングを対象の足元に配置
+- Ragnarok風のスキル詠唱(射程まで移動、詠唱リングとバー、地面スキルのプレビュー)、スキルホットキー、職業段階ごとの排他的スキルポイント、MageスキルのVFX
+- 有効効果バー、6つの職業試練を持つ試練NPC、レベルをリセットする転職(上限99/99)
+- 10x10のワールドマップと静的ミニマップで地域・砂漠マップを接続。敵定義は17種(Spider、Beetle、Tarantula、Davidis、Skeleton Warrior、Alpha Wolf、Giant Spider、Demon Skeleton)
+- 武器プレハブ規則(ロッド、弓、片手、両手)をソケットスケールに正規化。Rod、Bow、Book武器と4種類の矢
