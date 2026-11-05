@@ -170,6 +170,7 @@ namespace Project.Character.Combat
 
             CancelPicking();
             SetQueuedSkill(skill);
+            CombatLog.Write($"{skill.SkillName} queued: target is out of range, walking closer.");
             return true;
         }
 
@@ -215,6 +216,7 @@ namespace Project.Character.Combat
 
             if (target == null || damageable == null || damageable.IsDead)
             {
+                CombatLog.Write($"{queuedSkill.SkillName} dropped: the target was lost.");
                 SetQueuedSkill(null);
                 return;
             }
@@ -224,7 +226,8 @@ namespace Project.Character.Combat
                 var skill = queuedSkill;
                 SetQueuedSkill(null);
                 movement?.StopMovement();
-                caster.TryCastSkill(skill);
+                var cast = caster.TryCastSkill(skill);
+                CombatLog.Write($"{skill.SkillName}: in range, cast {(cast ? "started" : "refused")}.");
                 return;
             }
 

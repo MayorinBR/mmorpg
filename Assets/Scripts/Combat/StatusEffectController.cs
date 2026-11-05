@@ -132,6 +132,10 @@ namespace Project.Combat
             {
                 health.AttackedBy += HandleAttacked;
             }
+
+            Flinched += LogFlinched;
+            StatusApplied += LogStatusApplied;
+            StatusResisted += LogStatusResisted;
         }
 
         private void OnDisable()
@@ -140,12 +144,37 @@ namespace Project.Combat
             {
                 health.AttackedBy -= HandleAttacked;
             }
+
+            Flinched -= LogFlinched;
+            StatusApplied -= LogStatusApplied;
+            StatusResisted -= LogStatusResisted;
+        }
+
+        private void LogFlinched()
+        {
+            CombatLog.Write($"{transform.root.name} flinched for {flinchDurationSeconds:0.##}s.");
+        }
+
+        private void LogStatusApplied(StatusEffectType type)
+        {
+            CombatLog.Write($"{transform.root.name} is now {type}.");
+        }
+
+        private void LogStatusResisted(StatusEffectType type)
+        {
+            CombatLog.Write($"{transform.root.name} resisted {type}.");
         }
 
         private void HandleAttacked(Transform attacker)
         {
-            if (flinchDurationSeconds <= 0f || health.IsDead || (buffs != null && buffs.TryConsumeFlinchProtection()))
+            if (flinchDurationSeconds <= 0f || health.IsDead)
             {
+                return;
+            }
+
+            if (buffs != null && buffs.TryConsumeFlinchProtection())
+            {
+                CombatLog.Write($"{transform.root.name} did not flinch: protected by a buff.");
                 return;
             }
 
