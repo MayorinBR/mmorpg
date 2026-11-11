@@ -22,19 +22,30 @@ namespace Project.Character.Combat
 
             if (selector.CurrentTarget == null || selector.CurrentDamageable == null)
             {
+                CombatLog.Write($"{skill.SkillName}: not cast, the target was lost.");
                 return false;
             }
 
             if (skill.ZenyCost > 0 && (context.Currency == null || context.Currency.CurrentZeny < skill.ZenyCost))
             {
                 // Checked before the mana is spent, so a skill that cannot be afforded never partially spends.
+                CombatLog.Write($"{skill.SkillName}: not cast, not enough Zeny ({skill.ZenyCost} needed).");
                 return false;
             }
 
             var distance = CombatRangeMath.HorizontalDistance(context.Transform.position, selector.CurrentTarget.position);
 
-            if (distance > context.GetEffectiveRange(skill) || !context.Mana.TryConsumeMana(skill.ManaCost))
+            var range = context.GetEffectiveRange(skill);
+
+            if (distance > range)
             {
+                CombatLog.Write($"{skill.SkillName}: not cast, the target is out of range ({distance:0.#} m, {range:0.#} max).");
+                return false;
+            }
+
+            if (!context.Mana.TryConsumeMana(skill.GetManaCost(level)))
+            {
+                CombatLog.Write($"{skill.SkillName}: not cast, not enough mana ({skill.GetManaCost(level)} needed).");
                 return false;
             }
 
@@ -64,11 +75,13 @@ namespace Project.Character.Combat
 
             if (healthCost > 0 && context.OwnHealth != null && context.OwnHealth.CurrentHealth <= healthCost)
             {
+                CombatLog.Write($"{skill.SkillName}: not cast, not enough health ({healthCost} needed).");
                 return false;
             }
 
-            if (!context.Mana.TryConsumeMana(skill.ManaCost))
+            if (!context.Mana.TryConsumeMana(skill.GetManaCost(level)))
             {
+                CombatLog.Write($"{skill.SkillName}: not cast, not enough mana ({skill.GetManaCost(level)} needed).");
                 return false;
             }
 

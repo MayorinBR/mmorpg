@@ -15,17 +15,20 @@ MonoBehaviour:
   skillName: Pneuma
   description: Creates a barrier that blocks ranged physical attacks against anyone
     standing inside it, for a limited duration.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: c47996d6b27c0114b82009a489e44426, type: 3}
   allowedClasses: 03000000
   effectType: 4
   targetType: 5
   maxLevel: 1
   manaCost: 20
+  manaCostPerLevel: 0
   cooldownSeconds: 15
   range: 4
   requiredLevel: 0
   zenyCost: 0
   requiredWeaponSubtypes: 
+  arrowVolleyStyle: 0
+  arrowAuraPrefab: {fileID: 0}
   ammoCost: 0
   bonusDamageRace: 0
   bonusDamageRaceMultiplier: 1
@@ -45,6 +48,7 @@ MonoBehaviour:
   inflictedStatusDurationPerLevel: 0
   poisonDamagePerTickPerLevel: 0
   successChancePerLevel: 0
+  successChanceBase: 0
   knockbackDistance: 0
   buffPreventsFlinch: 0
   immuneToUndeadAndBoss: 0
@@ -61,6 +65,7 @@ MonoBehaviour:
   passiveRaceDefenseBonusPerLevel: 0
   augmentsSkill: {fileID: 0}
   stunChancePerAugmentedLevel: 0
+  stunMinimumAugmentedLevel: 0
   stunDurationSeconds: 0
   passiveRegenFlatPerLevel: 0
   passiveRegenPercentOfMaxHealthPerLevel: 0
@@ -68,12 +73,25 @@ MonoBehaviour:
   passiveSpRegenMultiplierPerLevel: 0
   passiveRemovesMovementRegenPenalty: 0
   healAmount: 0
+  healStatDivisor: 0
+  healFactorBase: 0
+  healFactorPerLevel: 0
   buffAtkPercentPerLevel: 0
+  buffAtkPercentBase: 0
+  buffDefPercentBase: 0
+  buffFlinchHitLimit: 0
   buffDefPercentPerLevel: 0
   buffMdefBonusPerLevel: 0
   buffDurationSeconds: 0
   buffDurationPerLevel: 0
   buffStatBonusPerLevel:
+    strength: 0
+    agility: 0
+    vitality: 0
+    intelligence: 0
+    dexterity: 0
+    luck: 0
+  buffStatBonusBase:
     strength: 0
     agility: 0
     vitality: 0
@@ -86,6 +104,12 @@ MonoBehaviour:
   fixedCastPerLevel: 0
   variableCastSeconds: 0
   variableCastPerLevel: 0
+  projectileVfxPrefab: {fileID: 0}
+  impactVfxPrefab: {fileID: 0}
+  weaponGlowVfxPrefab: {fileID: 0}
+  impactVfxAuthoredHeight: 0
+  usesAttackAnimation: 0
+  impactDelaySeconds: 0
   zonePrefab: {fileID: 1194768250972640681, guid: 7a8acecf98400914db4b9b02b53a3f5d, type: 3}
   zoneDurationSeconds: 10
   zoneDurationPerLevel: 0

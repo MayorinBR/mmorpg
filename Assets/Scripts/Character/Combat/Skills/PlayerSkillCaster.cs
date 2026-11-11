@@ -61,6 +61,7 @@ namespace Project.Character.Combat
         private readonly Dictionary<SkillDefinition, float> cooldownEndTimes = new Dictionary<SkillDefinition, float>();
         private readonly SkillEffectHandlerRegistry handlers = SkillEffectHandlerRegistry.CreateDefault();
         private readonly ZoneEffectHandler zoneHandler = new ZoneEffectHandler();
+        private readonly WarpPortalEffectHandler portalHandler = new WarpPortalEffectHandler();
 
         private Coroutine castRoutine;
         private CharacterMovementController movement;
@@ -183,7 +184,7 @@ namespace Project.Character.Combat
 
             if (castTime > 0f)
             {
-                if (mana.CurrentMana < skill.ManaCost)
+                if (mana.CurrentMana < skill.GetManaCost(level))
                 {
                     return false;
                 }
@@ -227,7 +228,7 @@ namespace Project.Character.Combat
 
             if (castTime > 0f)
             {
-                if (mana.CurrentMana < skill.ManaCost)
+                if (mana.CurrentMana < skill.GetManaCost(level))
                 {
                     return false;
                 }
@@ -257,7 +258,7 @@ namespace Project.Character.Combat
                 return SkillAvailability.OnCooldown;
             }
 
-            if (mana.CurrentMana < skill.ManaCost)
+            if (mana.CurrentMana < skill.GetManaCost(skillBook.GetLevel(skill)))
             {
                 return SkillAvailability.InsufficientMana;
             }
@@ -357,12 +358,18 @@ namespace Project.Character.Combat
         /// <returns>True if the zone was spawned.</returns>
         private bool ExecuteZoneCast(SkillDefinition skill, int level, Vector3 position)
         {
-            if (!SkillRequirementChecker.MeetsCatalystRequirement(Context, skill) || !zoneHandler.TryCast(Context, skill, level, position))
+            var isPortal = skill.EffectType == SkillEffectType.WarpPortal;
+
+            if (!SkillRequirementChecker.MeetsCatalystRequirement(Context, skill)
+                || !(isPortal ? portalHandler.TryCast(Context, skill, level, position) : zoneHandler.TryCast(Context, skill, level, position)))
             {
                 return false;
             }
 
-            SkillRequirementChecker.SpendCatalyst(Context, skill);
+            if (!isPortal)
+            {
+                SkillRequirementChecker.SpendCatalyst(Context, skill);
+            }
             SkillAnnouncementChannel.Announce(skill.SkillName, transform.position);
 
             animatorController?.TriggerCast();

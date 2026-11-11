@@ -108,6 +108,9 @@ namespace Project.Character.Combat
         private CharacterBaseStats baseStats;
         private ISubStatsCalculator subStatsCalculator;
         private IStatProvider effectiveStats;
+        private SubStats cachedSubStats;
+        private int cachedSubStatsFrame = -1;
+        private int baseLevel;
 
         /// <summary>
         /// Raised whenever a stat point is spent, stats are reset, a save is
@@ -122,7 +125,15 @@ namespace Project.Character.Combat
         public CharacterBaseStats BaseStats => baseStats;
 
         /// <summary>Gets or sets the player's current base level, driven by the experience system.</summary>
-        public int BaseLevel { get; set; }
+        public int BaseLevel
+        {
+            get => baseLevel;
+            set
+            {
+                baseLevel = value;
+                InvalidateSubStatsCache();
+            }
+        }
 
         /// <summary>Gets the base level a fresh character starts at, e.g. for <see cref="PlayerExperience.ResetProgress"/> to reset back to.</summary>
         public int StartingLevel => startingLevel;
@@ -145,25 +156,46 @@ namespace Project.Character.Combat
         {
             get
             {
-                EnsureInitialized();
-                var subStats = subStatsCalculator.Calculate(effectiveStats, BaseLevel, equipment != null && equipment.IsMainHandWeaponRanged(), GetBaseAttackSpeed());
-                var statusAtk = subStats.StatusAtk + GetPassiveAttackBonus() + GetWeaponAttack();
-                var statusMatk = subStats.StatusMatk + GetWeaponMagicAttack();
-                var statusMDef = subStats.StatusMDef + GetWeaponMagicDefense();
-                var hit = subStats.Hit + GetPassiveHitBonus();
-                var flee = subStats.Flee + GetPassiveFleeBonus();
-                var aspd = subStats.Aspd;
-
-                if (buffs != null)
+                if (!Application.isPlaying)
                 {
-                    statusAtk = Mathf.RoundToInt(statusAtk * buffs.AttackMultiplier);
-                    aspd = Mathf.RoundToInt(aspd * buffs.AspdMultiplier);
+                    return ComputeSubStats();
                 }
 
-                return statusAtk == subStats.StatusAtk && statusMatk == subStats.StatusMatk && statusMDef == subStats.StatusMDef && hit == subStats.Hit && flee == subStats.Flee && aspd == subStats.Aspd
-                    ? subStats
-                    : new SubStats(statusAtk, statusMatk, subStats.StatusDef, statusMDef, hit, flee, subStats.CriticalRate, aspd);
+                if (cachedSubStatsFrame != Time.frameCount)
+                {
+                    cachedSubStats = ComputeSubStats();
+                    cachedSubStatsFrame = Time.frameCount;
+                }
+
+                return cachedSubStats;
             }
+        }
+
+        /// <summary>
+        /// Computes the sub-stats from the current stats, level, passives, weapon and buffs. Buffs expire on the clock
+        /// without raising an event, so <see cref="CurrentSubStats"/> reuses this result for one frame only.
+        /// </summary>
+        /// <returns>The freshly computed sub-stats.</returns>
+        private SubStats ComputeSubStats()
+        {
+            EnsureInitialized();
+            var subStats = subStatsCalculator.Calculate(effectiveStats, BaseLevel, equipment != null && equipment.IsMainHandWeaponRanged(), GetBaseAttackSpeed());
+            var statusAtk = subStats.StatusAtk + GetPassiveAttackBonus() + GetWeaponAttack();
+            var statusMatk = subStats.StatusMatk + GetWeaponMagicAttack();
+            var statusMDef = subStats.StatusMDef + GetWeaponMagicDefense();
+            var hit = subStats.Hit + GetPassiveHitBonus();
+            var flee = subStats.Flee + GetPassiveFleeBonus();
+            var aspd = subStats.Aspd;
+
+            if (buffs != null)
+            {
+                statusAtk = Mathf.RoundToInt(statusAtk * buffs.AttackMultiplier);
+                aspd = Mathf.RoundToInt(aspd * buffs.AspdMultiplier);
+            }
+
+            return statusAtk == subStats.StatusAtk && statusMatk == subStats.StatusMatk && statusMDef == subStats.StatusMDef && hit == subStats.Hit && flee == subStats.Flee && aspd == subStats.Aspd
+                ? subStats
+                : new SubStats(statusAtk, statusMatk, subStats.StatusDef, statusMDef, hit, flee, subStats.CriticalRate, aspd);
         }
 
         /// <summary>
@@ -191,6 +223,15 @@ namespace Project.Character.Combat
                 var statusMDef = CurrentSubStats.StatusMDef;
                 return buffs != null ? statusMDef + buffs.MagicalDefenseBonus : statusMDef;
             }
+        }
+
+        /// <summary>Gets the effective value of a base stat, including equipment, job, buff and passive bonuses.</summary>
+        /// <param name="stat">The stat to read.</param>
+        /// <returns>The effective stat value.</returns>
+        public int GetEffectiveStat(StatType stat)
+        {
+            EnsureInitialized();
+            return effectiveStats.GetValue(stat);
         }
 
         private void Awake()
@@ -283,22 +324,35 @@ namespace Project.Character.Combat
             }
         }
 
+        /// <summary>Discards the cached <see cref="CurrentSubStats"/> so the next read recomputes it.</summary>
+        private void InvalidateSubStatsCache()
+        {
+            cachedSubStatsFrame = -1;
+        }
+
+        /// <summary>Discards the cached sub-stats and raises <see cref="StatsChanged"/>.</summary>
+        private void NotifyStatsChanged()
+        {
+            InvalidateSubStatsCache();
+            StatsChanged?.Invoke();
+        }
+
         private void HandleEquipmentChanged()
         {
             RefreshDependentMaxValues();
-            StatsChanged?.Invoke();
+            NotifyStatsChanged();
         }
 
         private void HandleClassChanged(CharacterClass newClass)
         {
             RefreshDependentMaxValues();
-            StatsChanged?.Invoke();
+            NotifyStatsChanged();
         }
 
         private void HandleJobLeveledUp(int newJobLevel)
         {
             RefreshDependentMaxValues();
-            StatsChanged?.Invoke();
+            NotifyStatsChanged();
         }
 
         /// <summary>
@@ -312,7 +366,7 @@ namespace Project.Character.Combat
         private void HandleSkillLeveledUp(SkillDefinition skill, int level)
         {
             RefreshDependentMaxValues();
-            StatsChanged?.Invoke();
+            NotifyStatsChanged();
         }
 
         /// <summary>
@@ -336,7 +390,7 @@ namespace Project.Character.Combat
             }
 
             RefreshDependentMaxValues();
-            StatsChanged?.Invoke();
+            NotifyStatsChanged();
             return true;
         }
 
@@ -361,7 +415,7 @@ namespace Project.Character.Combat
             mana?.ResetMana();
 
             PlayerFeedbackChannel.Publish($"Stats reset: {refunded} points refunded.");
-            StatsChanged?.Invoke();
+            NotifyStatsChanged();
             return refunded;
         }
 
@@ -643,7 +697,7 @@ namespace Project.Character.Combat
             health?.ResetHealth();
             mana?.ResetMana();
             RefreshDependentMaxValues();
-            StatsChanged?.Invoke();
+            NotifyStatsChanged();
             StartCoroutine(RestoreVitalsAfterLoad(data.currentHealth, data.currentMana));
         }
 

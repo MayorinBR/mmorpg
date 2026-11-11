@@ -23,7 +23,7 @@ namespace Project.Character.Combat
         /// <returns>True if the zone was spawned.</returns>
         public bool TryCast(SkillCastContext context, SkillDefinition skill, int level, Vector3 position)
         {
-            if (!context.Mana.TryConsumeMana(skill.ManaCost))
+            if (!context.Mana.TryConsumeMana(skill.GetManaCost(level)))
             {
                 return false;
             }

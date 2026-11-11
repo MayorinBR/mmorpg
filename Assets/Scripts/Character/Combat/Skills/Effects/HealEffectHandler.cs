@@ -15,21 +15,22 @@ namespace Project.Character.Combat
         /// <inheritdoc />
         public bool TryCast(SkillCastContext context, SkillDefinition skill, int level)
         {
-            if (!context.Mana.TryConsumeMana(skill.ManaCost))
+            if (!context.Mana.TryConsumeMana(skill.GetManaCost(level)))
             {
                 return false;
             }
 
+            var healAmount = skill.CalculateHeal(context.Stats.BaseLevel, context.Stats.GetEffectiveStat(StatType.Intelligence), level, context.Stats.CurrentSubStats.StatusMatk);
             var undeadTarget = GetUndeadTargetInRange(context, skill);
 
             if (undeadTarget != null)
             {
-                var damage = Mathf.Max(1, skill.CalculateHeal() / 2);
+                var damage = Mathf.Max(1, healAmount / 2);
                 undeadTarget.TakeDamage(damage, Element.Holy, DamageCategory.Magical, attacker: context.Transform);
                 return true;
             }
 
-            context.OwnHealth.Heal(skill.CalculateHeal());
+            context.OwnHealth.Heal(healAmount);
             return true;
         }
 

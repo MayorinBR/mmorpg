@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Project.Character.Combat;
 using Project.Character.Movement;
 using Project.Quests;
 
@@ -45,6 +46,11 @@ namespace Project.UI
             foreach (var window in windows)
             {
                 windowsById[window.Id] = window;
+            }
+
+            if (dialogueWindow != null)
+            {
+                SkillTravel.Prompt = new DialogueChoicePrompt(dialogueWindow);
             }
 
             if (npcInteractionController != null && dialogueWindow != null)

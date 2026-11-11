@@ -19,7 +19,7 @@ namespace Project.Character.Combat
         {
             var inventory = context.Inventory;
 
-            if (inventory == null || inventory.Items.IsMinorOverweight || !context.Mana.TryConsumeMana(skill.ManaCost))
+            if (inventory == null || inventory.Items.IsMinorOverweight || !context.Mana.TryConsumeMana(skill.GetManaCost(level)))
             {
                 return false;
             }

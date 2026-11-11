@@ -24,6 +24,9 @@ namespace Project.World
         /// <summary>Where the persisted player respawns after dying on this map.</summary>
         [SerializeField] private Transform defaultRespawnPoint;
 
+        [Tooltip("When set, entering this map makes its default respawn point the player's save point, which Teleport and Warp Portal can return to.")]
+        [SerializeField] private bool setsSavePoint;
+
         private IEnumerator Start()
         {
             // Lets a map scene be played directly from the Editor: without the
@@ -81,6 +84,7 @@ namespace Project.World
                 player.DeathHandler.SetRespawnPoint(defaultRespawnPoint);
             }
 
+            RegisterSavePoint(player);
             WarpToRespawnPointIfRequested(player);
             WarpToPendingSpawnPoint(player);
             WarpToPendingPosition(player);
@@ -130,6 +134,17 @@ namespace Project.World
 
             player.MovementController.StopMovement();
             player.MovementController.WarpTo(defaultRespawnPoint.position);
+        }
+
+        private void RegisterSavePoint(PersistentPlayerAnchor player)
+        {
+            if (!setsSavePoint || defaultRespawnPoint == null)
+            {
+                return;
+            }
+
+            var points = player.transform.root.GetComponentInChildren<PlayerTravelPoints>(true);
+            points?.SetSavePoint(SceneManager.GetActiveScene().name, defaultRespawnPoint.position);
         }
 
         private static void WarpToPendingPosition(PersistentPlayerAnchor player)

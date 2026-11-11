@@ -151,7 +151,8 @@ namespace Project.Character.Combat
 
         /// <summary>
         /// Runs the action right away, or after the skill's impact delay so a melee skill's damage lands when
-        /// its weapon swing connects.
+        /// its weapon swing connects. The action is skipped when the caster dies or is disabled during the delay
+        /// (see <see cref="IsCastInterrupted"/>).
         /// </summary>
         /// <param name="skill">The skill being resolved.</param>
         /// <param name="resolve">The action to run.</param>
@@ -163,12 +164,37 @@ namespace Project.Character.Combat
                 return;
             }
 
-            host.StartCoroutine(RunAfterDelay(skill.ImpactDelaySeconds, resolve));
+            host.StartCoroutine(RunAfterDelay(skill, resolve));
         }
 
-        private static IEnumerator RunAfterDelay(float seconds, System.Action action)
+        /// <summary>
+        /// Gets whether the caster lost a delayed skill impact: it is dead, or is stunned, frozen or petrified when the
+        /// impact is due. A flinch alone does not cancel it, so a melee skill still lands while mobs keep hitting the caster.
+        /// </summary>
+        /// <param name="statusEffects">The caster's status effects, or null.</param>
+        /// <param name="ownHealth">The caster's health, or null.</param>
+        /// <returns>True if the delayed impact must not land.</returns>
+        public static bool IsCastInterrupted(StatusEffectController statusEffects, HealthComponent ownHealth)
         {
-            yield return new WaitForSeconds(seconds);
+            if (ownHealth != null && ownHealth.IsDead)
+            {
+                return true;
+            }
+
+            return statusEffects != null && (statusEffects.IsStunned || statusEffects.IsFrozen || statusEffects.IsPetrified);
+        }
+
+        private IEnumerator RunAfterDelay(SkillDefinition skill, System.Action action)
+        {
+            yield return new WaitForSeconds(skill.ImpactDelaySeconds);
+
+            if (IsCastInterrupted(StatusEffects, OwnHealth))
+            {
+                CombatLog.Write($"{Transform.root.name}'s {skill.name} was interrupted before it landed.");
+                yield break;
+            }
+
+            CombatLog.Write($"{skill.name}: impact landed after {skill.ImpactDelaySeconds:0.##}s.");
             action();
         }
     }

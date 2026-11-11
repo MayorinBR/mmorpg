@@ -166,7 +166,7 @@ namespace Project.UI
 
             if (manaCostText != null)
             {
-                manaCostText.text = skill.EffectType == SkillEffectType.Passive ? "Passive" : $"{skill.ManaCost} SP";
+                manaCostText.text = skill.EffectType == SkillEffectType.Passive ? "Passive" : $"{skill.GetManaCost(Mathf.Max(1, book.GetLevel(skill)))} SP";
             }
 
             if (cooldownText != null)
