@@ -46,6 +46,8 @@ namespace Project.Skills
         Cleanse,
         Displacement,
         ToggleDrain,
-        Craft
+        Craft,
+        Teleport,
+        WarpPortal
     }
 }

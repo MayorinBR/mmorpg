@@ -23,6 +23,8 @@ namespace Project.Skills
         [SerializeField] private SkillTargetType targetType;
         [SerializeField] private int maxLevel = 5;
         [SerializeField] private int manaCost = 10;
+        [Tooltip("SP added to the base cost for every level above the first. Zero keeps the cost flat.")]
+        [SerializeField] private int manaCostPerLevel;
         [SerializeField] private float cooldownSeconds = 2f;
         [SerializeField] private float range = 3f;
 
@@ -169,6 +171,14 @@ namespace Project.Skills
 
         [Header("Heal (only used if Effect Type is Heal)")]
         [SerializeField] private int healAmount = 10;
+        [Tooltip("Divisor of (Base Level + INT) for a stat-scaled heal. Zero keeps the flat Heal Amount.")]
+        [SerializeField] private int healStatDivisor;
+        [Tooltip("Heal factor at skill level 0 for a stat-scaled heal.")]
+        [SerializeField] private int healFactorBase;
+        [Tooltip("Heal factor added per skill level for a stat-scaled heal.")]
+        [SerializeField] private int healFactorPerLevel;
+        [Tooltip("When on, the caster's Status MATK is added to the stat-scaled heal.")]
+        [SerializeField] private bool healAddsMatk;
 
         [Header("Buff/Debuff (only used if Effect Type is Buff)")]
         [Tooltip("Attack power multiplier bonus per skill level, e.g. Provoke's +32% at this project's max level.")]
@@ -197,6 +207,8 @@ namespace Project.Skills
 
         [Tooltip("Flat bonus to STR/AGI/VIT/INT/DEX/LUK per skill level, e.g. Blessing's flat STR/DEX/INT. Zero stats for a buff without a stat component.")]
         [SerializeField] private StatModifiers buffStatBonusPerLevel;
+        [Tooltip("Flat stat bonus granted at every level, added before the per-level bonus. Used when a wiki table starts above +1.")]
+        [SerializeField] private StatModifiers buffStatBonusBase;
 
         [Tooltip("Attack speed multiplier bonus per skill level, e.g. Increase AGI's ASPD% component.")]
         [SerializeField] private float buffAspdPercentPerLevel;
@@ -299,6 +311,17 @@ namespace Project.Skills
 
         /// <summary>Gets the mana cost to cast this skill, regardless of its level.</summary>
         public int ManaCost => manaCost;
+
+        /// <summary>
+        /// Gets the SP this skill costs to cast at the given level: the base cost plus the per-level increase for every
+        /// level above the first.
+        /// </summary>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The SP cost.</returns>
+        public int GetManaCost(int skillLevel)
+        {
+            return manaCost + manaCostPerLevel * Mathf.Max(0, skillLevel - 1);
+        }
 
         /// <summary>Gets the fraction of each hit that the caster's attacks add as defense-ignoring Fire damage after a cast, for <see cref="GetBuffDuration"/> seconds. Zero for skills without one.</summary>
         public float SelfFireDamageBonusPercent => selfFireDamageBonusPercent;
@@ -491,10 +514,43 @@ namespace Project.Skills
         }
 
         /// <summary>
-        /// Gets this skill's heal amount. Currently a flat value regardless
-        /// of level; scaling with the caster's INT is a planned future
-        /// refinement. Only meaningful when <see cref="EffectType"/> is Heal.
+        /// Gets this skill's heal amount without the caster's MATK. Only meaningful when <see cref="EffectType"/> is Heal.
         /// </summary>
+        /// <param name="baseLevel">The caster's Base Level.</param>
+        /// <param name="intelligence">The caster's effective INT.</param>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <returns>The calculated heal amount.</returns>
+        public int CalculateHeal(int baseLevel, int intelligence, int skillLevel)
+        {
+            return CalculateHeal(baseLevel, intelligence, skillLevel, 0);
+        }
+
+        /// <summary>
+        /// Gets this skill's heal amount: <c>floor((Base Level + INT) / divisor) * (base + perLevel * skill level)</c>,
+        /// plus the caster's Status MATK when <c>Heal Adds Matk</c> is on. A divisor of zero keeps the flat Heal Amount.
+        /// Only meaningful when <see cref="EffectType"/> is Heal.
+        /// </summary>
+        /// <param name="baseLevel">The caster's Base Level.</param>
+        /// <param name="intelligence">The caster's effective INT.</param>
+        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
+        /// <param name="statusMatk">The caster's current Status MATK.</param>
+        /// <returns>The calculated heal amount.</returns>
+        public int CalculateHeal(int baseLevel, int intelligence, int skillLevel, int statusMatk)
+        {
+            if (healStatDivisor <= 0)
+            {
+                return healAmount;
+            }
+
+            var scaled = (baseLevel + intelligence) / healStatDivisor * (healFactorBase + healFactorPerLevel * skillLevel);
+            return healAddsMatk ? scaled + statusMatk : scaled;
+        }
+
+        /// <summary>
+        /// Gets this skill's flat heal amount, ignoring the caster's stats. Prefer the overload that takes the
+        /// caster's Base Level, INT and the skill level.
+        /// </summary>
+        /// <returns>The flat heal amount.</returns>
         public int CalculateHeal()
         {
             return healAmount;
@@ -745,7 +801,7 @@ namespace Project.Skills
         /// <returns>The calculated bonus. Zero stats for a buff without a stat component.</returns>
         public StatModifiers GetBuffStatBonus(int skillLevel)
         {
-            return buffStatBonusPerLevel * skillLevel;
+            return buffStatBonusBase + buffStatBonusPerLevel * skillLevel;
         }
 
         /// <summary>

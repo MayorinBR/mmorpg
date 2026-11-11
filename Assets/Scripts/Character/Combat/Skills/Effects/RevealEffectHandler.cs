@@ -15,7 +15,7 @@ namespace Project.Character.Combat
         /// <inheritdoc />
         public bool TryCast(SkillCastContext context, SkillDefinition skill, int level)
         {
-            if (!context.Mana.TryConsumeMana(skill.ManaCost))
+            if (!context.Mana.TryConsumeMana(skill.GetManaCost(level)))
             {
                 return false;
             }

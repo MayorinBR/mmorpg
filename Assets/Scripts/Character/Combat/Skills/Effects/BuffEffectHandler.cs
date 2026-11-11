@@ -31,9 +31,9 @@ namespace Project.Character.Combat
                 return false;
             }
 
-            if (!context.Mana.TryConsumeMana(skill.ManaCost))
+            if (!context.Mana.TryConsumeMana(skill.GetManaCost(level)))
             {
-                CombatLog.Write($"{skill.SkillName}: not enough mana ({skill.ManaCost} needed).");
+                CombatLog.Write($"{skill.SkillName}: not enough mana ({skill.GetManaCost(level)} needed).");
                 return false;
             }
 
@@ -109,7 +109,7 @@ namespace Project.Character.Combat
         /// </summary>
         private static bool TryCastAreaDebuff(SkillCastContext context, SkillDefinition skill, int level)
         {
-            if (!context.Mana.TryConsumeMana(skill.ManaCost))
+            if (!context.Mana.TryConsumeMana(skill.GetManaCost(level)))
             {
                 return false;
             }

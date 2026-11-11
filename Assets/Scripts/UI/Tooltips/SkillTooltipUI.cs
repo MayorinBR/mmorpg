@@ -74,7 +74,7 @@ namespace Project.UI
         private static string FormatCost(SkillDefinition skill, int skillLevel)
         {
             var healthCost = skill.GetHealthCost(skillLevel);
-            return healthCost > 0 ? $"{skill.ManaCost} SP / {healthCost} HP" : $"{skill.ManaCost} SP";
+            return healthCost > 0 ? $"{skill.GetManaCost(skillLevel)} SP / {healthCost} HP" : $"{skill.GetManaCost(skillLevel)} SP";
         }
 
         /// <summary>Hides the tooltip.</summary>

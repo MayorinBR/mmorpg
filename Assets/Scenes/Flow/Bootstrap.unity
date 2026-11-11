@@ -15900,6 +15900,8 @@ MonoBehaviour:
   spawnOffset: {x: 0, y: 2, z: 0}
   horizontalJitter: 0.3
   regenController: {fileID: 0}
+  statusEffects: {fileID: 0}
+  statusPopupHeight: 0.6
 --- !u!1 &1375287689
 GameObject:
   m_ObjectHideFlags: 0
@@ -22344,6 +22346,7 @@ GameObject:
   - component: {fileID: 1928213989}
   - component: {fileID: 1928213988}
   - component: {fileID: 1928213990}
+  - component: {fileID: 1928213991}
   m_Layer: 7
   m_Name: SkillTargeting
   m_TagString: Untagged
@@ -22435,6 +22438,18 @@ MonoBehaviour:
   size: {x: 100, y: 8}
   backgroundColor: {r: 0, g: 0, b: 0, a: 0.75}
   fillColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &1928213991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1928213986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31a22cebeec3e3a4aa68423ea23547fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Character.Combat::Project.Character.Combat.PlayerTravelPoints
 --- !u!1 &1948768125
 GameObject:
   m_ObjectHideFlags: 0

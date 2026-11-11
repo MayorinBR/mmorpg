@@ -45,6 +45,31 @@ namespace Project.Skills.Tests
             Assert.AreEqual(150, skill.CalculateDamage(100, 0, 3));
         }
 
+        [TestCase(1, 48)]
+        [TestCase(5, 240)]
+        [TestCase(10, 480)]
+        public void CalculateHeal_ScalesWithBaseLevelPlusIntAndSkillLevel(int level, int expected)
+        {
+            SetField("healStatDivisor", 5);
+            SetField("healFactorBase", 0);
+            SetField("healFactorPerLevel", 3);
+
+            Assert.AreEqual(expected, skill.CalculateHeal(50, 30, level, 0));
+        }
+
+        [Test]
+        public void CalculateHeal_AddsMatkOnlyWhenEnabled()
+        {
+            SetField("healStatDivisor", 5);
+            SetField("healFactorPerLevel", 3);
+
+            Assert.AreEqual(48, skill.CalculateHeal(50, 30, 1, 20));
+
+            SetField("healAddsMatk", true);
+
+            Assert.AreEqual(68, skill.CalculateHeal(50, 30, 1, 20));
+        }
+
         [TestCase(1, 20)]
         [TestCase(2, 20)]
         [TestCase(3, 19)]

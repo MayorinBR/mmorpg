@@ -122,6 +122,29 @@ namespace Project.UI
             BuildOptions(options.Select(option => (option.OptionText, (Action)(() => HandleOptionClicked(option)))));
         }
 
+        /// <summary>
+        /// Opens this window with a question and a list of options that are not tied to an NPC. Picking an
+        /// option closes the window, then invokes that option's action.
+        /// </summary>
+        /// <param name="line">The question shown above the options.</param>
+        /// <param name="options">The options to offer.</param>
+        public void ShowChoices(string line, IReadOnlyList<ChoiceOption> options)
+        {
+            currentNpc = null;
+            gameObject.SetActive(true);
+
+            if (portraitImage != null)
+            {
+                portraitImage.gameObject.SetActive(false);
+            }
+
+            ShowDynamic(line, options.Select(option => (option.Label, (Action)(() =>
+            {
+                Close();
+                option.OnSelected();
+            }))).ToArray());
+        }
+
         /// <summary>Closes this window, if open.</summary>
         public void Close()
         {

@@ -62,7 +62,7 @@ namespace Project.Character.Combat
         /// <returns>True when every resource the skill consumes is available.</returns>
         public static bool MeetsResourceRequirement(SkillCastContext context, SkillDefinition skill)
         {
-            if (context.Mana.CurrentMana < skill.ManaCost)
+            if (context.Mana.CurrentMana < skill.GetManaCost(context.SkillBook.GetLevel(skill)))
             {
                 PlayerFeedbackChannel.Publish($"Not enough SP to cast {skill.SkillName}.");
                 return false;

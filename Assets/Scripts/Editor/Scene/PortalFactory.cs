@@ -41,6 +41,7 @@ namespace Project.EditorTools
                 {
                     serialized.FindProperty("destinationSceneName").stringValue = destinationScene;
                     serialized.FindProperty("destinationSpawnPointId").stringValue = destinationSpawnId;
+                    serialized.FindProperty("destinationScene").objectReferenceValue = null;
                 });
 
             ConfigureArrivalPoint(portal, arrivalSpawnId, arrivalOffsetX);
@@ -51,7 +52,11 @@ namespace Project.EditorTools
         private static void ConfigureArrivalPoint(GameObject portal, string arrivalSpawnId, float offsetX)
         {
             var arrival = portal.GetComponentInChildren(EditorReflection.FindType(SpawnPointTypeName), true);
-            EditorReflection.Set(arrival, serialized => serialized.FindProperty("spawnPointId").stringValue = arrivalSpawnId);
+            EditorReflection.Set(arrival, serialized =>
+            {
+                serialized.FindProperty("spawnPointId").stringValue = arrivalSpawnId;
+                serialized.FindProperty("fromScene").objectReferenceValue = null;
+            });
             arrival.gameObject.name = $"SpawnPoint_{arrivalSpawnId}";
 
             var local = arrival.transform.localPosition;

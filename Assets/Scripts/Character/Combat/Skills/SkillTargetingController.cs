@@ -226,8 +226,12 @@ namespace Project.Character.Combat
                 var skill = queuedSkill;
                 SetQueuedSkill(null);
                 movement?.StopMovement();
-                var cast = caster.TryCastSkill(skill);
-                CombatLog.Write($"{skill.SkillName}: in range, cast {(cast ? "started" : "refused")}.");
+                CombatLog.Write($"{skill.SkillName}: in range, trying to cast.");
+
+                if (!caster.TryCastSkill(skill))
+                {
+                    CombatLog.Write($"{skill.SkillName}: cast refused.");
+                }
                 return;
             }
 

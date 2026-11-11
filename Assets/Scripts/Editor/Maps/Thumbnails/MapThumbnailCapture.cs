@@ -149,7 +149,10 @@ namespace Project.EditorTools
 
             var target = RenderTexture.GetTemporary(Resolution, Resolution, 24);
             camera.targetTexture = target;
+            var previousFog = RenderSettings.fog;
+            RenderSettings.fog = false;
             camera.Render();
+            RenderSettings.fog = previousFog;
 
             var previousActive = RenderTexture.active;
             RenderTexture.active = target;

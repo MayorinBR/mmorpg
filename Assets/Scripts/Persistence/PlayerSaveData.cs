@@ -166,6 +166,33 @@ namespace Project.Persistence
         /// <summary>World-space Z of the player on <see cref="currentMapId"/> when this save was captured.</summary>
         public float positionZ;
 
+        /// <summary>Whether a save point has been set; <see cref="savePointMapId"/> and the <c>savePoint</c> position are only meaningful when true.</summary>
+        public bool hasSavePoint;
+
+        /// <summary>Id (scene name) of the map holding the save point.</summary>
+        public string savePointMapId = "";
+
+        /// <summary>World-space X of the save point.</summary>
+        public float savePointX;
+
+        /// <summary>World-space Y of the save point.</summary>
+        public float savePointY;
+
+        /// <summary>World-space Z of the save point.</summary>
+        public float savePointZ;
+
+        /// <summary>Id (scene name) of the map of each memorized location, parallel to the other <c>memo*</c> lists.</summary>
+        public List<string> memoMapIds = new List<string>();
+
+        /// <summary>World-space X of each memorized location, parallel to <see cref="memoMapIds"/>.</summary>
+        public List<float> memoX = new List<float>();
+
+        /// <summary>World-space Y of each memorized location, parallel to <see cref="memoMapIds"/>.</summary>
+        public List<float> memoY = new List<float>();
+
+        /// <summary>World-space Z of each memorized location, parallel to <see cref="memoMapIds"/>.</summary>
+        public List<float> memoZ = new List<float>();
+
         /// <summary>Id (asset name) of each currently accepted, not-yet-completed quest, parallel to <see cref="activeQuestProgress"/>.</summary>
         public List<string> activeQuestIds = new List<string>();
 
