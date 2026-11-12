@@ -49,6 +49,14 @@ namespace Project.Character.Combat
             {
                 options.Add(new ChoiceOption($"Memorize this location ({points.MemoCount}/{PlayerTravelPoints.MaxMemos}).", () => MemorizeAndReopen(context, skill, level, position, points)));
             }
+            else
+            {
+                for (var i = 0; i < points.MemoCount; i++)
+                {
+                    var slot = i;
+                    options.Add(new ChoiceOption($"Overwrite Memo {slot + 1} with this location.", () => OverwriteAndReopen(context, skill, level, position, points, slot)));
+                }
+            }
 
             options.Add(new ChoiceOption("Cancel.", () => { }));
             var line = options.Count > 2 ? "Choose the portal's destination." : "No destination is available yet.";
@@ -58,6 +66,12 @@ namespace Project.Character.Combat
         private static void MemorizeAndReopen(SkillCastContext context, SkillDefinition skill, int level, Vector3 position, PlayerTravelPoints points)
         {
             points.TryAddMemo(SkillTravel.Service.CurrentSceneName, context.Transform.position);
+            ShowMenu(context, skill, level, position, points);
+        }
+
+        private static void OverwriteAndReopen(SkillCastContext context, SkillDefinition skill, int level, Vector3 position, PlayerTravelPoints points, int slot)
+        {
+            points.TryReplaceMemo(slot, SkillTravel.Service.CurrentSceneName, context.Transform.position);
             ShowMenu(context, skill, level, position, points);
         }
 

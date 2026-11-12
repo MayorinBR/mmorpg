@@ -14,11 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Items::Project.Items.ItemDefinition
   itemName: Antidote
   description: Cures Poison instantly.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 1e16aba59a551fc4fafc78f4f54a2dcb, type: 3}
+  dropIconCategory: 0
   isStackable: 1
   maxStackSize: 99
   itemType: 0
-  requiredSlots:
+  requiredSlots: 
   statBonuses:
     strength: 0
     agility: 0
@@ -27,11 +28,16 @@ MonoBehaviour:
     dexterity: 0
     luck: 0
   requiredLevel: 1
-  allowedClasses:
+  allowedClasses: 
   weight: 0.5
   canBeOffHand: 0
   weaponType: 0
+  weaponSubtype: 0
   attackRange: 1.5
+  weaponAttack: 0
+  weaponMagicAttack: 0
+  weaponMagicDefense: 0
+  attackSpeedMultiplier: 1
   buyPrice: 80
   sellPrice: 20
   consumableEffectType: 0
@@ -40,3 +46,6 @@ MonoBehaviour:
   effectDurationSeconds: 1
   tickIntervalSeconds: 1
   curesPoison: 1
+  equippedModel: {fileID: 0}
+  equippedModelFemale: {fileID: 0}
+  hidesHair: 0

@@ -335,7 +335,7 @@ namespace Project.Character.Combat
                 SkillAnnouncementChannel.Announce(skill.SkillName, transform.position);
                 Context.Visuals.PlayWeaponVfx(skill);
 
-                if (skill.TargetType == SkillTargetType.Self)
+                if (PlaysImpactAtCaster(skill))
                 {
                     SkillVfx.Spawn(skill.ImpactVfxPrefab, transform.position);
                 }
@@ -346,6 +346,19 @@ namespace Project.Character.Combat
             }
 
             return cast;
+        }
+
+        /// <summary>
+        /// Checks whether a skill's impact effect plays on the caster: self skills, ally skills (which resolve to
+        /// the caster) and non-damage skills that act around the caster. Damage skills play theirs on the target.
+        /// </summary>
+        /// <param name="skill">The skill that was just cast.</param>
+        /// <returns>True if the impact effect spawns at the caster.</returns>
+        private static bool PlaysImpactAtCaster(SkillDefinition skill)
+        {
+            return skill.TargetType == SkillTargetType.Self
+                || skill.TargetType == SkillTargetType.Ally
+                || (skill.TargetType == SkillTargetType.AreaAroundCaster && skill.EffectType != SkillEffectType.Damage);
         }
 
         /// <summary>

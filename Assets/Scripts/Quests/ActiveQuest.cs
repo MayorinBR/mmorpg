@@ -38,6 +38,18 @@ namespace Project.Quests
             }
         }
 
+        /// <summary>
+        /// Gets whether every objective is done but the player has not yet
+        /// turned the quest in to claim its reward.
+        /// </summary>
+        public bool IsReadyToTurnIn { get; private set; }
+
+        /// <summary>Marks the objectives as done, leaving the quest waiting to be turned in.</summary>
+        public void MarkReadyToTurnIn()
+        {
+            IsReadyToTurnIn = true;
+        }
+
         /// <summary>Gets whether every requirement has reached its required count.</summary>
         public bool IsComplete
         {

@@ -54,6 +54,7 @@ namespace Project.Character.Combat
                 context.Currency.TrySpend(skill.ZenyCost);
             }
 
+            SkillDamageResolver.LogBaseDamage(context, skill, level);
             context.Visuals.PlayProjectileVisual(skill, selector.CurrentTarget);
 
             if (skill.IsAreaOfEffect)
@@ -89,6 +90,8 @@ namespace Project.Character.Combat
             {
                 context.OwnHealth.TrySpendHealth(healthCost);
             }
+
+            SkillDamageResolver.LogBaseDamage(context, skill, level);
 
             context.RunAfterImpactDelay(skill, () =>
             {

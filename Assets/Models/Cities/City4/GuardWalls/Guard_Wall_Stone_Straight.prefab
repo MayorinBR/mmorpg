@@ -41,7 +41,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6472850258668258021}
-  m_Mesh: {fileID: -3041271225095919226}
+  m_Mesh: {fileID: -8998842109641085068}
 --- !u!23 &5024332247307776976
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -70,7 +70,6 @@ MeshRenderer:
   - {fileID: 2100000, guid: eca39675534ea5043a14eaae9534814c, type: 2}
   - {fileID: 2100000, guid: 3bfa22b6c2c7c454a93bb1da8b6b9ba9, type: 2}
   - {fileID: 2100000, guid: efe92ba6af526fd40ba4f2d1bbf63051, type: 2}
-  - {fileID: 2100000, guid: 48328e76a46dbd7439820ecf97e51c5e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -115,7 +114,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4, y: 1, z: 0.62}
   m_Center: {x: 0, y: 0.5, z: 0}
---- !u!43 &-3041271225095919226
+--- !u!43 &-8998842109641085068
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -146,24 +145,14 @@ Mesh:
       m_Extent: {x: 1.49, y: 0.29198396, z: 0.23}
   - serializedVersion: 2
     firstByte: 720
-    indexCount: 36
+    indexCount: 72
     topology: 0
     baseVertex: 0
     firstVertex: 180
-    vertexCount: 36
+    vertexCount: 72
     localAABB:
-      m_Center: {x: 0, y: 0.93, z: 0}
-      m_Extent: {x: 2.02, y: 0.060000002, z: 0.3}
-  - serializedVersion: 2
-    firstByte: 864
-    indexCount: 36
-    topology: 0
-    baseVertex: 0
-    firstVertex: 216
-    vertexCount: 36
-    localAABB:
-      m_Center: {x: 0, y: 1, z: 0}
-      m_Extent: {x: 1.95, y: 0.024999976, z: 0.22}
+      m_Center: {x: 0, y: 0.9475, z: 0}
+      m_Extent: {x: 2.02, y: 0.077499986, z: 0.3}
   m_Shapes:
     vertices: []
     shapes: []
@@ -318,11 +307,6 @@ Mesh:
       m_LodBias: 0
     m_NumLevels: 1
     m_SubMeshes:
-    - serializedVersion: 2
-      m_Levels:
-      - serializedVersion: 1
-        m_IndexStart: 0
-        m_IndexCount: 0
     - serializedVersion: 2
       m_Levels:
       - serializedVersion: 1

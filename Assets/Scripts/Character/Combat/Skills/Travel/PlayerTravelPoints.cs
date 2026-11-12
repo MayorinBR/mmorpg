@@ -64,6 +64,24 @@ namespace Project.Character.Combat
         }
 
         /// <summary>
+        /// Overwrites an already memorized location.
+        /// </summary>
+        /// <param name="index">The zero-based memo slot to replace.</param>
+        /// <param name="sceneName">The scene of the new location.</param>
+        /// <param name="position">The world position of the new location.</param>
+        /// <returns>True if the slot existed and was replaced; false when the index is out of range.</returns>
+        public bool TryReplaceMemo(int index, string sceneName, Vector3 position)
+        {
+            if (index < 0 || index >= memos.Count)
+            {
+                return false;
+            }
+
+            memos[index] = new WarpDestination($"Memo {index + 1} ({sceneName})", sceneName, position);
+            return true;
+        }
+
+        /// <summary>
         /// Lists the destinations a skill of the given level can open, the save point first.
         /// </summary>
         /// <param name="limit">The most destinations the skill level allows.</param>
