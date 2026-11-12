@@ -26,10 +26,12 @@ namespace Project.Character.Combat
             if (undeadTarget != null)
             {
                 var damage = Mathf.Max(1, healAmount / 2);
+                CombatLog.Write($"{skill.SkillName} lv{level}: base damage {damage} (Holy, Undead target).");
                 undeadTarget.TakeDamage(damage, Element.Holy, DamageCategory.Magical, attacker: context.Transform);
                 return true;
             }
 
+            CombatLog.Write($"{skill.SkillName} lv{level}: base heal {healAmount}.");
             context.OwnHealth.Heal(healAmount);
             return true;
         }

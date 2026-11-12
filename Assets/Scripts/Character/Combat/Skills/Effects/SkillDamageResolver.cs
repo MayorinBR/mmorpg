@@ -14,6 +14,21 @@ namespace Project.Character.Combat
     public static class SkillDamageResolver
     {
         /// <summary>
+        /// Writes the skill's base damage to the combat log, before any target-specific modifier (race, size,
+        /// element, flee). Called when the cast is committed, so the value is logged even if the hit later
+        /// misses or no enemy is inside the area.
+        /// </summary>
+        /// <param name="context">The caster's collaborators.</param>
+        /// <param name="skill">The skill that was cast.</param>
+        /// <param name="level">The skill's current level.</param>
+        public static void LogBaseDamage(SkillCastContext context, SkillDefinition skill, int level)
+        {
+            var subStats = context.Stats.CurrentSubStats;
+            var damage = skill.CalculateDamage(subStats.StatusAtk, subStats.StatusMatk, level);
+            CombatLog.Write($"{skill.SkillName} lv{level}: base damage {damage} ({skill.Element}).");
+        }
+
+        /// <summary>
         /// Rolls the hit against a single target and applies the skill's damage, knockback and status procs.
         /// Skipped if the target was destroyed or died while the impact delay was running.
         /// </summary>
@@ -74,6 +89,8 @@ namespace Project.Character.Combat
                     target.NotifyDodged();
                 }
             }
+
+            CombatLog.Write($"{skill.SkillName}: {alreadyHit.Count} enemy(ies) inside the area.");
         }
 
         private static void ApplyHit(SkillCastContext context, SkillDefinition skill, int level, IDamageable target, Component targetComponent)

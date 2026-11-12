@@ -34,7 +34,14 @@ namespace Project.Quests
         /// <summary>Raised whenever a quest is accepted, its progress changes, or it completes.</summary>
         public event Action QuestsChanged;
 
-        /// <summary>Raised after a quest completes and its reward is granted, carrying the completed quest.</summary>
+        /// <summary>
+        /// Raised when a quest's objectives are all met, carrying the quest.
+        /// Raised for every quest, including those with no turn-in NPC, which
+        /// are turned in immediately afterwards.
+        /// </summary>
+        public event Action<QuestDefinition> QuestReadyToTurnIn;
+
+        /// <summary>Raised after a quest is turned in and its reward is granted, carrying the completed quest.</summary>
         public event Action<QuestDefinition> QuestCompleted;
 
         /// <summary>Gets every quest currently accepted and in progress.</summary>
@@ -169,7 +176,8 @@ namespace Project.Quests
 
             if (active.IsComplete)
             {
-                CompleteQuest(active);
+                // A restored quest was already announced in an earlier session.
+                MarkObjectivesMet(active, initialProgress == null);
             }
 
             QuestsChanged?.Invoke();
@@ -183,7 +191,7 @@ namespace Project.Quests
 
             if (active.IsComplete)
             {
-                CompleteQuest(active);
+                MarkObjectivesMet(active, true);
             }
             else
             {
@@ -192,9 +200,66 @@ namespace Project.Quests
             }
         }
 
-        private void CompleteQuest(ActiveQuest active)
+        /// <summary>
+        /// Called once every objective is met. Keeps the quest in the active
+        /// list, flagged as waiting to be turned in, so it stays in the quest
+        /// log until the player reports to the turn-in NPC. A quest with no
+        /// turn-in NPC is turned in right away.
+        /// </summary>
+        /// <param name="active">The quest whose objectives are all met.</param>
+        /// <param name="announce">Whether to tell the player; false when restoring a save.</param>
+        private void MarkObjectivesMet(ActiveQuest active, bool announce)
         {
             StopTracking(active);
+            active.MarkReadyToTurnIn();
+
+            var definition = active.Definition;
+
+            if (announce)
+            {
+                PlayerFeedbackChannel.Publish($"Objective complete: {definition.Title}");
+            }
+
+            QuestReadyToTurnIn?.Invoke(definition);
+
+            if (definition.TurnInDialogue == null)
+            {
+                TurnIn(active);
+                return;
+            }
+
+            QuestsChanged?.Invoke();
+        }
+
+        /// <summary>Gets whether the given quest has all its objectives met and is waiting to be turned in.</summary>
+        /// <param name="quest">The quest to check.</param>
+        public bool IsReadyToTurnIn(QuestDefinition quest) =>
+            activeQuests.Any(active => active.Definition == quest && active.IsReadyToTurnIn);
+
+        /// <summary>
+        /// Turns in a quest whose objectives are met, granting its reward and
+        /// moving it to the completed list. Called when the player picks the
+        /// turn-in option in the NPC's dialogue.
+        /// </summary>
+        /// <param name="quest">The quest to turn in.</param>
+        /// <returns>True if the quest was ready and has been turned in.</returns>
+        public bool TurnInQuest(QuestDefinition quest)
+        {
+            var active = activeQuests.FirstOrDefault(candidate => candidate.Definition == quest && candidate.IsReadyToTurnIn);
+
+            if (active == null)
+            {
+                return false;
+            }
+
+            TurnIn(active);
+            return true;
+        }
+
+        /// <summary>Grants the reward of a quest whose objectives are met and moves it to the completed list.</summary>
+        /// <param name="active">The quest being turned in.</param>
+        private void TurnIn(ActiveQuest active)
+        {
             activeQuests.Remove(active);
             completedQuests.Add(active.Definition);
 

@@ -16,6 +16,7 @@ namespace Project.UI
     {
         private const float LineHeight = 20f;
         private const float VerticalPadding = 6f;
+        private const int TurnInMessageLines = 2;
 
         private TMP_Text bodyText;
 
@@ -29,8 +30,7 @@ namespace Project.UI
         /// <param name="quest">The active quest this row displays.</param>
         public static QuestLogEntryUI Create(Transform parent, ActiveQuest quest)
         {
-            var requirements = quest.Definition.Requirements;
-            var lineCount = 1 + requirements.Count;
+            var lineCount = quest.IsReadyToTurnIn ? 1 + TurnInMessageLines : 1 + quest.Definition.Requirements.Count;
 
             var go = new GameObject("QuestLogEntry", typeof(RectTransform));
             var rect = (RectTransform)go.transform;
@@ -44,7 +44,7 @@ namespace Project.UI
             entry.bodyText = go.AddComponent<TextMeshProUGUI>();
             entry.bodyText.fontSize = 14;
             entry.bodyText.color = UiTheme.Ink;
-            entry.bodyText.textWrappingMode = TextWrappingModes.NoWrap;
+            entry.bodyText.textWrappingMode = TextWrappingModes.Normal;
 
             entry.Refresh(quest);
             return entry;
@@ -81,6 +81,12 @@ namespace Project.UI
         /// <param name="quest">The active quest this row displays.</param>
         public void Refresh(ActiveQuest quest)
         {
+            if (quest.IsReadyToTurnIn)
+            {
+                bodyText.text = $"{quest.Definition.Title}\nObjective complete. I should inform {quest.Definition.TurnInNpcName} about the mission to get my reward.";
+                return;
+            }
+
             var requirements = quest.Definition.Requirements;
             var lines = new string[1 + requirements.Count];
             lines[0] = quest.Definition.Title;

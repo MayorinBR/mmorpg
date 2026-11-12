@@ -18,7 +18,7 @@ namespace Project.Quests
         {
             if (questManager != null)
             {
-                questManager.QuestCompleted += HandleQuestCompleted;
+                questManager.QuestReadyToTurnIn += HandleQuestCompleted;
             }
         }
 
@@ -26,7 +26,7 @@ namespace Project.Quests
         {
             if (questManager != null)
             {
-                questManager.QuestCompleted -= HandleQuestCompleted;
+                questManager.QuestReadyToTurnIn -= HandleQuestCompleted;
             }
         }
 

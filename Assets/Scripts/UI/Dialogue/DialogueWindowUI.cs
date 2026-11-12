@@ -119,7 +119,37 @@ namespace Project.UI
             }
 
             var options = dialogue != null ? dialogue.Options : Array.Empty<NpcDialogueOption>();
-            BuildOptions(options.Select(option => (option.OptionText, (Action)(() => HandleOptionClicked(option)))));
+            BuildOptions(options
+                .Select(option => (option.OptionText, (Action)(() => HandleOptionClicked(option))))
+                .Concat(GetTurnInOptions(npc)));
+        }
+
+        /// <summary>
+        /// Builds one "Turn in" option per quest that is ready to be handed in
+        /// to this NPC. Class trials are skipped: the trial master turns them in
+        /// through the promotion conversation instead.
+        /// </summary>
+        /// <param name="npc">The NPC being talked to.</param>
+        /// <returns>The extra options to append to the NPC's own options.</returns>
+        private IEnumerable<(string text, Action onClick)> GetTurnInOptions(NpcDialogueController npc)
+        {
+            if (questManager == null || npc.Dialogue == null)
+            {
+                return Enumerable.Empty<(string, Action)>();
+            }
+
+            var promotion = npc.GetComponent<PromotionNpc>();
+
+            return questManager.ActiveQuests
+                .Where(active => active.IsReadyToTurnIn && active.Definition.TurnInDialogue == npc.Dialogue)
+                .Select(active => active.Definition)
+                .Where(quest => promotion == null || !promotion.Catalog.TryGetTargetClass(quest, out _))
+                .Select(quest => ($"Turn in: {quest.Title}", (Action)(() =>
+                {
+                    questManager.TurnInQuest(quest);
+                    Close();
+                })))
+                .ToArray();
         }
 
         /// <summary>
@@ -210,7 +240,7 @@ namespace Project.UI
         private void ShowPromotion(PromotionNpc npc)
         {
             var leave = ("Leave.", (Action)Close);
-            var completed = npc.Catalog.FindTrial(questManager.IsCompleted);
+            var completed = npc.Catalog.FindTrial(quest => questManager.IsReadyToTurnIn(quest) || questManager.IsCompleted(quest));
             var active = npc.Catalog.FindTrial(questManager.IsActive);
             var stage = ClassTrialRules.Resolve(
                 classController.CurrentClass == CharacterClass.Novice,
@@ -225,7 +255,7 @@ namespace Project.UI
                     break;
                 case ClassTrialStage.ClaimPromotion:
                     ShowDynamic($"You have completed the trial of the {completed.TargetClass}. Turn it in and your new path begins.",
-                        ("Turn in the trial.", () => ConfirmClass(completed.TargetClass)), leave);
+                        ("Turn in the trial.", () => ConfirmClass(completed)), leave);
                     break;
                 case ClassTrialStage.TrialActive:
                     ShowDynamic($"{active.Quest.Title}\n\n{active.Quest.Description}",
@@ -294,12 +324,13 @@ namespace Project.UI
         }
 
         /// <summary>
-        /// Evolves the player into the chosen class and closes the window.
+        /// Turns the completed trial in, then evolves the player into its class and closes the window.
         /// </summary>
-        /// <param name="target">The class to become.</param>
-        private void ConfirmClass(CharacterClass target)
+        /// <param name="trial">The trial being turned in.</param>
+        private void ConfirmClass(ClassTrial trial)
         {
-            classController.TryEvolve(target);
+            questManager.TurnInQuest(trial.Quest);
+            classController.TryEvolve(trial.TargetClass);
             Close();
         }
 

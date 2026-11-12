@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Project.Items;
+using Project.NPC;
 
 namespace Project.Quests
 {
@@ -23,6 +24,12 @@ namespace Project.Quests
         [SerializeField] private int rewardItemQuantity = 1;
         [SerializeField] private ItemDefinition grantItemOnAccept;
         [SerializeField] private int grantItemOnAcceptQuantity = 1;
+
+        [Tooltip("Optional. The NPC dialogue the player must open to turn this quest in once its objectives are done. Left empty, the quest completes and pays its reward the moment the objectives are met.")]
+        [SerializeField] private NpcDialogueDefinition turnInDialogue;
+
+        [Tooltip("Name of the NPC the quest log tells the player to report to. Only used when Turn In Dialogue is set.")]
+        [SerializeField] private string turnInNpcName;
 
         /// <summary>Gets the quest's display title, shown in the quest log and dialogue.</summary>
         public string Title => title;
@@ -56,5 +63,14 @@ namespace Project.Quests
 
         /// <summary>Gets the quantity of <see cref="GrantItemOnAccept"/> granted, when it isn't null.</summary>
         public int GrantItemOnAcceptQuantity => grantItemOnAcceptQuantity;
+
+        /// <summary>
+        /// Gets the dialogue of the NPC this quest must be turned in to, or null
+        /// when the quest completes as soon as its objectives are met.
+        /// </summary>
+        public NpcDialogueDefinition TurnInDialogue => turnInDialogue;
+
+        /// <summary>Gets the display name of the turn-in NPC, with a generic fallback when none is authored.</summary>
+        public string TurnInNpcName => string.IsNullOrWhiteSpace(turnInNpcName) ? "the quest giver" : turnInNpcName;
     }
 }

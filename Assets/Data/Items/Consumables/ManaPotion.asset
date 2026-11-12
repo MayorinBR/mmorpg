@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Items::Project.Items.ItemDefinition
   itemName: Mana Potion
   description: Restores a large amount of Mana instantly.
-  icon: {fileID: 1621884100, guid: 94d005860aec7034fb6eae4a4b450ffb, type: 3}
+  icon: {fileID: 21300000, guid: c1bb6e6e0fc6479418066dd65ab3de47, type: 3}
+  dropIconCategory: 0
   isStackable: 1
   maxStackSize: 99
   itemType: 0
@@ -31,7 +32,12 @@ MonoBehaviour:
   weight: 0.5
   canBeOffHand: 0
   weaponType: 0
+  weaponSubtype: 0
   attackRange: 1.5
+  weaponAttack: 0
+  weaponMagicAttack: 0
+  weaponMagicDefense: 0
+  attackSpeedMultiplier: 1
   buyPrice: 60
   sellPrice: 30
   consumableEffectType: 0
@@ -39,3 +45,7 @@ MonoBehaviour:
   manaRestore: 300
   effectDurationSeconds: 1
   tickIntervalSeconds: 1
+  curesPoison: 0
+  equippedModel: {fileID: 0}
+  equippedModelFemale: {fileID: 0}
+  hidesHair: 0

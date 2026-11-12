@@ -21,11 +21,14 @@ MonoBehaviour:
   targetType: 0
   maxLevel: 5
   manaCost: 10
+  manaCostPerLevel: 0
   cooldownSeconds: 2
   range: 3
   requiredLevel: 0
   zenyCost: 0
   requiredWeaponSubtypes: 
+  arrowVolleyStyle: 0
+  arrowAuraPrefab: {fileID: 0}
   ammoCost: 0
   bonusDamageRace: 0
   bonusDamageRaceMultiplier: 1
@@ -45,6 +48,7 @@ MonoBehaviour:
   inflictedStatusDurationPerLevel: 0
   poisonDamagePerTickPerLevel: 0
   successChancePerLevel: 0
+  successChanceBase: 0
   knockbackDistance: 0
   buffPreventsFlinch: 0
   immuneToUndeadAndBoss: 0
@@ -61,6 +65,7 @@ MonoBehaviour:
   passiveRaceDefenseBonusPerLevel: 0
   augmentsSkill: {fileID: 0}
   stunChancePerAugmentedLevel: 0
+  stunMinimumAugmentedLevel: 0
   stunDurationSeconds: 0
   passiveRegenFlatPerLevel: 0
   passiveRegenPercentOfMaxHealthPerLevel: 0
@@ -68,12 +73,26 @@ MonoBehaviour:
   passiveSpRegenMultiplierPerLevel: 0
   passiveRemovesMovementRegenPenalty: 0
   healAmount: 10
+  healStatDivisor: 0
+  healFactorBase: 0
+  healFactorPerLevel: 0
+  healAddsMatk: 0
   buffAtkPercentPerLevel: 0
+  buffAtkPercentBase: 0
+  buffDefPercentBase: 0
+  buffFlinchHitLimit: 0
   buffDefPercentPerLevel: 0
   buffMdefBonusPerLevel: 0
   buffDurationSeconds: 0
   buffDurationPerLevel: 0
   buffStatBonusPerLevel:
+    strength: 0
+    agility: 0
+    vitality: 0
+    intelligence: 0
+    dexterity: 0
+    luck: 0
+  buffStatBonusBase:
     strength: 0
     agility: 0
     vitality: 0
@@ -87,7 +106,11 @@ MonoBehaviour:
   variableCastSeconds: 0
   variableCastPerLevel: 0
   projectileVfxPrefab: {fileID: 0}
-  impactVfxPrefab: {fileID: 0}
+  impactVfxPrefab: {fileID: 5260158350856639532, guid: 070c7a30932e626479775fb578c05f71, type: 3}
+  weaponGlowVfxPrefab: {fileID: 0}
+  impactVfxAuthoredHeight: 0
+  usesAttackAnimation: 0
+  impactDelaySeconds: 0
   zonePrefab: {fileID: 0}
   zoneDurationSeconds: 15
   zoneDurationPerLevel: 0
