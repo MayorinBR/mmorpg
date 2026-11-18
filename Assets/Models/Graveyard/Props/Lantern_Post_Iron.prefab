@@ -109,6 +109,7 @@ GameObject:
   - component: {fileID: 3630557456287725708}
   - component: {fileID: 686245330939203349}
   - component: {fileID: 4252089368360227764}
+  - component: {fileID: 4645845203447815886}
   m_Layer: 0
   m_Name: Lantern_Post_Iron
   m_TagString: Untagged
@@ -211,6 +212,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.4, y: 3, z: 0.4}
   m_Center: {x: 0, y: 1.5, z: 0}
+--- !u!114 &4645845203447815886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9136258189604843677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6394063a898348a48b34c562884b1a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
+  lights: []
+  alwaysOn: 1
 --- !u!43 &-1790496594013406040
 Mesh:
   m_ObjectHideFlags: 0

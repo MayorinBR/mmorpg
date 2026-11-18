@@ -108,6 +108,7 @@ GameObject:
   - component: {fileID: 8284568266767683208}
   - component: {fileID: 2092439989133372955}
   - component: {fileID: 5568055061887643325}
+  - component: {fileID: 7821589330272967059}
   m_Layer: 0
   m_Name: Witch_Wall_Potion_Shelf
   m_TagString: Untagged
@@ -195,6 +196,20 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &7821589330272967059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3570167652649040358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6394063a898348a48b34c562884b1a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
+  lights: []
+  alwaysOn: 1
 --- !u!43 &-4326270137727083680
 Mesh:
   m_ObjectHideFlags: 0

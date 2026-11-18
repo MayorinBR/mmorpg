@@ -109,6 +109,7 @@ GameObject:
   - component: {fileID: 3003845103706541479}
   - component: {fileID: 4527971210827638580}
   - component: {fileID: 2414495371791464349}
+  - component: {fileID: 8918204086083816723}
   m_Layer: 0
   m_Name: Witch_Pumpkin_Set
   m_TagString: Untagged
@@ -215,6 +216,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2, y: 0.9, z: 1.4}
   m_Center: {x: 0.1, y: 0.45, z: 0.2}
+--- !u!114 &8918204086083816723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5700644958398321826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6394063a898348a48b34c562884b1a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
+  lights: []
+  alwaysOn: 1
 --- !u!43 &-3908516956464089533
 Mesh:
   m_ObjectHideFlags: 0

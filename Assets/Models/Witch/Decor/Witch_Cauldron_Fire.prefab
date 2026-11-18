@@ -109,6 +109,7 @@ GameObject:
   - component: {fileID: 4715290703952450089}
   - component: {fileID: 920635801295728469}
   - component: {fileID: 7967885958363873585}
+  - component: {fileID: 962429464109525363}
   m_Layer: 0
   m_Name: Witch_Cauldron_Fire
   m_TagString: Untagged
@@ -216,6 +217,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.6, y: 1.56, z: 1.6}
   m_Center: {x: 0, y: 0.78, z: 0}
+--- !u!114 &962429464109525363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4314256358989233154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6394063a898348a48b34c562884b1a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
+  lights: []
+  alwaysOn: 1
 --- !u!43 &3103801682258908959
 Mesh:
   m_ObjectHideFlags: 0

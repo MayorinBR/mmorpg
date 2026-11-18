@@ -208,6 +208,7 @@ GameObject:
   - component: {fileID: 1046487870967597423}
   - component: {fileID: 3465612479200881956}
   - component: {fileID: 1094703781911037938}
+  - component: {fileID: 3512959274322412615}
   m_Layer: 0
   m_Name: Bridge_Iron_Truss
   m_TagString: Untagged
@@ -266,7 +267,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 1a3c7565bc3ba5b4fa33938ce13d4d6a, type: 2}
-  - {fileID: 2100000, guid: 4544253d67449064a8501f990f85e914, type: 2}
+  - {fileID: 2100000, guid: 2fd41e43a3fe1e742ac9589415c917c0, type: 2}
   - {fileID: 2100000, guid: eca39675534ea5043a14eaae9534814c, type: 2}
   - {fileID: 2100000, guid: 4f830ff5443339847a076e6ec1fc6ecc, type: 2}
   - {fileID: 2100000, guid: 1258c4eeaf0cc4644a3db8dfaa8b40d9, type: 2}
@@ -356,6 +357,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.3, y: 2.4, z: 10}
   m_Center: {x: 1.75, y: 1.2, z: 0}
+--- !u!114 &3512959274322412615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6676825892858661536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6394063a898348a48b34c562884b1a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
+  lights: []
+  alwaysOn: 1
 --- !u!43 &-82366311883049095
 Mesh:
   m_ObjectHideFlags: 0

@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 9118388469268263460}
   - component: {fileID: 8058261966892398626}
   - component: {fileID: 6752244193705464401}
+  - component: {fileID: 507958620587249433}
   m_Layer: 0
   m_Name: Witch_Interior_Shell
   m_TagString: Untagged
@@ -227,6 +228,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.7, y: 3.6, z: 0.3}
   m_Center: {x: 2.65, y: 1.8, z: -3.5}
+--- !u!114 &507958620587249433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3974415005185380838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6394063a898348a48b34c562884b1a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
+  lights: []
+  alwaysOn: 1
 --- !u!1 &8108862674278836728
 GameObject:
   m_ObjectHideFlags: 0

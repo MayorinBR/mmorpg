@@ -109,6 +109,7 @@ GameObject:
   - component: {fileID: 7411088788256475495}
   - component: {fileID: 1683217775366324165}
   - component: {fileID: 2409057648347539217}
+  - component: {fileID: 4938417156791950497}
   m_Layer: 0
   m_Name: Lamp_Stone_Post
   m_TagString: Untagged
@@ -168,7 +169,7 @@ MeshRenderer:
   - {fileID: 2100000, guid: eca39675534ea5043a14eaae9534814c, type: 2}
   - {fileID: 2100000, guid: 3bfa22b6c2c7c454a93bb1da8b6b9ba9, type: 2}
   - {fileID: 2100000, guid: efe92ba6af526fd40ba4f2d1bbf63051, type: 2}
-  - {fileID: 2100000, guid: 4544253d67449064a8501f990f85e914, type: 2}
+  - {fileID: 2100000, guid: 2fd41e43a3fe1e742ac9589415c917c0, type: 2}
   - {fileID: 2100000, guid: 1258c4eeaf0cc4644a3db8dfaa8b40d9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -214,6 +215,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.9, y: 2, z: 0.9}
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &4938417156791950497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4563125762361748741}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6394063a898348a48b34c562884b1a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
+  lights: []
+  alwaysOn: 1
 --- !u!43 &5459997682418850422
 Mesh:
   m_ObjectHideFlags: 0

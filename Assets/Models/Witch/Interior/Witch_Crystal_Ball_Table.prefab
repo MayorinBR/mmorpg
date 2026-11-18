@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8404148627320895607}
   - component: {fileID: 1525349701663158094}
   - component: {fileID: 3313850994622866404}
+  - component: {fileID: 8755668884823256768}
   m_Layer: 0
   m_Name: Witch_Crystal_Ball_Table
   m_TagString: Untagged
@@ -117,6 +118,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.4, y: 1.5, z: 1.4}
   m_Center: {x: 0, y: 0.75, z: 0}
+--- !u!114 &8755668884823256768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1570855496343059633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6394063a898348a48b34c562884b1a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
+  lights: []
+  alwaysOn: 1
 --- !u!1 &4755488803999416241
 GameObject:
   m_ObjectHideFlags: 0

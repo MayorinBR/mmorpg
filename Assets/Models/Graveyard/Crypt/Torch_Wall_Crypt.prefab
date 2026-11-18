@@ -108,6 +108,7 @@ GameObject:
   - component: {fileID: 931926368281482503}
   - component: {fileID: 7828651194104556739}
   - component: {fileID: 1003777306066831987}
+  - component: {fileID: 7934148120025895661}
   m_Layer: 0
   m_Name: Torch_Wall_Crypt
   m_TagString: Untagged
@@ -191,6 +192,20 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &7934148120025895661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3282396743688427775}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6394063a898348a48b34c562884b1a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
+  lights: []
+  alwaysOn: 1
 --- !u!43 &-5386035292241101904
 Mesh:
   m_ObjectHideFlags: 0

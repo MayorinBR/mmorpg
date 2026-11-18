@@ -110,6 +110,7 @@ GameObject:
   - component: {fileID: 1690124686549324780}
   - component: {fileID: 3033276018829050342}
   - component: {fileID: 7779971121507207011}
+  - component: {fileID: 1969319798248378748}
   m_Layer: 0
   m_Name: Cemetery_Arch_Gate
   m_TagString: Untagged
@@ -237,6 +238,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.9, y: 3.6, z: 0.9}
   m_Center: {x: 1.9, y: 1.8, z: 0}
+--- !u!114 &1969319798248378748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3524281026294431533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6394063a898348a48b34c562884b1a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
+  lights: []
+  alwaysOn: 1
 --- !u!1 &4372716474504998773
 GameObject:
   m_ObjectHideFlags: 0

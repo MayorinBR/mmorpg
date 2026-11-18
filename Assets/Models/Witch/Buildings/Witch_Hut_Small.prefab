@@ -112,6 +112,7 @@ GameObject:
   - component: {fileID: 2487027283622346832}
   - component: {fileID: 7328616630584600816}
   - component: {fileID: 1021849106433840780}
+  - component: {fileID: 4079236110201488448}
   m_Layer: 0
   m_Name: Witch_Hut_Small
   m_TagString: Untagged
@@ -283,6 +284,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.75, y: 3.625, z: 3.75}
   m_Center: {x: 0, y: 1.8125, z: 0}
+--- !u!114 &4079236110201488448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4213271378315007640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6394063a898348a48b34c562884b1a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
+  lights: []
+  alwaysOn: 1
 --- !u!43 &-4130883237373594310
 Mesh:
   m_ObjectHideFlags: 0

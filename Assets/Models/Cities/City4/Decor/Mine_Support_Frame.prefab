@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8195573185074542395}
   - component: {fileID: 3750759462121550631}
   - component: {fileID: 6064865373983892285}
+  - component: {fileID: 3203427130648065472}
   m_Layer: 0
   m_Name: Mine_Support_Frame
   m_TagString: Untagged
@@ -70,7 +71,7 @@ MeshRenderer:
   m_Materials:
   - {fileID: 2100000, guid: 33cdd3837873ad042a686c2ab013f0db, type: 2}
   - {fileID: 2100000, guid: 0ebb4c05b4299664b9e6205484f92889, type: 2}
-  - {fileID: 2100000, guid: 4544253d67449064a8501f990f85e914, type: 2}
+  - {fileID: 2100000, guid: 2fd41e43a3fe1e742ac9589415c917c0, type: 2}
   - {fileID: 2100000, guid: 1258c4eeaf0cc4644a3db8dfaa8b40d9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -116,6 +117,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.2, y: 3.2, z: 2.33}
   m_Center: {x: 0, y: 1.6, z: -1}
+--- !u!114 &3203427130648065472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5688908860064343251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6394063a898348a48b34c562884b1a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
+  lights: []
+  alwaysOn: 1
 --- !u!1 &7839923888508153352
 GameObject:
   m_ObjectHideFlags: 0

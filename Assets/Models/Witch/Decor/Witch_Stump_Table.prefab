@@ -109,6 +109,7 @@ GameObject:
   - component: {fileID: 909448586885200525}
   - component: {fileID: 8211246714286862018}
   - component: {fileID: 4960618465279030195}
+  - component: {fileID: 1373613472106961561}
   m_Layer: 0
   m_Name: Witch_Stump_Table
   m_TagString: Untagged
@@ -223,6 +224,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.3, y: 1, z: 1.3}
   m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!114 &1373613472106961561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8459429448312579408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6394063a898348a48b34c562884b1a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
+  lights: []
+  alwaysOn: 1
 --- !u!43 &2041386832426746847
 Mesh:
   m_ObjectHideFlags: 0

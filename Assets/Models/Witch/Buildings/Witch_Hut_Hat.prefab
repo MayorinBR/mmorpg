@@ -116,6 +116,7 @@ GameObject:
   - component: {fileID: 8670098426404591826}
   - component: {fileID: 614674177540155125}
   - component: {fileID: 1107731802192244549}
+  - component: {fileID: 8683190157306901286}
   m_Layer: 0
   m_Name: Witch_Hut_Hat
   m_TagString: Untagged
@@ -374,6 +375,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.5, y: 3.45, z: 3.5}
   m_Center: {x: 3.6, y: 1.725, z: 0.5}
+--- !u!114 &8683190157306901286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2025503897394272064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6394063a898348a48b34c562884b1a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
+  lights: []
+  alwaysOn: 1
 --- !u!1 &3670285859376582951
 GameObject:
   m_ObjectHideFlags: 0

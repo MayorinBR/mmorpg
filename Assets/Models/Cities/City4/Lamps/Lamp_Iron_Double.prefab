@@ -109,6 +109,7 @@ GameObject:
   - component: {fileID: 6963260243621510065}
   - component: {fileID: 4105394920308310271}
   - component: {fileID: 5492402934605537307}
+  - component: {fileID: 4536717741486496698}
   m_Layer: 0
   m_Name: Lamp_Iron_Double
   m_TagString: Untagged
@@ -166,7 +167,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4544253d67449064a8501f990f85e914, type: 2}
+  - {fileID: 2100000, guid: 2fd41e43a3fe1e742ac9589415c917c0, type: 2}
   - {fileID: 2100000, guid: 1a3c7565bc3ba5b4fa33938ce13d4d6a, type: 2}
   - {fileID: 2100000, guid: 1258c4eeaf0cc4644a3db8dfaa8b40d9, type: 2}
   m_StaticBatchInfo:
@@ -213,6 +214,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5, y: 3.4, z: 0.5}
   m_Center: {x: 0, y: 1.7, z: 0}
+--- !u!114 &4536717741486496698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2124266239679168239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6394063a898348a48b34c562884b1a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
+  lights: []
+  alwaysOn: 1
 --- !u!1 &3854056665266641921
 GameObject:
   m_ObjectHideFlags: 0

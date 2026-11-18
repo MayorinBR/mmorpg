@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6547697429152806453}
   - component: {fileID: 3728667746173987299}
   - component: {fileID: 8799142039792488952}
+  - component: {fileID: 1260037189388919635}
   m_Layer: 0
   m_Name: Mausoleum_Small
   m_TagString: Untagged
@@ -118,6 +119,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4.4, y: 3.8, z: 4.4}
   m_Center: {x: 0, y: 1.9, z: 0}
+--- !u!114 &1260037189388919635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6116340674404521156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6394063a898348a48b34c562884b1a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
+  lights: []
+  alwaysOn: 1
 --- !u!1 &9110711322808018610
 GameObject:
   m_ObjectHideFlags: 0

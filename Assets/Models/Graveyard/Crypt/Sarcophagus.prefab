@@ -109,6 +109,7 @@ GameObject:
   - component: {fileID: 2828076277679399673}
   - component: {fileID: 4418620218563590529}
   - component: {fileID: 5870138681430556986}
+  - component: {fileID: 4009412963818043406}
   m_Layer: 0
   m_Name: Sarcophagus
   m_TagString: Untagged
@@ -213,6 +214,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.6, y: 0.9, z: 2.8}
   m_Center: {x: 0, y: 0.45, z: 0}
+--- !u!114 &4009412963818043406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8679357986192770126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6394063a898348a48b34c562884b1a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
+  lights: []
+  alwaysOn: 1
 --- !u!43 &7960770166994789450
 Mesh:
   m_ObjectHideFlags: 0
