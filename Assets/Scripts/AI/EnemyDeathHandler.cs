@@ -198,6 +198,7 @@ namespace Project.AI
             health.ResetHealth();
             controller.PlayerTarget = null;
             controller.RememberedAggressor = null;
+            controller.ResetSteal();
             controller.ChangeState(new EnemyWanderState());
         }
 

@@ -55,6 +55,7 @@ namespace Project.Character.Combat
             registry.Register(SkillEffectType.Displacement, new DisplacementEffectHandler());
             registry.Register(SkillEffectType.Craft, new CraftEffectHandler());
             registry.Register(SkillEffectType.Teleport, new TeleportEffectHandler());
+            registry.Register(SkillEffectType.Steal, new StealEffectHandler());
             return registry;
         }
     }

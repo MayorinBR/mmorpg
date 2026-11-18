@@ -16,6 +16,7 @@ namespace Project.EditorTools.Maps.World
         private const string SceneFolder = "Assets/Scenes/Maps";
         private const string DataFolder = "Assets/Terrains/Maps/World";
         private const string EnvironmentFolder = "Assets/Models/Environment";
+        private const string DungeonEntranceFolder = "Assets/Models/Dungeons/Entrances";
         private const string PropPrefix = "W_";
         private const string WaterRoot = "WorldWater";
         private const string NavBlockRoot = "WorldNavBlocks";
@@ -39,7 +40,7 @@ namespace Project.EditorTools.Maps.World
         public WorldSceneBuilder(WorldBuildData world)
         {
             this.world = world;
-            library = new PrefabLibrary(EnvironmentFolder);
+            library = new PrefabLibrary(EnvironmentFolder, DungeonEntranceFolder);
         }
 
         /// <summary>Builds or updates the scene of one map and saves it.</summary>

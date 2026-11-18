@@ -13,20 +13,117 @@ MonoBehaviour:
   m_Name: StoneFling
   m_EditorClassIdentifier: Project.Skills::Project.Skills.SkillDefinition
   skillName: Stone Fling
-  description: Flings a stone at a single target, dealing low Neutral-element physical damage, with a chance to stun the target. Real Ragnarok Online's fixed, stat-independent damage and 5% stun-or-blind roll aren't modeled here — approximated as a small ATK-scaled hit with a stun-only chance.
-  icon: {fileID: 0}
+  description: Throws a stone at the target, consuming one Stone (see Find Stone).
+    Has a chance to stun.
+  icon: {fileID: 21300000, guid: 8f5cbca35be1e0448a0ca0774aea4e4c, type: 3}
   allowedClasses: 04000000
   effectType: 0
   targetType: 2
   maxLevel: 1
   manaCost: 2
+  manaCostPerLevel: 0
   cooldownSeconds: 2
   range: 7
-  requiredJobLevel: 15
+  requiredLevel: 0
+  zenyCost: 0
+  requiredWeaponSubtypes: 
+  arrowVolleyStyle: 0
+  arrowAuraPrefab: {fileID: 0}
+  ammoCost: 0
+  bonusDamageRace: 0
+  bonusDamageRaceMultiplier: 1
+  buffRevealsHidden: 0
   damageType: 0
   damageMultiplierPerLevel: 0.5
+  damageBaseMultiplier: 0
+  healthCost: 0
+  healthCostReductionPerTwoLevels: 0
+  selfFireDamageBonusPercent: 0
+  element: 5
+  accuracyBonusPerLevel: 0
+  isAreaOfEffect: 0
+  areaRadius: 3
   inflictedStatus: 1
   inflictedStatusDurationSeconds: 3
   inflictedStatusDurationPerLevel: 0
+  poisonDamagePerTickPerLevel: 0
   successChancePerLevel: 0.05
+  successChanceBase: 0
+  knockbackDistance: 0
+  buffPreventsFlinch: 0
+  immuneToUndeadAndBoss: 0
+  requiredJobLevel: 15
+  prerequisites: []
+  passiveAttackBonusPerLevel: 0
+  passiveRequiredWeaponSubtypes: 
+  passiveDexBonusPerLevel: 0
+  passiveHitBonusPerLevel: 0
+  passiveRangeBonusPerLevel: 0
+  passiveFleeBonusPerLevel: 0
+  passiveDoubleAttackChancePerLevel: 0
+  passiveWeightLimitBonusPerLevel: 0
+  passiveRaceDamageBonusPerLevel: 0
+  passiveRaceDefenseBonusPerLevel: 0
+  augmentsSkill: {fileID: 0}
+  stunChancePerAugmentedLevel: 0
+  stunMinimumAugmentedLevel: 0
+  stunDurationSeconds: 0
+  passiveRegenFlatPerLevel: 0
+  passiveRegenPercentOfMaxHealthPerLevel: 0
+  passiveHealItemBonusPerLevel: 0
+  passiveSpRegenMultiplierPerLevel: 0
+  passiveRemovesMovementRegenPenalty: 0
   healAmount: 10
+  healStatDivisor: 0
+  healFactorBase: 0
+  healFactorPerLevel: 0
+  healAddsMatk: 0
+  buffAtkPercentPerLevel: 0
+  buffAtkPercentBase: 0
+  buffDefPercentBase: 0
+  buffFlinchHitLimit: 0
+  buffDefPercentPerLevel: 0
+  buffMdefBonusPerLevel: 0
+  buffDurationSeconds: 0
+  buffDurationPerLevel: 0
+  buffStatBonusPerLevel:
+    strength: 0
+    agility: 0
+    vitality: 0
+    intelligence: 0
+    dexterity: 0
+    luck: 0
+  buffStatBonusBase:
+    strength: 0
+    agility: 0
+    vitality: 0
+    intelligence: 0
+    dexterity: 0
+    luck: 0
+  buffAspdPercentPerLevel: 0
+  buffMaxHealthPerLevel: 0
+  fixedCastSeconds: 0
+  fixedCastPerLevel: 0
+  variableCastSeconds: 0
+  variableCastPerLevel: 0
+  projectileVfxPrefab: {fileID: 7424361530540035011, guid: 76aa6b8da80cd124fb9f9c845537388f, type: 3}
+  impactVfxPrefab: {fileID: 9212932827885915252, guid: b145287ea54253c499bbe42c3e60068b, type: 3}
+  weaponGlowVfxPrefab: {fileID: 0}
+  impactVfxAuthoredHeight: 0
+  usesAttackAnimation: 0
+  playsDead: 0
+  impactDelaySeconds: 0
+  zonePrefab: {fileID: 0}
+  zoneDurationSeconds: 15
+  zoneDurationPerLevel: 0
+  zoneTickIntervalSeconds: 1
+  zoneMaxHits: 0
+  zoneMaxHitsPerLevel: 0
+  blocksAttacks: 0
+  blockedWeaponType: 0
+  toggleDrainIncomingDamageReductionPercentPerLevel: 0
+  toggleDrainManaPerSecond: 0
+  craftingRecipe: {fileID: 0}
+  requiresNearWater: 0
+  requiredItem: {fileID: 11400000, guid: 5ff878dd2dd880144abcc404627d8599, type: 2}
+  requiredItemCount: 1

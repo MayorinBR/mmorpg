@@ -28,6 +28,12 @@ namespace Project.Combat
         [Tooltip("Seconds between attacks.")]
         [SerializeField] private float intervalSeconds = 4f;
 
+        [Tooltip("When false, a player hidden by Hiding is ignored, like a regular enemy. When true, this dummy still sees hidden players, e.g. to test Play Dead being hit.")]
+        [SerializeField] private bool detectsHidden;
+
+        [Tooltip("When false, a player lying from Play Dead is ignored. When true, this dummy still attacks them, to test that taking damage makes them stand up.")]
+        [SerializeField] private bool hitsPlayingDead;
+
         [Tooltip("Whether the attack counts as melee or ranged when checked against blocking zones.")]
         [SerializeField] private AttackRangeKind attackKind = AttackRangeKind.Melee;
 
@@ -66,8 +72,20 @@ namespace Project.Combat
 
         private Transform FindTarget()
         {
-            var hits = Physics.OverlapSphere(transform.position, range, playerLayer);
-            return hits.Length > 0 ? hits[0].transform : null;
+            foreach (var hit in Physics.OverlapSphere(transform.position, range, playerLayer))
+            {
+                var effects = hit.transform.root.GetComponentInChildren<StatusEffectController>();
+
+                var visible = effects == null || !effects.IsHidden || detectsHidden;
+                var alive = effects == null || !effects.IsPlayingDead || hitsPlayingDead;
+
+                if (visible && alive)
+                {
+                    return hit.transform;
+                }
+            }
+
+            return null;
         }
 
         private void Launch(Transform target)

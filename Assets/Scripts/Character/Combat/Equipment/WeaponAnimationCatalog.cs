@@ -36,6 +36,16 @@ namespace Project.Character.Combat
         }
 
         /// <summary>
+        /// Finds the second swing clip for a weapon category.
+        /// </summary>
+        /// <param name="subtype">The category of the wielded weapon, or <see cref="WeaponSubtype.Unarmed"/>.</param>
+        /// <returns>The alternate attack clip of the matching entry, or null when the category has a single swing.</returns>
+        public AnimationClip GetAlternateAttackClip(WeaponSubtype subtype)
+        {
+            return Find(subtype)?.AlternateAttackClip;
+        }
+
+        /// <summary>
         /// Finds the single cast clip for a weapon category.
         /// </summary>
         /// <param name="subtype">The category of the wielded weapon, or <see cref="WeaponSubtype.Unarmed"/>.</param>

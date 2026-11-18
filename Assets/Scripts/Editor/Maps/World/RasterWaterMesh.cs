@@ -35,13 +35,14 @@ namespace Project.EditorTools.Maps.World
                 return null;
             }
 
+            float[] filled = FillDryLevels(heights, wet, n);
             var vertices = new Vector3[n * n];
             var triangles = new System.Collections.Generic.List<int>();
             for (int z = 0; z < n; z++)
             {
                 for (int x = 0; x < n; x++)
                 {
-                    float level = wet[(z * n) + x] ? heights[(z * n) + x] : NearestWetLevel(heights, wet, n, x, z) - DryDrop;
+                    float level = wet[(z * n) + x] ? heights[(z * n) + x] : filled[(z * n) + x] - DryDrop;
                     vertices[(z * n) + x] = new Vector3((x * step) - MapMath.Half, level, (z * step) - MapMath.Half);
                 }
             }
@@ -92,33 +93,60 @@ namespace Project.EditorTools.Maps.World
             return value == short.MinValue ? (float?)null : value / 100f;
         }
 
-        private static float NearestWetLevel(float[] heights, bool[] wet, int n, int x, int z)
+        /// <summary>Gives every dry sample the lowest level of the wet samples closest to it, growing outward one ring at a time.</summary>
+        /// <param name="heights">Level of each wet sample.</param>
+        /// <param name="wet">Wet flag of each sample.</param>
+        /// <param name="n">Samples per side.</param>
+        /// <returns>The level of each sample, with dry samples filled from their nearest wet neighbors.</returns>
+        private static float[] FillDryLevels(float[] heights, bool[] wet, int n)
         {
-            for (int radius = 1; radius < n; radius++)
+            var result = (float[])heights.Clone();
+            var reached = (bool[])wet.Clone();
+            var frontier = new System.Collections.Generic.List<int>();
+            for (int i = 0; i < wet.Length; i++)
             {
-                float best = float.MaxValue;
-                for (int dz = -radius; dz <= radius; dz++)
+                if (wet[i])
                 {
-                    for (int dx = -radius; dx <= radius; dx++)
-                    {
-                        int xx = x + dx;
-                        int zz = z + dz;
-                        if (xx < 0 || zz < 0 || xx >= n || zz >= n || !wet[(zz * n) + xx])
-                        {
-                            continue;
-                        }
-
-                        best = Mathf.Min(best, heights[(zz * n) + xx]);
-                    }
-                }
-
-                if (best < float.MaxValue)
-                {
-                    return best;
+                    frontier.Add(i);
                 }
             }
 
-            return -0.5f;
+            while (frontier.Count > 0)
+            {
+                var next = new System.Collections.Generic.List<int>();
+                var pending = new System.Collections.Generic.Dictionary<int, float>();
+                foreach (int index in frontier)
+                {
+                    int x = index % n;
+                    int z = index / n;
+                    for (int dz = -1; dz <= 1; dz++)
+                    {
+                        for (int dx = -1; dx <= 1; dx++)
+                        {
+                            int xx = x + dx;
+                            int zz = z + dz;
+                            int neighbor = (zz * n) + xx;
+                            if (xx < 0 || zz < 0 || xx >= n || zz >= n || reached[neighbor])
+                            {
+                                continue;
+                            }
+
+                            pending[neighbor] = pending.TryGetValue(neighbor, out float known) ? Mathf.Min(known, result[index]) : result[index];
+                        }
+                    }
+                }
+
+                foreach (System.Collections.Generic.KeyValuePair<int, float> entry in pending)
+                {
+                    reached[entry.Key] = true;
+                    result[entry.Key] = entry.Value;
+                    next.Add(entry.Key);
+                }
+
+                frontier = next;
+            }
+
+            return result;
         }
     }
 }

@@ -159,6 +159,32 @@ namespace Project.Character.Combat
             return total;
         }
 
+        /// <summary>
+        /// Calculates the combined chance that a basic attack deals double damage, from every learned passive that applies
+        /// to the given equipped weapon subtype — e.g. Double Attack.
+        /// </summary>
+        /// <param name="equippedWeaponSubtype">The main-hand weapon's current subtype, or <see cref="WeaponSubtype.Unarmed"/> if none equipped.</param>
+        /// <returns>The chance from 0 to 1. Zero if no applicable passive skill is learned.</returns>
+        public float GetDoubleAttackChance(WeaponSubtype equippedWeaponSubtype)
+        {
+            var total = 0f;
+
+            foreach (var entry in skillBook.LearnedSkills)
+            {
+                var skill = entry.Key;
+                var level = entry.Value;
+
+                if (skill.EffectType != SkillEffectType.Passive || level <= 0 || !MatchesWeaponRequirement(skill, equippedWeaponSubtype))
+                {
+                    continue;
+                }
+
+                total += skill.GetPassiveDoubleAttackChance(level);
+            }
+
+            return Mathf.Clamp01(total);
+        }
+
         private int SumPassiveBonus(WeaponSubtype equippedWeaponSubtype, Func<SkillDefinition, int, int> getBonus)
         {
             var total = 0;

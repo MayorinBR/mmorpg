@@ -4,6 +4,7 @@ using UnityEngine.AI;
 using UnityEngine.Serialization;
 using Project.Character.Stats;
 using Project.Combat;
+using Project.Items;
 
 namespace Project.AI
 {
@@ -15,7 +16,7 @@ namespace Project.AI
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(CharacterStatsHolder))]
-    public class EnemyController : MonoBehaviour
+    public class EnemyController : MonoBehaviour, IStealTarget
     {
         [SerializeField] private NavMeshAgent agent;
         [SerializeField] private LayerMask playerLayer;
@@ -188,6 +189,24 @@ namespace Project.AI
         internal void NotifyAttackStarted()
         {
             AttackStarted?.Invoke();
+        }
+
+        private bool stolenFrom;
+
+        /// <inheritdoc />
+        public bool CanBeStolenFrom => !stolenFrom && Stats is MonsterDefinition monster && monster.HasStealableDrop;
+
+        /// <inheritdoc />
+        public ItemDefinition Steal()
+        {
+            stolenFrom = true;
+            return (Stats as MonsterDefinition)?.PickStealableDrop();
+        }
+
+        /// <summary>Makes this enemy stealable again. Called when it respawns.</summary>
+        internal void ResetSteal()
+        {
+            stolenFrom = false;
         }
 
         private void Awake()

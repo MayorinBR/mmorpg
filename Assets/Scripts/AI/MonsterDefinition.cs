@@ -26,6 +26,24 @@ namespace Project.AI
         /// <summary>Gets the possible drops of this monster.</summary>
         public IReadOnlyList<LootEntry> Drops => drops;
 
+        /// <summary>Gets whether this monster has at least one drop that a Steal skill can take.</summary>
+        public bool HasStealableDrop => drops != null && System.Array.Exists(drops, entry => entry.Item != null);
+
+        /// <summary>
+        /// Picks one of this monster's drops at random, ignoring drop chances, for a Steal skill.
+        /// </summary>
+        /// <returns>The picked item, or null when the monster has no drops.</returns>
+        public ItemDefinition PickStealableDrop()
+        {
+            if (!HasStealableDrop)
+            {
+                return null;
+            }
+
+            var candidates = System.Array.FindAll(drops, entry => entry.Item != null);
+            return candidates[Random.Range(0, candidates.Length)].Item;
+        }
+
         /// <summary>
         /// Rolls every drop entry independently against its drop chance.
         /// </summary>

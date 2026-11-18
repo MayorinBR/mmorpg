@@ -58,6 +58,7 @@ namespace Project.Combat
         private int poisonDamagePerTick;
         private float poisonTickTimer;
         private bool isHidden;
+        private bool playingDead;
 
         /// <summary>
         /// Raised whenever an Apply* call rolls a successful resist instead
@@ -101,8 +102,14 @@ namespace Project.Combat
         /// <summary>Gets whether this character is briefly staggered by a recent hit, blocking movement, basic attacks and skill casts. Never true while a buff such as Endure prevents flinching.</summary>
         public bool IsFlinching => Time.time < flinchExpireTime;
 
-        /// <summary>Gets whether Stun, Freeze, Petrify or a hit-reaction flinch is currently blocking movement, basic attacks and skill casts.</summary>
-        public bool IsImmobilized => IsStunned || IsFrozen || IsPetrified || IsFlinching;
+        /// <summary>Gets whether Stun, Freeze, Petrify, Play Dead or a hit-reaction flinch is currently blocking movement and basic attacks.</summary>
+        public bool IsImmobilized => IsStunned || IsFrozen || IsPetrified || IsFlinching || playingDead;
+
+        /// <summary>Gets whether this character is lying on the ground from Play Dead. Ends when it takes damage, is revealed or casts the skill again.</summary>
+        public bool IsPlayingDead => playingDead;
+
+        /// <summary>Raised when Play Dead ends because the character was hit, revealed or toggled off, so the death pose can be released.</summary>
+        public event System.Action StoodUp;
 
         /// <summary>
         /// Gets whether this character is currently hidden — e.g. Hiding
@@ -167,6 +174,11 @@ namespace Project.Combat
 
         private void HandleAttacked(Transform attacker)
         {
+            if (playingDead)
+            {
+                StandUp();
+            }
+
             if (flinchDurationSeconds <= 0f || health.IsDead)
             {
                 return;
@@ -286,12 +298,31 @@ namespace Project.Combat
         public void SetHidden(bool hidden)
         {
             isHidden = hidden;
+
+            if (!hidden && playingDead)
+            {
+                StandUp();
+            }
+        }
+
+        /// <summary>Starts or ends the Play Dead pose. While lying the character is immobilized (see <see cref="IsImmobilized"/>).</summary>
+        /// <param name="value">True to lie down, false to stand up.</param>
+        public void SetPlayingDead(bool value)
+        {
+            playingDead = value;
+        }
+
+        private void StandUp()
+        {
+            playingDead = false;
+            isHidden = false;
+            StoodUp?.Invoke();
         }
 
         /// <summary>Clears Hiding immediately, e.g. a reveal skill (Sight/Ruwach) hitting this character. No-ops if not hidden.</summary>
         public void Reveal()
         {
-            isHidden = false;
+            SetHidden(false);
         }
 
         /// <summary>

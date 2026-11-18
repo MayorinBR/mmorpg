@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -14,6 +15,7 @@ namespace Project.Character.Animation
     {
         private static readonly int SpeedParameter = Animator.StringToHash("Speed");
         private static readonly int AttackParameter = Animator.StringToHash("Attack");
+        private static readonly int AttackAlternateParameter = Animator.StringToHash("AttackAlt");
         private static readonly int CastParameter = Animator.StringToHash("Cast");
         private static readonly int IsChannelingParameter = Animator.StringToHash("IsChanneling");
         private static readonly int HitParameter = Animator.StringToHash("Hit");
@@ -27,6 +29,9 @@ namespace Project.Character.Animation
         [Tooltip("The exact clip bound to the Attack state's Motion field in the Animator Controller. It is the key that SetAttackClip overrides at runtime, and the clip used for the swing duration when no weapon clip has been set.")]
         [FormerlySerializedAs("meleeAttackClip")]
         [SerializeField] private AnimationClip attackPlaceholderClip;
+
+        [Tooltip("The exact clip bound to the AttackAlt state's Motion field in the Animator Controller. It is the key that SetAlternateAttackClip overrides at runtime.")]
+        [SerializeField] private AnimationClip attackAlternatePlaceholderClip;
 
         [Tooltip("The exact clip bound to the Idle state's Motion field in the Animator Controller. It is the key that SetIdleClip overrides at runtime.")]
         [SerializeField] private AnimationClip idlePlaceholderClip;
@@ -49,6 +54,8 @@ namespace Project.Character.Animation
 
         private AnimatorOverrideController overrideController;
         private AnimationClip activeAttackClip;
+        private AnimationClip activeAlternateAttackClip;
+        private Coroutine chainRoutine;
         private AnimationClip activeIdleClip;
         private AnimationClip activeRunClip;
         private AnimationClip activeCastClip;
@@ -83,6 +90,19 @@ namespace Project.Character.Animation
             activeAttackClip = clip;
             ApplyClipOverrides();
         }
+
+        /// <summary>
+        /// Chooses which clip the AttackAlt state plays, the same way <see cref="SetAttackClip"/> does for the Attack state.
+        /// </summary>
+        /// <param name="clip">The second swing clip for the equipped weapon; null when the weapon has a single swing.</param>
+        public void SetAlternateAttackClip(AnimationClip clip)
+        {
+            activeAlternateAttackClip = clip;
+            ApplyClipOverrides();
+        }
+
+        /// <summary>Gets whether the equipped weapon has a second swing to alternate or chain with.</summary>
+        public bool HasAlternateAttack => activeAlternateAttackClip != null;
 
         /// <summary>
         /// Chooses which clip the Idle state plays, the same way <see cref="SetAttackClip"/> does for the
@@ -158,6 +178,11 @@ namespace Project.Character.Animation
 
             overrideController[attackPlaceholderClip] = activeAttackClip != null ? activeAttackClip : attackPlaceholderClip;
 
+            if (attackAlternatePlaceholderClip != null)
+            {
+                overrideController[attackAlternatePlaceholderClip] = activeAlternateAttackClip != null ? activeAlternateAttackClip : attackAlternatePlaceholderClip;
+            }
+
             if (idlePlaceholderClip != null)
             {
                 overrideController[idlePlaceholderClip] = activeIdleClip != null ? activeIdleClip : idlePlaceholderClip;
@@ -213,8 +238,55 @@ namespace Project.Character.Animation
         /// </summary>
         public void TriggerAttack()
         {
+            CancelChain();
             animator.SetTrigger(AttackParameter);
             CombatActionTriggered?.Invoke();
+        }
+
+        /// <summary>
+        /// Plays the second swing of the equipped weapon (see <see cref="SetAlternateAttackClip"/>), scaled to last the given time.
+        /// </summary>
+        /// <param name="durationSeconds">How long the swing should actually take to play, in seconds.</param>
+        public void TriggerAlternateAttack(float durationSeconds)
+        {
+            var multiplier = HasAlternateAttack && durationSeconds > 0f ? activeAlternateAttackClip.length / durationSeconds : 1f;
+            animator.SetFloat(AttackSpeedMultiplierParameter, multiplier);
+            animator.SetTrigger(AttackAlternateParameter);
+            CombatActionTriggered?.Invoke();
+        }
+
+        /// <summary>
+        /// Plays the first swing and, right after it, the second swing, each at double speed so the pair takes the
+        /// time of a single attack. Used when Double Attack triggers.
+        /// </summary>
+        /// <param name="totalSeconds">How long both swings together should take, in seconds.</param>
+        /// <returns>The seconds after which the second swing starts.</returns>
+        public float TriggerAttackChain(float totalSeconds)
+        {
+            var half = totalSeconds * 0.5f;
+            SetAttackDuration(half);
+            TriggerAttack();
+            chainRoutine = StartCoroutine(PlayAlternateAfter(half));
+            return half;
+        }
+
+        /// <summary>Fraction of the first swing played before the second one starts, so the Attack state's exit does not show an idle frame in between.</summary>
+        private const float ChainOverlap = 0.9f;
+
+        private IEnumerator PlayAlternateAfter(float seconds)
+        {
+            yield return new WaitForSeconds(seconds * ChainOverlap);
+            chainRoutine = null;
+            TriggerAlternateAttack(seconds);
+        }
+
+        private void CancelChain()
+        {
+            if (chainRoutine != null)
+            {
+                StopCoroutine(chainRoutine);
+                chainRoutine = null;
+            }
         }
 
         /// <summary>

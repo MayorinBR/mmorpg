@@ -19,7 +19,7 @@ namespace Project.Character.Combat
 
             var transform = context.Transform;
             var currentTarget = context.TargetSelector.CurrentTarget;
-            var source = currentTarget != null ? currentTarget.position : transform.position - transform.forward;
+            var source = currentTarget != null ? currentTarget.position : transform.position + transform.forward;
 
             KnockbackUtility.Apply(context.Agent, source, skill.KnockbackDistance);
             return true;

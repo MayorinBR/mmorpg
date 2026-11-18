@@ -46,6 +46,7 @@ namespace Project.Character.Combat
         {
             var subtype = equipment.GetMainHandWeaponSubtype();
             animatorController.SetAttackClip(catalog.GetAttackClip(subtype));
+            animatorController.SetAlternateAttackClip(catalog.GetAlternateAttackClip(subtype));
             animatorController.SetIdleClip(catalog.GetIdleClip(subtype));
             animatorController.SetRunClip(catalog.GetRunClip(subtype));
             animatorController.SetCastClip(catalog.GetCastClip(subtype));

@@ -48,6 +48,9 @@ namespace Project.Skills
         ToggleDrain,
         Craft,
         Teleport,
-        WarpPortal
+        WarpPortal,
+
+        /// <summary>Takes one item from an enemy's drop table, such as Steal.</summary>
+        Steal
     }
 }

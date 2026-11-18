@@ -26,6 +26,9 @@ namespace Project.Character.Combat
             EquipmentSlot.Gloves
         };
 
+        private static readonly Quaternion MainHandDaggerGrip = Quaternion.Euler(355.73f, 59.58f, 198.5f);
+        private static readonly Quaternion OffHandDaggerGrip = Quaternion.Euler(353.99f, 299.64f, 171.38f);
+
         [SerializeField] private EquipmentManager equipment;
         [SerializeField] private PlayerGenderController genderController;
 
@@ -167,8 +170,9 @@ namespace Project.Character.Combat
                     continue;
                 }
 
-                var instance = Instantiate(model, bone, false);
+                var instance = Instantiate(model, ResolveAttachPoint(bone, item), false);
                 instance.name = $"Equipped_{slot}_{item.name}";
+                ApplyDaggerGrip(instance.transform, slot, item);
                 spawned.Add(instance);
 
                 if (item.WeaponSubtype != WeaponSubtype.Unarmed)
@@ -217,15 +221,56 @@ namespace Project.Character.Combat
                 return false;
             }
 
+            var usesMainHand = false;
+
             foreach (var required in item.RequiredSlots)
             {
-                if (required == EquipmentSlot.LeftHand)
+                usesMainHand |= required == EquipmentSlot.LeftHand;
+            }
+
+            return usesMainHand && item.RequiredSlots.Count > 1;
+        }
+
+        /// <summary>
+        /// Turns a dagger in the palm socket so that, with the arms hanging, the main-hand blade points forward and
+        /// the off-hand blade points backward. Other items keep the rotation of their prefab.
+        /// </summary>
+        /// <param name="model">The spawned item model, already parented to its socket.</param>
+        /// <param name="slot">The slot the item occupies.</param>
+        /// <param name="item">The item being attached.</param>
+        private static void ApplyDaggerGrip(Transform model, EquipmentSlot slot, ItemDefinition item)
+        {
+            if (item.WeaponSubtype != WeaponSubtype.Dagger)
+            {
+                return;
+            }
+
+            model.localRotation = slot == EquipmentSlot.RightHand ? OffHandDaggerGrip : MainHandDaggerGrip;
+        }
+
+        /// <summary>
+        /// Returns the transform a model is parented to: the palm socket of the hand bone for daggers,
+        /// so the grip sits in the palm, or the bone itself for every other item.
+        /// </summary>
+        /// <param name="bone">The bone resolved for the item's slot.</param>
+        /// <param name="item">The item being attached.</param>
+        /// <returns>The socket child of the bone when one applies, otherwise the bone.</returns>
+        private static Transform ResolveAttachPoint(Transform bone, ItemDefinition item)
+        {
+            if (item.WeaponSubtype != WeaponSubtype.Dagger)
+            {
+                return bone;
+            }
+
+            foreach (Transform child in bone)
+            {
+                if (child.name.StartsWith("Socket_Hand"))
                 {
-                    return true;
+                    return child;
                 }
             }
 
-            return false;
+            return bone;
         }
 
         private static Transform FindBone(Animator animator, HumanBodyBones bone)

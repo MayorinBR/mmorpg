@@ -13,6 +13,8 @@ namespace Project.Character.Combat
     {
         [SerializeField] private WeaponSubtype subtype;
         [SerializeField] private AnimationClip attackClip;
+        [Tooltip("Optional. Second swing played alternately with the attack clip while dual wielding, and right after it when Double Attack triggers.")]
+        [SerializeField] private AnimationClip alternateAttackClip;
         [Tooltip("Optional. Idle clip for this weapon category; empty keeps the default idle.")]
         [SerializeField] private AnimationClip idleClip;
         [Tooltip("Optional. Run clip for this weapon category; empty keeps the default run.")]
@@ -32,6 +34,11 @@ namespace Project.Character.Combat
         /// The basic-attack clip for the weapon category.
         /// </summary>
         public AnimationClip AttackClip => attackClip;
+
+        /// <summary>
+        /// The second swing of the weapon category, or null when the category has a single swing.
+        /// </summary>
+        public AnimationClip AlternateAttackClip => alternateAttackClip;
 
         /// <summary>
         /// The idle clip for the weapon category, or null to keep the default idle.
