@@ -194,7 +194,7 @@ namespace Project.AI
         private bool stolenFrom;
 
         /// <inheritdoc />
-        public bool CanBeStolenFrom => !stolenFrom && Stats is MonsterDefinition monster && monster.HasStealableDrop;
+        public bool CanBeStolenFrom => !stolenFrom && !Stats.IsBoss && Stats is MonsterDefinition monster && monster.HasStealableDrop;
 
         /// <inheritdoc />
         public ItemDefinition Steal()
