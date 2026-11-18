@@ -2,6 +2,7 @@ Shader "Project/Items/ToonItem"
 {
     Properties
     {
+        _Fade ("Fade", Range(0, 1)) = 1
         _BaseMap ("Base Map", 2D) = "white" {}
         _BaseColor ("Base Color", Color) = (1, 1, 1, 1)
         _ShadowColor ("Shadow Color", Color) = (0.62, 0.58, 0.72, 1)
@@ -28,6 +29,7 @@ Shader "Project/Items/ToonItem"
         SAMPLER(sampler_BaseMap);
 
         CBUFFER_START(UnityPerMaterial)
+            half _Fade;
             float4 _BaseMap_ST;
             half4 _BaseColor;
             half4 _ShadowColor;
@@ -42,6 +44,15 @@ Shader "Project/Items/ToonItem"
             half _SwaySpeed;
             half _SwayFrequency;
         CBUFFER_END
+
+        // Screen-door transparency: discards a share of pixels, in a 4x4 Bayer pattern, so that _Fade 1 keeps
+        // every pixel and _Fade 0 discards them all. Keeps the shader opaque, so no sorting is involved.
+        void ClipFade(float4 positionCS)
+        {
+            static const float bayer[16] = { 0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5 };
+            uint2 pixel = uint2(positionCS.xy) & 3u;
+            clip(_Fade - (bayer[pixel.y * 4u + pixel.x] + 0.5) / 16.0);
+        }
 
         // Waves the vertices in object space. The mask (vertex color red) is 0 where the mesh is pinned
         // to the body and grows toward the free edge, so a cape stays fixed at the shoulders and
@@ -98,6 +109,7 @@ Shader "Project/Items/ToonItem"
 
             half4 Frag(Varyings input) : SV_Target
             {
+                ClipFade(input.positionCS);
                 half3 normalWS = normalize(input.normalWS);
                 half3 viewDirWS = normalize(GetWorldSpaceViewDir(input.positionWS));
                 half4 albedo = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.uv) * _BaseColor;
@@ -156,6 +168,7 @@ Shader "Project/Items/ToonItem"
 
             half4 Frag(Varyings input) : SV_Target
             {
+                ClipFade(input.positionCS);
                 return _OutlineColor;
             }
             ENDHLSL
@@ -207,6 +220,7 @@ Shader "Project/Items/ToonItem"
 
             half4 Frag(float4 positionCS : SV_POSITION) : SV_Target
             {
+                ClipFade(positionCS);
                 return 0;
             }
             ENDHLSL
@@ -232,6 +246,7 @@ Shader "Project/Items/ToonItem"
 
             half4 Frag(float4 positionCS : SV_POSITION) : SV_Target
             {
+                ClipFade(positionCS);
                 return 0;
             }
             ENDHLSL

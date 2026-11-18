@@ -2,6 +2,7 @@ Shader "Project/Characters/ToonCharacter"
 {
     Properties
     {
+        _Fade ("Fade", Range(0, 1)) = 1
         _BaseMap ("Base Map", 2D) = "white" {}
         _BaseColor ("Base Color", Color) = (1, 1, 1, 1)
         [NoScaleOffset] _SkinMask ("Skin Mask", 2D) = "black" {}
@@ -47,6 +48,7 @@ Shader "Project/Characters/ToonCharacter"
         SAMPLER(sampler_MouthArray);
 
         CBUFFER_START(UnityPerMaterial)
+            half _Fade;
             float4 _BaseMap_ST;
             half4 _BaseColor;
             half4 _SkinColor;
@@ -67,6 +69,15 @@ Shader "Project/Characters/ToonCharacter"
             float4 _MouthOffset;
             float _MouthFrame;
         CBUFFER_END
+
+        // Screen-door transparency: discards a share of pixels, in a 4x4 Bayer pattern, so that _Fade 1 keeps
+        // every pixel and _Fade 0 discards them all. Keeps the shader opaque, so no sorting is involved.
+        void ClipFade(float4 positionCS)
+        {
+            static const float bayer[16] = { 0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5 };
+            uint2 pixel = uint2(positionCS.xy) & 3u;
+            clip(_Fade - (bayer[pixel.y * 4u + pixel.x] + 0.5) / 16.0);
+        }
 
         // Discards fragments below the plane (xyz = normal, w = offset). A zero plane keeps everything.
         void ClipBelowPlane(float3 positionWS)
@@ -158,6 +169,7 @@ Shader "Project/Characters/ToonCharacter"
 
             half4 Frag(Varyings input) : SV_Target
             {
+                ClipFade(input.positionCS);
                 ClipBelowPlane(input.positionWS);
                 half3 normalWS = normalize(input.normalWS);
                 half3 viewDirWS = normalize(GetWorldSpaceViewDir(input.positionWS));
@@ -222,6 +234,7 @@ Shader "Project/Characters/ToonCharacter"
 
             half4 Frag(Varyings input) : SV_Target
             {
+                ClipFade(input.positionCS);
                 ClipBelowPlane(input.positionWS);
                 return _OutlineColor;
             }
@@ -273,6 +286,7 @@ Shader "Project/Characters/ToonCharacter"
 
             half4 Frag(float4 positionCS : SV_POSITION) : SV_Target
             {
+                ClipFade(positionCS);
                 return 0;
             }
             ENDHLSL
@@ -298,6 +312,7 @@ Shader "Project/Characters/ToonCharacter"
 
             half4 Frag(float4 positionCS : SV_POSITION) : SV_Target
             {
+                ClipFade(positionCS);
                 return 0;
             }
             ENDHLSL

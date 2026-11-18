@@ -2,6 +2,7 @@ Shader "Project/Characters/ToonHair"
 {
     Properties
     {
+        _Fade ("Fade", Range(0, 1)) = 1
         _BaseColor ("Base Color", Color) = (0.42, 0.26, 0.14, 1)
         _ShadowColor ("Shadow Color", Color) = (0.62, 0.58, 0.72, 1)
         _ShadowThreshold ("Shadow Threshold", Range(0, 1)) = 0.5
@@ -21,6 +22,7 @@ Shader "Project/Characters/ToonHair"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
         CBUFFER_START(UnityPerMaterial)
+            half _Fade;
             half4 _BaseColor;
             half4 _ShadowColor;
             half _ShadowThreshold;
@@ -31,6 +33,15 @@ Shader "Project/Characters/ToonHair"
             half4 _OutlineColor;
             half _OutlineWidth;
         CBUFFER_END
+
+        // Screen-door transparency: discards a share of pixels, in a 4x4 Bayer pattern, so that _Fade 1 keeps
+        // every pixel and _Fade 0 discards them all. Keeps the shader opaque, so no sorting is involved.
+        void ClipFade(float4 positionCS)
+        {
+            static const float bayer[16] = { 0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5 };
+            uint2 pixel = uint2(positionCS.xy) & 3u;
+            clip(_Fade - (bayer[pixel.y * 4u + pixel.x] + 0.5) / 16.0);
+        }
         ENDHLSL
 
         Pass
@@ -71,6 +82,7 @@ Shader "Project/Characters/ToonHair"
 
             half4 Frag(Varyings input) : SV_Target
             {
+                ClipFade(input.positionCS);
                 half3 normalWS = normalize(input.normalWS);
                 half3 viewDirWS = normalize(GetWorldSpaceViewDir(input.positionWS));
                 half3 albedo = _BaseColor.rgb;
@@ -128,6 +140,7 @@ Shader "Project/Characters/ToonHair"
 
             half4 Frag(Varyings input) : SV_Target
             {
+                ClipFade(input.positionCS);
                 return _OutlineColor;
             }
             ENDHLSL
@@ -178,6 +191,7 @@ Shader "Project/Characters/ToonHair"
 
             half4 Frag(float4 positionCS : SV_POSITION) : SV_Target
             {
+                ClipFade(positionCS);
                 return 0;
             }
             ENDHLSL
@@ -203,6 +217,7 @@ Shader "Project/Characters/ToonHair"
 
             half4 Frag(float4 positionCS : SV_POSITION) : SV_Target
             {
+                ClipFade(positionCS);
                 return 0;
             }
             ENDHLSL

@@ -4644,6 +4644,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Character.Animation::Project.Character.Animation.PlayerAnimatorController
   animator: {fileID: 401280900}
   attackPlaceholderClip: {fileID: -203655887218126122, guid: 6c482b95c234c97448468a5c744268f2, type: 3}
+  attackAlternatePlaceholderClip: {fileID: -203655887218126122, guid: 462958f5313d0934ca1e7f896da70a9c, type: 3}
   idlePlaceholderClip: {fileID: -203655887218126122, guid: 50dc2fd46ddedc0478dadcd07002e15d, type: 3}
   runPlaceholderClip: {fileID: -203655887218126122, guid: e9c6c3d36ac4bc74fac6856a4ec9aec7, type: 3}
   channelPlaceholderClip: {fileID: -203655887218126122, guid: f0b0802fc11c58b45a4e8856c8a88374, type: 3}
@@ -20191,6 +20192,7 @@ GameObject:
   - component: {fileID: 1696850568}
   - component: {fileID: 7000000000000000005}
   - component: {fileID: 7000000000000000006}
+  - component: {fileID: 7000000000000000007}
   m_Layer: 7
   m_Name: Meta
   m_TagString: Untagged
@@ -27695,6 +27697,22 @@ MonoBehaviour:
   headCatalog: {fileID: 11400000, guid: e59678c691fdcec4782095d90b017594, type: 2}
   hairCatalog: {fileID: 11400000, guid: b399aa12ee54ece44b375a58eeb03fc4, type: 2}
   faceCatalog: {fileID: 11400000, guid: 4429d21e84073574b9569415ff6aa3ce, type: 2}
+--- !u!114 &7000000000000000007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1696850558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80c83fc1bbd759742a0cf63fb7092214, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Combat::Project.Combat.HidingFade
+  status: {fileID: 1696850568}
+  modelRoot: {fileID: 543450651632539191}
+  hiddenOpacity: 0.4
+  fadeSpeed: 3
 --- !u!222 &7101010101010101010
 CanvasRenderer:
   m_ObjectHideFlags: 0
