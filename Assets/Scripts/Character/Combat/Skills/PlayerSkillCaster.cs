@@ -58,7 +58,7 @@ namespace Project.Character.Combat
         [Tooltip("Layer containing Water colliders, checked by a Craft skill with SkillDefinition.RequiresNearWater (e.g. Aqua Benedicta). Left at its default (nothing), such a skill can never find water — ready for the moment a map actually tags one.")]
         [SerializeField] private LayerMask waterLayer;
 
-        private readonly Dictionary<SkillDefinition, float> cooldownEndTimes = new Dictionary<SkillDefinition, float>();
+        private readonly SkillCooldownTracker cooldowns = new SkillCooldownTracker();
         private readonly SkillEffectHandlerRegistry handlers = SkillEffectHandlerRegistry.CreateDefault();
         private readonly ZoneEffectHandler zoneHandler = new ZoneEffectHandler();
         private readonly WarpPortalEffectHandler portalHandler = new WarpPortalEffectHandler();
@@ -80,6 +80,11 @@ namespace Project.Character.Combat
 
         private void OnDisable()
         {
+            if (statusEffects != null)
+            {
+                statusEffects.StoodUp -= OnStoodUp;
+            }
+
             if (castRoutine != null)
             {
                 castRoutine = null;
@@ -117,7 +122,7 @@ namespace Project.Character.Combat
         /// <returns>True if the skill was successfully cast; false if any requirement wasn't met, or a target pick was started instead.</returns>
         public bool TryCastSkill(SkillDefinition skill)
         {
-            if (ownHealth.IsDead || IsCasting)
+            if (ownHealth.IsDead || IsCasting || IsLyingDownFor(skill))
             {
                 return false;
             }
@@ -136,7 +141,7 @@ namespace Project.Character.Combat
                 return false;
             }
 
-            if (Time.time < GetCooldownEndTime(skill))
+            if (cooldowns.IsOnCooldown(skill, Time.time))
             {
                 CombatLog.Write($"{skill.SkillName} on cooldown: {GetCooldownRemaining(skill):0.0}s left.");
                 return false;
@@ -208,14 +213,14 @@ namespace Project.Character.Combat
         /// <returns>True if the zone was spawned.</returns>
         public bool TryCastSkillAtPosition(SkillDefinition skill, Vector3 position)
         {
-            if (ownHealth.IsDead || IsCastBlocked() || IsCasting)
+            if (ownHealth.IsDead || IsCastBlocked() || IsCasting || IsLyingDownFor(skill))
             {
                 return false;
             }
 
             var level = skillBook.GetLevel(skill);
 
-            if (level <= 0 || Time.time < GetCooldownEndTime(skill)
+            if (level <= 0 || cooldowns.IsOnCooldown(skill, Time.time)
                 || !SkillRequirementChecker.MeetsCatalystRequirement(Context, skill)
                 || !SkillRequirementChecker.MeetsResourceRequirement(Context, skill))
             {
@@ -253,7 +258,7 @@ namespace Project.Character.Combat
                 return SkillAvailability.NotLearned;
             }
 
-            if (Time.time < GetCooldownEndTime(skill))
+            if (cooldowns.IsOnCooldown(skill, Time.time))
             {
                 return SkillAvailability.OnCooldown;
             }
@@ -278,7 +283,7 @@ namespace Project.Character.Combat
         /// <returns>Seconds remaining before the skill is off cooldown, or 0 if it's already ready.</returns>
         public float GetCooldownRemaining(SkillDefinition skill)
         {
-            return Mathf.Max(0f, GetCooldownEndTime(skill) - Time.time);
+            return cooldowns.GetRemaining(skill, Time.time);
         }
 
         /// <summary>
@@ -341,7 +346,7 @@ namespace Project.Character.Combat
                 }
 
                 PlayCastAnimation(skill);
-                cooldownEndTimes[skill] = Time.time + skill.CooldownSeconds;
+                cooldowns.Start(skill, Time.time, skill.CooldownSeconds);
                 StopMovementForCast();
             }
 
@@ -387,7 +392,7 @@ namespace Project.Character.Combat
 
             animatorController?.TriggerCast();
             StopMovementForCast();
-            cooldownEndTimes[skill] = Time.time + skill.CooldownSeconds;
+            cooldowns.Start(skill, Time.time, skill.CooldownSeconds);
             return true;
         }
 
@@ -398,6 +403,21 @@ namespace Project.Character.Combat
         /// <param name="skill">The skill that was just cast.</param>
         private void PlayCastAnimation(SkillDefinition skill)
         {
+            if (skill.PlaysDead)
+            {
+                var lying = statusEffects != null && statusEffects.IsHidden;
+                statusEffects?.SetPlayingDead(lying);
+                animatorController?.SetIsDead(lying);
+
+                if (statusEffects != null)
+                {
+                    statusEffects.StoodUp -= OnStoodUp;
+                    statusEffects.StoodUp += OnStoodUp;
+                }
+
+                return;
+            }
+
             var combatController = GetCombat();
 
             if (skill.UsesAttackAnimation && combatController != null)
@@ -407,6 +427,17 @@ namespace Project.Character.Combat
             }
 
             animatorController?.TriggerCast();
+        }
+
+        /// <summary>Gets whether the caster is lying from Play Dead and the skill is not Play Dead itself, the only skill that can end the pose.</summary>
+        private bool IsLyingDownFor(SkillDefinition skill)
+        {
+            return statusEffects != null && statusEffects.IsPlayingDead && !skill.PlaysDead;
+        }
+
+        private void OnStoodUp()
+        {
+            animatorController?.SetIsDead(false);
         }
 
         /// <summary>
@@ -516,18 +547,13 @@ namespace Project.Character.Combat
             onComplete();
         }
 
-        private float GetCooldownEndTime(SkillDefinition skill)
-        {
-            return cooldownEndTimes.TryGetValue(skill, out var endTime) ? endTime : 0f;
-        }
-
         /// <summary>
         /// Gets whether an active status effect is currently blocking the caster from casting anything: Stun,
         /// Freeze and Petrify block every action, Silence blocks casting alone, and heavy overweight blocks it too.
         /// </summary>
         private bool IsCastBlocked()
         {
-            return (statusEffects != null && (statusEffects.IsImmobilized || statusEffects.IsSilenced))
+            return (statusEffects != null && ((statusEffects.IsImmobilized && !statusEffects.IsPlayingDead) || statusEffects.IsSilenced))
                 || (inventory != null && inventory.Items.IsMajorOverweight);
         }
     }

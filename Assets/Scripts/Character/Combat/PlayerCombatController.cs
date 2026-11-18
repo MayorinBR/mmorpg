@@ -85,12 +85,6 @@ namespace Project.Character.Combat
         private const float CriticalDamageMultiplier = 1.4f;
         private const float OffHandDamageMultiplier = 0.5f;
         private const float AmmoWarningIntervalSeconds = 2f;
-        private const float ParallelArrowSpacing = 0.12f;
-        private const int RainArrowCount = 8;
-        private const float RainRadius = 1.2f;
-        private const float RainHeight = 5f;
-        private const float RainStagger = 0.8f;
-        private const float RainSpeedMultiplier = 1.5f;
 
         [SerializeField] private PlayerStatsController playerStats;
         [SerializeField] private PlayerTargetSelector targetSelector;
@@ -138,6 +132,9 @@ namespace Project.Character.Combat
         private float nextAmmoWarningTime;
         private System.Action pendingProjectileRelease;
         private float meleeImpactDelaySeconds;
+        private bool useAlternateSwingNext;
+
+        private SkillProjectileLauncher ProjectileLauncher => new SkillProjectileLauncher(transform, projectileOrigin, projectileSpeed, arrowProjectilePrefab, boltProjectilePrefab, equipment);
 
         /// <summary>
         /// Gets or sets whether chasing and auto attacks are paused because a
@@ -300,13 +297,30 @@ namespace Project.Character.Combat
                 ? animatorController.AttackImpactNormalizedTime * GetAttackIntervalSeconds()
                 : 0f;
 
+            var interval = GetAttackIntervalSeconds();
+            var doubleAttack = Random.value < playerStats.GetDoubleAttackChance();
+            var hasSecondSwing = animatorController != null && animatorController.HasAlternateAttack;
+            var chained = doubleAttack && hasSecondSwing && classController.CurrentClass != CharacterClass.Mage;
+            var secondHitDelay = 0f;
+
             if (classController.CurrentClass == CharacterClass.Mage)
             {
                 animatorController?.TriggerCast();
             }
+            else if (chained)
+            {
+                secondHitDelay = animatorController.TriggerAttackChain(interval);
+                useAlternateSwingNext = false;
+            }
+            else if (hasSecondSwing && IsDualWielding() && useAlternateSwingNext)
+            {
+                animatorController.TriggerAlternateAttack(interval);
+                useAlternateSwingNext = false;
+            }
             else
             {
                 animatorController?.TriggerAttack();
+                useAlternateSwingNext = hasSecondSwing && IsDualWielding();
             }
 
             if (classController.CurrentClass == CharacterClass.Mage)
@@ -322,7 +336,18 @@ namespace Project.Character.Combat
             // StatusMATK (INT-based) instead, the same stat its skills use.
             var baseDamage = isMage ? playerStats.CurrentSubStats.StatusMatk : playerStats.CurrentSubStats.StatusAtk;
 
-            var arrowPrefab = ResolveArrowPrefab();
+            if (chained)
+            {
+                CombatLog.Write("Double Attack: a second hit follows the first.");
+                StartCoroutine(DealHitAfterDelay(secondHitDelay, targetSelector.CurrentDamageable, baseDamage));
+            }
+            else if (doubleAttack)
+            {
+                baseDamage *= 2;
+                CombatLog.Write("Double Attack: this hit deals double damage.");
+            }
+
+            var arrowPrefab = ProjectileLauncher.ResolveArrowPrefab();
 
             if (classController.CurrentClass == CharacterClass.Archer && isRanged)
             {
@@ -375,6 +400,20 @@ namespace Project.Character.Combat
             return equipment.GetEquippedItems(EquipmentSlot.LeftHand).FirstOrDefault();
         }
 
+        /// <summary>Deals a plain hit on a target after a delay, dropping it when the target died in the meantime.</summary>
+        /// <param name="seconds">How long to wait before the hit lands.</param>
+        /// <param name="target">The target to hit.</param>
+        /// <param name="baseDamage">The damage of the hit before critical and modifiers.</param>
+        private IEnumerator DealHitAfterDelay(float seconds, IDamageable target, int baseDamage)
+        {
+            yield return new WaitForSeconds(seconds);
+
+            if (target != null && !target.IsDead)
+            {
+                DealHit(target, baseDamage);
+            }
+        }
+
         private bool IsDualWielding()
         {
             var mainHandItems = equipment.GetEquippedItems(EquipmentSlot.LeftHand);
@@ -385,7 +424,7 @@ namespace Project.Character.Combat
                 return false;
             }
 
-            return mainHandItems[0] != offHandItems[0];
+            return mainHandItems[0] != offHandItems[0] || offHandItems[0].RequiredSlots.Count == 1;
         }
 
         /// <summary>
@@ -502,18 +541,6 @@ namespace Project.Character.Combat
         }
 
         /// <summary>
-        /// Picks the arrow visual for the next shot: the model authored on the equipped ammo item when it has one,
-        /// otherwise the shared <see cref="arrowProjectilePrefab"/>.
-        /// </summary>
-        /// <returns>The projectile prefab to spawn, or null when neither is available.</returns>
-        private GameObject ResolveArrowPrefab()
-        {
-            var ammo = equipment.EquippedAmmoItem;
-            var ammoModel = ammo != null ? ammo.GetEquippedModel(default) : null;
-            return ammoModel != null ? ammoModel : arrowProjectilePrefab;
-        }
-
-        /// <summary>
         /// Fires the arrow or bolt visual at a target for a skill cast, using the same prefabs, speed and
         /// origin as the basic attack. Purely cosmetic: the skill's outcome is decided by the caster.
         /// </summary>
@@ -521,15 +548,7 @@ namespace Project.Character.Combat
         /// <param name="target">The transform the projectile flies to.</param>
         public void SpawnSkillProjectile(bool magical, Transform target)
         {
-            var prefab = magical ? boltProjectilePrefab : ResolveArrowPrefab();
-
-            if (prefab == null || target == null)
-            {
-                return;
-            }
-
-            var origin = projectileOrigin != null ? projectileOrigin.position : transform.position;
-            Projectile.Spawn(prefab, origin, target, projectileSpeed, null);
+            ProjectileLauncher.SpawnProjectile(magical, target);
         }
 
         /// <summary>
@@ -540,45 +559,7 @@ namespace Project.Character.Combat
         /// <param name="target">The transform the arrows fly to.</param>
         public void SpawnSkillArrows(SkillDefinition skill, Transform target)
         {
-            var prefab = ResolveArrowPrefab();
-
-            if (prefab == null || target == null)
-            {
-                return;
-            }
-
-            var origin = projectileOrigin != null ? projectileOrigin.position : transform.position;
-
-            switch (skill.ArrowVolleyStyle)
-            {
-                case ArrowVolleyStyle.Parallel:
-                    var side = Vector3.Cross(Vector3.up, target.position - origin).normalized * ParallelArrowSpacing;
-                    AttachAura(skill, Projectile.Spawn(prefab, origin + side, target, projectileSpeed, null, side));
-                    AttachAura(skill, Projectile.Spawn(prefab, origin - side, target, projectileSpeed, null, -side));
-                    break;
-
-                case ArrowVolleyStyle.Rain:
-                    for (var i = 0; i < RainArrowCount; i++)
-                    {
-                        var landing = target.position + Quaternion.Euler(0f, Random.value * 360f, 0f) * Vector3.forward * (Random.value * RainRadius);
-                        var start = landing + Vector3.up * (RainHeight + i * RainStagger);
-                        AttachAura(skill, Projectile.SpawnToPoint(prefab, start, landing, projectileSpeed * RainSpeedMultiplier));
-                    }
-
-                    break;
-
-                default:
-                    AttachAura(skill, Projectile.Spawn(prefab, origin, target, projectileSpeed, null));
-                    break;
-            }
-        }
-
-        private static void AttachAura(SkillDefinition skill, GameObject arrow)
-        {
-            if (skill.ArrowAuraPrefab != null)
-            {
-                Instantiate(skill.ArrowAuraPrefab, arrow.transform);
-            }
+            ProjectileLauncher.SpawnArrowVolley(skill, target);
         }
 
         /// <summary>
@@ -589,8 +570,7 @@ namespace Project.Character.Combat
         /// <param name="onArrival">Invoked when the projectile reaches the target.</param>
         public void SpawnSkillProjectile(GameObject prefab, Transform target, System.Action onArrival)
         {
-            var origin = projectileOrigin != null ? projectileOrigin.position : transform.position;
-            Projectile.Spawn(prefab, origin, target, projectileSpeed, onArrival);
+            ProjectileLauncher.SpawnProjectile(prefab, target, onArrival);
         }
 
         /// <summary>

@@ -13,7 +13,7 @@ namespace Project.Skills
     /// character stats are already defined as data in this project.
     /// </summary>
     [CreateAssetMenu(fileName = "NewSkill", menuName = "Project/Skills/Skill")]
-    public class SkillDefinition : ScriptableObject
+    public partial class SkillDefinition : ScriptableObject
     {
         [SerializeField] private string skillName;
         [SerializeField] private string description;
@@ -132,6 +132,8 @@ namespace Project.Skills
 
         [Tooltip("Flat Flee rating bonus per skill level, applied the same way as PassiveAttackBonusPerLevel, but never weapon-gated — e.g. Improve Dodge.")]
         [SerializeField] private float passiveFleeBonusPerLevel;
+        [Tooltip("Chance per skill level (0 to 1) that a basic attack deals double damage, such as Double Attack. Gated by Passive Required Weapon Subtypes.")]
+        [SerializeField] private float passiveDoubleAttackChancePerLevel;
 
         [Tooltip("Flat bonus to max carry weight per skill level, never weapon-gated — e.g. Enlarge Weight Limit. Zero for passives without one.")]
         [SerializeField] private float passiveWeightLimitBonusPerLevel;
@@ -245,6 +247,9 @@ namespace Project.Skills
         [Header("Animation")]
         [Tooltip("Plays the equipped weapon's basic-attack swing (one-handed or two-handed) instead of the cast animation when the skill is cast. For melee skills that strike with the weapon, such as Bash and Magnum Break.")]
         [SerializeField] private bool usesAttackAnimation;
+
+        [Tooltip("Plays the death pose instead of the cast animation and keeps the caster lying down until the skill is cast again or the caster is hit. For Play Dead.")]
+        [SerializeField] private bool playsDead;
 
         [Tooltip("Seconds after the cast before the damage and its after-effects are applied, so they land when the weapon swing connects instead of at the start of the animation. Zero applies them instantly.")]
         [SerializeField] private float impactDelaySeconds;
@@ -458,6 +463,9 @@ namespace Project.Skills
         /// <summary>Gets whether casting this skill plays the weapon's basic-attack swing instead of the cast animation.</summary>
         public bool UsesAttackAnimation => usesAttackAnimation;
 
+        /// <summary>Gets whether casting this skill lays the caster down in the death pose (Play Dead) instead of playing the cast animation.</summary>
+        public bool PlaysDead => playsDead;
+
         /// <summary>Gets the delay, in seconds, between the cast and the moment the skill's damage is applied.</summary>
         public float ImpactDelaySeconds => impactDelaySeconds;
 
@@ -652,195 +660,6 @@ namespace Project.Skills
         public float KnockbackDistance => knockbackDistance;
 
         /// <summary>
-        /// Calculates the flat Status ATK bonus this passive skill grants
-        /// at the given level, before <see cref="PassiveRequiredWeaponSubtypes"/>
-        /// is checked against the equipped weapon. Only meaningful when
-        /// <see cref="EffectType"/> is Passive.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated attack bonus, zero for passives without one.</returns>
-        public int GetPassiveAttackBonus(int skillLevel)
-        {
-            return Mathf.RoundToInt(passiveAttackBonusPerLevel * skillLevel);
-        }
-
-        /// <summary>
-        /// Calculates the flat DEX bonus this passive skill grants at the
-        /// given level, before <see cref="PassiveRequiredWeaponSubtypes"/>
-        /// is checked against the equipped weapon. Only meaningful when
-        /// <see cref="EffectType"/> is Passive.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated DEX bonus, zero for passives without one.</returns>
-        public int GetPassiveDexBonus(int skillLevel)
-        {
-            return Mathf.RoundToInt(passiveDexBonusPerLevel * skillLevel);
-        }
-
-        /// <summary>
-        /// Calculates the flat Hit rating bonus this passive skill grants
-        /// at the given level, before
-        /// <see cref="PassiveRequiredWeaponSubtypes"/> is checked against
-        /// the equipped weapon. Only meaningful when <see cref="EffectType"/>
-        /// is Passive.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated Hit bonus, zero for passives without one.</returns>
-        public int GetPassiveHitBonus(int skillLevel)
-        {
-            return Mathf.RoundToInt(passiveHitBonusPerLevel * skillLevel);
-        }
-
-        /// <summary>
-        /// Calculates the flat attack range bonus, in meters, this passive
-        /// skill grants at the given level, before
-        /// <see cref="PassiveRequiredWeaponSubtypes"/> is checked against
-        /// the equipped weapon. Only meaningful when <see cref="EffectType"/>
-        /// is Passive.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated range bonus, zero for passives without one.</returns>
-        public float GetPassiveRangeBonus(int skillLevel)
-        {
-            return passiveRangeBonusPerLevel * skillLevel;
-        }
-
-        /// <summary>
-        /// Calculates the flat Flee rating bonus this passive skill grants
-        /// at the given level. Only meaningful when <see cref="EffectType"/>
-        /// is Passive.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated Flee bonus, zero for passives without one.</returns>
-        public int GetPassiveFleeBonus(int skillLevel)
-        {
-            return Mathf.RoundToInt(passiveFleeBonusPerLevel * skillLevel);
-        }
-
-        /// <summary>
-        /// Calculates the flat max carry weight bonus this passive skill
-        /// grants at the given level (e.g. Enlarge Weight Limit). Never
-        /// weapon-gated. Only meaningful when <see cref="EffectType"/> is Passive.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated bonus, zero for passives without one.</returns>
-        public float GetPassiveWeightLimitBonus(int skillLevel)
-        {
-            return passiveWeightLimitBonusPerLevel * skillLevel;
-        }
-
-        /// <summary>
-        /// Calculates the flat physical damage bonus this passive skill
-        /// grants at the given level against Demon/Undead race targets
-        /// (e.g. Demon Bane). Only meaningful when <see cref="EffectType"/>
-        /// is Passive.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated damage bonus, zero for passives without one.</returns>
-        public int GetPassiveRaceDamageBonus(int skillLevel)
-        {
-            return Mathf.RoundToInt(passiveRaceDamageBonusPerLevel * skillLevel);
-        }
-
-        /// <summary>
-        /// Calculates the flat physical defense bonus this passive skill
-        /// grants at the given level against Demon/Undead race attackers
-        /// (e.g. Divine Protection). Only meaningful when
-        /// <see cref="EffectType"/> is Passive.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated defense bonus, zero for passives without one.</returns>
-        public int GetPassiveRaceDefenseBonus(int skillLevel)
-        {
-            return Mathf.RoundToInt(passiveRaceDefenseBonusPerLevel * skillLevel);
-        }
-
-        /// <summary>
-        /// Calculates the attack power multiplier bonus this buff/debuff
-        /// skill applies at the given level (e.g. 0.32 for Provoke's +32%
-        /// ATK). Only meaningful when <see cref="EffectType"/> is Buff.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated bonus. Zero for a buff without an ATK component.</returns>
-        public float GetBuffAtkPercent(int skillLevel)
-        {
-            return buffAtkPercentBase + buffAtkPercentPerLevel * skillLevel;
-        }
-
-        /// <summary>
-        /// Calculates the physical defense multiplier bonus this buff/debuff
-        /// skill applies at the given level (e.g. -0.55 for Provoke's -55%
-        /// DEF). Only meaningful when <see cref="EffectType"/> is Buff.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated bonus. Zero for a buff without a DEF component.</returns>
-        public float GetBuffDefPercent(int skillLevel)
-        {
-            return buffDefPercentBase + buffDefPercentPerLevel * skillLevel;
-        }
-
-        /// <summary>
-        /// Calculates the flat magical defense bonus this buff/debuff skill
-        /// grants at the given level. Only meaningful when
-        /// <see cref="EffectType"/> is Buff.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated bonus. Zero for a buff without an MDEF component.</returns>
-        public int GetBuffMdefBonus(int skillLevel)
-        {
-            return Mathf.RoundToInt(buffMdefBonusPerLevel * skillLevel);
-        }
-
-        /// <summary>
-        /// Calculates the flat STR/AGI/VIT/INT/DEX/LUK bonus this
-        /// buff/debuff skill grants at the given level (e.g. Blessing's
-        /// flat STR/DEX/INT). Only meaningful when <see cref="EffectType"/>
-        /// is Buff.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated bonus. Zero stats for a buff without a stat component.</returns>
-        public StatModifiers GetBuffStatBonus(int skillLevel)
-        {
-            return buffStatBonusBase + buffStatBonusPerLevel * skillLevel;
-        }
-
-        /// <summary>
-        /// Calculates the attack speed multiplier bonus this buff/debuff
-        /// skill applies at the given level (e.g. Increase AGI's ASPD%
-        /// component). Only meaningful when <see cref="EffectType"/> is Buff.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated bonus. Zero for a buff without an ASPD component.</returns>
-        public float GetBuffAspdPercent(int skillLevel)
-        {
-            return buffAspdPercentPerLevel * skillLevel;
-        }
-
-        /// <summary>
-        /// Calculates the flat Max HP bonus this buff/debuff skill grants
-        /// at the given level (e.g. Angelus's flat Max HP component). Only
-        /// meaningful when <see cref="EffectType"/> is Buff.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated bonus. Zero for a buff without a Max HP component.</returns>
-        public int GetBuffMaxHealthBonus(int skillLevel)
-        {
-            return buffMaxHealthPerLevel * skillLevel;
-        }
-
-        /// <summary>
-        /// Calculates how long, in seconds, this buff/debuff lasts once
-        /// applied at the given level. Only meaningful when
-        /// <see cref="EffectType"/> is Buff.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated duration in seconds.</returns>
-        public float GetBuffDuration(int skillLevel)
-        {
-            return buffDurationSeconds + buffDurationPerLevel * skillLevel;
-        }
-
-        /// <summary>
         /// Calculates how long, in seconds, this Zone skill's spawned zone
         /// lasts before despawning at the given level. Only meaningful when
         /// <see cref="EffectType"/> is Zone.
@@ -903,46 +722,6 @@ namespace Project.Skills
             }
 
             return stunChancePerAugmentedLevel * (augmentedSkillLevel - firstLevel + 1);
-        }
-
-        /// <summary>
-        /// Calculates the HP this passive restores on each skill-regen tick
-        /// at the given level: a flat amount plus a fraction of max HP, both
-        /// scaling with level (e.g. Increase HP Recovery). Summed across
-        /// every learned regen passive by the player's passive-skill
-        /// controller. Only meaningful when <see cref="EffectType"/> is Passive.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <param name="maxHealth">The player's current max HP.</param>
-        /// <returns>The HP restored per tick. Zero for a passive without a regen component.</returns>
-        public float GetPassiveRegenAmount(int skillLevel, int maxHealth)
-        {
-            return (passiveRegenFlatPerLevel + passiveRegenPercentOfMaxHealthPerLevel * maxHealth) * skillLevel;
-        }
-
-        /// <summary>
-        /// Calculates this passive's bonus to the HP restored by healing
-        /// items at the given level (e.g. 0.3 for Increase HP Recovery at
-        /// level 3, a +30% bonus). Only meaningful when
-        /// <see cref="EffectType"/> is Passive.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated bonus. Zero for a passive without one.</returns>
-        public float GetPassiveHealItemBonus(int skillLevel)
-        {
-            return passiveHealItemBonusPerLevel * skillLevel;
-        }
-
-        /// <summary>
-        /// Calculates this passive's bonus to natural SP regen at the given
-        /// level (e.g. 0.4 for Increase SP Recovery at level 2, a +40%
-        /// bonus) applied to the natural SP regen tick. Only meaningful when <see cref="EffectType"/> is Passive.
-        /// </summary>
-        /// <param name="skillLevel">The skill's current level (1 or higher).</param>
-        /// <returns>The calculated bonus. Zero for a passive without an SP regen component.</returns>
-        public float GetPassiveSpRegenBonus(int skillLevel)
-        {
-            return passiveSpRegenMultiplierPerLevel * skillLevel;
         }
 
         /// <summary>

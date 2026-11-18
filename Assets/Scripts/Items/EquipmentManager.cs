@@ -26,7 +26,6 @@ namespace Project.Items
     public class EquipmentManager : MonoBehaviour, ISaveParticipant
     {
         private const int AccessoryCapacity = 2;
-        private const int SlotCount = 9;
 
         [SerializeField] private PlayerInventory inventory;
         [SerializeField] private MonoBehaviour playerStatsSource;
@@ -268,51 +267,14 @@ namespace Project.Items
         }
 
         /// <summary>
-        /// Decides which slot(s) an item should occupy when equipped, and
-        /// whether equipping it should also evict whatever's in the off
-        /// hand. Most items (armor, two-handed weapons) just use their
-        /// authored required slots. A one-handed weapon (authored as Left
-        /// Hand) is special-cased: it goes to whichever hand is free,
-        /// landing in the off hand (Right Hand) only if both it and
-        /// whatever's already in the main hand are flagged
-        /// <see cref="ItemDefinition.CanBeOffHand"/>. Replacing the
-        /// main-hand weapon with one that can't validly dual-wield with
-        /// the current off-hand weapon also evicts that off-hand weapon,
-        /// since an off-hand weapon can only stay paired with another
-        /// off-hand-capable weapon.
+        /// Decides which slot(s) an item should occupy when equipped, using the hands' current contents.
         /// </summary>
         /// <param name="item">The item being equipped.</param>
         /// <param name="alsoEvictOffHand">Set to true if the current off-hand weapon must be evicted too.</param>
         /// <returns>The slot(s) the item should occupy.</returns>
         private IReadOnlyList<EquipmentSlot> ResolveTargetSlots(ItemDefinition item, out bool alsoEvictOffHand)
         {
-            alsoEvictOffHand = false;
-            var authoredSlots = item.RequiredSlots;
-            var isOneHandedWeapon = authoredSlots.Count == 1 && authoredSlots[0] == EquipmentSlot.LeftHand;
-
-            if (!isOneHandedWeapon)
-            {
-                return authoredSlots;
-            }
-
-            var mainHandItem = GetEquippedItems(EquipmentSlot.LeftHand).FirstOrDefault();
-            var offHandItem = GetEquippedItems(EquipmentSlot.RightHand).FirstOrDefault();
-
-            if (mainHandItem == null)
-            {
-                return new[] { EquipmentSlot.LeftHand };
-            }
-
-            var canDualWield = offHandItem == null && item.CanBeOffHand && mainHandItem.CanBeOffHand;
-
-            if (canDualWield)
-            {
-                return new[] { EquipmentSlot.RightHand };
-            }
-
-            alsoEvictOffHand = offHandItem != null && !(item.CanBeOffHand && offHandItem.CanBeOffHand);
-
-            return new[] { EquipmentSlot.LeftHand };
+            return EquipmentSlotResolver.Resolve(item, GetMainHandItem(), GetEquippedItems(EquipmentSlot.RightHand).FirstOrDefault(), out alsoEvictOffHand);
         }
 
         private static bool IsAmmo(ItemDefinition item)
@@ -377,13 +339,18 @@ namespace Project.Items
             AmmoCountChanged?.Invoke();
         }
 
+        private ItemDefinition GetMainHandItem()
+        {
+            return GetEquippedItems(EquipmentSlot.LeftHand).FirstOrDefault();
+        }
+
         /// <summary>
         /// Gets whether the currently equipped main-hand weapon is Ranged.
         /// False if unarmed or wielding a Melee weapon.
         /// </summary>
         public bool IsMainHandWeaponRanged()
         {
-            var mainHandWeapon = GetEquippedItems(EquipmentSlot.LeftHand).FirstOrDefault();
+            var mainHandWeapon = GetMainHandItem();
             return mainHandWeapon != null && mainHandWeapon.WeaponType == WeaponType.Ranged;
         }
 
@@ -397,7 +364,7 @@ namespace Project.Items
         /// </summary>
         public WeaponSubtype GetMainHandWeaponSubtype()
         {
-            var mainHandWeapon = GetEquippedItems(EquipmentSlot.LeftHand).FirstOrDefault();
+            var mainHandWeapon = GetMainHandItem();
             return mainHandWeapon != null ? mainHandWeapon.WeaponSubtype : WeaponSubtype.Unarmed;
         }
 
@@ -408,7 +375,7 @@ namespace Project.Items
         /// <returns>The main-hand weapon's attack power.</returns>
         public int GetMainHandWeaponAttack()
         {
-            var mainHandWeapon = GetEquippedItems(EquipmentSlot.LeftHand).FirstOrDefault();
+            var mainHandWeapon = GetMainHandItem();
             return mainHandWeapon != null ? mainHandWeapon.WeaponAttack : 0;
         }
 
@@ -419,7 +386,7 @@ namespace Project.Items
         /// <returns>The main-hand weapon's magic attack.</returns>
         public int GetMainHandWeaponMagicAttack()
         {
-            var mainHandWeapon = GetEquippedItems(EquipmentSlot.LeftHand).FirstOrDefault();
+            var mainHandWeapon = GetMainHandItem();
             return mainHandWeapon != null ? mainHandWeapon.WeaponMagicAttack : 0;
         }
 
@@ -430,7 +397,7 @@ namespace Project.Items
         /// <returns>The main-hand weapon's magic defense.</returns>
         public int GetMainHandWeaponMagicDefense()
         {
-            var mainHandWeapon = GetEquippedItems(EquipmentSlot.LeftHand).FirstOrDefault();
+            var mainHandWeapon = GetMainHandItem();
             return mainHandWeapon != null ? mainHandWeapon.WeaponMagicDefense : 0;
         }
 
@@ -441,7 +408,7 @@ namespace Project.Items
         /// <returns>The main-hand weapon's attack speed multiplier.</returns>
         public float GetMainHandAttackSpeedMultiplier()
         {
-            var mainHandWeapon = GetEquippedItems(EquipmentSlot.LeftHand).FirstOrDefault();
+            var mainHandWeapon = GetMainHandItem();
             return mainHandWeapon != null ? mainHandWeapon.AttackSpeedMultiplier : 1f;
         }
 
@@ -509,7 +476,7 @@ namespace Project.Items
             foreach (var record in equippedRecords)
             {
                 data.equippedItemIds.Add(itemDatabase.GetId(record.Item));
-                data.equippedSlotMasks.Add(ToSlotMask(record.OccupiedSlots));
+                data.equippedSlotMasks.Add(EquipmentSlotMask.ToMask(record.OccupiedSlots));
             }
         }
 
@@ -530,7 +497,7 @@ namespace Project.Items
                         continue;
                     }
 
-                    var occupiedSlots = FromSlotMask(data.equippedSlotMasks[i]);
+                    var occupiedSlots = EquipmentSlotMask.FromMask(data.equippedSlotMasks[i]);
                     equippedRecords.Add(new EquippedRecord(item, occupiedSlots));
 
                     // Mirrors the reservation TryEquipFromInventory/EquipAmmo would
@@ -547,33 +514,6 @@ namespace Project.Items
 
             EquipmentChanged?.Invoke();
             AmmoCountChanged?.Invoke();
-        }
-
-        private static int ToSlotMask(IReadOnlyList<EquipmentSlot> slots)
-        {
-            var mask = 0;
-
-            foreach (var slot in slots)
-            {
-                mask |= 1 << (int)slot;
-            }
-
-            return mask;
-        }
-
-        private static IReadOnlyList<EquipmentSlot> FromSlotMask(int mask)
-        {
-            var slots = new List<EquipmentSlot>();
-
-            for (var bit = 0; bit < SlotCount; bit++)
-            {
-                if ((mask & (1 << bit)) != 0)
-                {
-                    slots.Add((EquipmentSlot)bit);
-                }
-            }
-
-            return slots;
         }
 
         private class EquippedRecord

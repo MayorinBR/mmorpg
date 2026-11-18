@@ -56,21 +56,6 @@ namespace Project.Character.Combat
         // before this was researched.
         private const int RealRagnarokStartingStatPoints = 48;
 
-        // Real Ragnarok Online per-point bonus: max HP/SP scale up by 1%
-        // for every point of VIT/INT respectively (source: iRO Wiki
-        // Classic — Stats, consulted September 2026).
-        private const float MaxHealthBonusPerVit = 0.01f;
-        private const float MaxManaBonusPerInt = 0.01f;
-        private const float CastTimeReductionDivisor = 530f;
-
-        // Real Ragnarok Online formula (source: ragnarokjobguides.blogspot.com
-        // "How stats affect statuses", consulted September 2026): VIT+3 = %
-        // resist chance against Stun/Poison/Silence/Bleeding, with immunity
-        // around 97 VIT. Applied here to all six StatusEffectType values as
-        // a deliberate simplification — see StatusEffectController's own
-        // RollResisted ponytail note for why.
-        private const int VitStatusResistOffset = 3;
-
         // Used only if statsHolder (or its Stats asset) isn't wired, so a
         // missing reference degrades gracefully instead of throwing.
         // Matches CharacterStatsDefinition.BaseAttackSpeed's own default.
@@ -111,6 +96,8 @@ namespace Project.Character.Combat
         private SubStats cachedSubStats;
         private int cachedSubStatsFrame = -1;
         private int baseLevel;
+
+        private PassiveStatBonuses Passives => new PassiveStatBonuses(passiveSkills, equipment);
 
         /// <summary>
         /// Raised whenever a stat point is spent, stats are reset, a save is
@@ -179,23 +166,8 @@ namespace Project.Character.Combat
         private SubStats ComputeSubStats()
         {
             EnsureInitialized();
-            var subStats = subStatsCalculator.Calculate(effectiveStats, BaseLevel, equipment != null && equipment.IsMainHandWeaponRanged(), GetBaseAttackSpeed());
-            var statusAtk = subStats.StatusAtk + GetPassiveAttackBonus() + GetWeaponAttack();
-            var statusMatk = subStats.StatusMatk + GetWeaponMagicAttack();
-            var statusMDef = subStats.StatusMDef + GetWeaponMagicDefense();
-            var hit = subStats.Hit + GetPassiveHitBonus();
-            var flee = subStats.Flee + GetPassiveFleeBonus();
-            var aspd = subStats.Aspd;
-
-            if (buffs != null)
-            {
-                statusAtk = Mathf.RoundToInt(statusAtk * buffs.AttackMultiplier);
-                aspd = Mathf.RoundToInt(aspd * buffs.AspdMultiplier);
-            }
-
-            return statusAtk == subStats.StatusAtk && statusMatk == subStats.StatusMatk && statusMDef == subStats.StatusMDef && hit == subStats.Hit && flee == subStats.Flee && aspd == subStats.Aspd
-                ? subStats
-                : new SubStats(statusAtk, statusMatk, subStats.StatusDef, statusMDef, hit, flee, subStats.CriticalRate, aspd);
+            var raw = subStatsCalculator.Calculate(effectiveStats, BaseLevel, equipment != null && equipment.IsMainHandWeaponRanged(), GetBaseAttackSpeed());
+            return SubStatsAdjuster.Apply(raw, equipment, Passives, buffs);
         }
 
         /// <summary>
@@ -300,7 +272,7 @@ namespace Project.Character.Combat
 
             if (passiveSkills != null && equipment != null)
             {
-                effectiveStats = new JobBonusStatsView(effectiveStats, () => new StatModifiers(0, 0, 0, 0, GetPassiveDexBonus(), 0));
+                effectiveStats = new JobBonusStatsView(effectiveStats, () => new StatModifiers(0, 0, 0, 0, Passives.DexBonus, 0));
             }
 
             if (equipment != null)
@@ -429,7 +401,7 @@ namespace Project.Character.Combat
                 return;
             }
 
-            inventory.Items.RefreshWeightCapacityBonus(passiveSkills != null ? passiveSkills.GetWeightLimitBonus() * carryWeightScale : 0f);
+            inventory.Items.RefreshWeightCapacityBonus(Passives.WeightLimitBonus * carryWeightScale);
             inventory.Items.SetBaseMaxCarryWeight(GetBaseCarryWeight());
         }
 
@@ -457,95 +429,6 @@ namespace Project.Character.Combat
         }
 
         /// <summary>
-        /// Reads the flat Status ATK bonus from learned passive skills
-        /// (see <see cref="PlayerPassiveSkillController"/>) that apply to
-        /// the currently equipped main-hand weapon. Zero if either
-        /// <see cref="passiveSkills"/> or <see cref="equipment"/> isn't wired.
-        /// </summary>
-        private int GetPassiveAttackBonus()
-        {
-            if (passiveSkills == null || equipment == null)
-            {
-                return 0;
-            }
-
-            return passiveSkills.GetAttackBonus(equipment.GetMainHandWeaponSubtype());
-        }
-
-        /// <summary>
-        /// Reads the own attack power of the equipped main-hand weapon. Zero if <see cref="equipment"/> isn't wired.
-        /// </summary>
-        private int GetWeaponAttack()
-        {
-            return equipment != null ? equipment.GetMainHandWeaponAttack() : 0;
-        }
-
-        /// <summary>
-        /// Reads the own magic attack of the equipped main-hand weapon. Zero if <see cref="equipment"/> isn't wired.
-        /// </summary>
-        private int GetWeaponMagicAttack()
-        {
-            return equipment != null ? equipment.GetMainHandWeaponMagicAttack() : 0;
-        }
-
-        /// <summary>
-        /// Reads the own magic defense of the equipped main-hand weapon. Zero if <see cref="equipment"/> isn't wired.
-        /// </summary>
-        private int GetWeaponMagicDefense()
-        {
-            return equipment != null ? equipment.GetMainHandWeaponMagicDefense() : 0;
-        }
-
-        /// <summary>
-        /// Reads the flat DEX bonus from learned passive skills (e.g. Owl's
-        /// Eye) that apply to the currently equipped main-hand weapon.
-        /// Zero if either <see cref="passiveSkills"/> or <see cref="equipment"/>
-        /// isn't wired.
-        /// </summary>
-        private int GetPassiveDexBonus()
-        {
-            if (passiveSkills == null || equipment == null)
-            {
-                return 0;
-            }
-
-            return passiveSkills.GetDexBonus(equipment.GetMainHandWeaponSubtype());
-        }
-
-        /// <summary>
-        /// Reads the flat Hit bonus from learned passive skills (e.g.
-        /// Vulture's Eye) that apply to the currently equipped main-hand
-        /// weapon. Zero if either <see cref="passiveSkills"/> or
-        /// <see cref="equipment"/> isn't wired.
-        /// </summary>
-        private int GetPassiveHitBonus()
-        {
-            if (passiveSkills == null || equipment == null)
-            {
-                return 0;
-            }
-
-            return passiveSkills.GetHitBonus(equipment.GetMainHandWeaponSubtype());
-        }
-
-        /// <summary>
-        /// Reads the flat Flee bonus from learned passive skills (e.g.
-        /// Improve Dodge). Zero if <see cref="passiveSkills"/> isn't wired
-        /// — unlike the other passive bonuses, this one isn't weapon-gated,
-        /// but still routes through <see cref="PlayerPassiveSkillController"/>
-        /// for a consistent single place that sums learned passives.
-        /// </summary>
-        private int GetPassiveFleeBonus()
-        {
-            if (passiveSkills == null)
-            {
-                return 0;
-            }
-
-            return passiveSkills.GetFleeBonus(equipment != null ? equipment.GetMainHandWeaponSubtype() : WeaponSubtype.Unarmed);
-        }
-
-        /// <summary>
         /// Gets the flat attack range bonus, in meters, granted by learned
         /// passive skills (e.g. Vulture's Eye) for the currently equipped
         /// main-hand weapon. Read by
@@ -555,12 +438,7 @@ namespace Project.Character.Combat
         /// <returns>The calculated range bonus, zero if no passive applies.</returns>
         public float GetPassiveRangeBonus()
         {
-            if (passiveSkills == null || equipment == null)
-            {
-                return 0f;
-            }
-
-            return passiveSkills.GetRangeBonus(equipment.GetMainHandWeaponSubtype());
+            return Passives.RangeBonus;
         }
 
         /// <summary>
@@ -582,7 +460,7 @@ namespace Project.Character.Combat
         public int GetMaxHealthBonus(int baseMaxHealth)
         {
             EnsureInitialized();
-            var bonus = Mathf.RoundToInt(baseMaxHealth * effectiveStats.GetValue(StatType.Vitality) * MaxHealthBonusPerVit);
+            var bonus = DerivedStatFormulas.MaxHealthBonus(baseMaxHealth, effectiveStats.GetValue(StatType.Vitality));
             return buffs != null ? bonus + buffs.MaxHealthBonus : bonus;
         }
 
@@ -590,7 +468,7 @@ namespace Project.Character.Combat
         public int GetMaxManaBonus(int baseMaxMana)
         {
             EnsureInitialized();
-            return Mathf.RoundToInt(baseMaxMana * effectiveStats.GetValue(StatType.Intelligence) * MaxManaBonusPerInt);
+            return DerivedStatFormulas.MaxManaBonus(baseMaxMana, effectiveStats.GetValue(StatType.Intelligence));
         }
 
         /// <summary>
@@ -601,8 +479,7 @@ namespace Project.Character.Combat
         public float GetCastTimeMultiplier()
         {
             EnsureInitialized();
-            var reduction = (effectiveStats.GetValue(StatType.Dexterity) * 2 + effectiveStats.GetValue(StatType.Intelligence)) / CastTimeReductionDivisor;
-            return Mathf.Clamp01(1f - reduction);
+            return DerivedStatFormulas.CastTimeMultiplier(effectiveStats.GetValue(StatType.Dexterity), effectiveStats.GetValue(StatType.Intelligence));
         }
 
         /// <inheritdoc />
@@ -629,14 +506,14 @@ namespace Project.Character.Combat
         /// <inheritdoc />
         public int GetRaceDefenseBonus(MonsterRace attackerRace)
         {
-            return passiveSkills != null ? passiveSkills.GetRaceDefenseBonus(attackerRace) : 0;
+            return Passives.GetRaceDefenseBonus(attackerRace);
         }
 
         /// <inheritdoc />
         public float GetStatusResistChance()
         {
             EnsureInitialized();
-            return Mathf.Clamp01((effectiveStats.GetValue(StatType.Vitality) + VitStatusResistOffset) / 100f);
+            return DerivedStatFormulas.StatusResistChance(effectiveStats.GetValue(StatType.Vitality));
         }
 
         /// <summary>
@@ -652,20 +529,24 @@ namespace Project.Character.Combat
         /// <param name="targetRace">The race of the target being hit.</param>
         public int GetRaceDamageBonus(MonsterRace targetRace)
         {
-            return passiveSkills != null ? passiveSkills.GetRaceDamageBonus(targetRace) : 0;
+            return Passives.GetRaceDamageBonus(targetRace);
+        }
+
+        /// <summary>
+        /// Gets the chance, from 0 to 1, that a basic attack with the equipped main-hand weapon deals double damage, from
+        /// learned passives such as Double Attack. Zero if <see cref="passiveSkills"/> or <see cref="equipment"/> isn't wired.
+        /// </summary>
+        /// <returns>The double damage chance.</returns>
+        public float GetDoubleAttackChance()
+        {
+            return Passives.DoubleAttackChance;
         }
 
         /// <inheritdoc />
         public void CaptureState(PlayerSaveData data)
         {
             EnsureInitialized();
-            data.strength = baseStats.GetValue(StatType.Strength);
-            data.agility = baseStats.GetValue(StatType.Agility);
-            data.vitality = baseStats.GetValue(StatType.Vitality);
-            data.intelligence = baseStats.GetValue(StatType.Intelligence);
-            data.dexterity = baseStats.GetValue(StatType.Dexterity);
-            data.luck = baseStats.GetValue(StatType.Luck);
-            data.availableStatPoints = baseStats.AvailablePoints;
+            PlayerStatsSaveMapper.Capture(baseStats, data);
             data.currentHealth = health != null ? health.CurrentHealth : -1;
             data.currentMana = mana != null ? mana.CurrentMana : -1;
         }
@@ -686,13 +567,7 @@ namespace Project.Character.Combat
         public void RestoreState(PlayerSaveData data)
         {
             EnsureInitialized();
-            baseStats.SetValue(StatType.Strength, data.strength);
-            baseStats.SetValue(StatType.Agility, data.agility);
-            baseStats.SetValue(StatType.Vitality, data.vitality);
-            baseStats.SetValue(StatType.Intelligence, data.intelligence);
-            baseStats.SetValue(StatType.Dexterity, data.dexterity);
-            baseStats.SetValue(StatType.Luck, data.luck);
-            baseStats.SetAvailablePoints(data.availableStatPoints);
+            PlayerStatsSaveMapper.Restore(baseStats, data);
 
             health?.ResetHealth();
             mana?.ResetMana();
