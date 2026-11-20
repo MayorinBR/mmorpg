@@ -27,14 +27,20 @@ namespace Project.Ambience
         /// <inheritdoc />
         public bool IsLit { get; private set; }
 
+        private bool driven;
+
         private void Awake()
         {
-            SetLit(litOnStart);
+            if (!driven)
+            {
+                SetLit(litOnStart);
+            }
         }
 
         /// <inheritdoc />
         public void SetLit(bool lit)
         {
+            driven = true;
             IsLit = lit;
 
             if (pane != null)

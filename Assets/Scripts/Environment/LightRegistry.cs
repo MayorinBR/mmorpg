@@ -16,15 +16,19 @@ namespace Project.Ambience
         public static IReadOnlyList<ILightSwitchable> All => Sources;
 
         /// <summary>
-        /// Registers a source. Registering the same source twice has no effect.
+        /// Registers a source and sets it to the state matching the current period, so lights of a map that
+        /// loads at night start lit. Registering the same source twice has no effect.
         /// </summary>
         /// <param name="source">The source to register.</param>
         public static void Register(ILightSwitchable source)
         {
-            if (!Sources.Contains(source))
+            if (Sources.Contains(source))
             {
-                Sources.Add(source);
+                return;
             }
+
+            Sources.Add(source);
+            source.SetLit(WorldClock.IsNight);
         }
 
         /// <summary>
@@ -45,6 +49,19 @@ namespace Project.Ambience
             for (var i = 0; i < Sources.Count; i++)
             {
                 Sources[i].SetLit(lit);
+            }
+        }
+
+        /// <summary>
+        /// Moves every registered source to the lit or unlit state as a dusk or dawn transition, letting
+        /// each source spread the change over time.
+        /// </summary>
+        /// <param name="lit">True for dusk, when sources light up; false for dawn.</param>
+        public static void TransitionAll(bool lit)
+        {
+            for (var i = 0; i < Sources.Count; i++)
+            {
+                Sources[i].TransitionTo(lit);
             }
         }
 

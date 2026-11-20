@@ -18,7 +18,11 @@ namespace Project.Ambience
         [Tooltip("Seed of the lighting pattern. Zero derives the seed from the building position.")]
         [SerializeField] private int seed;
 
+        [Tooltip("Longest random wait, in seconds, before this building switches at dusk or dawn, so the town does not change all at once.")]
+        [SerializeField, Min(0f)] private float transitionSpreadSeconds = 240f;
+
         private int[] order;
+        private Coroutine pendingTransition;
 
         /// <inheritdoc />
         public bool IsLit { get; private set; }
@@ -46,7 +50,35 @@ namespace Project.Ambience
         /// <inheritdoc />
         public void SetLit(bool lit)
         {
+            CancelPendingTransition();
             SetLitRatio(lit ? litRatio : 0f);
+        }
+
+        /// <summary>
+        /// Switches the building after a random wait of up to the configured spread, so neighbouring houses
+        /// light up and go dark at different moments.
+        /// </summary>
+        /// <param name="lit">True at dusk, when windows light up; false at dawn.</param>
+        public void TransitionTo(bool lit)
+        {
+            CancelPendingTransition();
+            pendingTransition = StartCoroutine(SwitchAfterDelay(lit, Random.value * transitionSpreadSeconds));
+        }
+
+        private System.Collections.IEnumerator SwitchAfterDelay(bool lit, float delaySeconds)
+        {
+            yield return new WaitForSeconds(delaySeconds);
+            pendingTransition = null;
+            SetLitRatio(lit ? litRatio : 0f);
+        }
+
+        private void CancelPendingTransition()
+        {
+            if (pendingTransition != null)
+            {
+                StopCoroutine(pendingTransition);
+                pendingTransition = null;
+            }
         }
 
         /// <summary>

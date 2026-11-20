@@ -38,6 +38,17 @@ namespace Project.AI.Tests
             Assert.AreEqual(expected, SpawnRules.ShouldSpawnBoss(chance, roll, spawned, max));
         }
 
+        [TestCase(SpawnPeriod.Always, false, true)]
+        [TestCase(SpawnPeriod.Always, true, true)]
+        [TestCase(SpawnPeriod.Day, false, true)]
+        [TestCase(SpawnPeriod.Day, true, false)]
+        [TestCase(SpawnPeriod.Night, false, false)]
+        [TestCase(SpawnPeriod.Night, true, true)]
+        public void IsAllowed_MatchesPeriodOfTheEntry(SpawnPeriod period, bool isNight, bool expected)
+        {
+            Assert.AreEqual(expected, SpawnRules.IsAllowed(period, isNight));
+        }
+
         [Test]
         public void StableHash_SameTextGivesSameValue_DifferentTextDiffers()
         {

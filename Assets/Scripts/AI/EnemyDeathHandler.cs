@@ -45,6 +45,12 @@ namespace Project.AI
         /// <summary>Raised whenever this enemy starts waiting to respawn, including when a dead enemy is restored after a map switch.</summary>
         public event System.Action<EnemyDeathHandler> RespawnScheduled;
 
+        /// <summary>Gets a value indicating whether this enemy is currently alive rather than waiting to respawn.</summary>
+        public bool IsAlive => isCurrentlyAlive;
+
+        /// <summary>Gets the <see cref="Time.time"/> at which a dead enemy returns; only meaningful while it is dead.</summary>
+        public float RespawnAtTime => pendingRespawnAtTime;
+
         /// <summary>Gets or sets how long this enemy stays dead before respawning.</summary>
         public float RespawnDelaySeconds
         {

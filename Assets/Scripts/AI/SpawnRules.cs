@@ -69,6 +69,25 @@ namespace Project.AI
         }
 
         /// <summary>
+        /// Decides whether a spawn table entry may appear in the current period of the day and night cycle.
+        /// </summary>
+        /// <param name="period">When the entry is allowed to spawn.</param>
+        /// <param name="isNight">True when it is currently night.</param>
+        /// <returns>True when the entry may spawn now.</returns>
+        public static bool IsAllowed(SpawnPeriod period, bool isNight)
+        {
+            switch (period)
+            {
+                case SpawnPeriod.Day:
+                    return !isNight;
+                case SpawnPeriod.Night:
+                    return isNight;
+                default:
+                    return true;
+            }
+        }
+
+        /// <summary>
         /// Computes a hash of a string that is stable across runs and platforms (FNV-1a), unlike
         /// <see cref="string.GetHashCode"/>.
         /// </summary>

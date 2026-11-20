@@ -15,5 +15,15 @@ namespace Project.Ambience
         /// </summary>
         /// <param name="lit">True to light the source, false to turn it off.</param>
         void SetLit(bool lit);
+
+        /// <summary>
+        /// Switches the source on or off as part of a dusk or dawn transition. Sources may spread the change
+        /// over time; by default the switch is immediate.
+        /// </summary>
+        /// <param name="lit">True to light the source, false to turn it off.</param>
+        void TransitionTo(bool lit)
+        {
+            SetLit(lit);
+        }
     }
 }
