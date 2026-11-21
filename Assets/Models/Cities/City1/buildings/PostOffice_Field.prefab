@@ -1307,7 +1307,6 @@ GameObject:
   - component: {fileID: 152406158270923961}
   - component: {fileID: 1208318377281583372}
   - component: {fileID: 7827710223051340312}
-  - component: {fileID: 2819273723496048370}
   - component: {fileID: 5817437003648483072}
   m_Layer: 0
   m_Name: PostOffice_Field
@@ -1402,27 +1401,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &2819273723496048370
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4703875153359100969}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 7.666564, y: 11.1648, z: 7.623282}
-  m_Center: {x: 0, y: 5.5824, z: 0.47835898}
 --- !u!114 &5817437003648483072
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1461,6 +1439,7 @@ MonoBehaviour:
   - {fileID: 3097664797314732747}
   litRatio: 0.7
   seed: 0
+  transitionSpreadSeconds: 240
 --- !u!1 &5569366664216025595
 GameObject:
   m_ObjectHideFlags: 0

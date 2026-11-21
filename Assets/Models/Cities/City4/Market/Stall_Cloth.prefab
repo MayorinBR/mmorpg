@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2523699426621412708}
   - component: {fileID: 4198503044943934817}
   - component: {fileID: 6526933138541520472}
-  - component: {fileID: 2414759900044555897}
   m_Layer: 0
   m_Name: Stall_Cloth
   m_TagString: Untagged
@@ -41,7 +40,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4592774651660482918}
-  m_Mesh: {fileID: -736486425634169823}
+  m_Mesh: {fileID: 3512752078980979710}
 --- !u!23 &6526933138541520472
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -70,7 +69,7 @@ MeshRenderer:
   - {fileID: 2100000, guid: 0ebb4c05b4299664b9e6205484f92889, type: 2}
   - {fileID: 2100000, guid: eca39675534ea5043a14eaae9534814c, type: 2}
   - {fileID: 2100000, guid: 5ce748f28e461f64198ef518d2d0c5b0, type: 2}
-  - {fileID: 2100000, guid: 0511ed0f81fbcc74486f55657dcb32f4, type: 2}
+  - {fileID: 2100000, guid: edb50dda0ac01ca438072e684f8b2762, type: 2}
   - {fileID: 2100000, guid: 33cdd3837873ad042a686c2ab013f0db, type: 2}
   - {fileID: 2100000, guid: 19d98bd2377888242895696eb7dc799d, type: 2}
   - {fileID: 2100000, guid: 87e6603ffb752b949a0ada51d12a83cd, type: 2}
@@ -97,28 +96,7 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &2414759900044555897
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4592774651660482918}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 3, y: 1.8, z: 2.4}
-  m_Center: {x: 0, y: 0.9, z: 0}
---- !u!43 &-736486425634169823
+--- !u!43 &3512752078980979710
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

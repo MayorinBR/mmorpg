@@ -108,7 +108,6 @@ GameObject:
   - component: {fileID: 1371502911234853999}
   - component: {fileID: 3630557456287725708}
   - component: {fileID: 686245330939203349}
-  - component: {fileID: 4252089368360227764}
   - component: {fileID: 4645845203447815886}
   m_Layer: 0
   m_Name: Lantern_Post_Iron
@@ -191,27 +190,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &4252089368360227764
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9136258189604843677}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.4, y: 3, z: 0.4}
-  m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!114 &4645845203447815886
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -226,6 +204,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
   lights: []
   alwaysOn: 1
+  nightRangeScale: 1.8
 --- !u!43 &-1790496594013406040
 Mesh:
   m_ObjectHideFlags: 0

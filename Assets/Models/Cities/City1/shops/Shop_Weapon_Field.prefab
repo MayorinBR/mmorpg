@@ -1955,7 +1955,6 @@ GameObject:
   - component: {fileID: 4549887283436684618}
   - component: {fileID: 4738274786700417267}
   - component: {fileID: 8780912407754354411}
-  - component: {fileID: 637138954302022441}
   - component: {fileID: 537128296874940483}
   m_Layer: 0
   m_Name: Shop_Weapon_Field
@@ -2051,27 +2050,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &637138954302022441
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8290687227111537010}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 10.059672, y: 8.36, z: 6.886506}
-  m_Center: {x: -1.1098361, y: 4.18, z: 0.40674686}
 --- !u!114 &537128296874940483
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2106,6 +2084,7 @@ MonoBehaviour:
   - {fileID: 4889796770331938217}
   litRatio: 0.7
   seed: 0
+  transitionSpreadSeconds: 240
 --- !u!1 &8844729153035538435
 GameObject:
   m_ObjectHideFlags: 0

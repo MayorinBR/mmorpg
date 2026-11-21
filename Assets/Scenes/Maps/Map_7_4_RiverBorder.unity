@@ -2348,12 +2348,15 @@ MonoBehaviour:
   - prefab: {fileID: 3451313833103779264, guid: c0c68f616fd30fb45b2eae62303b46ec, type: 3}
     weight: 3
     respawnDelaySeconds: 45
+    period: 0
   - prefab: {fileID: 3451313833103779264, guid: bc658bd42e415d34eae17c8fce6d10ac, type: 3}
     weight: 2
     respawnDelaySeconds: 45
+    period: 0
   - prefab: {fileID: 3451313833103779264, guid: 77844b3cbb7a0cc43a225029c01d4aa5, type: 3}
     weight: 2
     respawnDelaySeconds: 45
+    period: 0
   bossPrefab: {fileID: 0}
   bossRespawnDelaySeconds: 30
   bossChance: 0
@@ -4362,7 +4365,8 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 5
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2963331030066677007, guid: 469f245fcb2ebeb44bb11ef625ccf828, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

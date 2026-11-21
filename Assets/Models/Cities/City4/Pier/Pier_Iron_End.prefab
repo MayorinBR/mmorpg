@@ -108,7 +108,6 @@ GameObject:
   - component: {fileID: 3465353815601544757}
   - component: {fileID: 4264213385625488213}
   - component: {fileID: 5473847994714149922}
-  - component: {fileID: 624459842932609608}
   - component: {fileID: 4170672197560958833}
   m_Layer: 0
   m_Name: Pier_Iron_End
@@ -196,27 +195,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &624459842932609608
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9143251119885382122}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 3, y: 1, z: 4}
-  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!114 &4170672197560958833
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -231,6 +209,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
   lights: []
   alwaysOn: 0
+  nightRangeScale: 1.8
 --- !u!43 &1791534185082916787
 Mesh:
   m_ObjectHideFlags: 0

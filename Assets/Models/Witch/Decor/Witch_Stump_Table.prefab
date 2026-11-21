@@ -108,7 +108,6 @@ GameObject:
   - component: {fileID: 5146944747181631956}
   - component: {fileID: 909448586885200525}
   - component: {fileID: 8211246714286862018}
-  - component: {fileID: 4960618465279030195}
   - component: {fileID: 1373613472106961561}
   m_Layer: 0
   m_Name: Witch_Stump_Table
@@ -203,27 +202,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &4960618465279030195
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8459429448312579408}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.3, y: 1, z: 1.3}
-  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!114 &1373613472106961561
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -238,6 +216,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
   lights: []
   alwaysOn: 0
+  nightRangeScale: 1.8
 --- !u!43 &2041386832426746847
 Mesh:
   m_ObjectHideFlags: 0

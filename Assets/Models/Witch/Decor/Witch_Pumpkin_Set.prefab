@@ -108,7 +108,6 @@ GameObject:
   - component: {fileID: 1129262872686821525}
   - component: {fileID: 3003845103706541479}
   - component: {fileID: 4527971210827638580}
-  - component: {fileID: 2414495371791464349}
   - component: {fileID: 8918204086083816723}
   m_Layer: 0
   m_Name: Witch_Pumpkin_Set
@@ -195,27 +194,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &2414495371791464349
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5700644958398321826}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2, y: 0.9, z: 1.4}
-  m_Center: {x: 0.1, y: 0.45, z: 0.2}
 --- !u!114 &8918204086083816723
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -230,6 +208,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
   lights: []
   alwaysOn: 0
+  nightRangeScale: 1.8
 --- !u!43 &-3908516956464089533
 Mesh:
   m_ObjectHideFlags: 0

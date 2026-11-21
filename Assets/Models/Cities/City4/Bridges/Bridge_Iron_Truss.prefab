@@ -205,9 +205,6 @@ GameObject:
   - component: {fileID: 6530864389094056448}
   - component: {fileID: 5642913205498186058}
   - component: {fileID: 8082372492767024594}
-  - component: {fileID: 1046487870967597423}
-  - component: {fileID: 3465612479200881956}
-  - component: {fileID: 1094703781911037938}
   - component: {fileID: 3512959274322412615}
   m_Layer: 0
   m_Name: Bridge_Iron_Truss
@@ -294,69 +291,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &1046487870967597423
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6676825892858661536}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 3.6, y: 0.5, z: 10}
-  m_Center: {x: 0, y: -0.25, z: 0}
---- !u!65 &3465612479200881956
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6676825892858661536}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.3, y: 2.4, z: 10}
-  m_Center: {x: -1.75, y: 1.2, z: 0}
---- !u!65 &1094703781911037938
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6676825892858661536}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.3, y: 2.4, z: 10}
-  m_Center: {x: 1.75, y: 1.2, z: 0}
 --- !u!114 &3512959274322412615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -371,6 +305,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
   lights: []
   alwaysOn: 0
+  nightRangeScale: 1.8
 --- !u!43 &-82366311883049095
 Mesh:
   m_ObjectHideFlags: 0

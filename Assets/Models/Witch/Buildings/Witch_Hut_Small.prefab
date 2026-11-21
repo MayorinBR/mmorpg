@@ -108,10 +108,6 @@ GameObject:
   - component: {fileID: 7862833253690155550}
   - component: {fileID: 1769336659211192910}
   - component: {fileID: 3059394368091862517}
-  - component: {fileID: 2169131798401923607}
-  - component: {fileID: 2487027283622346832}
-  - component: {fileID: 7328616630584600816}
-  - component: {fileID: 1021849106433840780}
   - component: {fileID: 4079236110201488448}
   m_Layer: 0
   m_Name: Witch_Hut_Small
@@ -200,90 +196,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &2169131798401923607
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4213271378315007640}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.3499999, y: 0.9187501, z: 0.41250002}
-  m_Center: {x: 0, y: 0.45937505, z: 2.4375}
---- !u!65 &2487027283622346832
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4213271378315007640}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.3499999, y: 0.6125001, z: 0.41250002}
-  m_Center: {x: 0, y: 0.30625004, z: 2.85}
---- !u!65 &7328616630584600816
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4213271378315007640}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.3499999, y: 0.30625004, z: 0.41250002}
-  m_Center: {x: 0, y: 0.15312502, z: 3.2624998}
---- !u!65 &1021849106433840780
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4213271378315007640}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 3.75, y: 3.625, z: 3.75}
-  m_Center: {x: 0, y: 1.8125, z: 0}
 --- !u!114 &4079236110201488448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -298,6 +210,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
   lights: []
   alwaysOn: 0
+  nightRangeScale: 1.8
 --- !u!43 &-4130883237373594310
 Mesh:
   m_ObjectHideFlags: 0

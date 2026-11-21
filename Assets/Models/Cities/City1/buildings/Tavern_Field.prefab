@@ -1262,7 +1262,6 @@ GameObject:
   - component: {fileID: 3748600642920700132}
   - component: {fileID: 829549143105171142}
   - component: {fileID: 8627772836186236485}
-  - component: {fileID: 3278832166871526995}
   - component: {fileID: 5239514948138386241}
   m_Layer: 0
   m_Name: Tavern_Field
@@ -1356,27 +1355,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &3278832166871526995
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4551249417478671366}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 14.629601, y: 9.16, z: 10.603549}
-  m_Center: {x: -1.1851997, y: 4.58, z: 0.9682255}
 --- !u!114 &5239514948138386241
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1424,6 +1402,7 @@ MonoBehaviour:
   - {fileID: 2534525725684439367}
   litRatio: 0.7
   seed: 0
+  transitionSpreadSeconds: 240
 --- !u!1 &4682859025060428882
 GameObject:
   m_ObjectHideFlags: 0

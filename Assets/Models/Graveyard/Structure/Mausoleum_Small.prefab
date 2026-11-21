@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 4738483174709668130}
   - component: {fileID: 6547697429152806453}
   - component: {fileID: 3728667746173987299}
-  - component: {fileID: 8799142039792488952}
   - component: {fileID: 1260037189388919635}
   m_Layer: 0
   m_Name: Mausoleum_Small
@@ -98,27 +97,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &8799142039792488952
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6116340674404521156}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 4.4, y: 3.8, z: 4.4}
-  m_Center: {x: 0, y: 1.9, z: 0}
 --- !u!114 &1260037189388919635
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133,6 +111,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
   lights: []
   alwaysOn: 0
+  nightRangeScale: 1.8
 --- !u!1 &9110711322808018610
 GameObject:
   m_ObjectHideFlags: 0

@@ -108,7 +108,6 @@ GameObject:
   - component: {fileID: 6296281657908921813}
   - component: {fileID: 3717946767420845920}
   - component: {fileID: 4415953745697268313}
-  - component: {fileID: 134369106803992009}
   - component: {fileID: 1125888203860472330}
   m_Layer: 0
   m_Name: Witch_Fireplace
@@ -197,27 +196,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &134369106803992009
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7550920339745140220}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 3, y: 2.4, z: 1}
-  m_Center: {x: 0, y: 1.2, z: 0}
 --- !u!114 &1125888203860472330
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -232,6 +210,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
   lights: []
   alwaysOn: 1
+  nightRangeScale: 1.8
 --- !u!43 &-2745000830144911148
 Mesh:
   m_ObjectHideFlags: 0

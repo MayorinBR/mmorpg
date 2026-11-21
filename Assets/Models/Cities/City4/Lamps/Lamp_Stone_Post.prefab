@@ -108,7 +108,6 @@ GameObject:
   - component: {fileID: 3536188984151190989}
   - component: {fileID: 7411088788256475495}
   - component: {fileID: 1683217775366324165}
-  - component: {fileID: 2409057648347539217}
   - component: {fileID: 4938417156791950497}
   m_Layer: 0
   m_Name: Lamp_Stone_Post
@@ -194,27 +193,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &2409057648347539217
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4563125762361748741}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.9, y: 2, z: 0.9}
-  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &4938417156791950497
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -229,6 +207,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
   lights: []
   alwaysOn: 1
+  nightRangeScale: 1.8
 --- !u!43 &5459997682418850422
 Mesh:
   m_ObjectHideFlags: 0

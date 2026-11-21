@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 5104608164986899023}
   - component: {fileID: 8195573185074542395}
   - component: {fileID: 3750759462121550631}
-  - component: {fileID: 6064865373983892285}
   - component: {fileID: 3203427130648065472}
   m_Layer: 0
   m_Name: Mine_Support_Frame
@@ -96,27 +95,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &6064865373983892285
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5688908860064343251}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 3.2, y: 3.2, z: 2.33}
-  m_Center: {x: 0, y: 1.6, z: -1}
 --- !u!114 &3203427130648065472
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131,6 +109,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Project.Environment::Project.Ambience.LightPoint
   lights: []
   alwaysOn: 0
+  nightRangeScale: 1.8
 --- !u!1 &7839923888508153352
 GameObject:
   m_ObjectHideFlags: 0
