@@ -72,7 +72,7 @@ namespace Project.Character.Combat
         {
             var weapon = visuals.MainHandWeapon;
 
-            if (weapon == null || poses == null || !poses.IsDefined || offHandWeight <= 0f)
+            if (weapon == null || !weapon.gameObject.activeInHierarchy || poses == null || !poses.IsDefined || offHandWeight <= 0f)
             {
                 worldPosition = Vector3.zero;
                 weight = 0f;

@@ -20338,6 +20338,7 @@ GameObject:
   - component: {fileID: 7000000000000000005}
   - component: {fileID: 7000000000000000006}
   - component: {fileID: 7000000000000000007}
+  - component: {fileID: 7000000000000000008}
   m_Layer: 7
   m_Name: Meta
   m_TagString: Untagged
@@ -27906,6 +27907,50 @@ MonoBehaviour:
   modelRoot: {fileID: 543450651632539191}
   hiddenOpacity: 0.4
   fadeSpeed: 3
+--- !u!114 &7000000000000000008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1696850558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7078755ada32bb42b88d490a85194c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Character.Combat::Project.Character.Combat.PlayerIkController
+  genderController: {fileID: 1696850566}
+  targetSelector: {fileID: 401280844}
+  equipment: {fileID: 26099406}
+  lookAtEnabled: 1
+  lookAt:
+    headWeight: 1
+    bodyWeight: 0.2
+    aimBodyWeight: 0.5
+    clampWeight: 0.5
+    fullBelowAngle: 60
+    zeroAboveAngle: 120
+    fadeSpeed: 3
+    followSharpness: 8
+  lookTargetHeight: 1.2
+  bowHandEnabled: 1
+  equipmentVisuals: {fileID: 270351490}
+  bowHand:
+    gripOffset: {x: 0, y: 0, z: -0.15}
+    holdWeight: 1
+    fadeSpeed: 4
+  feetEnabled: 1
+  feet:
+    groundMask:
+      serializedVersion: 2
+      m_Bits: 64
+    rayStartHeight: 0.5
+    rayLength: 1.3
+    plantedWithin: 0.02
+    liftedAbove: 0.15
+    maxAdjust: 0.4
+    adjustSpeed: 3
+    hipsSpeed: 2
 --- !u!222 &7101010101010101010
 CanvasRenderer:
   m_ObjectHideFlags: 0
