@@ -56,6 +56,13 @@ Prototype of a 2.5D/3D MMORPG built in Unity, inspired by Ragnarok Online's clas
 - Active effects bar, Class Trial NPC with six class trials, and promotion that resets levels (evolved cap 99/99)
 - Region and desert maps connected by a 10x10 world map with a static minimap; enemy roster grown to 17 definitions (Spider, Beetle, Tarantula, Davidis, Skeleton Warrior, Alpha Wolf, Giant Spider, Demon Skeleton)
 - Weapon prefab rules (rods, bows, one-hand, two-hand) normalized to the socket scale; Rod, Bow and Book weapon sets and four arrow types
+- Acolyte and Thief kits complete: Acolyte follows the Ragnarok prerequisite tree (Heal, Blessing, Angelus, Pneuma, Warp Portal and more); Thief has dual wield, Double Attack, Steal (bosses are immune), Find Stone and Stone Fling. Fighter replaces Merchant as the sixth base class (its kit is still to be designed); a class hexagon defines the advancement and hybrid paths
+- Full 10x10 world built from one height field: 90 validated scenes with rivers, lakes, sea, coast, relief and texture blending, 83 land routes with portals and NavMesh, a castle garden and a waterfall with river flow
+- Cities with modular procedural kits: City4 is a multi-level mountain mining town with terrace stairs, supports, modular stalls and floors, rule-based population on three layers, banners, signs and a library in City1
+- Day and night cycle on a real UTC clock (1 h day, 1 h night) with a HUD clock, night-only light points, window lights and per-spawn periods (Always, Day, Night)
+- Chimney smoke with three levels (off, light vapour, heavy smoke) switchable per building
+- Performance pass: colliders nobody reads were removed (prefabs 1104 to 45, scenes about 1570 to 214) and City1 builds its NavMesh from render meshes
+- Large classes split into focused components (stats, combat, equipment, skill caster, skill definition) behind an EditMode test suite
 
 ---
 
@@ -111,6 +118,13 @@ Protótipo de um MMORPG 2.5D/3D feito em Unity, inspirado no gameplay clássico 
 - Barra de efeitos ativos, NPC de Trial de classe com seis provas e promocao que reseta niveis (limite 99/99)
 - Mapas de regiao e deserto ligados por um mapa-mundi 10x10 com minimapa estatico; 17 definicoes de inimigos (Spider, Beetle, Tarantula, Davidis, Skeleton Warrior, Alpha Wolf, Giant Spider, Demon Skeleton)
 - Regras de prefab de armas (rod, arco, uma mao, duas maos) normalizadas na escala do socket; armas Rod, Bow e Book e quatro tipos de flecha
+- Kits de Acolyte e Thief completos: Acolyte segue a arvore de pre-requisitos do Ragnarok (Heal, Blessing, Angelus, Pneuma, Warp Portal e mais); Thief tem dual wield, Double Attack, Steal (bosses sao imunes), Find Stone e Stone Fling. Fighter substitui o Merchant como sexta classe base (kit ainda a projetar); um hexagono de classes define as evolucoes e os hibridos
+- Mundo 10x10 completo a partir de um unico campo de altura: 90 cenas validadas com rios, lagos, mar, costa, relevo e mistura de texturas, 83 rotas terrestres com portais e NavMesh, jardim do castelo e cachoeira com fluxo de rio
+- Cidades com kits procedurais modulares: City4 e uma cidade mineradora de montanha em varios niveis com escadas em terraco, suportes, barracas e pisos modulares, populacao por regras em tres camadas, alem de banners, placas e uma biblioteca na City1
+- Ciclo de dia e noite com relogio UTC real (1 h de dia, 1 h de noite), relogio na HUD, luzes que acendem so a noite, luzes de janela e periodo por spawn (Always, Day, Night)
+- Fumaca de chamine com tres niveis (desligada, vapor leve, fumaca pesada) ajustavel por construcao
+- Passada de performance: colliders que ninguem le foram removidos (prefabs de 1104 para 45, cenas de cerca de 1570 para 214) e a City1 gera o NavMesh a partir dos meshes de renderizacao
+- Classes grandes divididas em componentes focados (status, combate, equipamento, skill caster, skill definition) sob uma suite de testes EditMode
 
 ---
 
@@ -166,3 +180,10 @@ Ragnarok Onlineのクラシックな戦闘(PvE)と探索のゲームプレイに
 - 有効効果バー、6つの職業試練を持つ試練NPC、レベルをリセットする転職(上限99/99)
 - 10x10のワールドマップと静的ミニマップで地域・砂漠マップを接続。敵定義は17種(Spider、Beetle、Tarantula、Davidis、Skeleton Warrior、Alpha Wolf、Giant Spider、Demon Skeleton)
 - 武器プレハブ規則(ロッド、弓、片手、両手)をソケットスケールに正規化。Rod、Bow、Book武器と4種類の矢
+- AcolyteとThiefのキットが完成: AcolyteはRagnarokの前提スキルツリー(Heal、Blessing、Angelus、Pneuma、Warp Portalなど)に準拠、Thiefは二刀流、Double Attack、Steal(ボスは無効)、Find Stone、Stone Flingを持つ。FighterがMerchantに代わる6番目の基本職となる(キットは設計中)。職業ヘキサゴン図で進化と複合職の経路を定義
+- 1つの高さフィールドから構築した10x10の完全なワールド: 河川・湖・海・海岸・地形とテクスチャのブレンドを備えた90の検証済みシーン、ポータルとNavMesh付きの陸路83本、城の庭園、河川の流れを持つ滝
+- モジュール式プロシージャルキットによる街: City4は多層構造の山岳鉱山町で、テラス階段、支柱、モジュール式の露店と床、3層のルールベース配置、バナーと看板を備え、City1には図書館がある
+- 実時間UTCに基づく昼夜サイクル(昼1時間、夜1時間)、HUD時計、夜だけ点灯するライト、窓の明かり、スポーン別の時間帯(Always、Day、Night)
+- 煙突の煙を3段階(なし、薄い蒸気、濃い煙)で建物ごとに切り替え可能
+- パフォーマンス改善: 参照されないコライダーを削除(プレハブ1104から45、シーン約1570から214)、City1はレンダーメッシュからNavMeshを生成
+- 大きなクラスを責務ごとのコンポーネント(ステータス、戦闘、装備、スキル発動、スキル定義)に分割し、EditModeテストで保護
