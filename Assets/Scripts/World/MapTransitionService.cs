@@ -57,6 +57,20 @@ namespace Project.World
             SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
         }
 
+#if UNITY_EDITOR
+        /// <summary>
+        /// Editor only. Loads a scene that is not in Build Settings, such as the test arena, and requests the
+        /// respawn point arrival like <see cref="WarpToRespawnPoint"/>.
+        /// </summary>
+        /// <param name="scenePath">Asset path of the destination scene.</param>
+        public static void WarpToRespawnPointFromPath(string scenePath)
+        {
+            PendingRespawn = true;
+            BeginLoading();
+            UnityEditor.SceneManagement.EditorSceneManager.LoadSceneInPlayMode(scenePath, new LoadSceneParameters(LoadSceneMode.Single));
+        }
+#endif
+
         /// <summary>
         /// Clears <see cref="PendingRespawn"/> and returns its previous value,
         /// so a stale request is never reapplied on a later scene load.

@@ -10,7 +10,8 @@ namespace Project.DebugTools
 {
     /// <summary>
     /// Debug overlay that teleports the player to any map scene under
-    /// <c>Scenes/Maps</c>, arriving at that map's default respawn point.
+    /// <c>Scenes/Maps</c>, arriving at that map's default respawn point. In the Editor it also lists the
+    /// scenes under <c>Scenes/Test</c>, which are not in Build Settings.
     /// Toggled with <see cref="ToggleKey"/> and only available in the Editor
     /// and development builds. Creates itself on startup, so no scene needs
     /// to reference it.
@@ -20,11 +21,13 @@ namespace Project.DebugTools
         private const Key ToggleKey = Key.F10;
         private const string MapsFolder = "/Maps/";
         private const string RetiredMapSuffix = "_OLD";
+        private const string TestScenesFolder = "Assets/Scenes/Test";
         private const float PanelWidth = 260f;
         private const float PanelMargin = 10f;
         private const float ButtonHeight = 26f;
 
         private readonly List<string> mapNames = new List<string>();
+        private readonly Dictionary<string, string> testScenePaths = new Dictionary<string, string>();
         private Vector2 scrollPosition;
         private bool visible;
 
@@ -103,7 +106,25 @@ namespace Project.DebugTools
             }
 
             mapNames.Sort();
+#if UNITY_EDITOR
+            AddTestScenes();
+#endif
         }
+
+#if UNITY_EDITOR
+        private void AddTestScenes()
+        {
+            testScenePaths.Clear();
+
+            foreach (var guid in UnityEditor.AssetDatabase.FindAssets("t:Scene", new[] { TestScenesFolder }))
+            {
+                var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                var name = Path.GetFileNameWithoutExtension(path);
+                testScenePaths[name] = path;
+                mapNames.Add(name);
+            }
+        }
+#endif
 
         /// <summary>
         /// Closes the menu and loads the chosen map with the player at its respawn point.
@@ -112,6 +133,13 @@ namespace Project.DebugTools
         private void Teleport(string mapName)
         {
             visible = false;
+#if UNITY_EDITOR
+            if (testScenePaths.TryGetValue(mapName, out var testScenePath))
+            {
+                MapTransitionService.WarpToRespawnPointFromPath(testScenePath);
+                return;
+            }
+#endif
             MapTransitionService.WarpToRespawnPoint(mapName);
         }
     }

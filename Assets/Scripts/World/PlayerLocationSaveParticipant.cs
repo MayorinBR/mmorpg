@@ -11,7 +11,8 @@ namespace Project.World
     /// its <c>MapDefinition</c>. The player object only exists in the first
     /// gameplay scene, so when the saved map is a different scene, restoring
     /// loads that scene through <see cref="MapTransitionService"/> and the
-    /// saved position is applied there once it has loaded.
+    /// saved position is applied there once it has loaded. A scene that is not in the build, such as the test arena,
+    /// is never saved and never replaced by the saved map.
     /// </summary>
     public class PlayerLocationSaveParticipant : MonoBehaviour, ISaveParticipant
     {
@@ -19,7 +20,7 @@ namespace Project.World
         public void CaptureState(PlayerSaveData data)
         {
             var sceneName = SceneManager.GetActiveScene().name;
-            if (sceneName == BootstrapLoader.SceneName)
+            if (sceneName == BootstrapLoader.SceneName || SceneManager.GetActiveScene().buildIndex < 0)
             {
                 return;
             }
@@ -43,7 +44,7 @@ namespace Project.World
         public void RestoreState(PlayerSaveData data)
         {
             var player = PersistentPlayerAnchor.Instance;
-            if (player == null || !data.hasSavedPosition || string.IsNullOrEmpty(data.currentMapId))
+            if (player == null || !data.hasSavedPosition || string.IsNullOrEmpty(data.currentMapId) || SceneManager.GetActiveScene().buildIndex < 0)
             {
                 return;
             }

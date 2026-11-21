@@ -9,7 +9,7 @@ namespace Project.Character.Combat
     /// <summary>
     /// Owns the player's inverse kinematics: the head and aim follow the selected target, the free hand
     /// meets the bow, and the feet follow steps and slopes. The passes run from an <see cref="AnimatorIkRelay"/> on the model, which is destroyed and
-    /// recreated on every gender swap, so this component attaches the relay again after each swap. The two-handed
+    /// recreated on every gender swap, so this component notices the new model and attaches the relay again. The two-handed
     /// weapon grip is handled separately by <see cref="OffHandGripIK"/>.
     /// </summary>
     public sealed class PlayerIkController : MonoBehaviour, ILookTargetSource
@@ -39,19 +39,14 @@ namespace Project.Character.Combat
             feet.GroundMask = LayerMask.GetMask("Ground");
         }
 
-        private void OnEnable()
-        {
-            genderController.GenderChanged += HandleGenderChanged;
-        }
+        private GameObject attachedGeometry;
 
-        private void OnDisable()
+        private void LateUpdate()
         {
-            genderController.GenderChanged -= HandleGenderChanged;
-        }
-
-        private void Start()
-        {
-            Attach();
+            if (genderController.CurrentGeometry != attachedGeometry)
+            {
+                Attach();
+            }
         }
 
         /// <inheritdoc />
@@ -69,14 +64,10 @@ namespace Project.Character.Combat
             return true;
         }
 
-        private void HandleGenderChanged(Stats.CharacterGender gender)
-        {
-            Attach();
-        }
-
         private void Attach()
         {
             var geometry = genderController.CurrentGeometry;
+            attachedGeometry = geometry;
             var animator = geometry != null ? geometry.GetComponentInChildren<Animator>() : null;
 
             if (animator == null)
