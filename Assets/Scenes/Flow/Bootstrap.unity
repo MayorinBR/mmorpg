@@ -4130,6 +4130,7 @@ GameObject:
   - component: {fileID: 1753397689}
   - component: {fileID: 1753397688}
   - component: {fileID: 1753397691}
+  - component: {fileID: 1753397692}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -21332,6 +21333,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Project.UI::Project.UI.GroundSkillPreviewUI
   areaPrefab: {fileID: 5408684023084988207, guid: 7a8acecf98400914db4b9b02b53a3f5d, type: 3}
+--- !u!114 &1753397692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 401280833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ee0d34df74f25448a45fa0220564ada, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Project.Character.Movement::Project.Character.Movement.MoveDestinationMarker
+  inputRouter: {fileID: 401280840}
+  movementController: {fileID: 401280838}
+  markerMaterial: {fileID: 2100000, guid: 4eec209cd1cf8f54187caf2f7387a8ad, type: 2}
+  ringRadius: 0.45
+  ringPulse: 0.08
+  arrowSize: 0.3
+  arrowHeight: 0.6
+  arrowBob: 0.12
+  arrowSpinDegreesPerSecond: 180
+  popDuration: 0.25
+  groundOffset: 0.05
 --- !u!1 &1787174242
 GameObject:
   m_ObjectHideFlags: 0

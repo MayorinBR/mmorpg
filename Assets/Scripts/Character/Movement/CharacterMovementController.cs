@@ -125,6 +125,37 @@ namespace Project.Character.Movement
         }
 
         /// <summary>
+        /// Gets whether the agent is still walking a path whose destination
+        /// lies within <paramref name="tolerance"/> of <paramref name="point"/>
+        /// on the horizontal plane. False once it arrives, the path is reset,
+        /// or another system sends it somewhere else.
+        /// </summary>
+        /// <param name="point">World-space point to compare with the agent's destination.</param>
+        /// <param name="tolerance">Maximum horizontal distance between the two, in world units.</param>
+        /// <returns>True while the agent is on its way to that point.</returns>
+        public bool IsHeadingTo(Vector3 point, float tolerance)
+        {
+            if (!agent.isOnNavMesh)
+            {
+                return false;
+            }
+
+            if (agent.pathPending)
+            {
+                return true;
+            }
+
+            if (!agent.hasPath || agent.remainingDistance <= agent.stoppingDistance)
+            {
+                return false;
+            }
+
+            var offset = agent.destination - point;
+            offset.y = 0f;
+            return offset.sqrMagnitude <= tolerance * tolerance;
+        }
+
+        /// <summary>
         /// Cancels any path currently in progress, typically called when
         /// another system (such as combat) needs to stop the character in place.
         /// </summary>

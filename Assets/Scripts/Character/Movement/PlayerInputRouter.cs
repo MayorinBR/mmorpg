@@ -34,6 +34,9 @@ namespace Project.Character.Movement
         /// <summary>Raised when the living enemy under the cursor changes, including to null.</summary>
         public event Action<Transform> HoveredEnemyChanged;
 
+        /// <summary>Raised with the clicked world point after a plain ground click sends the character walking there.</summary>
+        public event Action<Vector3> GroundClicked;
+
         private void Update()
         {
             isPointerOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
@@ -128,6 +131,7 @@ namespace Project.Character.Movement
             lootController.SetTarget(null);
             npcInteractionController.SetTarget(null);
             movementController.SetClickDestination(hit.point);
+            GroundClicked?.Invoke(hit.point);
         }
 
         /// <summary>
