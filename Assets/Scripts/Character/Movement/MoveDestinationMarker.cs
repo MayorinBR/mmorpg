@@ -18,6 +18,7 @@ namespace Project.Character.Movement
         private const float RingInnerRatio = 0.78f;
         private const float DestinationTolerance = 2.5f;
         private const float ArrowDropHeight = 1.2f;
+        private const int PathSettleFrames = 2;
 
         private static Mesh ringMesh;
         private static Mesh coneMesh;
@@ -54,6 +55,7 @@ namespace Project.Character.Movement
         private Transform arrow;
         private Vector3 destination;
         private float shownAt;
+        private int shownFrame;
 
         private void Awake()
         {
@@ -95,7 +97,9 @@ namespace Project.Character.Movement
                 return;
             }
 
-            if (!movementController.IsHeadingTo(destination, DestinationTolerance))
+            var pathSettled = Time.frameCount - shownFrame >= PathSettleFrames;
+
+            if (pathSettled && !movementController.IsHeadingTo(destination, DestinationTolerance))
             {
                 root.gameObject.SetActive(false);
                 return;
@@ -117,6 +121,7 @@ namespace Project.Character.Movement
         {
             destination = point;
             shownAt = Time.time;
+            shownFrame = Time.frameCount;
             root.position = point + Vector3.up * groundOffset;
             root.gameObject.SetActive(true);
             LateUpdate();

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using Project.Combat;
@@ -17,6 +18,11 @@ namespace Project.Character.Movement
     /// </summary>
     public class PlayerInputRouter : MonoBehaviour
     {
+        private const float NavMeshProbeStep = 0.25f;
+        private const float NavMeshProbeRadius = 0.3f;
+        private const float SameSurfaceTolerance = 0.5f;
+        private const float MaxNavMeshProbeDistance = 200f;
+
         [SerializeField] private CharacterMovementController movementController;
         [SerializeField] private PlayerTargetSelector targetSelector;
         [SerializeField] private PlayerLootController lootController;
@@ -106,22 +112,23 @@ namespace Project.Character.Movement
             var pointerPosition = Pointer.current.position.ReadValue();
             var ray = worldCamera.ScreenPointToRay(pointerPosition);
             var combinedMask = groundLayer | itemLayer | npcLayer;
+            var hasHit = Physics.Raycast(ray, out var hit, float.MaxValue, combinedMask);
 
-            if (!Physics.Raycast(ray, out var hit, float.MaxValue, combinedMask))
+            if (!TryResolveWalkPoint(ray, hasHit, hit, out var destination))
             {
                 return;
             }
 
             targetSelector.ClearTarget();
 
-            if (hit.collider.TryGetComponent(out NpcDialogueController npc))
+            if (hasHit && hit.collider.TryGetComponent(out NpcDialogueController npc))
             {
                 lootController.SetTarget(null);
                 npcInteractionController.SetTarget(npc);
                 return;
             }
 
-            if (hit.collider.TryGetComponent(out ItemPickup pickup))
+            if (hasHit && hit.collider.TryGetComponent(out ItemPickup pickup))
             {
                 npcInteractionController.SetTarget(null);
                 lootController.SetTarget(pickup);
@@ -130,8 +137,38 @@ namespace Project.Character.Movement
 
             lootController.SetTarget(null);
             npcInteractionController.SetTarget(null);
-            movementController.SetClickDestination(hit.point);
-            GroundClicked?.Invoke(hit.point);
+            movementController.SetClickDestination(destination);
+            GroundClicked?.Invoke(destination);
+        }
+
+        /// <summary>
+        /// Finds the first NavMesh surface the click ray passes through, so a bridge or pier baked into the
+        /// NavMesh wins over the ground beneath it, even without a collider and even when no ground lies
+        /// beneath it at all. Keeps the exact physics hit when the NavMesh point lies on the same surface.
+        /// </summary>
+        /// <param name="ray">The click ray from the camera.</param>
+        /// <param name="hasHit">Whether the ray hit a collider on the clickable layers.</param>
+        /// <param name="hit">The physics hit, valid only when <paramref name="hasHit"/> is true.</param>
+        /// <param name="point">The world point the character should walk to.</param>
+        /// <returns>False when the ray crosses no NavMesh and hits nothing.</returns>
+        private static bool TryResolveWalkPoint(Ray ray, bool hasHit, RaycastHit hit, out Vector3 point)
+        {
+            var maxDistance = hasHit ? hit.distance : MaxNavMeshProbeDistance;
+
+            for (var distance = 0f; distance <= maxDistance; distance += NavMeshProbeStep)
+            {
+                if (!NavMesh.SamplePosition(ray.GetPoint(distance), out var navHit, NavMeshProbeRadius, NavMesh.AllAreas))
+                {
+                    continue;
+                }
+
+                var sameSurface = hasHit && (navHit.position - hit.point).sqrMagnitude <= SameSurfaceTolerance * SameSurfaceTolerance;
+                point = sameSurface ? hit.point : navHit.position;
+                return true;
+            }
+
+            point = hit.point;
+            return hasHit;
         }
 
         /// <summary>
